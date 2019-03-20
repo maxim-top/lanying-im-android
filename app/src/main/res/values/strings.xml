@@ -1,0 +1,137 @@
+<resources>
+    <string name="app_name">MaxIM</string>
+
+    <!--Tab-->
+    <string name="tab_chat">对话</string>
+    <string name="tab_contact">联系人</string>
+    <string name="tab_mine">设置</string>
+
+    <!--Chat-->
+    <string name="block_message">MaxIM</string>
+    <string name="recent_chat">最近会话</string>
+    <string name="group">群组</string>
+    <string name="group_info">群详情(%s)</string>
+    <string name="choose_group_member">选择群成员</string>
+    <string name="group_member">群成员</string>
+    <string name="group_owner_id">群主ID</string>
+    <string name="group_manager">群管理</string>
+    <string name="group_rename">修改群名称</string>
+    <string name="group_manager_list">管理员列表</string>
+    <string name="group_name">群名称</string>
+    <string name="group_desc">群描述</string>
+    <string name="group_notice">群公告</string>
+    <string name="group_ext">群扩展信息</string>
+    <string name="group_share">群共享列表</string>
+    <string name="group_quit">删除并退出</string>
+    <string name="group_quit_notice">确定退出群聊?</string>
+    <string name="group_setting">群设置</string>
+    <string name="group_mute_msg">屏蔽群消息</string>
+    <string name="group_show_msg">接收并提示群消息</string>
+    <string name="group_invite_confirm">群聊邀请确认</string>
+    <string name="group_trans">群主管理权转让</string>
+    <string name="group_black">群成员黑名单</string>
+    <string name="group_ban">群成员禁言</string>
+    <string name="group_ban_time">禁言时间(分钟) 为空永久禁言</string>
+    <string name="group_ban_reason">禁言原因</string>
+    <string name="group_apply">入群申请</string>
+    <string name="group_notify_mode">群消息通知模式</string>
+    <string name="group_join_auth_mode">入群审批模式</string>
+    <string name="group_invite_mode">邀请入群模式</string>
+    <string name="group_beInvite_mode">被邀请入群模式</string>
+    <string name="group_avatar">群头像</string>
+    <string name="group_my_name">我在群里的昵称</string>
+    <string name="group_share_info">共享文件信息</string>
+    <string name="group_add_members">添加群成员</string>
+    <string name="group_remove_members">移除群成员</string>
+    <string name="setting">设置</string>
+    <string name="choose_file">选择文件</string>
+    <string name="chat_file_not_exit">文件不存在！</string>
+    <string name="chat_file_not_open">没有可以打开该文件的应用</string>
+    <string name="chat_msg_relay">转发</string>
+    <string name="chat_msg_revoke">撤回</string>
+    <string name="chat_msg_reSend">重新发送</string>
+    <string name="chat_msg_ack">标记已读</string>
+    <string name="chat_clear_msg">清除聊天记录</string>
+    <string name="chat_at_message">%s&#160;</string>
+
+    <!--Common-->
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="search">搜索</string>
+    <string name="edit">编辑</string>
+    <string name="delete">删除</string>
+    <string name="profile">资料</string>
+    <string name="profile_phone">手机号</string>
+    <string name="profile_public">公有信息</string>
+    <string name="begin_chat">开始聊天</string>
+    <string name="send">发送</string>
+
+    <!--Contact-->
+    <string name="contact_apply_notice">申请与通知</string>
+    <string name="contact_group">群组</string>
+    <string name="create_group">创建群组</string>
+    <string name="choose_contact">选择联系人</string>
+    <string name="group_invite">群聊邀请通知</string>
+
+    <!--权限-->
+    <string name="permission_title">权限申请</string>
+    <string name="permission_setting">去设置</string>
+    <string name="permission_prompt">在设置中开启权限，以保证正常使用</string>
+    <string name="record_fail_check_permission">录音失败，请检查权限</string>
+    <string name="camera_fail_check_permission">拍照失败，请检查权限</string>
+    <string name="not_has_sd_permission">没有手机存储权限</string>
+
+    <!--登录-->
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+    <string name="login_user_name_hint">请输入用户名或手机号</string>
+    <string name="login_user_id_hint">请输入用户id</string>
+    <string name="login_user_pwd_hint">请输入密码</string>
+    <string name="register_user_phone_hint">手机号</string>
+    <string name="register_user_name_hint">用户名</string>
+    <string name="register_user_verify_hint">验证码</string>
+    <string name="register_user_pwd_hint">密码</string>
+
+    <!--设置-->
+    <string name="user_protocol">用户协议</string>
+    <string name="version_info">版本信息</string>
+    <string name="quit_app">退出</string>
+    <string name="receive_push_notice">接受新消息通知</string>
+    <string name="push_sound">声音</string>
+    <string name="push_vibrate">振动</string>
+    <string name="push_detail">是否推送详情</string>
+    <string name="push_name">设置推送昵称</string>
+    <string name="auto_download_attachment">是否自动下载缩略图附件</string>
+    <string name="auto_accept_group_invite">是否自动接收群邀请</string>
+    <string name="black_list">黑名单列表</string>
+    <string name="other_device_tips">是否多端提示</string>
+    <string name="device_list">多设备列表</string>
+    <string name="setting_user_name">设置昵称</string>
+    <string name="setting_user_phone">设置手机号</string>
+    <string name="setting_user_public">设置公开信息</string>
+    <string name="setting_roster_alias">设置昵称</string>
+    <string name="setting_roster_ext">设置扩展信息</string>
+    <string name="setting_user_private">设置私密信息</string>
+    <string name="setting_user_disturb">设置免打扰</string>
+    <string name="setting_add_friend_auth_mode">好友验证类型</string>
+    <string name="setting_add_friend_auth_question">好友验证问题</string>
+    <string name="add_friend_auth_open">公开</string>
+    <string name="add_friend_auth_approval">需要同意</string>
+    <string name="add_friend_auth_answer">需要回答问题</string>
+    <string name="add_friend_auth_reject">拒绝所有人</string>
+
+    <!--群设置-->
+    <string name="group_notify_all">所有人</string>
+    <string name="group_notify_admin_at">群主和@</string>
+    <string name="group_notify_none">关闭</string>
+    <string name="group_join_auth_open">公开</string>
+    <string name="group_join_auth_approval">需要同意</string>
+    <string name="group_join_auth_reject">拒绝所有人</string>
+    <string name="group_invite_open">开放</string>
+    <string name="group_invite_admin">只有群主</string>
+    <string name="group_beInvite_open">开放</string>
+    <string name="group_beInvite_approval">需要同意</string>
+    <string name="group_mute_none">不屏蔽</string>
+    <string name="group_mute_notification">屏蔽本地消息通知</string>
+    <string name="group_mute_chat">屏蔽消息</string>
+</resources>

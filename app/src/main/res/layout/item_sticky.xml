@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_sticky"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_30"
+        android:layout_marginLeft="@dimen/dimen_15"
+        android:background="@color/color_background"
+        android:gravity="center_vertical"
+        android:textColor="@color/color_9B9BA9"
+        android:textSize="@dimen/dimen_14" />
+
+</RelativeLayout>

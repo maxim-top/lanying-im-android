@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <top.maxim.im.message.customviews.MessageInputBar
+        android:id="@+id/chat_control_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
+    <top.maxim.im.message.customviews.ChatViewGroup
+        android:id="@+id/chat_view_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/chat_control_bar">
+
+        <top.maxim.im.message.customviews.ChatRecyclerView
+            android:id="@+id/rcy_chat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:scrollbars="none" />
+    </top.maxim.im.message.customviews.ChatViewGroup>
+
+    <include
+        android:id="@+id/record_voice_view"
+        layout="@layout/voice_record_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+</RelativeLayout>

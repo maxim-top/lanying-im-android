@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <top.maxim.im.common.view.ShapeImageView
+        android:id="@+id/image_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/dimen_10"
+        android:layout_marginLeft="@dimen/dimen_10"
+        app:radius_x="10"
+        app:radius_y="10"
+        app:shape="round_rectangle" />
+
+</FrameLayout>

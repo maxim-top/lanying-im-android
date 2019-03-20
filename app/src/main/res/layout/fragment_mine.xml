@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:overScrollMode="never"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/rl_user_info"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_120"
+            android:background="@color/color_white"
+            android:paddingRight="@dimen/dimen_15">
+
+            <top.maxim.im.common.view.ShapeImageView
+                android:id="@+id/iv_user_avatar"
+                android:layout_width="@dimen/dimen_71"
+                android:layout_height="@dimen/dimen_71"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/dimen_20"
+                android:layout_marginRight="@dimen/dimen_20"
+                android:src="@drawable/default_avatar_icon"
+                app:radius_x="5"
+                app:radius_y="5"
+                app:shape="round_rectangle" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/dimen_30"
+                android:layout_toRightOf="@id/iv_user_avatar"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:textColor="@color/color_black"
+                    android:textSize="@dimen/dimen_20" />
+
+                <TextView
+                    android:id="@+id/tv_user_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_5"
+                    android:maxLines="1"
+                    android:textColor="@color/color_355522"
+                    android:textSize="@dimen/dimen_13" />
+
+                <TextView
+                    android:id="@+id/tv_nick_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_5"
+                    android:maxLines="1"
+                    android:textColor="@color/color_355522"
+                    android:textSize="@dimen/dimen_13" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/common_arrow_right" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_mine_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_10"
+            android:orientation="vertical">
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_version_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dimen_20"
+            android:layout_marginBottom="@dimen/dimen_10"
+            android:gravity="center"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen_16" />
+
+        <TextView
+            android:id="@+id/tv_quit_app"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_50"
+            android:layout_marginTop="@dimen/dimen_20"
+            android:layout_marginBottom="@dimen/dimen_30"
+            android:background="@color/color_white"
+            android:gravity="center"
+            android:text="@string/quit_app"
+            android:textColor="@color/color_333333"
+            android:textSize="@dimen/dimen_16" />
+
+    </LinearLayout>
+</ScrollView>

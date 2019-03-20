@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/list_selector"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/dimen_10"
+    android:paddingBottom="@dimen/dimen_10">
+
+    <FrameLayout
+        android:id="@+id/fl_session_avatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="@dimen/dimen_15">
+
+        <top.maxim.im.common.view.ShapeImageView
+            android:id="@+id/session_avatar"
+            android:layout_width="@dimen/dimen_48"
+            android:layout_height="@dimen/dimen_48"
+            android:layout_marginTop="@dimen/dimen_3"
+            android:layout_marginRight="@dimen/dimen_3"
+            android:src="@drawable/default_avatar_icon"
+            app:radius_x="24"
+            app:radius_y="24"
+            app:shape="round_rectangle" />
+
+        <TextView
+            android:id="@+id/session_unread_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="end"
+            android:background="@drawable/message_unread_circle"
+            android:gravity="center"
+            android:maxLines="1"
+            android:text="1"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/dimen_9"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_session_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/fl_session_avatar"
+        android:layout_marginLeft="@dimen/dimen_14"
+        android:layout_marginRight="@dimen/dimen_14"
+        android:layout_toRightOf="@id/fl_session_avatar">
+
+        <TextView
+            android:id="@+id/session_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dimen_30"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen_16" />
+
+        <TextView
+            android:id="@+id/session_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="@color/color_999999"
+            android:textSize="@dimen/dimen_12" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rl_session_title"
+        android:layout_marginLeft="@dimen/dimen_14"
+        android:layout_marginTop="@dimen/dimen_6"
+        android:layout_marginRight="@dimen/dimen_14"
+        android:layout_toRightOf="@id/fl_session_avatar">
+
+        <TextView
+            android:id="@+id/session_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dimen_30"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="@color/color_999999"
+            android:textSize="@dimen/dimen_12" />
+
+        <ImageView
+            android:id="@+id/session_disturb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="end"
+            android:background="@drawable/txt_circle_red_bg"
+            android:gravity="center"
+            android:visibility="gone" />
+    </RelativeLayout>
+</RelativeLayout>

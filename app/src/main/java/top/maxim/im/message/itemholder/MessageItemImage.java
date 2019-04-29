@@ -139,7 +139,7 @@ public class MessageItemImage extends MessageItemBaseView {
         } else {
             BMImageLoader.getInstance().display(mImageView, "", mImageConfig);
             ChatManager.getInstance().downloadAttachment(mMaxMessage,
-                    new FileCallback(body.path()) {
+                    new FileCallback(body.url()) {
                         @Override
                         protected void onProgress(long percent, String path, boolean isThumbnail) {
 
@@ -147,7 +147,7 @@ public class MessageItemImage extends MessageItemBaseView {
 
                         @Override
                         protected void onFinish(String url, boolean isThumbnail) {
-                            BMImageLoader.getInstance().display(mImageView, "file://" + url,
+                            BMImageLoader.getInstance().display(mImageView, "file://" + body.path(),
                                     mImageConfig);
                         }
 

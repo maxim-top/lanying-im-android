@@ -789,7 +789,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             return;
         }
         ackMessage(bean);
-        BMXVoiceAttachment body = BMXVoiceAttachment.dynamic_cast(bean.attachment());
+        final BMXVoiceAttachment body = BMXVoiceAttachment.dynamic_cast(bean.attachment());
         if (body == null) {
             return;
         }
@@ -819,7 +819,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (status == BMXMessageAttachment.DownloadStatus.Downloaing) {
             return;
         }
-        ChatManager.getInstance().downloadAttachment(bean, new FileCallback(body.path()) {
+        ChatManager.getInstance().downloadAttachment(bean, new FileCallback(body.url()) {
             @Override
             protected void onProgress(long percent, String path, boolean isThumbnail) {
 
@@ -827,7 +827,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
             @Override
             protected void onFinish(String url, boolean isThumbnail) {
-                playVoice(url, bean);
+                playVoice(body.path(), bean);
             }
 
             @Override
@@ -985,7 +985,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (mView == null || bean == null || bean.contentType() != BMXMessage.ContentType.File) {
             return;
         }
-        BMXFileAttachment body = BMXFileAttachment.dynamic_cast(bean.attachment());
+        final BMXFileAttachment body = BMXFileAttachment.dynamic_cast(bean.attachment());
         if (body == null) {
             return;
         }
@@ -1004,7 +1004,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (status == BMXMessageAttachment.DownloadStatus.Downloaing) {
             return;
         }
-        ChatManager.getInstance().downloadAttachment(bean, new FileCallback(body.path()) {
+        ChatManager.getInstance().downloadAttachment(bean, new FileCallback(body.url()) {
             @Override
             protected void onProgress(long percent, String path, boolean isThumbnail) {
 
@@ -1012,7 +1012,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
             @Override
             protected void onFinish(String url, boolean isThumbnail) {
-                openFilePreView(url);
+                openFilePreView(body.path());
             }
 
             @Override

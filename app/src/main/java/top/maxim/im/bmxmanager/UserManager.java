@@ -84,7 +84,7 @@ public class UserManager extends BaseManager {
      * @return
      */
     public BMXErrorCode autoSignInByName(String name, String password) {
-        return mService.autoSignInByName(name, password);
+        return mService.fastSignInByName(name, password);
     }
 
     /**
@@ -95,7 +95,7 @@ public class UserManager extends BaseManager {
      * @return
      */
     public BMXErrorCode autoSignInById(long uid, String password) {
-        return mService.autoSignInById(uid, password);
+        return mService.fastSignInById(uid, password);
     }
 
     /**

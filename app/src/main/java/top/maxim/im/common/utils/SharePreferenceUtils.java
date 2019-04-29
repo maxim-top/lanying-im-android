@@ -148,16 +148,16 @@ public class SharePreferenceUtils {
         return false;
     }
 
-    public boolean putCustomDns(boolean custom) {
-        saveEditor.putBoolean(CUSTOM_DNS, custom);
+    public boolean putCustomDns(int index) {
+        saveEditor.putInt(CUSTOM_DNS, index);
         return saveEditor.commit();
     }
 
-    public boolean getCustomDns() {
+    public int getCustomDns() {
         if (saveInfo != null) {
-            return saveInfo.getBoolean(CUSTOM_DNS, false);
+            return saveInfo.getInt(CUSTOM_DNS, 0);
         }
-        return false;
+        return 0;
     }
 
     /**

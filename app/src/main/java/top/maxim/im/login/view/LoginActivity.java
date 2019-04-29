@@ -85,9 +85,12 @@ public class LoginActivity extends BaseTitleActivity {
                 new ClickTimeUtils.IClick() {
                     @Override
                     public void onClick() {
-                        ToastUtil.showTextViewPrompt("切换新的环境配置");
-                        SharePreferenceUtils.getInstance().putCustomDns(true);
-                        BaseManager.initTestBMXSDK();
+                        int newIndex = SharePreferenceUtils.getInstance().getCustomDns() + 1;
+                        if (newIndex > 4){
+                            newIndex = 0;
+                        }
+                        SharePreferenceUtils.getInstance().putCustomDns(newIndex);
+                        ToastUtil.showTextViewPrompt("切换新的环境配置:" + newIndex);
                     }
                 });
         return view;
@@ -157,6 +160,8 @@ public class LoginActivity extends BaseTitleActivity {
 
     public static void login(final Activity activity, String name, final String pwd,
             final boolean isLoginById) {
+        BaseManager.initTestBMXSDK(SharePreferenceUtils.getInstance().getCustomDns());
+
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pwd)) {
             ToastUtil.showTextViewPrompt("不能为空");
             return;

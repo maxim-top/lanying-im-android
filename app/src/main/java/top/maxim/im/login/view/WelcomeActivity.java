@@ -124,6 +124,7 @@ public class WelcomeActivity extends BaseTitleActivity {
         Observable.just(userName).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
+                BaseManager.initTestBMXSDK(SharePreferenceUtils.getInstance().getCustomDns());
                 return UserManager.getInstance().signInByName(s, pwd);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {

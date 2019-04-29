@@ -77,11 +77,12 @@ public class MaxIMApplication extends Application {
      * 初始化sdk
      */
     private void initBMXSDK() {
-        boolean custom = SharePreferenceUtils.getInstance().getCustomDns();
-        if (custom) {
-            BaseManager.initTestBMXSDK();
-        } else {
-            BaseManager.initBMXSDK();
-        }
+//        BaseManager.initTestBMXSDK(SharePreferenceUtils.getInstance().getCustomDns());
+//        boolean custom = SharePreferenceUtils.getInstance().getCustomDns();
+//        if (custom) {
+//            BaseManager.initTestBMXSDK();
+//        } else {
+//            BaseManager.initBMXSDK();
+//        }
     }
 }

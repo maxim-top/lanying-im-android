@@ -84,7 +84,7 @@ public class ChatGroupTransActivity extends ChatGroupListMemberActivity {
         Observable.just(uid).map(new Func1<Long, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(Long l) {
-                return GroupManager.getInstance().transferOwner(mGroup, (int)uid);
+                return GroupManager.getInstance().transferOwner(mGroup, uid);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

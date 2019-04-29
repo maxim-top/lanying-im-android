@@ -203,14 +203,14 @@ public class GroupManager extends BaseManager {
     /**
      * 接受入群申请
      **/
-    public BMXErrorCode acceptApplication(BMXGroup group, int applicantId) {
+    public BMXErrorCode acceptApplication(BMXGroup group, long applicantId) {
         return mService.acceptApplication(group, applicantId);
     }
 
     /**
      * 拒绝入群申请
      **/
-    public BMXErrorCode declineApplication(BMXGroup group, int applicantId, String reason) {
+    public BMXErrorCode declineApplication(BMXGroup group, long applicantId, String reason) {
         return mService.declineApplication(group, applicantId, reason);
     }
 
@@ -231,7 +231,7 @@ public class GroupManager extends BaseManager {
     /**
      * 转移群主
      **/
-    public BMXErrorCode transferOwner(BMXGroup group, int newOwnerId) {
+    public BMXErrorCode transferOwner(BMXGroup group, long newOwnerId) {
         return mService.transferOwner(group, newOwnerId);
     }
 

@@ -313,7 +313,7 @@ public class GroupApplyActivity extends BaseTitleActivity {
                 @Override
                 public void onClick(View v) {
                     dialog.dismiss();
-                    acceptApply(group, (int)applicationId);
+                    acceptApply(group, (long)applicationId);
                 }
             });
             ll.addView(accept, params);
@@ -337,7 +337,7 @@ public class GroupApplyActivity extends BaseTitleActivity {
             dialog.showDialog((Activity)mContext);
         }
 
-        private void acceptApply(BMXGroup group, final int applicantId) {
+        private void acceptApply(BMXGroup group, final long applicantId) {
             if (group == null || applicantId <= 0) {
                 return;
             }

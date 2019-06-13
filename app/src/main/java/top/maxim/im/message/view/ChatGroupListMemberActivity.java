@@ -36,6 +36,7 @@ import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.RosterFetcher;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.BMImageLoader;
 import top.maxim.im.common.view.Header;
@@ -253,7 +254,16 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
     }
 
     protected BMXErrorCode initData(BMXGroupMemberList memberList, boolean forceRefresh) {
-        return GroupManager.getInstance().getMembers(mGroup, memberList, forceRefresh);
+        BMXGroupMemberList memberListTmp = new BMXGroupMemberList();
+        BMXErrorCode errorCode =  GroupManager.getInstance().getMembers(mGroup, memberListTmp, forceRefresh);
+        long myId = SharePreferenceUtils.getInstance().getUserId();
+        for (int i=0; i< memberListTmp.size(); i++){
+            long memberId = memberListTmp.get(i).getMUid();
+            if (myId != memberId){
+                memberList.add(memberListTmp.get(i));
+            }
+        }
+        return errorCode;
     }
 
     protected void bindData(BMXGroupMemberList memberList) {

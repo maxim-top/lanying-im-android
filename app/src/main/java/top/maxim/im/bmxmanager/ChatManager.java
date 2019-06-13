@@ -115,8 +115,8 @@ public class ChatManager extends BaseManager {
     /**
      * 删除会话
      **/
-    public BMXErrorCode deleteConversation(long conversationId) {
-        return mService.deleteConversation(conversationId);
+    public void deleteConversation(long conversationId) {
+        mService.deleteConversation(conversationId);
     }
 
     /**

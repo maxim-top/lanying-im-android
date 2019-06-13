@@ -304,7 +304,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
          * 输入框弹出
          */
         private void showDeclineReason(final long rosterId) {
-            DialogUtils.getInstance().showEditDialog((Activity)mContext, "添加好友",
+            DialogUtils.getInstance().showEditDialog((Activity)mContext, "拒绝原因",
                     getString(R.string.confirm), getString(R.string.cancel),
                     new CommonEditDialog.OnDialogListener() {
                         @Override

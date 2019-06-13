@@ -66,8 +66,8 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         String name = "";
-                        if (mRoster != null && !TextUtils.isEmpty(mRoster.nickname())) {
-                            name = mRoster.nickname();
+                        if (mRoster != null && !TextUtils.isEmpty(mRoster.alias())) {
+                            name = mRoster.alias();
                         } else if (mRoster != null) {
                             name = mRoster.username();
                         }

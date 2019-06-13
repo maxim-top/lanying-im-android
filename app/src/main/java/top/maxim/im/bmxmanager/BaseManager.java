@@ -44,9 +44,6 @@ public class BaseManager {
      * 配置环境
      */
     public static void initTestBMXSDK(int index) {
-        if (bmxClient != null){
-            return;
-        }
         String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
         File dataPath = new File(appPath + "/data_dir");
         File cachePath = new File(appPath + "/cache_dir");
@@ -59,15 +56,21 @@ public class BaseManager {
         conf.setConsoleOutput(true);
         conf.setLogLevel(BMXLogLevel.Debug);
 
-        BMXSDKConfig.HostConfig hostConfig = new BMXSDKConfig.HostConfig("sync.maxim.top", 443, "https://api.maxim.top");
-        if (index == 1){
-            hostConfig = new BMXSDKConfig.HostConfig("c1-sync.kube.maxim.top", 443, "https://c1-api.kube.maxim.top");
-        }else if (index == 2){
-            hostConfig = new BMXSDKConfig.HostConfig("s1-sync.kube.maxim.top", 443, "https://s1-api.kube.maxim.top");
-        }else if (index == 3){
-            hostConfig = new BMXSDKConfig.HostConfig("s2-sync.kube.maxim.top", 80, "https://s2-api.kube.maxim.top");
-        }else if (index == 4){
+        BMXSDKConfig.HostConfig hostConfig;
+        if (index == 1) {
+            hostConfig = new BMXSDKConfig.HostConfig("c1-sync.kube.maxim.top", 443,
+                    "https://c1-api.kube.maxim.top");
+        } else if (index == 2) {
+            hostConfig = new BMXSDKConfig.HostConfig("s1-sync.kube.maxim.top", 443,
+                    "https://s1-api.kube.maxim.top");
+        } else if (index == 3) {
+            hostConfig = new BMXSDKConfig.HostConfig("s2-sync.kube.maxim.top", 80,
+                    "https://s2-api.kube.maxim.top");
+        } else if (index == 4) {
             hostConfig = new BMXSDKConfig.HostConfig("47.93.11.47", 1729, "http://47.93.11.47");
+        } else {
+            hostConfig = new BMXSDKConfig.HostConfig("sync.maxim.top", 443,
+                    "https://api.maxim.top");
         }
         conf.setHostConfig(hostConfig);
         bmxClient = BMXClient.create(conf);

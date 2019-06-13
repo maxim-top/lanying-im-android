@@ -24,7 +24,6 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
-import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 
@@ -143,7 +142,6 @@ public class RegisterActivity extends BaseTitleActivity {
     }
 
     void register(final String account, final String pwd, final String phone, final String verify) {
-        BaseManager.initTestBMXSDK(SharePreferenceUtils.getInstance().getCustomDns());
 
         if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd) || TextUtils.isEmpty(phone)
                 || TextUtils.isEmpty(verify)) {

@@ -32,8 +32,6 @@ import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ToastUtil;
-import top.maxim.im.common.utils.dialog.CommonEditDialog;
-import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.BMImageLoader;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
@@ -234,26 +232,32 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
      * 输入框弹出
      */
     private void showOperate(final String title, final ListOfLongLong member) {
-        DialogUtils.getInstance().showEditDialog(this, title, getString(R.string.confirm),
-                getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
-                    @Override
-                    public void onConfirmListener(String content) {
-                        if (TextUtils.isEmpty(content)) {
-                            return;
-                        }
-                        if (TextUtils.equals(title, getString(R.string.group_add_members))) {
-                            addMembers(member, content);
-                        } else if (TextUtils.equals(title,
-                                getString(R.string.group_remove_members))) {
-                            removeMembers(member, content);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelListener() {
-
-                    }
-                });
+        // 移除 添加群成员 暂时不加输入框 reason直接传入""
+        if (TextUtils.equals(title, getString(R.string.group_add_members))) {
+            addMembers(member, "");
+        } else if (TextUtils.equals(title, getString(R.string.group_remove_members))) {
+            removeMembers(member, "");
+        }
+//        DialogUtils.getInstance().showEditDialog(this, title, getString(R.string.confirm),
+//                getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
+//                    @Override
+//                    public void onConfirmListener(String content) {
+//                        if (TextUtils.isEmpty(content)) {
+//                            return;
+//                        }
+//                        if (TextUtils.equals(title, getString(R.string.group_add_members))) {
+//                            addMembers(member, content);
+//                        } else if (TextUtils.equals(title,
+//                                getString(R.string.group_remove_members))) {
+//                            removeMembers(member, content);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelListener() {
+//
+//                    }
+//                });
     }
 
     /**

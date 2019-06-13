@@ -108,7 +108,7 @@ public class ChatManager extends BaseManager {
     /**
      * 读取一条消息
      **/
-    public BMXMessage getMessage(int msgId) {
+    public BMXMessage getMessage(long msgId) {
         return mService.getMessage(msgId);
     }
 

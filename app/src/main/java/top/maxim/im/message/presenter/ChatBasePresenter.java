@@ -162,6 +162,21 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
         @Override
         public void onRecallStatusChanged(BMXMessage msg, BMXErrorCode error) {
+            if (msg == null) {
+                return;
+            }
+            boolean success = error != null
+                    && error.swigValue() == BMXErrorCode.NoError.swigValue();
+            if (success) {
+                // 撤回成功需要删除原始消息
+                if (mView != null) {
+                    mView.deleteChatMessage(msg);
+                }
+            } else {
+                // 原始消息不为空 则没有撤回成功
+                ((Activity)mView.getContext())
+                        .runOnUiThread(() -> ToastUtil.showTextViewPrompt("撤回失败"));
+            }
         }
 
         @Override
@@ -225,12 +240,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     if (message != null && isCurrentSession(message)) {
                         // 当前会话
                         if (mView != null) {
-                            ((Activity)mView.getContext()).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ToastUtil.showTextViewPrompt("对方撤回一条消息");
-                                }
-                            });
+                            ((Activity)mView.getContext())
+                                    .runOnUiThread(() -> ToastUtil.showTextViewPrompt("对方撤回一条消息"));
                             mView.deleteChatMessage(message);
                         }
                     }
@@ -731,9 +742,6 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
                     @Override
                     public void onNext(BMXMessage message) {
-                        if (mView != null) {
-                            mView.deleteChatMessage(message);
-                        }
                     }
                 });
     }

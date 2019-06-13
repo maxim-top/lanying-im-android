@@ -470,7 +470,8 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                         });
             }
         });
-        ll.addView(clear, params);
+        // TODO 清除聊天记录功能暂时不加 C++暂时没有对外提供
+        // ll.addView(clear, params);
 
         dialog.setCustomView(ll);
         dialog.showDialog(getActivity());

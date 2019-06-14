@@ -152,6 +152,40 @@ public class ChatUtils {
     }
 
     /**
+     * 根据消息获取描述
+     *
+     * @param message message
+     * @return String
+     */
+    public String getMessageDesc(MessageBean message) {
+        if (message == null) {
+            return "";
+        }
+        BMXMessage.ContentType type = message.getContentType();
+        if (type == null) {
+            return "[未知消息]";
+        }
+        String desc = "";
+        if (type == BMXMessage.ContentType.Text) {
+            // 文本
+            desc = message.getContent();
+        } else if (type == BMXMessage.ContentType.Image) {
+            // 图片
+            desc = "[图片]";
+        } else if (type == BMXMessage.ContentType.Video) {
+            desc = "[视频]";
+        } else if (type == BMXMessage.ContentType.Location) {
+            desc = "[位置]";
+        } else if (type == BMXMessage.ContentType.File) {
+            desc = "[文件]";
+        } else if (type == BMXMessage.ContentType.Voice) {
+            // 语音
+            desc = "[语音]";
+        }
+        return desc;
+    }
+
+    /**
      * 展示头像
      * 
      * @param imageView
@@ -528,6 +562,7 @@ public class ChatUtils {
         messageBean.setContentType(contentType);
         messageBean.setType(type);
         messageBean.setChatId(chatId);
+        messageBean.setReceiveMsg(mBmxMessage.isReceiveMsg());
         if (contentType == BMXMessage.ContentType.Text) {
             String text = mBmxMessage.content();
             if (!TextUtils.isEmpty(text)) {

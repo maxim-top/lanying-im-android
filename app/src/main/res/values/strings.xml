@@ -134,4 +134,10 @@
     <string name="group_mute_none">不屏蔽</string>
     <string name="group_mute_notification">屏蔽本地消息通知</string>
     <string name="group_mute_chat">屏蔽消息</string>
+
+    <string name="channel_id">%1$s..channel_id_%2$d</string>
+    <!--im消息push-->
+    <string name="im_push_msg_action">%1$s.action.push.msg</string>
+    <string name="push_receiver_rec_msg_count">您收到了%1$s条消息</string>
+
 </resources>

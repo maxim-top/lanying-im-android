@@ -259,6 +259,15 @@
                 android:resource="@xml/file_path" />
         </provider>
 
+        <!-- 聊天push广播 -->
+        <receiver
+            android:name=".push.PushReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="${applicationId}.action.push.msg" />
+            </intent-filter>
+        </receiver>
+
 
         <!--华为push  配置-->
         <meta-data

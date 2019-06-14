@@ -6,41 +6,22 @@ package top.maxim.im.sdk.utils;
  */
 public interface MsgConstants {
 
-    /**
-     * 消息发送ack结果码 -1,失败, 0, ACK消息成功 1, ACK消息违禁2, from_client与名片不匹配 3,
-     * to_client与名片不匹配 4, 消息超长 5, 服务器错误 6,消息格式错误 7, 用户不在群聊中 8, 名片被禁止沟通能力
+    /*
+     * 通知渠道号
      */
-    interface MessageSendACK {
 
-        /* 失败 */
-        int ACK_FAIL = -1;
+    String NOTIFICATION_CHANNEL_PUBLIC = "公开渠道";
 
-        /* 成功 */
-        int ACK_SUCCESS = 0;
+    String NOTIFICATION_CHANNEL_TOPIC = "订阅渠道";
 
-        /* 违禁 */
-        int ACK_VIOLATE = 1;
+    String NOTIFICATION_CHANNEL_PRIVATE = "私有渠道";
 
-        /* from不匹配 */
-        int ACK_FROM_ERROR = 2;
+    interface ChannelImportance {
+        int PUBLIC = 1;
 
-        /* to不匹配 */
-        int ACK_TO_ERROR = 3;
+        int TOPIC = PUBLIC + 1;
 
-        /* 消息过长 */
-        int ACK_SUPER = 4;
-
-        /* 服务器错误 */
-        int ACK_SERVER_ERROR = 5;
-
-        /* 消息格式错误 */
-        int ACK_MSG_ERROR = 6;
-
-        /* 用户不在群聊 */
-        int ACK_NOT_IN_GROUP = 7;
-
-        /* 名片被禁止 */
-        int ACK_CARD_FORBIDDEN = 8;
+        int PRIVATE = +TOPIC + 1;
     }
 
 }

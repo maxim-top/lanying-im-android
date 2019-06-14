@@ -1,6 +1,7 @@
 
 package top.maxim.im.sdk.utils;
 
+import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
@@ -25,6 +26,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -36,6 +38,8 @@ import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.login.view.WelcomeActivity;
+import top.maxim.im.message.utils.ChatUtils;
+import top.maxim.im.message.utils.MessageConfig;
 
 /**
  * Description : 消息分发 Created by mango on 2018/12/20.
@@ -75,6 +79,9 @@ public class MessageDispatcher {
         @Override
         public void onReceive(BMXMessageList list) {
             super.onReceive(list);
+            if (list != null && !list.isEmpty()) {
+                notifyNotification(list.get(0));
+            }
             for (BMXChatServiceListener listener : mListener) {
                 listener.onReceive(list);
             }
@@ -569,5 +576,26 @@ public class MessageDispatcher {
                         RxBus.getInstance().send(intent);
                     }
                 });
+    }
+
+    /**
+     * 通知push
+     */
+    private void notifyNotification(BMXMessage bean) {
+        if (bean == null || !bean.isReceiveMsg()) {
+            return;
+        }
+        Context context = AppContextUtils.getAppContext();
+        Intent intent = new Intent(String.format(context.getString(R.string.im_push_msg_action),
+                context.getPackageName()));
+        if (bean.type() == BMXMessage.MessageType.Group) {
+            intent.putExtra(MessageConfig.CHAT_MSG,
+                    ChatUtils.getInstance().buildMessage(bean, bean.type(), bean.toId()));
+        } else {
+            intent.putExtra(MessageConfig.CHAT_MSG,
+                    ChatUtils.getInstance().buildMessage(bean, bean.type(), bean.fromId()));
+        }
+        intent.setPackage(context.getPackageName());
+        context.sendBroadcast(intent);
     }
 }

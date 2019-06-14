@@ -20,6 +20,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleFragment;
+import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -34,6 +35,7 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.contact.view.BlockListActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.push.PushClientMgr;
+import top.maxim.im.push.PushUtils;
 
 /**
  * Description : 我的 Created by Mango on 2018/11/06
@@ -652,6 +654,8 @@ public class MineFragment extends BaseTitleFragment {
                         dismissLoadingDialog();
                         SharePreferenceUtils.getInstance().putLoginStatus(false);
                         PushClientMgr.getManager().unRegister();
+                        PushUtils.getInstance()
+                                .unregisterActivityListener(AppContextUtils.getApplication());
                         WelcomeActivity.openWelcome(getActivity());
                     }
                 });

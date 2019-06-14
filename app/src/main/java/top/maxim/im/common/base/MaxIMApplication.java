@@ -19,6 +19,7 @@ import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.push.PushClientMgr;
+import top.maxim.im.push.PushUtils;
 
 /**
  * Description : application Created by Mango on 2018/11/5.
@@ -54,6 +55,7 @@ public class MaxIMApplication extends Application {
         initImageLoader();
         //push
         PushClientMgr.initManager(this);
+        PushUtils.getInstance().registerActivityListener(this);
     }
 
     /**

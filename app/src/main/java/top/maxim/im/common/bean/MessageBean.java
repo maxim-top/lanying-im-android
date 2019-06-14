@@ -11,6 +11,8 @@ public class MessageBean extends BaseBean {
 
     private BMXMessage.ContentType contentType;
 
+    private boolean isReceiveMsg;
+
     private String content;
 
     private String path;
@@ -57,6 +59,14 @@ public class MessageBean extends BaseBean {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public boolean isReceiveMsg() {
+        return isReceiveMsg;
+    }
+
+    public void setReceiveMsg(boolean receiveMsg) {
+        isReceiveMsg = receiveMsg;
     }
 
     public String getPath() {

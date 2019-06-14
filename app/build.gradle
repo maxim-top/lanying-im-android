@@ -44,6 +44,11 @@ android {
             dirs 'libs'   // aar目录
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -66,8 +71,8 @@ dependencies {
 
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-//    implementation(name:'floo-android_1.0.1.20190221',ext:'aar')
-    implementation project(path: ':floo-android')
+    implementation(name:'floo-android_1.0.6.20190613',ext:'aar')
+//    implementation project(path: ':floo-android')
 //    implementation files('libs/floo-android.jar')
 
 //    //fresco图片控件

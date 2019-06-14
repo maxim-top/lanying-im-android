@@ -178,13 +178,12 @@ public class DeviceListActivity extends BaseTitleActivity {
                 return;
             }
             // 退出
-            quit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    deleteDevice((int) device.deviceSN());
-                }
-            });
+            quit.setOnClickListener(v ->  
+            deleteDevice(device.deviceSN()));
             long platform = device.platform();
+            // 当前设备没有退出按钮
+            boolean isCurrent = device.isCurrentDevice();
+            quit.setVisibility(isCurrent ? View.GONE : View.VISIBLE);
             String deviceTitle = "";
             if (platform == MessageConfig.DeviceType.IOS) {
                 deviceTitle = "iOS";

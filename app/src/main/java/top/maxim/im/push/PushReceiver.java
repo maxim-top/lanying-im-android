@@ -32,22 +32,6 @@ public class PushReceiver extends BroadcastReceiver {
 
     public static final String TAG = "PushReceiver";
 
-    public static final String PUSH_INTENT_TYPE = "pushIntentType";
-
-    public static final String PUSH_INTENT_PROTOCOL_PATH = "protocolPath";
-
-    public static final String PUSH_INTENT_PROTOCOL_PARAM = "protocolParam";
-
-    public static final String PUSH_TALKER = "talker";
-
-    public static final String PUSH_MY_FEED_ID = "myFeedId";
-
-    public static final String PUSH_TITLE = "title";
-
-    public static final String PUSH_SESSION_ID = "sessionId";
-
-    public static final String PUSH_PARENT_MSG_ID = "parentMsgId";
-
     private long mLastSendBroadcastTime = 0L;
 
     @Override

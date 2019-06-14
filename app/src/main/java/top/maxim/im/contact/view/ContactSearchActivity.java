@@ -216,9 +216,6 @@ public class ContactSearchActivity extends BaseTitleActivity {
                     new CommonEditDialog.OnDialogListener() {
                         @Override
                         public void onConfirmListener(String content) {
-                            if (TextUtils.isEmpty(content)) {
-                                return;
-                            }
                             addRoster(rosterId, content);
                         }
 

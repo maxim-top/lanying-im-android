@@ -190,9 +190,6 @@ public class GroupSearchActivity extends BaseTitleActivity {
                     new CommonEditDialog.OnDialogListener() {
                         @Override
                         public void onConfirmListener(String content) {
-                            if (TextUtils.isEmpty(content)) {
-                                return;
-                            }
                             joinGroup(group, content);
                         }
 
@@ -204,7 +201,7 @@ public class GroupSearchActivity extends BaseTitleActivity {
         }
 
         private void joinGroup(final BMXGroup group, final String reason) {
-            if (group == null || TextUtils.isEmpty(reason)) {
+            if (group == null) {
                 return;
             }
             showLoadingDialog(true);

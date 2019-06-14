@@ -309,9 +309,6 @@ public class RosterApplyActivity extends BaseTitleActivity {
                     new CommonEditDialog.OnDialogListener() {
                         @Override
                         public void onConfirmListener(String content) {
-                            if (TextUtils.isEmpty(content)) {
-                                return;
-                            }
                             declineApply(rosterId, content);
                         }
 

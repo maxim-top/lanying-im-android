@@ -132,9 +132,6 @@ public class ChatGroupAdminActivity extends ChatGroupListMemberActivity {
                 getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        if (TextUtils.isEmpty(content)) {
-                            return;
-                        }
                         removeAdmin(admin, content);
                     }
 
@@ -153,9 +150,6 @@ public class ChatGroupAdminActivity extends ChatGroupListMemberActivity {
                 getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        if (TextUtils.isEmpty(content)) {
-                            return;
-                        }
                         addAdmin(admin, content);
                     }
 

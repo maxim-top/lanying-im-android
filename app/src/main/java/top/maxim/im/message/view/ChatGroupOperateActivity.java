@@ -620,9 +620,6 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        if (TextUtils.isEmpty(content)) {
-                            return;
-                        }
                         setGroupInfo(title, content);
                     }
 

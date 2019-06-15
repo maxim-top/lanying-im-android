@@ -54,4 +54,13 @@
         android:layout_alignTop="@id/message_avatar"
         android:layout_marginLeft="@dimen/dimen_10"
         android:layout_toRightOf="@id/message_avatar" />
+
+    <include
+        layout="@layout/item_loading_and_fail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/fl_message"
+        android:layout_alignBottom="@+id/fl_message"
+        android:layout_marginLeft="@dimen/dimen_8"
+        android:layout_toRightOf="@+id/fl_message" />
 </RelativeLayout>

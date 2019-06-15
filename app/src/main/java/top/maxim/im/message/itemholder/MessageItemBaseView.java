@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import im.floo.floolib.BMXMessage;
@@ -65,6 +67,12 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
 
     private TextView mTvReadStatus;
 
+    /* 发送失败图片 */
+    private ImageView mSendFailImg;
+
+    /* 发送中图片 */
+    private ProgressBar mSendingImg;
+
     public MessageItemBaseView(Context context, ChatActionListener listener, int itemPos) {
         super(context);
         mContext = context;
@@ -105,6 +113,7 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         showHead();
         bindData();
         showReadStatus();
+        showSendStatus();
     }
 
     /**
@@ -115,6 +124,10 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         if (mItemPos != ITEM_CENTER) {
             mIconView = mItemView.findViewById(R.id.message_avatar);
             mUsetText = mItemView.findViewById(R.id.message_name);
+            mSendFailImg = (ImageView)mItemView.findViewById(R.id.img_sendfail);
+            mSendFailImg.setVisibility(View.GONE);
+            mSendingImg = (ProgressBar)mItemView.findViewById(R.id.img_sending);
+            mSendingImg.setVisibility(View.GONE);
         }
     }
 
@@ -145,7 +158,7 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
                 userName = item.nickname();
             } else if (item != null) {
                 userName = item.username();
-            }         
+            }
             if (mIconView != null) {
                 ChatUtils.getInstance().showRosterAvatar(item, mIconView, ICON_CONFIG);
             }
@@ -194,6 +207,30 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         mTvReadStatus.setVisibility(View.VISIBLE);
         boolean isRead = mMaxMessage.isReadAcked();
         mTvReadStatus.setText(isRead ? "已读" : "未读");
+    }
+
+    /**
+     * 展示发送消息的发送状态
+     */
+    private void showSendStatus() {
+        if (mItemPos != ITEM_RIGHT || mSendFailImg == null || mSendingImg == null) {
+            return;
+        }
+        BMXMessage.DeliveryStatus sendStatus = mMaxMessage == null ? null
+                : mMaxMessage.deliveryStatus();
+        // 消息发送状态是否失败
+        if (sendStatus == null || sendStatus == BMXMessage.DeliveryStatus.Deliveried) {
+            // 空和成功都展示成功
+            mSendFailImg.setVisibility(View.GONE);
+            mSendingImg.setVisibility(View.GONE);
+        } else if (sendStatus == BMXMessage.DeliveryStatus.Failed) {
+            // 失败
+            mSendFailImg.setVisibility(View.VISIBLE);
+            mSendingImg.setVisibility(View.GONE);
+        } else {
+            mSendFailImg.setVisibility(View.GONE);
+            mSendingImg.setVisibility(View.VISIBLE);
+        }
     }
 
     /**

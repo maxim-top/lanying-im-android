@@ -68,7 +68,6 @@
         android:theme="@style/ActivityAnimation"
         android:usesCleartextTraffic="true"
         tools:replace="android:icon,android:roundIcon,android:theme">
-        <activity android:name=".message.view.ProductDetailActivity"/>
 
         <activity
             android:name=".login.view.WelcomeActivity"

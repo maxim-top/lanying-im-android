@@ -154,6 +154,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
         @Override
         public void onStatusChanged(BMXMessage msg, BMXErrorCode error) {
+            //发送状态更新页面
+            if (msg != null && isCurrentSession(msg)) {
+                mView.updateChatMessage(msg);
+            }
         }
 
         @Override

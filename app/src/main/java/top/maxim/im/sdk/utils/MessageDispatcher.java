@@ -40,6 +40,8 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.push.PushClientMgr;
+import top.maxim.im.push.PushUtils;
 
 /**
  * Description : 消息分发 Created by mango on 2018/12/20.
@@ -195,7 +197,7 @@ public class MessageDispatcher {
         public void onUserSignOut(BMXErrorCode error) {
             super.onUserSignOut(error);
             toastListener("onUserSignOut");
-            if (error.swigValue() == BMXErrorCode.UserKickedByOtherDevices.swigValue()) {
+            if (error.swigValue() == BMXErrorCode.UserRemoved.swigValue()) {
                 // 被其他设备踢下线 跳转到登录页面
                 Observable.just("").subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -212,8 +214,11 @@ public class MessageDispatcher {
 
                             @Override
                             public void onNext(String s) {
-                                WelcomeActivity.openWelcome(AppContextUtils
-                                        .getActivity(AppContextUtils.getAppContext()));
+                                SharePreferenceUtils.getInstance().putLoginStatus(false);
+                                PushClientMgr.getManager().unRegister();
+                                PushUtils.getInstance().unregisterActivityListener(
+                                        AppContextUtils.getApplication());
+                                WelcomeActivity.openWelcome(AppContextUtils.getAppContext());
                             }
                         });
             }
@@ -369,7 +374,6 @@ public class MessageDispatcher {
             super.onMembersBanned(group, members, duration);
             toastListener("onMembersBanned");
         }
-
 
         @Override
         public void onMembersUnbanned(BMXGroup group, ListOfLongLong members) {

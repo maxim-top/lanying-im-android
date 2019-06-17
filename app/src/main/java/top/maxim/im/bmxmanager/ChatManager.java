@@ -85,6 +85,13 @@ public class ChatManager extends BaseManager {
     }
 
     /**
+     * 设置未读
+     **/
+    public void readCancel(BMXMessage msg) {
+        mService.readCancel(msg);
+    }
+
+    /**
      * 下载缩略图，下载状态变化和进度通过listener通知
      **/
     public void downloadThumbnail(BMXMessage msg) {

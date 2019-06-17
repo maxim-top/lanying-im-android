@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import im.floo.floolib.BMXChatServiceListener;
@@ -132,12 +131,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
     private void buildContactHeaderView() {
         View headerView = View.inflate(getActivity(), R.layout.item_contact_header, null);
         FrameLayout search = headerView.findViewById(R.id.fl_contact_header_search);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MessageSearchActivity.openMessageSearch(getActivity());
-            }
-        });
+        search.setOnClickListener(v -> MessageSearchActivity.openMessageSearch(getActivity()));
         mAdapter.addHeaderView(headerView);
     }
 
@@ -148,12 +142,8 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
     }
 
     private void loadSession() {
-        Observable.just("").map(new Func1<String, BMXConversationList>() {
-            @Override
-            public BMXConversationList call(String s) {
-                return ChatManager.getInstance().getAllConversations();
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+        Observable.just("").map(s -> ChatManager.getInstance().getAllConversations())
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BMXConversationList>() {
                     @Override
                     public void onCompleted() {
@@ -189,18 +179,15 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
         if (conversationList == null || conversationList.isEmpty()) {
             return;
         }
-        Collections.sort(conversationList, new Comparator<BMXConversation>() {
-            @Override
-            public int compare(BMXConversation o1, BMXConversation o2) {
-                BMXMessage m1 = o1 == null || o1.lastMsg() == null ? null : o1.lastMsg();
-                BMXMessage m2 = o2 == null || o2.lastMsg() == null ? null : o2.lastMsg();
-                long o1Time = m1 == null ? -1 : m1.serverTimestamp();
-                long o2Time = m2 == null ? -1 : m2.serverTimestamp();
-                if (o1Time == o2Time) {
-                    return 0;
-                }
-                return o1Time > o2Time ? -1 : 1;
+        Collections.sort(conversationList, (o1, o2) -> {
+            BMXMessage m1 = o1 == null || o1.lastMsg() == null ? null : o1.lastMsg();
+            BMXMessage m2 = o2 == null || o2.lastMsg() == null ? null : o2.lastMsg();
+            long o1Time = m1 == null ? -1 : m1.serverTimestamp();
+            long o2Time = m2 == null ? -1 : m2.serverTimestamp();
+            if (o1Time == o2Time) {
+                return 0;
             }
+            return o1Time > o2Time ? -1 : 1;
         });
     }
 

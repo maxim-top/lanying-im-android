@@ -398,9 +398,6 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     @Override
     public void onPause() {
         stopAudio();
-        if (mConversation != null && mConversation.unreadNumber() > 0) {
-            mConversation.setAllMessagesRead();
-        }
     }
 
     @Override
@@ -675,6 +672,21 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 ackMessage(message);
             });
             // ll.addView(ackRead, params);
+
+            // 设置未读
+            TextView ackUnRead = new TextView(mView.getContext());
+            ackUnRead.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                    ScreenUtils.dp2px(15), 0);
+            ackUnRead.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+            ackUnRead.setTextColor(mView.getContext().getResources().getColor(R.color.color_black));
+            ackUnRead.setBackgroundColor(
+                    mView.getContext().getResources().getColor(R.color.color_white));
+            ackUnRead.setText(mView.getContext().getString(R.string.chat_msg_unread));
+            ackUnRead.setOnClickListener(v -> {
+                dialog.dismiss();
+                setUnReadMessage(message);
+            });
+            ll.addView(ackUnRead, params);
         }
 
         dialog.setCustomView(ll);
@@ -809,6 +821,37 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      * @param message 消息
      */
     protected void ackMessage(final BMXMessage message) {
+    }
+
+    /**
+     * 设置未读
+     *
+     * @param message 消息
+     */
+    private void setUnReadMessage(BMXMessage message) {
+        // 已读不在发送 自己发送的消息不设置已读
+        if (message == null || !message.isReceiveMsg()) {
+            return;
+        }
+        Observable.just(message).map(msg -> {
+            ChatManager.getInstance().readCancel(msg);
+            return msg;
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BMXMessage>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(BMXMessage message) {
+                    }
+                });
     }
 
     /**

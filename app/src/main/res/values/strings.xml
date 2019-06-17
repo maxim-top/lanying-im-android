@@ -52,6 +52,7 @@
     <string name="chat_msg_revoke">撤回</string>
     <string name="chat_msg_reSend">重新发送</string>
     <string name="chat_msg_ack">标记已读</string>
+    <string name="chat_msg_unread">设置未读</string>
     <string name="chat_clear_msg">清除聊天记录</string>
     <string name="chat_at_message">%s&#160;</string>
 

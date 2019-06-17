@@ -74,8 +74,11 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     /* 群成员 */
     private TextView mChatGroupMember;
 
-    /* 群聊id */
+    /* 群id */
     private ItemLineArrow.Builder mChatGroupId;
+
+    /* 群主id */
+    private ItemLineArrow.Builder mChatGroupOwnerId;
 
     /* 群聊管理 */
     private ItemLineArrow.Builder mChatGroupManager;
@@ -224,10 +227,20 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
             }
         });
 
-        /* 群主id */
+        /* 群id */
         mChatGroupId = new ItemLineArrow.Builder(this)
-                .setStartContent(getString(R.string.group_owner_id));
+                .setStartContent(getString(R.string.group_id));
         container.addView(mChatGroupId.build());
+
+        // 分割线
+        ItemLine.Builder itemLine_1 = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(itemLine_1.build());
+
+        /* 群主id */
+        mChatGroupOwnerId = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.group_owner_id));
+        container.addView(mChatGroupOwnerId.build());
 
         // 分割线
         ItemLine.Builder itemLine0 = new ItemLine.Builder(this, container)
@@ -492,14 +505,14 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     }
 
     private void bindGroupInfo() {
+        long groupId = mGroup.groupId();
+        mChatGroupId.setEndContent(groupId > 0 ? String.valueOf(groupId) : "");
+        
         final long ownerId = mGroup.ownerId();
-        mChatGroupId.setEndContent(ownerId > 0 ? String.valueOf(ownerId) : "");
-        mChatGroupId.setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
-            @Override
-            public void onItemClick(View v) {
-                if (ownerId > 0) {
-                    RosterDetailActivity.openRosterDetail(ChatGroupOperateActivity.this, ownerId);
-                }
+        mChatGroupOwnerId.setEndContent(ownerId > 0 ? String.valueOf(ownerId) : "");
+        mChatGroupOwnerId.setOnItemClickListener(v -> {
+            if (ownerId > 0) {
+                RosterDetailActivity.openRosterDetail(ChatGroupOperateActivity.this, ownerId);
             }
         });
 

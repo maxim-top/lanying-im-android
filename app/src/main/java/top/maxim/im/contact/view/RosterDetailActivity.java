@@ -305,7 +305,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
                 getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        setRosterInfo(content, title);
+                        setRosterInfo(TextUtils.isEmpty(content) ? "" : content, title);
                     }
 
                     @Override
@@ -321,9 +321,6 @@ public class RosterDetailActivity extends BaseTitleActivity {
      * @param info
      */
     private void setRosterInfo(final String info, final String title) {
-        if (TextUtils.isEmpty(info)) {
-            return;
-        }
         showLoadingDialog(true);
         Observable.just(info).map(new Func1<String, BMXErrorCode>() {
             @Override

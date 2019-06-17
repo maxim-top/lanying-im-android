@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,7 +30,6 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
 import top.maxim.im.common.view.recyclerview.RecyclerWithHFAdapter;
-import top.maxim.im.message.utils.MessageConfig;
 
 /**
  * Description : 多设备列表 Created by Mango on 2018/11/06
@@ -170,7 +170,8 @@ public class DeviceListActivity extends BaseTitleActivity {
 
         @Override
         protected void onBindHolder(BaseViewHolder holder, int position) {
-            TextView title = holder.findViewById(R.id.tv_device);
+            TextView tvDeviceSN = holder.findViewById(R.id.tv_device_sn);
+            TextView tvDeviceAgent = holder.findViewById(R.id.tv_device_agent);
             TextView quit = holder.findViewById(R.id.tv_quit);
 
             final BMXDevice device = getItem(position);
@@ -178,27 +179,13 @@ public class DeviceListActivity extends BaseTitleActivity {
                 return;
             }
             // 退出
-            quit.setOnClickListener(v ->  
-            deleteDevice(device.deviceSN()));
+            quit.setOnClickListener(v -> deleteDevice(device.deviceSN()));
             long platform = device.platform();
             // 当前设备没有退出按钮
             boolean isCurrent = device.isCurrentDevice();
             quit.setVisibility(isCurrent ? View.GONE : View.VISIBLE);
-            String deviceTitle = "";
-            if (platform == MessageConfig.DeviceType.IOS) {
-                deviceTitle = "iOS";
-            } else if (platform == MessageConfig.DeviceType.Android) {
-                deviceTitle = "Android";
-            } else if (platform == MessageConfig.DeviceType.WIN) {
-                deviceTitle = "Windows";
-            } else if (platform == MessageConfig.DeviceType.MAC) {
-                deviceTitle = "Mac";
-            } else if (platform == MessageConfig.DeviceType.LINUX) {
-                deviceTitle = "Linux";
-            } else if (platform == MessageConfig.DeviceType.WEB) {
-                deviceTitle = "Web";
-            }
-            title.setText(deviceTitle);
+            tvDeviceSN.setText("设备序列号:" + device.deviceSN());
+            tvDeviceAgent.setText(TextUtils.isEmpty(device.userAgent()) ? "" : device.userAgent());
         }
     }
 }

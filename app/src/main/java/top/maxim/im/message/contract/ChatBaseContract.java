@@ -193,6 +193,12 @@ public interface ChatBaseContract {
         void onMessageReadAck(BMXMessage bean);
 
         /**
+         * 消息重发
+         * @param bean 消息体
+         */
+        void onReSendMessage(BMXMessage bean);
+
+        /**
          * 返回数据
          * @param requestCode  请求码
          * @param resultCode   返回码

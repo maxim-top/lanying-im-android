@@ -329,4 +329,11 @@ public class ChatViewHelper implements ChatActionListener {
             mPresenter.onMessageReadAck(bean);
         }
     }
+
+    @Override
+    public void onReSendMessage(BMXMessage bean) {
+        if (mPresenter != null) {
+            mPresenter.onReSendMessage(bean);
+        }
+    }
 }

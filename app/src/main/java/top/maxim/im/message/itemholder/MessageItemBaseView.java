@@ -124,10 +124,15 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         if (mItemPos != ITEM_CENTER) {
             mIconView = mItemView.findViewById(R.id.message_avatar);
             mUsetText = mItemView.findViewById(R.id.message_name);
-            mSendFailImg = (ImageView)mItemView.findViewById(R.id.img_sendfail);
+            mSendFailImg = mItemView.findViewById(R.id.img_sendfail);
             mSendFailImg.setVisibility(View.GONE);
-            mSendingImg = (ProgressBar)mItemView.findViewById(R.id.img_sending);
+            mSendingImg = mItemView.findViewById(R.id.img_sending);
             mSendingImg.setVisibility(View.GONE);
+            mSendFailImg.setOnClickListener(v -> {
+                if (mActionListener != null) {
+                    mActionListener.onReSendMessage(mMaxMessage);
+                }
+            });
         }
     }
 
@@ -174,16 +179,13 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
             }
         }
         if (mIconView != null) {
-            mIconView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mMaxMessage.isReceiveMsg()) {
-                        // 收到的消息进入roster详情
-                        RosterDetailActivity.openRosterDetail(mContext, mMaxMessage.fromId());
-                    } else {
-                        // 自己的进入设置页面
-                        SettingUserActivity.openSettingUser(mContext);
-                    }
+            mIconView.setOnClickListener(v -> {
+                if (mMaxMessage.isReceiveMsg()) {
+                    // 收到的消息进入roster详情
+                    RosterDetailActivity.openRosterDetail(mContext, mMaxMessage.fromId());
+                } else {
+                    // 自己的进入设置页面
+                    SettingUserActivity.openSettingUser(mContext);
                 }
             });
         }
@@ -242,12 +244,9 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         // 长按
         view.setOnLongClickListener(new ItemLongClickListener());
         // 点击
-        view.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mActionListener != null) {
-                    mActionListener.onItemFunc(mMaxMessage);
-                }
+        view.setOnClickListener(v -> {
+            if (mActionListener != null) {
+                mActionListener.onItemFunc(mMaxMessage);
             }
         });
     }

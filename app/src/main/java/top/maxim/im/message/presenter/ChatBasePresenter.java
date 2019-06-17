@@ -163,6 +163,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
         @Override
         public void onAttachmentStatusChanged(BMXMessage msg, BMXErrorCode error, int percent) {
+            Log.d("statusChanged", percent+"");
         }
 
         @Override
@@ -260,6 +261,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             if (msg != null && isCurrentSession(msg)) {
                 mView.updateChatMessage(msg);
             }
+            Log.d("progressChanged", percent+"");
         }
     };
 
@@ -580,6 +582,11 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         ackMessage(bean);
     }
 
+    @Override
+    public void onReSendMessage(BMXMessage bean) {
+        reSendMessage(bean);
+    }
+
     private void showOperateMessage(final BMXMessage message) {
         if (message == null) {
             return;
@@ -669,19 +676,6 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             });
             // ll.addView(ackRead, params);
         }
-        // 重新发送
-        TextView reSend = new TextView(mView.getContext());
-        reSend.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), 0);
-        reSend.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
-        reSend.setTextColor(mView.getContext().getResources().getColor(R.color.color_black));
-        reSend.setBackgroundColor(mView.getContext().getResources().getColor(R.color.color_white));
-        reSend.setText(mView.getContext().getString(R.string.chat_msg_reSend));
-        reSend.setOnClickListener(v -> {
-            dialog.dismiss();
-            reSendMessage(message);
-        });
-        // TODO
-        // ll.addView(reSend, params);
 
         dialog.setCustomView(ll);
         dialog.showDialog((Activity)mView.getContext());
@@ -784,16 +778,13 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      *
      * @param message 消息
      */
-    private void reSendMessage(final BMXMessage message) {
+    private void reSendMessage(BMXMessage message) {
         if (message == null || mConversation == null) {
             return;
         }
-        Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
-            @Override
-            public BMXMessage call(BMXMessage message) {
-                ChatManager.getInstance().resendMessage(message);
-                return message;
-            }
+        Observable.just(message).map(msg -> {
+            ChatManager.getInstance().resendMessage(msg);
+            return msg;
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BMXMessage>() {
                     @Override

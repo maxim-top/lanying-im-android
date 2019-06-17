@@ -27,4 +27,10 @@ public interface ChatActionListener {
      * @param bean 消息体
      */
     void onMessageReadAck(BMXMessage bean);
+
+    /**
+     * 消息重发
+     * @param bean 消息体
+     */
+    void onReSendMessage(BMXMessage bean);
 }

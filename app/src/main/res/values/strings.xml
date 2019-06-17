@@ -47,6 +47,7 @@
     <string name="choose_file">选择文件</string>
     <string name="chat_file_not_exit">文件不存在！</string>
     <string name="chat_file_not_open">没有可以打开该文件的应用</string>
+    <string name="chat_msg_copy">复制</string>
     <string name="chat_msg_relay">转发</string>
     <string name="chat_msg_revoke">撤回</string>
     <string name="chat_msg_reSend">重新发送</string>

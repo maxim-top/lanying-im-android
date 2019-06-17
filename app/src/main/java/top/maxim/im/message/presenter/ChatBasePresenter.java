@@ -2,6 +2,8 @@
 package top.maxim.im.message.presenter;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +14,6 @@ import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -588,6 +589,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         ll.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        
         // 删除
         TextView delete = new TextView(mView.getContext());
         delete.setPadding(ScreenUtils.dp2px(15), 0, ScreenUtils.dp2px(15), 0);
@@ -595,14 +597,30 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         delete.setTextColor(mView.getContext().getResources().getColor(R.color.color_black));
         delete.setBackgroundColor(mView.getContext().getResources().getColor(R.color.color_white));
         delete.setText(mView.getContext().getString(R.string.delete));
-        delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                deleteMessage(message);
-            }
+        delete.setOnClickListener(v -> {
+            dialog.dismiss();
+            deleteMessage(message);
         });
         ll.addView(delete, params);
+        
+        // 复制 文字才有
+        // 自己发送的消息才有撤回
+        if (message.contentType() == BMXMessage.ContentType.Text) {
+            // 撤回
+            TextView copy = new TextView(mView.getContext());
+            copy.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), 0);
+            copy.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+            copy.setTextColor(mView.getContext().getResources().getColor(R.color.color_black));
+            copy.setBackgroundColor(
+                    mView.getContext().getResources().getColor(R.color.color_white));
+            copy.setText(mView.getContext().getString(R.string.chat_msg_copy));
+            copy.setOnClickListener(v -> {
+                dialog.dismiss();
+                copyMessage(message);
+            });
+            ll.addView(copy, params);
+        }
+        
         // 转发
         TextView relay = new TextView(mView.getContext());
         relay.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), 0);
@@ -610,13 +628,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         relay.setTextColor(mView.getContext().getResources().getColor(R.color.color_black));
         relay.setBackgroundColor(mView.getContext().getResources().getColor(R.color.color_white));
         relay.setText(mView.getContext().getString(R.string.chat_msg_relay));
-        relay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                ForwardMsgRosterActivity.openForwardMsgRosterActivity(mView.getContext(),
-                        ChatUtils.getInstance().buildMessage(message, mChatType, mChatId));
-            }
+        relay.setOnClickListener(v -> {
+            dialog.dismiss();
+            ForwardMsgRosterActivity.openForwardMsgRosterActivity(mView.getContext(),
+                    ChatUtils.getInstance().buildMessage(message, mChatType, mChatId));
         });
         ll.addView(relay, params);
 
@@ -631,12 +646,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             revoke.setBackgroundColor(
                     mView.getContext().getResources().getColor(R.color.color_white));
             revoke.setText(mView.getContext().getString(R.string.chat_msg_revoke));
-            revoke.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                    revokeMessage(message);
-                }
+            revoke.setOnClickListener(v -> {
+                dialog.dismiss();
+                revokeMessage(message);
             });
             ll.addView(revoke, params);
         }
@@ -651,12 +663,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             ackRead.setBackgroundColor(
                     mView.getContext().getResources().getColor(R.color.color_white));
             ackRead.setText(mView.getContext().getString(R.string.chat_msg_ack));
-            ackRead.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                    ackMessage(message);
-                }
+            ackRead.setOnClickListener(v -> {
+                dialog.dismiss();
+                ackMessage(message);
             });
             // ll.addView(ackRead, params);
         }
@@ -667,18 +676,38 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         reSend.setTextColor(mView.getContext().getResources().getColor(R.color.color_black));
         reSend.setBackgroundColor(mView.getContext().getResources().getColor(R.color.color_white));
         reSend.setText(mView.getContext().getString(R.string.chat_msg_reSend));
-        reSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                reSendMessage(message);
-            }
+        reSend.setOnClickListener(v -> {
+            dialog.dismiss();
+            reSendMessage(message);
         });
         // TODO
         // ll.addView(reSend, params);
 
         dialog.setCustomView(ll);
         dialog.showDialog((Activity)mView.getContext());
+    }
+
+    /**
+     * 复制消息
+     * 
+     * @param message 消息
+     */
+    private void copyMessage(BMXMessage message) {
+        if (message == null || message.contentType() != BMXMessage.ContentType.Text) {
+            return;
+        }
+        ClipboardManager clipboard = (ClipboardManager)mView.getContext()
+                .getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard == null) {
+            return;
+        }
+        String text = message.content();
+        if (TextUtils.isEmpty(text)) {
+            return;
+        }
+        ClipData clip = ClipData.newPlainText("chat_text", text);
+        clipboard.setPrimaryClip(clip);
+        ToastUtil.showTextViewPrompt("复制成功");
     }
 
     /**

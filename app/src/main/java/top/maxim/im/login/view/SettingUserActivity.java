@@ -452,9 +452,6 @@ public class SettingUserActivity extends BaseTitleActivity {
                 getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        if (TextUtils.isEmpty(content)) {
-                            return;
-                        }
                         setUserInfo(title, content);
                     }
 
@@ -635,8 +632,12 @@ public class SettingUserActivity extends BaseTitleActivity {
      * 更新信息
      */
     private void setUserInfo(final String title, final String info) {
-        if (TextUtils.isEmpty(info)) {
-            return;
+        if (TextUtils.equals(title, getString(R.string.setting_user_phone))
+                || TextUtils.equals(title, getString(R.string.setting_add_friend_auth_mode))) {
+            // 设置手机号 好友验证类型时候 content不能为空
+            if (TextUtils.isEmpty(info)) {
+                return;
+            }
         }
         showLoadingDialog(true);
         Observable.just(info).map(new Func1<String, BMXErrorCode>() {
@@ -705,13 +706,15 @@ public class SettingUserActivity extends BaseTitleActivity {
                         } else if (TextUtils.equals(title,
                                 getString(R.string.setting_user_public))) {
                             // 设置公有信息
-                            mTvPublic.setVisibility(View.VISIBLE);
-                            mTvPublic.setText(info);
+                            mTvPublic.setVisibility(
+                                    TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                            mTvPublic.setText(TextUtils.isEmpty(info) ? "" : info);
                         } else if (TextUtils.equals(title,
                                 getString(R.string.setting_user_private))) {
                             // 设置私密信息
-                            mTvPrivate.setVisibility(View.VISIBLE);
-                            mTvPrivate.setText(info);
+                            mTvPrivate.setVisibility(
+                                    TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                            mTvPrivate.setText(TextUtils.isEmpty(info) ? "" : info);
                         } else if (TextUtils.equals(title,
                                 getString(R.string.setting_add_friend_auth_mode))) {
                             // 设置好友验证类型

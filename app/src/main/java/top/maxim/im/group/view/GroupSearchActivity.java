@@ -131,6 +131,8 @@ public class GroupSearchActivity extends BaseTitleActivity {
                     @Override
                     public void onError(Throwable e) {
                         dismissLoadingDialog();
+                        mAdapter.removeAll();
+                        ToastUtil.showTextViewPrompt("未搜索到群组");
                     }
 
                     @Override

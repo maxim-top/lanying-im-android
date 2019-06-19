@@ -29,6 +29,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
@@ -50,8 +51,6 @@ public class ContactSearchActivity extends BaseTitleActivity {
     private TextView mSwicthSearchMode;
 
     private EditText mSearch;
-
-    private List<BMXRosterItem> mSearchs = new ArrayList<>();
 
     private SearchAdapter mAdapter;
 
@@ -155,11 +154,13 @@ public class ContactSearchActivity extends BaseTitleActivity {
                     @Override
                     public void onError(Throwable e) {
                         dismissLoadingDialog();
+                        mAdapter.removeAll();
+                        ToastUtil.showTextViewPrompt("未搜索到用户");
                     }
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
-                        mSearchs.clear();
+                        List<BMXRosterItem> mSearchs = new ArrayList<>();
                         mSearchs.add(item);
                         mAdapter.replaceList(mSearchs);
                     }
@@ -194,12 +195,12 @@ public class ContactSearchActivity extends BaseTitleActivity {
             if (item == null) {
                 return;
             }
-            add.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    long rosterId = item.rosterId();
-                    showAddReason(rosterId);
-                }
+            long myId = SharePreferenceUtils.getInstance().getUserId();
+            //自己不展示添加按钮
+            add.setVisibility(myId == item.rosterId() ? View.GONE : View.VISIBLE);
+            add.setOnClickListener(v -> {
+                long rosterId = item.rosterId();
+                showAddReason(rosterId);
             });
 
             String name = item.username();

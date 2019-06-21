@@ -82,36 +82,42 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /* 群聊管理 */
     private ItemLineArrow.Builder mChatGroupManager;
+    private View mViewChatGroupManager;
 
     /* 修改名称 */
     private ItemLineArrow.Builder mChatGroupRename;
+    private View mViewChatGroupRename;
 
     /* 群头像 */
     private ItemLineArrow.Builder mGroupAvatar;
+    private View mViewGroupAvatar;
 
     /* 我在群里的昵称 */
     private ItemLineArrow.Builder mGroupMyNickName;
+    private View mViewGroupMyNickName;
 
     /* 管理员列表 */
     private ItemLineArrow.Builder mChatGroupManagerList;
+    private View mViewChatGroupManagerList;
 
     /* 群描述 */
     private ItemLineArrow.Builder mChatGroupDesc;
-
+    private View mViewChatGroupDesc;
     private TextView mViewGroupDesc;
 
     /* 群公告 */
     private ItemLineArrow.Builder mChatGroupNotice;
-
+    private View mViewChatGroupNotice;
     private TextView mViewGroupNotice;
 
     /* 群扩展 */
     private ItemLineArrow.Builder mChatGroupExt;
-
+    private View mViewChatGroupExt;
     private TextView mViewGroupExt;
 
     /* 群共享 */
     private ItemLineArrow.Builder mChatGroupShare;
+    private View mViewChatGroupShare;
 
     /* 群聊成员gridView */
     private RecyclerView mGvGroupMember;
@@ -130,6 +136,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /* 减人 */
     private final int REMOVE_MEMBER_REQUEST = 1002;
+    
+    /* 是否是群聊创建者 */
+    private boolean mIsOwner;
 
     public static void startGroupOperateActivity(Context context, long groupId) {
         Intent intent = new Intent(context, ChatGroupOperateActivity.class);
@@ -257,7 +266,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                                 .startGroupSettingActivity(ChatGroupOperateActivity.this, mGroupId);
                     }
                 });
-        container.addView(mChatGroupManager.build());
+        container.addView(mViewChatGroupManager = mChatGroupManager.build());
 
         // 分割线
         ItemLine.Builder itemLine1 = new ItemLine.Builder(this, container)
@@ -273,7 +282,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                         showSettingDialog(getString(R.string.group_rename));
                     }
                 });
-        container.addView(mChatGroupRename.build());
+        container.addView(mViewChatGroupRename = mChatGroupRename.build());
 
         /* 群头像 */
         mGroupAvatar = new ItemLineArrow.Builder(this)
@@ -292,7 +301,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                         }
                     }
                 });
-        container.addView(mGroupAvatar.build());
+        container.addView(mViewGroupAvatar = mGroupAvatar.build());
 
         // 分割线
         ItemLine.Builder itemLine2 = new ItemLine.Builder(this, container)
@@ -308,7 +317,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                         showSettingDialog(getString(R.string.group_my_name));
                     }
                 });
-        container.addView(mGroupMyNickName.build());
+        container.addView(mViewGroupMyNickName = mGroupMyNickName.build());
 
         // 分割线
         ItemLine.Builder itemLine3 = new ItemLine.Builder(this, container)
@@ -325,7 +334,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                                 .startGroupAdminActivity(ChatGroupOperateActivity.this, mGroupId);
                     }
                 });
-        container.addView(mChatGroupManagerList.build());
+        container.addView(mViewChatGroupManagerList = mChatGroupManagerList.build());
         // 分割线
         ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
@@ -340,7 +349,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                         showSettingDialog(getString(R.string.group_desc));
                     }
                 });
-        container.addView(mChatGroupDesc.build());
+        container.addView(mViewChatGroupDesc = mChatGroupDesc.build());
 
         // 分割线
         ItemLine.Builder itemLine5 = new ItemLine.Builder(this, container)
@@ -372,7 +381,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                                 ChatGroupOperateActivity.this, mGroupId);
                     }
                 });
-        container.addView(mChatGroupNotice.build());
+        container.addView(mViewChatGroupNotice = mChatGroupNotice.build());
         // 分割线
         ItemLine.Builder itemLine7 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
@@ -402,7 +411,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                         showSettingDialog(getString(R.string.group_ext));
                     }
                 });
-        container.addView(mChatGroupExt.build());
+        container.addView(mViewChatGroupExt = mChatGroupExt.build());
 
         // 分割线
         ItemLine.Builder itemLine9 = new ItemLine.Builder(this, container)
@@ -434,7 +443,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                                 .startGroupShareActivity(ChatGroupOperateActivity.this, mGroupId);
                     }
                 });
-        container.addView(mChatGroupShare.build());
+        container.addView(mViewChatGroupShare = mChatGroupShare.build());
         // 分割线
         ItemLine.Builder itemLine11 = new ItemLine.Builder(this, container);
         container.addView(itemLine11.build());
@@ -505,10 +514,12 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     }
 
     private void bindGroupInfo() {
+        mIsOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
+        
         long groupId = mGroup.groupId();
         mChatGroupId.setEndContent(groupId > 0 ? String.valueOf(groupId) : "");
         
-        final long ownerId = mGroup.ownerId();
+        long ownerId = mGroup.ownerId();
         mChatGroupOwnerId.setEndContent(ownerId > 0 ? String.valueOf(ownerId) : "");
         mChatGroupOwnerId.setOnItemClickListener(v -> {
             if (ownerId > 0) {
@@ -558,8 +569,32 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         // 群共享列表
         int shares = mGroup.sharedFilesCount();
         mChatGroupShare.setEndContent(shares <= 0 ? "" : String.valueOf(shares));
+        
+        setManagerVisible();
     }
 
+    /**
+     * 设置群主和群成员的页面view显隐
+     */
+    private void setManagerVisible() {
+        mViewChatGroupManager.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        mViewChatGroupRename.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        mViewGroupAvatar.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        mViewGroupMyNickName.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        mViewChatGroupManagerList.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+
+        mViewChatGroupDesc.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        mViewGroupDesc.setVisibility(mIsOwner ? mViewGroupDesc.getVisibility() : View.GONE);
+
+        mViewChatGroupNotice.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        mViewGroupNotice.setVisibility(mIsOwner ? mViewGroupNotice.getVisibility() : View.GONE);
+
+        mViewChatGroupExt.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        mViewGroupExt.setVisibility(mIsOwner ? mViewGroupExt.getVisibility() : View.GONE);
+
+        mViewChatGroupShare.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+    }
+    
     /**
      * 初始化群成员
      */
@@ -614,12 +649,16 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                         long memberCount = memberList.size();
                         mHeader.setTitle(String.format(getString(R.string.group_info),
                                 String.valueOf(memberCount)));
-                        // 增加添加 移除
-                        BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "", 0);
-                        BMXGroup.Member remove = new BMXGroup.Member(MessageConfig.MEMBER_REMOVE,
-                                "", 0);
-                        members.add(add);
-                        members.add(remove);
+                        // 群主才有添加 删除功能
+                        if (mIsOwner) {
+                            // 增加添加 移除
+                            BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "",
+                                    0);
+                            BMXGroup.Member remove = new BMXGroup.Member(
+                                    MessageConfig.MEMBER_REMOVE, "", 0);
+                            members.add(add);
+                            members.add(remove);
+                        }
                         mAdapter.replaceList(members);
                     }
                 });
@@ -680,8 +719,10 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
      * 更新信息
      */
     private void setGroupInfo(final String title, final String info) {
-        if (TextUtils.isEmpty(info)) {
-            return;
+        if (TextUtils.equals(title, getString(R.string.group_rename))) {
+            if (TextUtils.isEmpty(info)) {
+                return;
+            }
         }
         showLoadingDialog(true);
         Observable.just(info).map(new Func1<String, BMXErrorCode>() {
@@ -733,12 +774,14 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                             mGroupMyNickName.setEndContent(info);
                         } else if (TextUtils.equals(title, getString(R.string.group_desc))) {
                             // 设置群描述
-                            mViewGroupDesc.setVisibility(View.VISIBLE);
-                            mViewGroupDesc.setText(info);
+                            mViewGroupDesc.setVisibility(
+                                    TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                            mViewGroupDesc.setText(TextUtils.isEmpty(info) ? "" : info);
                         } else if (TextUtils.equals(title, getString(R.string.group_ext))) {
                             // 设置群扩展信息
-                            mViewGroupExt.setVisibility(View.VISIBLE);
-                            mViewGroupExt.setText(info);
+                            mViewGroupExt.setVisibility(
+                                    TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                            mViewGroupExt.setText(TextUtils.isEmpty(info) ? "" : info);
                         }
                     }
                 });

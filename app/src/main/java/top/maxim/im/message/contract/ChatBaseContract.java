@@ -97,6 +97,18 @@ public interface ChatBaseContract {
 
         void insertInAt(List<String> atNames);
 
+        /**
+         * 设置输入板文字框
+         *
+         * @param content 显示内容
+         */
+        void setControlBarText(String content);
+
+        /**
+         * 获取输入板文字
+         */
+        String getControlBarText();
+
     }
 
     /**

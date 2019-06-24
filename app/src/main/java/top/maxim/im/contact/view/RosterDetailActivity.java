@@ -358,8 +358,8 @@ public class RosterDetailActivity extends BaseTitleActivity {
                             mSetAlias.setEndContent(info);
                         } else if (TextUtils.equals(title,
                                 getString(R.string.setting_roster_ext))) {
-                            mTvExt.setVisibility(View.VISIBLE);
-                            mTvExt.setText(info);
+                            mTvExt.setVisibility(TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                            mTvExt.setText(TextUtils.isEmpty(info) ? "" : info);
                         }
                     }
                 });

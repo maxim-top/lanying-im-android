@@ -305,6 +305,27 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
         }
     }
 
+    /**
+     * 设置输入框内容
+     */
+    public void appendString(String text) {
+        if (mChatEditText != null && mChatEditText.getEditableText() != null) {
+            mChatEditText.getEditableText().append(text);
+        }
+    }
+
+    /**
+     * 获取输入框内容
+     * 
+     * @return String
+     */
+    public String getChatEditText() {
+        if (mChatEditText != null && mChatEditText.getText() != null) {
+            return mChatEditText.getText().toString();
+        }
+        return "";
+    }
+
     public void insertInAt(List<String> atNames) {
         if (atNames == null || atNames.isEmpty()) {
             return;

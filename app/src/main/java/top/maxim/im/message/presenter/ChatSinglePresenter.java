@@ -16,6 +16,7 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.RosterManager;
+import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatSingleContract;
 import top.maxim.im.message.utils.MessageConfig;
 
@@ -40,6 +41,22 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
     @Override
     public void setChatInfo(BMXMessage.MessageType chatType, final long myUserId, long chatId) {
         super.setChatInfo(chatType, myUserId, chatId);
+        // 先从conversation获取名称展示
+        if (mConversation != null) {
+            String name = "";
+            BMXRosterItem rosterItem = RosterFetcher.getFetcher()
+                    .getRoster(mConversation.conversationId());
+            if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
+                name = rosterItem.alias();
+            } else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
+                name = rosterItem.nickname();
+            } else if (rosterItem != null) {
+                name = rosterItem.username();
+            }
+            if (mView != null) {
+                mView.setHeadTitle(name);
+            }
+        }
         mRoster = new BMXRosterItem();
         Observable.just(chatId).map(new Func1<Long, BMXErrorCode>() {
             @Override
@@ -65,9 +82,12 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
+                        RosterFetcher.getFetcher().putRoster(mRoster);
                         String name = "";
                         if (mRoster != null && !TextUtils.isEmpty(mRoster.alias())) {
                             name = mRoster.alias();
+                        } else if (mRoster != null && !TextUtils.isEmpty(mRoster.nickname())) {
+                            name = mRoster.nickname();
                         } else if (mRoster != null) {
                             name = mRoster.username();
                         }

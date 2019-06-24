@@ -76,7 +76,7 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
         builder.setHeaderBgColor(getResources().getColor(R.color.color_white));
-        builder.setTitle(R.string.block_message);
+        builder.setTitle("");
         builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -404,6 +404,18 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
         if (mInputBar != null) {
             mInputBar.insertInAt(atNames);
         }
+    }
+
+    @Override
+    public void setControlBarText(String content) {
+        if (mInputBar != null && !TextUtils.isEmpty(content)) {
+            mInputBar.appendString(content);
+        }
+    }
+
+    @Override
+    public String getControlBarText() {
+        return mInputBar == null ? "" : mInputBar.getChatEditText();
     }
 
     @Override

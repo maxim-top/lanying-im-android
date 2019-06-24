@@ -159,7 +159,9 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         String userName = null;
         if (mMaxMessage.isReceiveMsg()) {
             BMXRosterItem item = RosterFetcher.getFetcher().getRoster(mMaxMessage.fromId());
-            if (item != null && !TextUtils.isEmpty(item.nickname())) {
+            if (item != null && !TextUtils.isEmpty(item.alias())) {
+                userName = item.alias();
+            } else if (item != null && !TextUtils.isEmpty(item.nickname())) {
                 userName = item.nickname();
             } else if (item != null) {
                 userName = item.username();

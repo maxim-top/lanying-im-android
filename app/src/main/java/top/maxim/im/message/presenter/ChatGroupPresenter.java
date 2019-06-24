@@ -23,6 +23,7 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
+import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatGroupContract;
 import top.maxim.im.message.view.ChatGroupAtActivity;
 
@@ -52,6 +53,15 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     @Override
     public void setChatInfo(BMXMessage.MessageType chatType, long myUserId, final long chatId) {
         super.setChatInfo(chatType, myUserId, chatId);
+        // 先从conversation获取名称展示
+        if (mConversation != null) {
+            BMXGroup groupItem = RosterFetcher.getFetcher()
+                    .getGroup(mConversation.conversationId());
+            String name = groupItem != null ? groupItem.name() : "";
+            if (mView != null) {
+                mView.setHeadTitle(name);
+            }
+        }
         // 获取群聊信息
         if (chatId <= 0) {
             return;
@@ -80,6 +90,7 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
+                        RosterFetcher.getFetcher().putGroup(mGroup);
                         if (mView != null) {
                             mView.setHeadTitle(mGroup.name());
                         }

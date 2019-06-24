@@ -3,7 +3,12 @@ package top.maxim.im.message.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -77,6 +82,8 @@ public class SessionAdapter extends RecyclerWithHFAdapter<BMXConversation> {
             BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(item.conversationId());
             if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
                 name = rosterItem.alias();
+            } else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
+                name = rosterItem.nickname();
             } else if (rosterItem != null) {
                 name = rosterItem.username();
             }
@@ -107,26 +114,37 @@ public class SessionAdapter extends RecyclerWithHFAdapter<BMXConversation> {
         }
         tvTitle.setText(TextUtils.isEmpty(name) ? "" : name);
         time.setText(lastMsg != null ? TimeUtils.millis2String(lastMsg.serverTimestamp()) : "");
-        String msgDesc = ChatUtils.getInstance().getMessageDesc(lastMsg);
-
-        if (lastMsg != null && lastMsg.isReceiveMsg() && !TextUtils.isEmpty(lastMsg.config())) {
-            // 有@
-            try {
-                MentionBean mentionBean = new Gson().fromJson(lastMsg.config(), MentionBean.class);
-                if (mentionBean != null && mentionBean.isMentionAll()) {
-                    msgDesc = "[有人@你]" + msgDesc;
-                } else if (mentionBean != null) {
-                    List<Long> atList = mentionBean.getMentionList();
-                    if (atList != null && !atList.isEmpty()
-                            && atList.contains(SharePreferenceUtils.getInstance().getUserId())) {
+        String draft = item == null ? "" : item.editMessage();
+        if (!TextUtils.isEmpty(draft)) {
+            // 有草稿
+            SpannableStringBuilder spannable = new SpannableStringBuilder();
+            String draftText = "[草稿]";
+            SpannableString spannableString = new SpannableString(draftText);
+            spannableString.setSpan(new ForegroundColorSpan(Color.RED), 0, draftText.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.append(spannableString).append(draft);
+            desc.setText(spannable);
+        } else {
+            String msgDesc = ChatUtils.getInstance().getMessageDesc(lastMsg);
+            if (lastMsg != null && lastMsg.isReceiveMsg() && !TextUtils.isEmpty(lastMsg.config())) {
+                // 有@
+                try {
+                    MentionBean mentionBean = new Gson().fromJson(lastMsg.config(),
+                            MentionBean.class);
+                    if (mentionBean != null && mentionBean.isMentionAll()) {
                         msgDesc = "[有人@你]" + msgDesc;
+                    } else if (mentionBean != null) {
+                        List<Long> atList = mentionBean.getMentionList();
+                        if (atList != null && !atList.isEmpty() && atList
+                                .contains(SharePreferenceUtils.getInstance().getUserId())) {
+                            msgDesc = "[有人@你]" + msgDesc;
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+            desc.setText(!TextUtils.isEmpty(msgDesc) ? msgDesc : "");
         }
-        desc.setText(!TextUtils.isEmpty(msgDesc) ? msgDesc : "");
     }
-
 }

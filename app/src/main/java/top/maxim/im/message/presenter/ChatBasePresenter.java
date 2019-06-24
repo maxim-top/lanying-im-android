@@ -1,15 +1,21 @@
-
 package top.maxim.im.message.presenter;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
@@ -25,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import im.floo.floolib.BMXChatServiceListener;
@@ -100,6 +107,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     /* 文件权限 */
     private final int TYPE_FILE_PERMISSION = 4;
 
+    /* 位置权限 */
+    private final int TYPE_LOCATION_PERMISSION = 5;
+
     /* 我的id */
     protected long mMyUserId;
 
@@ -163,7 +173,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
         @Override
         public void onAttachmentStatusChanged(BMXMessage msg, BMXErrorCode error, int percent) {
-            Log.d("statusChanged", percent+"");
+            Log.d("statusChanged", percent + "");
         }
 
         @Override
@@ -180,7 +190,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 }
             } else {
                 // 原始消息不为空 则没有撤回成功
-                ((Activity)mView.getContext())
+                ((Activity) mView.getContext())
                         .runOnUiThread(() -> ToastUtil.showTextViewPrompt("撤回失败"));
             }
         }
@@ -246,7 +256,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     if (message != null && isCurrentSession(message)) {
                         // 当前会话
                         if (mView != null) {
-                            ((Activity)mView.getContext())
+                            ((Activity) mView.getContext())
                                     .runOnUiThread(() -> ToastUtil.showTextViewPrompt("对方撤回一条消息"));
                             mView.deleteChatMessage(message);
                         }
@@ -261,7 +271,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             if (msg != null && isCurrentSession(msg)) {
                 mView.updateChatMessage(msg);
             }
-            Log.d("progressChanged", percent+"");
+            Log.d("progressChanged", percent + "");
         }
     };
 
@@ -398,6 +408,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     @Override
     public void onPause() {
         stopAudio();
+        // 聊天页面返回需要更新会话的草稿
+        if (mConversation != null) {
+            mConversation.setEditMessage(mView == null ? "" : mView.getControlBarText());
+        }
     }
 
     @Override
@@ -415,8 +429,15 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         BMXConversation.Type.Group, true);
             }
         }
-        if (mConversation != null && mConversation.unreadNumber() > 0) {
-            mConversation.setAllMessagesRead();
+        if (mConversation != null) {
+            // 设置已读
+            if (mConversation.unreadNumber() > 0) {
+                mConversation.setAllMessagesRead();
+            }
+            // 获取草稿
+            if (mView != null) {
+                mView.setControlBarText(mConversation.editMessage());
+            }
         }
         initChatData(0);
 
@@ -462,7 +483,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 // 选择相册 需要SD卡读写权限
                 if (hasPermission(PermissionsConstant.READ_STORAGE,
                         PermissionsConstant.WRITE_STORAGE)) {
-                    CameraUtils.getInstance().takeGalley((Activity)mView.getContext(),
+                    CameraUtils.getInstance().takeGalley((Activity) mView.getContext(),
                             IMAGE_REQUEST);
                 } else {
                     requestPermissions(TYPE_PHOTO_PERMISSION, PermissionsConstant.READ_STORAGE);
@@ -488,11 +509,13 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 break;
             case "位置":
                 if (mView != null) {
-                    double longitude = 116.39750766754;
-                    double latitude = 39.908605910761;
-                    String address = "天安门广场";
-                    mView.sendChatMessage(mSendUtils.sendLocationMessage(mChatType, mMyUserId,
-                            mChatId, latitude, longitude, address));
+                    if (hasPermission(PermissionsConstant.FINE_LOCATION,
+                            PermissionsConstant.COARSE_LOCATION)) {
+                        sendCurrentLocation();
+                    } else {
+                        requestPermissions(TYPE_LOCATION_PERMISSION,
+                                PermissionsConstant.FINE_LOCATION);
+                    }
                 }
                 break;
             default:
@@ -593,7 +616,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         ll.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        
+
         // 删除
         TextView delete = new TextView(mView.getContext());
         delete.setPadding(ScreenUtils.dp2px(15), 0, ScreenUtils.dp2px(15), 0);
@@ -606,7 +629,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             deleteMessage(message);
         });
         ll.addView(delete, params);
-        
+
         // 复制 文字才有
         // 自己发送的消息才有撤回
         if (message.contentType() == BMXMessage.ContentType.Text) {
@@ -624,7 +647,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             });
             ll.addView(copy, params);
         }
-        
+
         // 转发
         TextView relay = new TextView(mView.getContext());
         relay.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), 0);
@@ -690,19 +713,19 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }
 
         dialog.setCustomView(ll);
-        dialog.showDialog((Activity)mView.getContext());
+        dialog.showDialog((Activity) mView.getContext());
     }
 
     /**
      * 复制消息
-     * 
+     *
      * @param message 消息
      */
     private void copyMessage(BMXMessage message) {
         if (message == null || message.contentType() != BMXMessage.ContentType.Text) {
             return;
         }
-        ClipboardManager clipboard = (ClipboardManager)mView.getContext()
+        ClipboardManager clipboard = (ClipboardManager) mView.getContext()
                 .getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard == null) {
             return;
@@ -718,7 +741,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     /**
      * 删除消息
-     * 
+     *
      * @param message 消息
      */
     private void deleteMessage(final BMXMessage message) {
@@ -869,7 +892,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             return;
         }
         if (mVoicePlayHelper == null) {
-            mVoicePlayHelper = new VoicePlayHelper((Activity)mView.getContext());
+            mVoicePlayHelper = new VoicePlayHelper((Activity) mView.getContext());
             registerSensor();
         }
         if (mVoicePlayHelper.isPlaying()) {
@@ -919,14 +942,14 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         // 停止其他占用音频的地方
         stopAudio();
         if (mVoiceRecordHelper == null) {
-            mVoiceRecordHelper = new VoiceRecordHelper((Activity)mView.getContext());
+            mVoiceRecordHelper = new VoiceRecordHelper((Activity) mView.getContext());
         }
         // 录制音量
         mVoiceRecordHelper.setCallBackSoundDecibel(new VoiceRecordHelper.OnCallBackSoundDecibel() {
             @Override
             public void callBackSoundDecibel(float decibel) {
                 if (mView != null) {
-                    mView.showRecordMicView((int)decibel);
+                    mView.showRecordMicView((int) decibel);
                 }
             }
         });
@@ -958,7 +981,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             if (new File(mVoiceName).exists() && new File(mVoiceName).length() > 0) {
                 // 文件长度大于0才发送 否则就是没有录制成功
                 mView.sendChatMessage(mSendUtils.sendAudioMessage(mChatType, mMyUserId, mChatId,
-                        mVoiceName, (int)time));
+                        mVoiceName, (int) time));
             } else {
                 // 录制失败 停止录音并删除文件
                 mVoiceRecordHelper.stopVoiceRecord(true, mVoiceName);
@@ -1132,7 +1155,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     /**
      * 文件预览
-     * 
+     *
      * @param path 路径
      */
     private void openFilePreView(String path) {
@@ -1207,7 +1230,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 // 文件
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null) {
-                        List<FileBean> beans = (List<FileBean>)data
+                        List<FileBean> beans = (List<FileBean>) data
                                 .getSerializableExtra(ChooseFileActivity.CHOOSE_FILE_DATA);
                         if (beans == null || beans.isEmpty()) {
                             return;
@@ -1256,7 +1279,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      */
     private boolean hasPermission(String... permissions) {
         if (mView.getContext() instanceof PermissionActivity) {
-            PermissionActivity activity = (PermissionActivity)mView.getContext();
+            PermissionActivity activity = (PermissionActivity) mView.getContext();
             return activity.hasPermission(permissions);
         } else {
             throw new IllegalArgumentException("is not allow request permission");
@@ -1276,7 +1299,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             return;
         }
         PermissionsMgr.getInstance().requestPermissionsIfNecessaryForResult(
-                (Activity)mView.getContext(), permissions, new PermissionsResultAction() {
+                (Activity) mView.getContext(), permissions, new PermissionsResultAction() {
 
                     @Override
                     public void onGranted(List<String> perms) {
@@ -1332,6 +1355,17 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         e.printStackTrace();
                     }
                     break;
+                case PermissionsConstant.FINE_LOCATION:
+                    // 定位权限
+                    if (hasPermission(PermissionsConstant.COARSE_LOCATION)) {
+                        hasPermissionHandler(requestType);
+                    } else {
+                        requestPermissions(requestType, PermissionsConstant.COARSE_LOCATION);
+                    }
+                    break;
+                case PermissionsConstant.COARSE_LOCATION:
+                    hasPermissionHandler(requestType);
+                    break;
                 default:
                     break;
             }
@@ -1353,7 +1387,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 case PermissionsConstant.READ_STORAGE:
                 case PermissionsConstant.WRITE_STORAGE:
                     // 读写SD权限拒绝
-                    CommonProvider.openAppPermission((Activity)mView.getContext());
+                    CommonProvider.openAppPermission((Activity) mView.getContext());
                     break;
                 case PermissionsConstant.CAMERA:
                     if (requestType == TYPE_CAMERA_PERMISSION) {
@@ -1367,6 +1401,14 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         // 语音权限拒绝
                         ToastUtil.showTextViewPrompt(mView.getContext()
                                 .getString(R.string.record_fail_check_permission));
+                    }
+                    break;
+                case PermissionsConstant.FINE_LOCATION:
+                case PermissionsConstant.COARSE_LOCATION:
+                    if (requestType == TYPE_LOCATION_PERMISSION) {
+                        // 定位权限拒绝
+                        ToastUtil.showTextViewPrompt(mView.getContext()
+                                .getString(R.string.location_fail_check_permission));
                     }
                     break;
                 default:
@@ -1392,7 +1434,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 break;
             case TYPE_PHOTO_PERMISSION:
                 // 相册
-                CameraUtils.getInstance().takeGalley((Activity)mView.getContext(), IMAGE_REQUEST);
+                CameraUtils.getInstance().takeGalley((Activity) mView.getContext(), IMAGE_REQUEST);
                 break;
             case TYPE_VOICE_PERMISSION:
                 // 语音权限
@@ -1409,6 +1451,13 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             case TYPE_FILE_PERMISSION:
                 // 文件
                 chooseFile();
+                break;
+            case TYPE_LOCATION_PERMISSION:
+                if (hasPermission(PermissionsConstant.COARSE_LOCATION)) {
+                    sendCurrentLocation();
+                } else {
+                    requestPermissions(requestType, PermissionsConstant.COARSE_LOCATION);
+                }
                 break;
             default:
                 break;
@@ -1432,7 +1481,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         mCameraName = CameraUtils.getInstance().getCameraName();
         mCameraDir = FileConfig.DIR_APP_CACHE_CAMERA + "/";
         mCameraPath = FileConfig.DIR_APP_CACHE_CAMERA + "/" + mCameraName + ".jpg";
-        CameraUtils.getInstance().takePhoto(mCameraDir, mCameraPath, (Activity)mView.getContext(),
+        CameraUtils.getInstance().takePhoto(mCameraDir, mCameraPath, (Activity) mView.getContext(),
                 CAMERA_REQUEST);
     }
 
@@ -1441,6 +1490,59 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      */
     private void chooseFile() {
         ChooseFileActivity.openChooseFileActivity(mView.getContext(), FILE_REQUEST);
+    }
+
+    /**
+     * 获取当前位置
+     */
+    private void sendCurrentLocation() {
+        LocationManager manager = mView == null ? null
+                : (LocationManager)mView.getContext().getSystemService(Context.LOCATION_SERVICE);
+        if (manager == null) {
+            return;
+        }
+        String provider = "";
+        List<String> providers = manager.getProviders(true);
+        if (providers == null) {
+            return;
+        }
+        if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
+            provider = LocationManager.NETWORK_PROVIDER;
+        } else if (providers.contains(LocationManager.GPS_PROVIDER)) {
+            provider = LocationManager.GPS_PROVIDER;
+        }
+        if (!TextUtils.isEmpty(provider)) {
+            Location location;
+            if (ActivityCompat.checkSelfPermission(mView.getContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(mView.getContext(),
+                            Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                location = null;
+            } else {
+                location = manager.getLastKnownLocation(provider);
+                if (location != null) {
+                    double longitude = location.getLongitude();
+                    double latitude = location.getLatitude();
+                    String add = "";
+                    Geocoder geocoder = new Geocoder(mView.getContext(), Locale.CHINESE);
+                    try {
+                        List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                        Address address = addresses.get(0);
+                        // Address[addressLines=[0:"中国",1:"北京市海淀区",2:"华奥饭店公司写字间中关村创业大街"]latitude=39.980973,hasLongitude=true,longitude=116.301712]
+                        int maxLine = address.getMaxAddressLineIndex();
+                        if (maxLine >= 2) {
+                            add = address.getAddressLine(1) + address.getAddressLine(2);
+                        } else {
+                            add = address.getAddressLine(1);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    mView.sendChatMessage(mSendUtils.sendLocationMessage(mChatType, mMyUserId,
+                            mChatId, latitude, longitude, add));
+                }
+            }
+        }
     }
 
     @Override

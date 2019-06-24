@@ -41,6 +41,10 @@ public class PanelFuncView implements IPanel {
         picture.text = "拍照";
         picture.resId = R.drawable.panel_normal_camera;
         items.add(picture);
+        FuncItem video = new FuncItem();
+        video.text = "视频";
+        video.resId = R.drawable.panel_normal_video;
+        items.add(video);
         FuncItem file = new FuncItem();
         file.text = "文件";
         file.resId = R.drawable.panel_normal_file;

@@ -249,7 +249,7 @@ public class MineFragment extends BaseTitleFragment {
         Observable.just(profile).map(new Func1<BMXUserProfile, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXUserProfile profile) {
-                return UserManager.getInstance().getProfile(profile, true);
+                return UserManager.getInstance().getProfile(profile, false);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

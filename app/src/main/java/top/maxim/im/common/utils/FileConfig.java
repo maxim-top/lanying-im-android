@@ -25,6 +25,9 @@ public class FileConfig {
     // 应用音频绝对路径
     public static String DIR_APP_CACHE_VOICE = DIR_APP_NAME + "/voice";
 
+    // 应用音频绝对路径
+    public static String DIR_APP_CACHE_VIDEO = DIR_APP_NAME + "/video";
+
     // 应用log绝对路径
     public static String DIR_APP_CRASH_LOG = DIR_APP_NAME + "/log";
 

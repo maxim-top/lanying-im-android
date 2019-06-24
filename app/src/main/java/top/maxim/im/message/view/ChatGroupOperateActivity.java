@@ -970,6 +970,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt("设置成功");
                     }
                 });
     }

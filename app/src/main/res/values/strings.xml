@@ -82,6 +82,7 @@
     <string name="permission_prompt">在设置中开启权限，以保证正常使用</string>
     <string name="record_fail_check_permission">录音失败，请检查权限</string>
     <string name="camera_fail_check_permission">拍照失败，请检查权限</string>
+    <string name="video_fail_check_permission">录制视频失败，请检查权限</string>
     <string name="location_fail_check_permission">定位失败，请检查权限</string>
     <string name="not_has_sd_permission">没有手机存储权限</string>
 
@@ -95,6 +96,7 @@
     <string name="register_user_name_hint">用户名</string>
     <string name="register_user_verify_hint">验证码</string>
     <string name="register_user_pwd_hint">密码</string>
+    <string name="weixin_login">微信登录</string>
 
     <!--设置-->
     <string name="user_protocol">用户协议</string>
@@ -138,6 +140,9 @@
     <string name="group_mute_none">不屏蔽</string>
     <string name="group_mute_notification">屏蔽本地消息通知</string>
     <string name="group_mute_chat">屏蔽消息</string>
+
+    <!--录制视频-->
+    <string name="tip_no_camera_or_reject">没有摄像头或相机权限被拒绝</string>
 
     <string name="channel_id">%1$s..channel_id_%2$d</string>
     <!--im消息push-->

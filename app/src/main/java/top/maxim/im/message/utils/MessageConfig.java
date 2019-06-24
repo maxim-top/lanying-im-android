@@ -69,6 +69,9 @@ public interface MessageConfig {
     interface MediaFormat {
         /** 音频文件格式 **/
         String VOICE_FORMAT = ".amr";
+
+        /** 视频文件格式 **/
+        String VIDEO_FORMAT = ".mp4";
     }
 
     /**

@@ -69,6 +69,7 @@ import top.maxim.im.common.utils.dialog.CustomDialog;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.utils.permissions.PermissionsMgr;
 import top.maxim.im.common.utils.permissions.PermissionsResultAction;
+import top.maxim.im.common.utils.video.PhotoRecorderActivity;
 import top.maxim.im.contact.view.ForwardMsgRosterActivity;
 import top.maxim.im.message.contract.ChatBaseContract;
 import top.maxim.im.message.customviews.MessageInputBar;
@@ -95,6 +96,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     /* 文件 */
     private final int FILE_REQUEST = 1002;
 
+    /* 视频 */
+    private final int VIDEO_REQUEST = 1003;
+    
     /* 拍照权限 */
     private final int TYPE_CAMERA_PERMISSION = 1;
 
@@ -109,6 +113,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     /* 位置权限 */
     private final int TYPE_LOCATION_PERMISSION = 5;
+
+    /* 视频权限 */
+    private final int TYPE_VIDEO_PERMISSION = 6;
 
     /* 我的id */
     protected long mMyUserId;
@@ -445,7 +452,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         Observable.just(myUserId).map(new Func1<Long, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(Long aLong) {
-                return UserManager.getInstance().getProfile(profile, true);
+                return UserManager.getInstance().getProfile(profile, false);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
@@ -496,6 +503,16 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     takePic();
                 } else {
                     requestPermissions(TYPE_CAMERA_PERMISSION, PermissionsConstant.READ_STORAGE);
+                }
+                break;
+            case "视频":
+                // 视频需要SD卡读写 麦克风权限
+                if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.RECORD_AUDIO,
+                        PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE)) {
+                    showVideoView();
+                } else {
+                    // 如果没有权限 首先请求SD读权限
+                    requestPermissions(TYPE_VIDEO_PERMISSION, PermissionsConstant.READ_STORAGE);
                 }
                 break;
             case "文件":
@@ -1226,6 +1243,40 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     }
                 }
                 break;
+            case VIDEO_REQUEST:
+                // 视频
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    int type = data.getIntExtra(PhotoRecorderActivity.EXTRA_RECORD_TYPE, -1);
+                    if (type == 1) {
+                        String videoPath = data
+                                .getStringExtra(PhotoRecorderActivity.EXTRA_VIDEO_PATH);
+                        if (TextUtils.isEmpty(videoPath) || !new File(videoPath).exists()
+                                || new File(videoPath).length() <= 0) {
+                            ToastUtil.showTextViewPrompt("视频录制失败");
+                            return;
+                        }
+                        int videoDuration = data
+                                .getIntExtra(PhotoRecorderActivity.EXTRA_VIDEO_DURATION, 0);
+                        int width = data.getIntExtra("width", 0);
+                        int height = data.getIntExtra("height", 0);
+//                        mView.sendChatMessage(mSendUtils.sendV(mChatType, mMyUserId,
+//                                mChatId, picturePath, size[0], size[1]));
+                    } else if (type == 2) {
+                        String picturePath = data
+                                .getStringExtra(PhotoRecorderActivity.EXTRA_CAMERA_PATH);
+                        if (TextUtils.isEmpty(picturePath)) {
+                            ToastUtil.showTextViewPrompt("照片拍摄失败");
+                            return;
+                        }
+                        File f = new File(picturePath);
+                        mView.getContext().sendBroadcast(new Intent(
+                                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + f)));
+                        int[] size = ChatUtils.getInstance().getImageSize(picturePath);
+                        mView.sendChatMessage(mSendUtils.sendImageMessage(mChatType, mMyUserId,
+                                mChatId, picturePath, size[0], size[1]));
+                    }
+                }
+                break;
             case FILE_REQUEST:
                 // 文件
                 if (resultCode == Activity.RESULT_OK) {
@@ -1344,15 +1395,27 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     if (requestType == TYPE_CAMERA_PERMISSION) {
                         // 拍照
                         takePic();
+                    } else if (requestType == TYPE_VIDEO_PERMISSION) {
+                        // 视频
+                        if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
+                            showVideoView();
+                        } else {
+                            requestPermissions(requestType, PermissionsConstant.RECORD_AUDIO);
+                        }
                     }
                     break;
                 case PermissionsConstant.RECORD_AUDIO:
-                    try {
-                        if (requestType == TYPE_VOICE_PERMISSION) {
+                    if (requestType == TYPE_VOICE_PERMISSION) {
+                        try {
                             recordMedia(mRecordVoiceAction, mRecordVoiceTime);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } else if (requestType == TYPE_VIDEO_PERMISSION) {
+                        // 视频
+                        if (hasPermission(PermissionsConstant.CAMERA)) {
+                            showVideoView();
+                        }
                     }
                     break;
                 case PermissionsConstant.FINE_LOCATION:
@@ -1394,6 +1457,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         // 拍照权限拒绝
                         ToastUtil.showTextViewPrompt(mView.getContext()
                                 .getString(R.string.camera_fail_check_permission));
+                    } else if (requestType == TYPE_VIDEO_PERMISSION) {
+                        ToastUtil.showTextViewPrompt(
+                                mView.getContext().getString(R.string.video_fail_check_permission));
                     }
                     break;
                 case PermissionsConstant.RECORD_AUDIO:
@@ -1401,6 +1467,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         // 语音权限拒绝
                         ToastUtil.showTextViewPrompt(mView.getContext()
                                 .getString(R.string.record_fail_check_permission));
+                    } else if (requestType == TYPE_VIDEO_PERMISSION) {
+                        ToastUtil.showTextViewPrompt(
+                                mView.getContext().getString(R.string.video_fail_check_permission));
                     }
                     break;
                 case PermissionsConstant.FINE_LOCATION:
@@ -1459,6 +1528,19 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     requestPermissions(requestType, PermissionsConstant.COARSE_LOCATION);
                 }
                 break;
+            case TYPE_VIDEO_PERMISSION:
+                // 视频
+                if (hasPermission(PermissionsConstant.CAMERA)) {
+                    // 视频
+                    if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
+                        showVideoView();
+                    } else {
+                        requestPermissions(requestType, PermissionsConstant.RECORD_AUDIO);
+                    }
+                } else {
+                    requestPermissions(requestType, PermissionsConstant.CAMERA);
+                }
+                break;
             default:
                 break;
         }
@@ -1483,6 +1565,14 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         mCameraPath = FileConfig.DIR_APP_CACHE_CAMERA + "/" + mCameraName + ".jpg";
         CameraUtils.getInstance().takePhoto(mCameraDir, mCameraPath, (Activity) mView.getContext(),
                 CAMERA_REQUEST);
+    }
+
+    /**
+     * 录制视频
+     */
+    private void showVideoView() {
+        Intent it = new Intent(mView.getContext(), PhotoRecorderActivity.class);
+        ((Activity)mView.getContext()).startActivityForResult(it, VIDEO_REQUEST);
     }
 
     /**

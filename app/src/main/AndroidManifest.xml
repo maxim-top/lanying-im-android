@@ -247,6 +247,18 @@
             android:name=".message.view.PhotoDetailActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".common.utils.video.PhotoRecorderActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".wxapi.WXEntryActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:taskAffinity="net.sourceforge.simcpux"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
         <!-- fileProvider -->
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -292,6 +304,11 @@
         <meta-data
             android:name="MEIZU_APP_KEY"
             android:value="a_${MEIZU_APP_KEY}" />
+
+        <!-- 微信 -->
+        <meta-data
+            android:name="WEIXIN_APPID"
+            android:value="${WEIXIN_APPID}" />
 
 
         <!-- 接入HMSSDK 需要注册的provider，authorities 一定不能与其他应用一样，所以这边 ${PACKAGE_NAME} 要替换上您应用的包名

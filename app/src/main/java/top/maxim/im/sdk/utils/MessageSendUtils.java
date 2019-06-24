@@ -141,6 +141,19 @@ public final class MessageSendUtils {
     }
 
     /**
+     * 发送音频消息
+     *
+     * @param type 消息类型
+     * @param from from
+     * @param to to
+     * @param path 语音路径
+     * @return BMXMessage
+     */
+//    public BMXMessage sendVideoMessage(BMXMessage.MessageType type, long from, long to, String path,
+//            int time) {
+//    }
+
+    /**
      * 发送文件消息
      *
      * @param type 消息类型

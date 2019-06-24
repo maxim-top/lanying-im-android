@@ -30,6 +30,7 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.sdk.utils.MessageDispatcher;
+import top.maxim.im.wxapi.WXUtils;
 
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
@@ -50,6 +51,9 @@ public class LoginActivity extends BaseTitleActivity {
 
     /* 切换登陆模式 */
     private TextView mSwitchLoginMode;
+
+    /* 微信登录 */
+    private TextView mWXLogin;
 
     /* 是否是id登陆 */
     private boolean mLoginByUserId = false;
@@ -78,6 +82,7 @@ public class LoginActivity extends BaseTitleActivity {
         mInputPwd = view.findViewById(R.id.et_user_pwd);
         mLogin = view.findViewById(R.id.tv_login);
         mRegister = view.findViewById(R.id.tv_register);
+        mWXLogin = view.findViewById(R.id.tv_wx_login);
         mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
         mSwitchLoginMode.setVisibility(View.GONE);
         // 三次点击 进入另一套环境配置
@@ -101,22 +106,23 @@ public class LoginActivity extends BaseTitleActivity {
     protected void setViewListener() {
 
         // 注册
-        mRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                RegisterActivity.openRegister(LoginActivity.this, REGISTER_CODE);
-            }
-        });
+        mRegister.setOnClickListener(
+                v -> RegisterActivity.openRegister(LoginActivity.this, REGISTER_CODE));
         // 登陆
-        mLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String name = mInputName.getText().toString().trim();
-                String pwd = mInputPwd.getText().toString().trim();
-                // MainActivity.openMain(LoginActivity.this);
+        mLogin.setOnClickListener(v -> {
+            String name = mInputName.getText().toString().trim();
+            String pwd = mInputPwd.getText().toString().trim();
+            // MainActivity.openMain(LoginActivity.this);
 
-                login(LoginActivity.this, name, pwd, mLoginByUserId);
+            login(LoginActivity.this, name, pwd, mLoginByUserId);
+        });
+        // 微信登录
+        mWXLogin.setOnClickListener(v -> {
+            if (!WXUtils.getInstance().wxSupported()) {
+                ToastUtil.showTextViewPrompt("请安装微信");
+                return;
             }
+            WXUtils.getInstance().wxLogin();
         });
         mInputWatcher = new TextWatcher() {
             @Override
@@ -143,19 +149,16 @@ public class LoginActivity extends BaseTitleActivity {
         mInputName.addTextChangedListener(mInputWatcher);
         mInputPwd.addTextChangedListener(mInputWatcher);
         // 切换登陆模式
-        mSwitchLoginMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLoginByUserId) {
-                    // id登陆 切换为用户名
-                    mInputName.setHint(R.string.login_user_name_hint);
-                    mInputName.setInputType(EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                } else {
-                    mInputName.setHint(R.string.login_user_id_hint);
-                    mInputName.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
-                }
-                mLoginByUserId = !mLoginByUserId;
+        mSwitchLoginMode.setOnClickListener(v -> {
+            if (mLoginByUserId) {
+                // id登陆 切换为用户名
+                mInputName.setHint(R.string.login_user_name_hint);
+                mInputName.setInputType(EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+            } else {
+                mInputName.setHint(R.string.login_user_id_hint);
+                mInputName.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
             }
+            mLoginByUserId = !mLoginByUserId;
         });
     }
 
@@ -170,13 +173,13 @@ public class LoginActivity extends BaseTitleActivity {
         Observable.just(name).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-//                if (isLoginById) {
-//                    return UserManager.getInstance().signInById(Long.valueOf(s), pwd);
-//                }
-//                if (Pattern.matches("0?(13|14|15|17|18|19)[0-9]{9}", s)) {
-//                    // 手机号
-//                    return UserManager.getInstance().signInByPhone(s, pwd);
-//                }
+                // if (isLoginById) {
+                // return UserManager.getInstance().signInById(Long.valueOf(s), pwd);
+                // }
+                // if (Pattern.matches("0?(13|14|15|17|18|19)[0-9]{9}", s)) {
+                // // 手机号
+                // return UserManager.getInstance().signInByPhone(s, pwd);
+                // }
                 return UserManager.getInstance().signInByName(s, pwd);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {

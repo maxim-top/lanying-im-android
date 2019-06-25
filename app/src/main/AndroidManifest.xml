@@ -247,6 +247,11 @@
             android:name=".message.view.PhotoDetailActivity"
             android:screenOrientation="portrait" />
 
+        <!--视频-->
+        <activity
+            android:name=".message.view.VideoDetailActivity"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name=".common.utils.video.PhotoRecorderActivity"
             android:screenOrientation="portrait" />

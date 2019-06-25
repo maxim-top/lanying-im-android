@@ -14,6 +14,7 @@ import im.floo.floolib.BMXImageAttachment;
 import im.floo.floolib.BMXLocationAttachment;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageAttachment;
+import im.floo.floolib.BMXVideoAttachment;
 import im.floo.floolib.BMXVoiceAttachment;
 import rx.Observable;
 import rx.Subscriber;
@@ -141,17 +142,21 @@ public final class MessageSendUtils {
     }
 
     /**
-     * 发送音频消息
+     * 发送视频消息
      *
      * @param type 消息类型
      * @param from from
      * @param to to
-     * @param path 语音路径
+     * @param path 视频路径
      * @return BMXMessage
      */
-//    public BMXMessage sendVideoMessage(BMXMessage.MessageType type, long from, long to, String path,
-//            int time) {
-//    }
+    public BMXMessage sendVideoMessage(BMXMessage.MessageType type, long from, long to, String path,
+            int time, int w, int h) {
+        BMXVideoAttachment.Size size = new BMXVideoAttachment.Size(w, h);
+        BMXVideoAttachment videoAttachment = new BMXVideoAttachment(path, time, size);
+        BMXMessage msg = BMXMessage.createMessage(from, to, type, to, videoAttachment);
+        return handlerMessage(msg);
+    }
 
     /**
      * 发送文件消息

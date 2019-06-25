@@ -43,6 +43,7 @@ import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageAttachment;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXUserProfile;
+import im.floo.floolib.BMXVideoAttachment;
 import im.floo.floolib.BMXVoiceAttachment;
 import rx.Observable;
 import rx.Subscriber;
@@ -78,6 +79,7 @@ import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.view.ChooseFileActivity;
 import top.maxim.im.message.view.PhotoDetailActivity;
+import top.maxim.im.message.view.VideoDetailActivity;
 import top.maxim.im.sdk.utils.MessageSendUtils;
 
 /**
@@ -595,7 +597,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (contentType == BMXMessage.ContentType.Text) {
             // TODO
         } else if (contentType == BMXMessage.ContentType.Image) {
-            //图片
+            // 图片
             onImageItemClick(bean);
         } else if (contentType == BMXMessage.ContentType.Voice) {
             // 语音播放
@@ -603,6 +605,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         } else if (contentType == BMXMessage.ContentType.File) {
             // 文件查看
             onFileItemClick(bean);
+        } else if (contentType == BMXMessage.ContentType.Video) {
+            // 视频
+            openVideoItemClick(bean);
         }
     }
 
@@ -1152,9 +1157,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }
         String picUrl = null;
         if (!TextUtils.isEmpty(body.thumbnailPath()) && new File(body.thumbnailPath()).exists()) {
-            picUrl = "file://" + body.thumbnailPath();
+            picUrl = body.thumbnailPath();
         } else if (!TextUtils.isEmpty(body.path()) && new File(body.path()).exists()) {
-            picUrl = "file://" + body.path();
+            picUrl = body.path();
         }
         if (TextUtils.isEmpty(picUrl)) {
             //正在下载
@@ -1213,6 +1218,34 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }
     }
 
+    /**
+     * 视频预览
+     */
+    private void openVideoItemClick(BMXMessage bean) {
+        if (mView == null || bean == null || bean.contentType() != BMXMessage.ContentType.Video) {
+            return;
+        }
+        BMXVideoAttachment body = BMXVideoAttachment.dynamic_cast(bean.attachment());
+        if (body == null) {
+            return;
+        }
+        String videoUrl = null;
+        if (!TextUtils.isEmpty(body.path()) && new File(body.path()).exists()) {
+            videoUrl = body.path();
+        }
+        if (TextUtils.isEmpty(videoUrl)) {
+            // 正在下载
+            ToastUtil.showTextViewPrompt("正在下载");
+            return;
+        }
+        BMXMessageAttachment.DownloadStatus status = body.downloadStatus();
+        if (status == BMXMessageAttachment.DownloadStatus.Downloaing) {
+            ToastUtil.showTextViewPrompt("正在下载");
+            return;
+        }
+        VideoDetailActivity.openVideoDetail(mView.getContext(), videoUrl);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -1259,8 +1292,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                                 .getIntExtra(PhotoRecorderActivity.EXTRA_VIDEO_DURATION, 0);
                         int width = data.getIntExtra("width", 0);
                         int height = data.getIntExtra("height", 0);
-//                        mView.sendChatMessage(mSendUtils.sendV(mChatType, mMyUserId,
-//                                mChatId, picturePath, size[0], size[1]));
+                        mView.sendChatMessage(mSendUtils.sendVideoMessage(mChatType, mMyUserId,
+                                mChatId, videoPath, videoDuration, width, height));
                     } else if (type == 2) {
                         String picturePath = data
                                 .getStringExtra(PhotoRecorderActivity.EXTRA_CAMERA_PATH);
@@ -1413,9 +1446,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         }
                     } else if (requestType == TYPE_VIDEO_PERMISSION) {
                         // 视频
-                        if (hasPermission(PermissionsConstant.CAMERA)) {
-                            showVideoView();
-                        }
+                        showVideoView();
                     }
                     break;
                 case PermissionsConstant.FINE_LOCATION:
@@ -1667,7 +1698,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject(message.extension());
-                if(jsonObject.has(MessageConfig.INPUT_STATUS)){
+                if (jsonObject.has(MessageConfig.INPUT_STATUS)) {
                     handelInputStatus(message.extension());
                 }
             } catch (JSONException e) {

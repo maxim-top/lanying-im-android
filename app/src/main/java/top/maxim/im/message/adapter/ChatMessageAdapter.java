@@ -19,6 +19,7 @@ import top.maxim.im.message.itemholder.MessageItemFile;
 import top.maxim.im.message.itemholder.MessageItemImage;
 import top.maxim.im.message.itemholder.MessageItemLocation;
 import top.maxim.im.message.itemholder.MessageItemText;
+import top.maxim.im.message.itemholder.MessageItemVideo;
 import top.maxim.im.sdk.bean.MsgBodyHelper;
 
 /**
@@ -108,7 +109,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
             factory = new MessageItemImage(mContext, mActionListener,
                     isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
         } else if (type == BMXMessage.ContentType.Video.swigValue()) {
-            // 视频 TODO
+            // 视频
+            factory = new MessageItemVideo(mContext, mActionListener,
+                    isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
         } else if (type == BMXMessage.ContentType.Location.swigValue()) {
             // 位置
             factory = new MessageItemLocation(mContext, mActionListener,

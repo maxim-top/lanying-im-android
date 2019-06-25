@@ -5,12 +5,18 @@
     android:layout_height="wrap_content">
 
     <top.maxim.im.common.view.ShapeImageView
-        android:id="@+id/image_message"
+        android:id="@+id/video_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         app:radius_x="10"
         app:radius_y="10"
         app:shape="round_rectangle" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/chat_video_play" />
 
 </FrameLayout>

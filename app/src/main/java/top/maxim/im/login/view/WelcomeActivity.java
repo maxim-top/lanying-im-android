@@ -10,6 +10,8 @@ import android.widget.RelativeLayout;
 import java.util.List;
 
 import im.floo.floolib.BMXErrorCode;
+import im.floo.floolib.BMXUserProfile;
+import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -18,6 +20,7 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.MainActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.provider.CommonProvider;
@@ -121,6 +124,7 @@ public class WelcomeActivity extends BaseTitleActivity {
      * 自动登陆
      */
     private void autoLogin(String userName, final String pwd) {
+        initData();
         Observable.just(userName).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
@@ -147,6 +151,36 @@ public class WelcomeActivity extends BaseTitleActivity {
                         SharePreferenceUtils.getInstance().putLoginStatus(true);
                         MessageDispatcher.getDispatcher().initialize();
                         MainActivity.openMain(WelcomeActivity.this);
+                    }
+                });
+    }
+
+    /**
+     * 预加载数据 每次登陆获取service的profile  roster
+     */
+    private void initData() {
+        Observable.just("").map(new Func1<String, String>() {
+            @Override
+            public String call(String s) {
+                UserManager.getInstance().getProfile(new BMXUserProfile(), true);
+                RosterManager.getInstance().get(new ListOfLongLong(), true);
+                return "";
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+
                     }
                 });
     }

@@ -154,7 +154,7 @@ public class ForwardMsgRosterActivity extends BaseTitleActivity {
         Observable.just(listOfLongLong).map(new Func1<ListOfLongLong, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(ListOfLongLong longs) {
-                return RosterManager.getInstance().get(longs, true);
+                return RosterManager.getInstance().get(longs, false);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

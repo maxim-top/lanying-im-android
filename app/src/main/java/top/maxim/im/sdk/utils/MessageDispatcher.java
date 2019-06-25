@@ -420,29 +420,6 @@ public class MessageDispatcher {
         GroupManager.getInstance().addGroupListener(mGroupListener);
     }
 
-    /**
-     * 注册IM在线监听
-     *
-     * @param listener IM发消息监听
-     */
-
-    public void registerMessageReceiveListener(BMXChatServiceListener listener) {
-        if (listener != null && mListener != null && !mListener.contains(listener)) {
-            mListener.add(listener);
-        }
-    }
-
-    /**
-     * 移除IM在线监听
-     *
-     * @param listener IM收消息监听
-     */
-    public void unRegisterMessageReceiveListener(BMXChatServiceListener listener) {
-        if (listener != null && mListener != null && mListener.contains(listener)) {
-            mListener.remove(listener);
-        }
-    }
-
     private void toastListener(String content) {
         if (TextUtils.isEmpty(content)) {
             return;

@@ -18,6 +18,7 @@ import java.util.List;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXRosterItemList;
+import im.floo.floolib.BMXRosterServiceListener;
 import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
 import rx.Subscriber;
@@ -49,6 +50,60 @@ public class ContactFragment extends BaseTitleFragment {
 
     private ContactAdapter mAdapter;
 
+    /* roster监听 */
+    private BMXRosterServiceListener mRosterListener = new BMXRosterServiceListener() {
+        @Override
+        public void onFriendAdded(long sponsorId, long recipientId) {
+            super.onFriendAdded(sponsorId, recipientId);
+            // 添加好友
+            initRoster(true);
+        }
+
+        @Override
+        public void onFriendRemoved(long sponsorId, long recipientId) {
+            super.onFriendRemoved(sponsorId, recipientId);
+            // 删除好友
+            initRoster(true);
+        }
+
+        @Override
+        public void onApplied(long sponsorId, long recipientId, String message) {
+            super.onApplied(sponsorId, recipientId, message);
+            // 申请
+        }
+
+        @Override
+        public void onApplicationAccepted(long sponsorId, long recipientId) {
+            super.onApplicationAccepted(sponsorId, recipientId);
+            // 申请被接受
+        }
+
+        @Override
+        public void onApplicationDeclined(long sponsorId, long recipientId, String reason) {
+            super.onApplicationDeclined(sponsorId, recipientId, reason);
+            // 申请被拒绝
+        }
+
+        @Override
+        public void onBlockListAdded(long sponsorId, long recipientId) {
+            super.onBlockListAdded(sponsorId, recipientId);
+            // 被加入黑名单
+        }
+
+        @Override
+        public void onBlockListRemoved(long sponsorId, long recipientId) {
+            super.onBlockListRemoved(sponsorId, recipientId);
+            // 被移除黑名单
+        }
+
+        @Override
+        public void onRosterInfoUpdate(BMXRosterItem item) {
+            super.onRosterInfoUpdate(item);
+            // roster有更新
+            initRoster(true);
+        }
+    };
+
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(getActivity(), headerContainer);
@@ -65,6 +120,7 @@ public class ContactFragment extends BaseTitleFragment {
                 .addItemDecoration(new DividerItemDecoration(getActivity(), R.color.guide_divider));
         mAdapter = new ContactAdapter(getActivity());
         mRecycler.setAdapter(mAdapter);
+        RosterManager.getInstance().addRosterListener(mRosterListener);
         buildContactHeaderView();
         return view;
     }
@@ -209,12 +265,16 @@ public class ContactFragment extends BaseTitleFragment {
     @Override
     public void onResume() {
         super.onResume();
+        initRoster(false);
+    }
+    
+    private void initRoster(boolean forceRefresh) {
         final ListOfLongLong listOfLongLong = new ListOfLongLong();
         final BMXRosterItemList itemList = new BMXRosterItemList();
         Observable.just(listOfLongLong).map(new Func1<ListOfLongLong, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(ListOfLongLong longs) {
-                return RosterManager.getInstance().get(longs, true);
+                return RosterManager.getInstance().get(longs, forceRefresh);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

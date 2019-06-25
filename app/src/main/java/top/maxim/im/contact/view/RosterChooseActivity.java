@@ -204,7 +204,7 @@ public class RosterChooseActivity extends BaseTitleActivity {
                 if (itemList != null && !itemList.isEmpty()) {
                     itemList.clear();
                 }
-                return initData(listOfLongLong, true);
+                return initData(listOfLongLong, false);
             }
         }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
             @Override

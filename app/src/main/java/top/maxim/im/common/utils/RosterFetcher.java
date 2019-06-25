@@ -118,7 +118,7 @@ public class RosterFetcher {
         Observable.just("").map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return UserManager.getInstance().getProfile(finalProfile, true);
+                return UserManager.getInstance().getProfile(finalProfile, false);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

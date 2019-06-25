@@ -16,6 +16,8 @@ android {
                 "XIAOMI_APP_KEY" : "5221792385338",
                 "MEIZU_APPID"    : "117965",
                 "MEIZU_APP_KEY"  : "ba1881e1356d4c9ea622772c64873c41",
+
+                "WEIXIN_APPID"   : "wxf0f8e197ecfb0925",
         ]
     }
 
@@ -72,6 +74,7 @@ dependencies {
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     implementation(name:'floo-android_1.0.6.20190613',ext:'aar')
+
 //    implementation project(path: ':floo-android')
 //    implementation files('libs/floo-android.jar')
 
@@ -93,5 +96,8 @@ dependencies {
     implementation 'com.meizu.flyme.internet:push-ups:1.1.+'
 
     implementation 'com.google.code.gson:gson:2.8.5'
+
+    //微信
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
 
 }

@@ -22,6 +22,7 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupInvitationList;
 import im.floo.floolib.BMXGroupList;
+import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.GroupInvitaionPage;
 import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
@@ -187,6 +188,18 @@ public class GroupInviteActivity extends BaseTitleActivity {
                     groupItem != null && !TextUtils.isEmpty(groupItem.name()) ? groupItem.name()
                             : "");
 
+            BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(item.getMInviterId());
+            String name = "";
+            if (rosterItem != null) {
+                if (!TextUtils.isEmpty(rosterItem.alias())) {
+                    name = rosterItem.alias();
+                } else if (!TextUtils.isEmpty(rosterItem.nickname())) {
+                    name = rosterItem.nickname();
+                } else {
+                    name = rosterItem.username();
+                }
+            }
+
             BMXGroup.InvitationStatus inviteStatus = item.getMStatus();
             String statusDesc = "";
             if (inviteStatus != null) {
@@ -194,7 +207,6 @@ public class GroupInviteActivity extends BaseTitleActivity {
                     statusDesc = "已添加";
                     accept.setVisibility(View.INVISIBLE);
                 } else if (inviteStatus == BMXGroup.InvitationStatus.Pending) {
-                    statusDesc = "未处理";
                     accept.setVisibility(View.VISIBLE);
                 } else if (inviteStatus == BMXGroup.InvitationStatus.Declined) {
                     statusDesc = "已拒绝";

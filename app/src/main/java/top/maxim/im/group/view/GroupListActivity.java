@@ -161,7 +161,7 @@ public class GroupListActivity extends BaseTitleActivity {
         Observable.just(list).map(new Func1<BMXGroupList, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXGroupList bmxGroupList) {
-                return GroupManager.getInstance().search(bmxGroupList, true);
+                return GroupManager.getInstance().search(bmxGroupList, false);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

@@ -182,6 +182,11 @@
             android:name=".login.view.SettingUserActivity"
             android:screenOrientation="portrait" />
 
+        <!--我的二维码-->
+        <activity
+            android:name=".login.view.MyQrCodeActivity"
+            android:screenOrientation="portrait" />
+
         <!--搜搜-->
         <activity
             android:name=".contact.view.ContactSearchActivity"
@@ -252,6 +257,7 @@
             android:name=".message.view.VideoDetailActivity"
             android:screenOrientation="portrait" />
 
+        <!--视频录制-->
         <activity
             android:name=".common.utils.video.PhotoRecorderActivity"
             android:screenOrientation="portrait" />

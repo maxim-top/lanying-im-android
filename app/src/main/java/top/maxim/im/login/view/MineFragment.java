@@ -4,6 +4,7 @@ package top.maxim.im.login.view;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -55,6 +56,9 @@ public class MineFragment extends BaseTitleFragment {
 
     /* 退出登录 */
     private TextView mQuitView;
+
+    /* 我的二维码 */
+    private ImageView mMyQrCode;
 
     /* 接受新消息通知 */
     private ItemLineSwitch.Builder mSettingPush;
@@ -116,6 +120,7 @@ public class MineFragment extends BaseTitleFragment {
         mUserId = view.findViewById(R.id.tv_user_id);
         mQuitView = view.findViewById(R.id.tv_quit_app);
         mAppVersion = view.findViewById(R.id.tv_version_app);
+        mMyQrCode = view.findViewById(R.id.icon_qrcode);
         // 获取app版本
         int versionCode = BuildConfig.VERSION_CODE;
         String versionName = BuildConfig.VERSION_NAME;
@@ -316,19 +321,11 @@ public class MineFragment extends BaseTitleFragment {
 
     @Override
     protected void setViewListener() {
-        mQuitView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logout();
-            }
-        });
+        mQuitView.setOnClickListener(v -> logout());
 
-        mUserInfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SettingUserActivity.openSettingUser(getActivity());
-            }
-        });
+        mUserInfo.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
+
+        mMyQrCode.setOnClickListener(v -> MyQrCodeActivity.openMyQrcode(getActivity()));
     }
 
     @Override

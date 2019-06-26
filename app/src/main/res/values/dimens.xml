@@ -165,4 +165,16 @@
     <dimen name="dimen_347">347dp</dimen>
     <dimen name="dimen_348">348dp</dimen>
     <dimen name="dimen_440">440dp</dimen>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="scan_left_right">12dp</dimen>
+    <dimen name="scan_top_bottom">60dp</dimen>
+
+    <dimen name="scan_blueline_length">16dp</dimen>
+
+    <dimen name="scan_rect_width">240dp</dimen>
+
+    <dimen name="scan_app_qr_code_logo_width">158dp</dimen>
 </resources>

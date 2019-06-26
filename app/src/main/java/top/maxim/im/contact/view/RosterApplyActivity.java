@@ -179,6 +179,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
             TextView title = holder.findViewById(R.id.apply_title);
             TextView status = holder.findViewById(R.id.apply_status);
             TextView accept = holder.findViewById(R.id.tv_accept);
+            TextView reason = holder.findViewById(R.id.apply_reason);
             final BMXRosterService.Application item = getItem(position);
             if (item == null) {
                 return;
@@ -205,7 +206,6 @@ public class RosterApplyActivity extends BaseTitleActivity {
                     statusDesc = "已添加";
                     accept.setVisibility(View.INVISIBLE);
                 } else if (applicationStatus == BMXRosterService.ApplicationStatus.Pending) {
-                    statusDesc = "未处理";
                     accept.setVisibility(View.VISIBLE);
                 } else if (applicationStatus == BMXRosterService.ApplicationStatus.Declined) {
                     statusDesc = "已拒绝";
@@ -217,6 +217,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
                 accept.setVisibility(View.INVISIBLE);
             }
             status.setText(statusDesc);
+            reason.setText(!TextUtils.isEmpty(item.getMReason()) ? item.getMReason() : "");
             // 处理通知
             accept.setOnClickListener(new View.OnClickListener() {
                 @Override

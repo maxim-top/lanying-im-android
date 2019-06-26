@@ -24,15 +24,34 @@
             app:radius_y="3"
             app:shape="round_rectangle" />
 
-        <TextView
-            android:id="@+id/tv_accept"
+        <FrameLayout
+            android:id="@+id/fl_handle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@color/c8"
-            android:padding="@dimen/dimen_10"
-            android:text="处理" />
+            android:layout_centerVertical="true">
+
+            <TextView
+                android:id="@+id/tv_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/c8"
+                android:padding="@dimen/dimen_10"
+                android:text="处理" />
+
+            <TextView
+                android:id="@+id/apply_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingTop="@dimen/dimen_5"
+                android:textColor="@color/color_333333"
+                android:textSize="@dimen/dimen_16" />
+
+        </FrameLayout>
+
 
         <LinearLayout
             android:id="@+id/ll_apply"
@@ -41,7 +60,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/dimen_17"
             android:layout_marginRight="@dimen/dimen_17"
-            android:layout_toLeftOf="@id/tv_accept"
+            android:layout_toLeftOf="@id/fl_handle"
             android:layout_toRightOf="@id/apply_avatar"
             android:orientation="vertical">
 
@@ -56,15 +75,15 @@
                 android:textSize="@dimen/dimen_16" />
 
             <TextView
-                android:id="@+id/apply_status"
+                android:id="@+id/apply_reason"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:gravity="start|center_vertical"
                 android:maxLines="1"
-                android:paddingTop="@dimen/dimen_5"
-                android:textColor="@color/color_333333"
-                android:textSize="@dimen/dimen_16" />
+                android:textColor="@color/color_black"
+                android:textSize="@dimen/dimen_12" />
+
 
         </LinearLayout>
 

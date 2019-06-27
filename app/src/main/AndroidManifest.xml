@@ -177,6 +177,11 @@
             android:name=".message.view.ChatGroupSettingActivity"
             android:screenOrientation="portrait" />
 
+        <!--群聊二维码-->
+        <activity
+            android:name=".group.view.GroupQrCodeActivity"
+            android:screenOrientation="portrait" />
+
         <!--用户设置-->
         <activity
             android:name=".login.view.SettingUserActivity"

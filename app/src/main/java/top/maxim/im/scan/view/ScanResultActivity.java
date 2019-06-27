@@ -11,8 +11,10 @@ import android.widget.TextView;
 
 import top.maxim.im.R;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.contact.view.RosterDetailActivity;
+import top.maxim.im.login.view.SettingUserActivity;
 import top.maxim.im.scan.config.ScanConfigs;
 
 /**
@@ -60,7 +62,13 @@ public class ScanResultActivity extends BaseTitleActivity {
             // roster
             long rosterId = Long
                     .valueOf(mResult.replace(ScanConfigs.CODE_ROSTER_PRE, ""));
-            RosterDetailActivity.openRosterDetail(this, rosterId);
+            long myId = SharePreferenceUtils.getInstance().getUserId();
+            if (rosterId == myId) {
+                // 自己进入设置页面
+                SettingUserActivity.openSettingUser(this);
+            } else {
+                RosterDetailActivity.openRosterDetail(this, rosterId);
+            }
             finish();
         } else if (mResult.startsWith(ScanConfigs.CODE_GROUP_PRE)) {
             // 群聊

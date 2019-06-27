@@ -59,6 +59,7 @@ import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.common.view.recyclerview.FullyGridLayoutManager;
 import top.maxim.im.contact.view.RosterChooseActivity;
 import top.maxim.im.contact.view.RosterDetailActivity;
+import top.maxim.im.group.view.GroupQrCodeActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 
@@ -79,6 +80,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /* 群主id */
     private ItemLineArrow.Builder mChatGroupOwnerId;
+
+    /* 群二维码 */
+    private ItemLineArrow.Builder mChatGroupQrcode;
 
     /* 群聊管理 */
     private ItemLineArrow.Builder mChatGroupManager;
@@ -256,16 +260,22 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 .setMarginLeft(ScreenUtils.dp2px(15));
         container.addView(itemLine0.build());
 
+        /* 群二维码 */
+        mChatGroupQrcode = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.group_qrcode))
+                .setOnItemClickListener(v -> GroupQrCodeActivity.openGroupQrcode(this, mGroupId));
+        container.addView(mChatGroupQrcode.build());
+
+        // 分割线
+        ItemLine.Builder itemLine_2 = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(itemLine_2.build());
+
         /* 群管理 */
         mChatGroupManager = new ItemLineArrow.Builder(this)
                 .setStartContent(getString(R.string.group_manager))
-                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
-                    @Override
-                    public void onItemClick(View v) {
-                        ChatGroupSettingActivity
-                                .startGroupSettingActivity(ChatGroupOperateActivity.this, mGroupId);
-                    }
-                });
+                .setOnItemClickListener(v -> ChatGroupSettingActivity
+                        .startGroupSettingActivity(ChatGroupOperateActivity.this, mGroupId));
         container.addView(mViewChatGroupManager = mChatGroupManager.build());
 
         // 分割线

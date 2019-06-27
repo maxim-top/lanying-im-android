@@ -15,6 +15,7 @@
     <string name="group_member">群成员</string>
     <string name="group_id">群ID</string>
     <string name="group_owner_id">群主ID</string>
+    <string name="group_qrcode">群二维码</string>
     <string name="group_manager">群管理</string>
     <string name="group_rename">修改群名称</string>
     <string name="group_manager_list">管理员列表</string>

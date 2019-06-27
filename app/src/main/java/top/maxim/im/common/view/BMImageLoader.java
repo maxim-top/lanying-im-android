@@ -66,4 +66,8 @@ public class BMImageLoader {
             ImageLoadingListener listener) {
         mLoader.displayImage(uri, imageView, config != null ? config.getOptions() : null, listener);
     }
+
+    public void loadImage(String uri, ImageRequestConfig config, ImageLoadingListener listener) {
+        mLoader.loadImage(uri, config != null ? config.getOptions() : null, listener);
+    }
 }

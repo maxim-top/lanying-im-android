@@ -195,9 +195,12 @@ public class ContactSearchActivity extends BaseTitleActivity {
             if (item == null) {
                 return;
             }
+            //是否是好友
+            BMXRosterItem.RosterRelation rosterRelation = item.relation();
+            boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
             long myId = SharePreferenceUtils.getInstance().getUserId();
-            //自己不展示添加按钮
-            add.setVisibility(myId == item.rosterId() ? View.GONE : View.VISIBLE);
+            // 自己不展示添加按钮
+            add.setVisibility(myId == item.rosterId() || friend ? View.GONE : View.VISIBLE);
             add.setOnClickListener(v -> {
                 long rosterId = item.rosterId();
                 showAddReason(rosterId);

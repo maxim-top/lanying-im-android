@@ -58,6 +58,7 @@ public class MyQrCodeActivity extends BaseTitleActivity {
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
         builder.setTitle(R.string.my_qrcode);
+        builder.setBackIcon(R.drawable.header_back_icon, v -> finish());
         return builder.build();
     }
 

@@ -262,6 +262,16 @@
             android:name=".common.utils.video.PhotoRecorderActivity"
             android:screenOrientation="portrait" />
 
+        <!--扫一扫-->
+        <activity
+            android:name=".scan.view.ScannerActivity"
+            android:screenOrientation="portrait" />
+
+        <!--扫一扫结果-->
+        <activity
+            android:name=".scan.view.ScanResultActivity"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name=".wxapi.WXEntryActivity"
             android:exported="true"

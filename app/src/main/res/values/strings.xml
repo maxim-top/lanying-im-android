@@ -142,6 +142,10 @@
     <string name="group_mute_chat">屏蔽消息</string>
 
     <string name="my_qrcode">我的二维码</string>
+    <string name="contact_scan">扫一扫</string>
+    <string name="scan_open_flash">周边光线较暗轻触点亮</string>
+    <string name="scan_close_flash">轻触关闭</string>
+    <string name="scan_notice">将二维码/条形码放到框内</string>
 
     <!--录制视频-->
     <string name="tip_no_camera_or_reject">没有摄像头或相机权限被拒绝</string>

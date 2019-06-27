@@ -7,6 +7,9 @@ package top.maxim.im.scan.config;
 
 public class ScanConfigs {
 
+    /* 二维码结果 */
+    public static final String CODE_RESULT = "codeResult";
+
     /* roster二维码前缀 */
     public static final String CODE_ROSTER_PRE = "R_";
 

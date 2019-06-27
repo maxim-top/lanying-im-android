@@ -40,6 +40,7 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
 import top.maxim.im.contact.adapter.ContactAdapter;
 import top.maxim.im.group.view.GroupListActivity;
+import top.maxim.im.scan.view.ScannerActivity;
 
 /**
  * Description : 通讯录 Created by Mango on 2018/11/06
@@ -108,6 +109,7 @@ public class ContactFragment extends BaseTitleFragment {
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(getActivity(), headerContainer);
         builder.setTitle(R.string.tab_contact);
+        builder.setRightText(R.string.contact_scan, v -> ScannerActivity.openScan(getActivity()));
         return builder.build();
     }
 
@@ -267,7 +269,7 @@ public class ContactFragment extends BaseTitleFragment {
         super.onResume();
         initRoster(false);
     }
-    
+
     private void initRoster(boolean forceRefresh) {
         final ListOfLongLong listOfLongLong = new ListOfLongLong();
         final BMXRosterItemList itemList = new BMXRosterItemList();

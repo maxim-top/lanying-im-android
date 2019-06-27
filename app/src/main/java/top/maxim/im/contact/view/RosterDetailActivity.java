@@ -80,10 +80,8 @@ public class RosterDetailActivity extends BaseTitleActivity {
 
     private ImageRequestConfig mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
             .showImageForEmptyUri(R.drawable.default_avatar_icon)
-            .showImageOnFail(R.drawable.default_avatar_icon)
-            .bitmapConfig(Bitmap.Config.RGB_565)
-            .cacheOnDisk(true)
-            .showImageOnLoading(R.drawable.default_avatar_icon).build();
+            .showImageOnFail(R.drawable.default_avatar_icon).bitmapConfig(Bitmap.Config.RGB_565)
+            .cacheOnDisk(true).showImageOnLoading(R.drawable.default_avatar_icon).build();
 
     public static void openRosterDetail(Context context, long rosterId) {
         Intent intent = new Intent(context, RosterDetailActivity.class);
@@ -95,12 +93,8 @@ public class RosterDetailActivity extends BaseTitleActivity {
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
         builder.setTitle(R.string.profile);
-        builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        builder.setRightText("", v -> showAddReason(mRosterId));
+        builder.setBackIcon(R.drawable.header_back_icon, v -> finish());
         return builder.build();
     }
 
@@ -233,6 +227,10 @@ public class RosterDetailActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
+        initRoster();
+    }
+
+    private void initRoster(){
         showLoadingDialog(true);
         Observable.just(mRosterId).map(new Func1<Long, BMXErrorCode>() {
             @Override
@@ -295,6 +293,19 @@ public class RosterDetailActivity extends BaseTitleActivity {
         // 免打扰
         boolean isBlock = mRosterItem.isMuteNotification();
         mSetDistrub.setCheckStatus(isBlock);
+
+        // 是否是好友
+        BMXRosterItem.RosterRelation rosterRelation = mRosterItem.relation();
+        boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
+        TextView add = mHeader.getRightText();
+        if (friend) {
+            mTvOpenChat.setVisibility(View.VISIBLE);
+            add.setVisibility(View.GONE);
+        } else {
+            mTvOpenChat.setVisibility(View.GONE);
+            add.setVisibility(View.VISIBLE);
+            add.setText("添加");
+        }
     }
 
     /**
@@ -358,7 +369,8 @@ public class RosterDetailActivity extends BaseTitleActivity {
                             mSetAlias.setEndContent(info);
                         } else if (TextUtils.equals(title,
                                 getString(R.string.setting_roster_ext))) {
-                            mTvExt.setVisibility(TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                            mTvExt.setVisibility(
+                                    TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
                             mTvExt.setText(TextUtils.isEmpty(info) ? "" : info);
                         }
                     }
@@ -400,6 +412,61 @@ public class RosterDetailActivity extends BaseTitleActivity {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         RosterFetcher.getFetcher().putRoster(mRosterItem);
+                    }
+                });
+    }
+
+    /**
+     * 输入框弹出
+     */
+    private void showAddReason(final long rosterId) {
+        DialogUtils.getInstance().showEditDialog(this, "添加好友",
+                getString(R.string.confirm), getString(R.string.cancel),
+                new CommonEditDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener(String content) {
+                        addRoster(rosterId, content);
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
+    }
+
+    private void addRoster(long rosterId, final String reason) {
+        if (rosterId <= 0) {
+            return;
+        }
+        showLoadingDialog(true);
+        Observable.just(rosterId).map(new Func1<Long, BMXErrorCode>() {
+            @Override
+            public BMXErrorCode call(Long s) {
+                return RosterManager.getInstance().apply(s, reason);
+            }
+        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
+            @Override
+            public Observable<BMXErrorCode> call(BMXErrorCode bmxErrorCode) {
+                return BaseManager.bmxFinish(bmxErrorCode, bmxErrorCode);
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BMXErrorCode>() {
+                    @Override
+                    public void onCompleted() {
+                        dismissLoadingDialog();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt("添加失败");
+                    }
+
+                    @Override
+                    public void onNext(BMXErrorCode errorCode) {
+                        ToastUtil.showTextViewPrompt("添加成功");
+                        initRoster();
                     }
                 });
     }

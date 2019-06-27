@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#66000000"
+    android:gravity="center_horizontal">
+
+    <SurfaceView
+        android:id="@+id/sv_scan_camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <top.maxim.im.scan.view.ScanFrameView
+        android:id="@+id/v_scan_frame_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
+
+        <ImageView
+            android:id="@+id/iv_scan_back"
+            android:layout_width="@dimen/dimen_20"
+            android:layout_height="@dimen/dimen_20"
+            android:layout_marginLeft="@dimen/dimen_9"
+            android:layout_marginTop="@dimen/dimen_10"
+            android:layout_marginBottom="@dimen/dimen_9"
+            android:background="@drawable/header_back_icon_white"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dimen_10"
+            android:layout_marginBottom="@dimen/dimen_9"
+            android:text="@string/contact_scan"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/dimen_18" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/scan_line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/icon_scan_line"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_scan_notice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="@string/scan_notice"
+        android:textColor="@color/color_white"
+        android:textSize="@dimen/dimen_16" />
+
+    <LinearLayout
+        android:id="@+id/ll_scan_operate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/tv_scan_notice"
+        android:layout_marginLeft="@dimen/dimen_15"
+        android:layout_marginRight="@dimen/dimen_15"
+        android:layout_marginTop="@dimen/dimen_50">
+
+        <LinearLayout
+            android:id="@+id/ll_scan_qrcode_album"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/iv_scan_qrcode_album"
+                android:layout_width="@dimen/dimen_56"
+                android:layout_height="@dimen/dimen_56"
+                android:background="@drawable/icon_scan_album"/>
+            <TextView
+                android:id="@+id/tv_scan_qrcode_album"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="相册"
+                android:layout_marginTop="@dimen/dimen_10"
+                android:singleLine="true"
+                android:textColor="@color/color_white"
+                android:textSize="@dimen/dimen_12"/>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

@@ -230,7 +230,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
         initRoster();
     }
 
-    private void initRoster(){
+    private void initRoster() {
         showLoadingDialog(true);
         Observable.just(mRosterId).map(new Func1<Long, BMXErrorCode>() {
             @Override
@@ -258,6 +258,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
+                        dismissLoadingDialog();
                         bindRoster();
                         RosterFetcher.getFetcher().putRoster(mRosterItem);
                     }
@@ -420,9 +421,8 @@ public class RosterDetailActivity extends BaseTitleActivity {
      * 输入框弹出
      */
     private void showAddReason(final long rosterId) {
-        DialogUtils.getInstance().showEditDialog(this, "添加好友",
-                getString(R.string.confirm), getString(R.string.cancel),
-                new CommonEditDialog.OnDialogListener() {
+        DialogUtils.getInstance().showEditDialog(this, "添加好友", getString(R.string.confirm),
+                getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
                         addRoster(rosterId, content);

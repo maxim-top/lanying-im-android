@@ -20,6 +20,7 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.MainActivity;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -126,7 +127,6 @@ public class WelcomeActivity extends BaseTitleActivity {
      * 自动登陆
      */
     private void autoLogin(String userName, final String pwd) {
-        initData();
         Observable.just(userName).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
@@ -150,6 +150,7 @@ public class WelcomeActivity extends BaseTitleActivity {
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
+                        initData();
                         SharePreferenceUtils.getInstance().putLoginStatus(true);
                         MessageDispatcher.getDispatcher().initialize();
                         MainActivity.openMain(WelcomeActivity.this);
@@ -165,6 +166,9 @@ public class WelcomeActivity extends BaseTitleActivity {
             UserManager.getInstance().getProfile(new BMXUserProfile(), true);
             RosterManager.getInstance().get(new ListOfLongLong(), true);
             GroupManager.getInstance().search(new BMXGroupList(), true);
+            String name = SharePreferenceUtils.getInstance().getUserName();
+            String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+            AppManager.getInstance().getTokenByName(name, pwd, null);
             return "";
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<String>() {

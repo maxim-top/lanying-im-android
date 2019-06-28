@@ -182,6 +182,11 @@
             android:name=".group.view.GroupQrCodeActivity"
             android:screenOrientation="portrait" />
 
+        <!--加入群聊二维码-->
+        <activity
+            android:name=".group.view.GroupQrcodeDetailActivity"
+            android:screenOrientation="portrait" />
+
         <!--用户设置-->
         <activity
             android:name=".login.view.SettingUserActivity"

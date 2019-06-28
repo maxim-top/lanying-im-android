@@ -22,6 +22,7 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.MainActivity;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
@@ -198,6 +199,7 @@ public class LoginActivity extends BaseTitleActivity {
                     SharePreferenceUtils.getInstance().putUserId(profile.userId());
                     SharePreferenceUtils.getInstance().putUserName(profile.username());
                     SharePreferenceUtils.getInstance().putUserPwd(pwd);
+                    AppManager.getInstance().getTokenByName(profile.username(), pwd, null);
                 }
                 return bmxErrorCode;
             }

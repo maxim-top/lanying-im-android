@@ -14,6 +14,7 @@ import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.contact.view.RosterDetailActivity;
+import top.maxim.im.group.view.GroupQrcodeDetailActivity;
 import top.maxim.im.login.view.SettingUserActivity;
 import top.maxim.im.scan.config.ScanConfigs;
 
@@ -60,8 +61,7 @@ public class ScanResultActivity extends BaseTitleActivity {
         }
         if (mResult.startsWith(ScanConfigs.CODE_ROSTER_PRE)) {
             // roster
-            long rosterId = Long
-                    .valueOf(mResult.replace(ScanConfigs.CODE_ROSTER_PRE, ""));
+            long rosterId = Long.valueOf(mResult.replace(ScanConfigs.CODE_ROSTER_PRE, ""));
             long myId = SharePreferenceUtils.getInstance().getUserId();
             if (rosterId == myId) {
                 // 自己进入设置页面
@@ -72,8 +72,9 @@ public class ScanResultActivity extends BaseTitleActivity {
             finish();
         } else if (mResult.startsWith(ScanConfigs.CODE_GROUP_PRE)) {
             // 群聊
-            long groupId = Long
-                    .valueOf(mResult.replace(ScanConfigs.CODE_GROUP_PRE, ""));
+            long groupId = Long.valueOf(mResult.replace(ScanConfigs.CODE_GROUP_PRE, ""));
+            GroupQrcodeDetailActivity.openGroupQrcodeDetail(this, groupId);
+            finish();
         }
     }
 

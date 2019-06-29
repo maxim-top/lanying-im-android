@@ -21,11 +21,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.net.HttpResponseCallback;
 
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
@@ -132,12 +134,23 @@ public class RegisterActivity extends BaseTitleActivity {
         mInputPwd.addTextChangedListener(mInputWatcher);
         mInputPhone.addTextChangedListener(mInputWatcher);
         mInputVerify.addTextChangedListener(mInputWatcher);
-        //发送验证码
-        mSendVerify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO
-            }
+        // 发送验证码
+        mSendVerify.setOnClickListener(v -> {
+            showLoadingDialog(true);
+            String phone = mInputPhone.getEditableText().toString().trim();
+            AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<String>() {
+                @Override
+                public void onResponse(String result) {
+                    dismissLoadingDialog();
+                    ToastUtil.showTextViewPrompt("获取验证码成功");
+                }
+
+                @Override
+                public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                    dismissLoadingDialog();
+                    ToastUtil.showTextViewPrompt("获取验证码失败");
+                }
+            });
         });
     }
 

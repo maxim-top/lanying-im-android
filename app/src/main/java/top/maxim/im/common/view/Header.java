@@ -290,7 +290,7 @@ public class Header {
                         RelativeLayout.LayoutParams.MATCH_PARENT);
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                mRightIcon.setPadding(0, 0, ScreenUtils.dp2px(16), 0);
+                mRightIcon.setPadding(ScreenUtils.dp2px(16), 0, ScreenUtils.dp2px(16), 0);
                 mContainer.addView(mRightIcon, params);
             }
 

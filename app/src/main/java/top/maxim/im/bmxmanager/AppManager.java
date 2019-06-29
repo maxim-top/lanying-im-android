@@ -222,4 +222,50 @@ public class AppManager {
                     }
                 });
     }
+
+    /**
+     * 获取手机验证码
+     * 
+     * @param mobile 手机号
+     */
+    public void captchaSMS(String mobile, HttpResponseCallback<String> callback) {
+        Map<String, String> params = new HashMap<>();
+        params.put("mobile", mobile);
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "captcha/sms", params, null,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (data) {
+                                    if (callback != null) {
+                                        callback.onCallResponse(jsonObject.getString("qr_info"));
+                                    }
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (callback != null) {
+                            callback.onCallFailure(-1, "", new Throwable());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(-1, "", new Throwable());
+                        }
+                    }
+                });
+    }
 }

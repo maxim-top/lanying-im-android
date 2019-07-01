@@ -9,7 +9,6 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXMessageListList;
-import top.maxim.im.message.interfaces.FileCallback;
 
 /**
  * Description : chat Created by Mango on 2018/12/2.
@@ -101,7 +100,7 @@ public class ChatManager extends BaseManager {
     /**
      * 下载附件，下载状态变化和进度通过listener通知
      **/
-    public void downloadAttachment(BMXMessage msg, FileCallback callback) {
+    public void downloadAttachment(BMXMessage msg) {
         mService.downloadAttachment(msg);
     }
 

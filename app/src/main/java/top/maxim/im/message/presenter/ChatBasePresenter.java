@@ -74,7 +74,6 @@ import top.maxim.im.common.utils.video.PhotoRecorderActivity;
 import top.maxim.im.contact.view.ForwardMsgRosterActivity;
 import top.maxim.im.message.contract.ChatBaseContract;
 import top.maxim.im.message.customviews.MessageInputBar;
-import top.maxim.im.message.interfaces.FileCallback;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.view.ChooseFileActivity;
@@ -182,7 +181,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
         @Override
         public void onAttachmentStatusChanged(BMXMessage msg, BMXErrorCode error, int percent) {
-            Log.d("statusChanged", percent + "");
+            Log.d("onAttachmentStatusChanged", percent + "");
         }
 
         @Override
@@ -939,22 +938,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (status == BMXMessageAttachment.DownloadStatus.Downloaing) {
             return;
         }
-        ChatManager.getInstance().downloadAttachment(bean, new FileCallback(body.url()) {
-            @Override
-            protected void onProgress(long percent, String path, boolean isThumbnail) {
-
-            }
-
-            @Override
-            protected void onFinish(String url, boolean isThumbnail) {
-                playVoice(body.path(), bean);
-            }
-
-            @Override
-            protected void onFail(String path, boolean isThumbnail) {
-
-            }
-        });
+        ChatManager.getInstance().downloadAttachment(bean);
     }
 
     /**
@@ -1124,22 +1108,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (status == BMXMessageAttachment.DownloadStatus.Downloaing) {
             return;
         }
-        ChatManager.getInstance().downloadAttachment(bean, new FileCallback(body.url()) {
-            @Override
-            protected void onProgress(long percent, String path, boolean isThumbnail) {
-
-            }
-
-            @Override
-            protected void onFinish(String url, boolean isThumbnail) {
-                openFilePreView(body.path());
-            }
-
-            @Override
-            protected void onFail(String path, boolean isThumbnail) {
-
-            }
-        });
+        ChatManager.getInstance().downloadAttachment(bean);
     }
 
     /**

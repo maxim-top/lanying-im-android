@@ -20,7 +20,6 @@ import top.maxim.im.common.view.BMImageLoader;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.interfaces.ChatActionListener;
-import top.maxim.im.message.interfaces.FileCallback;
 
 /**
  * Description : 消息图片类型 Created by Mango on 2018/11/18.
@@ -138,24 +137,7 @@ public class MessageItemImage extends MessageItemBaseView {
             BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
         } else {
             BMImageLoader.getInstance().display(mImageView, "", mImageConfig);
-            ChatManager.getInstance().downloadAttachment(mMaxMessage,
-                    new FileCallback(body.url()) {
-                        @Override
-                        protected void onProgress(long percent, String path, boolean isThumbnail) {
-
-                        }
-
-                        @Override
-                        protected void onFinish(String url, boolean isThumbnail) {
-                            BMImageLoader.getInstance().display(mImageView, "file://" + body.path(),
-                                    mImageConfig);
-                        }
-
-                        @Override
-                        protected void onFail(String path, boolean isThumbnail) {
-
-                        }
-                    });
+            ChatManager.getInstance().downloadAttachment(mMaxMessage);
         }
     }
 

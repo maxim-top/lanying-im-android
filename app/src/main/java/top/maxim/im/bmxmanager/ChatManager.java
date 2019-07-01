@@ -122,8 +122,8 @@ public class ChatManager extends BaseManager {
     /**
      * 删除会话
      **/
-    public void deleteConversation(long conversationId) {
-        mService.deleteConversation(conversationId);
+    public void deleteConversation(long conversationId, Boolean sync) {
+        mService.deleteConversation(conversationId, sync);
     }
 
     /**

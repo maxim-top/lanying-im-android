@@ -8,7 +8,7 @@ import im.floo.floolib.BMXSignInStatus;
 import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.BMXUserService;
 import im.floo.floolib.BMXUserServiceListener;
-import im.floo.floolib.SWIGTYPE_p_std__functionT_void_fintF_t;
+import im.floo.floolib.FileProgressListener;
 
 /**
  * Description : 用户 Created by Mango on 2018/12/2.
@@ -159,15 +159,15 @@ public class UserManager extends BaseManager {
     /**
      * 上传头像
      **/
-    public BMXErrorCode uploadAvatar(String avatarPath) {
-        return mService.uploadAvatar(avatarPath, new SWIGTYPE_p_std__functionT_void_fintF_t());
+    public BMXErrorCode uploadAvatar(String avatarPath, FileProgressListener listener) {
+        return mService.uploadAvatar(avatarPath, listener);
     }
 
     /**
      * 下载头像
      */
-    public BMXErrorCode downloadAvatar(BMXUserProfile profile) {
-        return mService.downloadAvatar(profile, false, new SWIGTYPE_p_std__functionT_void_fintF_t());
+    public BMXErrorCode downloadAvatar(BMXUserProfile profile, FileProgressListener listener) {
+        return mService.downloadAvatar(profile, false, listener);
     }
 
     /**

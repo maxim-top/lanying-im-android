@@ -10,10 +10,10 @@ import im.floo.floolib.BMXGroupMemberList;
 import im.floo.floolib.BMXGroupService;
 import im.floo.floolib.BMXGroupServiceListener;
 import im.floo.floolib.BMXGroupSharedFileList;
+import im.floo.floolib.FileProgressListener;
 import im.floo.floolib.GroupApplicationPage;
 import im.floo.floolib.GroupInvitaionPage;
 import im.floo.floolib.ListOfLongLong;
-import im.floo.floolib.SWIGTYPE_p_std__functionT_void_fintF_t;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 
 /**
@@ -239,9 +239,9 @@ public class GroupManager extends BaseManager {
      * 添加群共享文件
      **/
     public BMXErrorCode uploadSharedFile(BMXGroup group, String filePath, String displayName,
-            String extensionName) {
+            String extensionName, FileProgressListener listener) {
         return mService.uploadSharedFile(group, filePath, displayName, extensionName,
-                new SWIGTYPE_p_std__functionT_void_fintF_t());
+                listener);
     }
 
     /**
@@ -254,9 +254,8 @@ public class GroupManager extends BaseManager {
     /**
      * 下载群共享文件
      **/
-    public BMXErrorCode downloadSharedFile(BMXGroup group, BMXGroup.SharedFile sharedFile) {
-        return mService.downloadSharedFile(group, sharedFile,
-                new SWIGTYPE_p_std__functionT_void_fintF_t());
+    public BMXErrorCode downloadSharedFile(BMXGroup group, BMXGroup.SharedFile sharedFile, FileProgressListener listener) {
+        return mService.downloadSharedFile(group, sharedFile, listener);
     }
 
     /**
@@ -344,15 +343,15 @@ public class GroupManager extends BaseManager {
     /**
      * 设置群头像
      **/
-    public BMXErrorCode setAvatar(BMXGroup group, String avatarPath) {
-        return mService.setAvatar(group, avatarPath, new SWIGTYPE_p_std__functionT_void_fintF_t());
+    public BMXErrorCode setAvatar(BMXGroup group, String avatarPath, FileProgressListener listener) {
+        return mService.setAvatar(group, avatarPath,listener);
     }
 
     /**
      * 下载群头像
      */
-    public BMXErrorCode downloadAvatar(BMXGroup group) {
-        return mService.downloadAvatar(group, false, new SWIGTYPE_p_std__functionT_void_fintF_t());
+    public BMXErrorCode downloadAvatar(BMXGroup group, FileProgressListener listener) {
+        return mService.downloadAvatar(group, false, listener);
     }
 
     /**

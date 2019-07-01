@@ -20,6 +20,7 @@ import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.BMXVoiceAttachment;
+import im.floo.floolib.FileProgressListener;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -323,7 +324,12 @@ public class ChatUtils {
         Observable.just("").map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return UserManager.getInstance().downloadAvatar(profile);
+                return UserManager.getInstance().downloadAvatar(profile, new FileProgressListener(){
+                    @Override
+                    public int onProgressChange(String total, String already) {
+                        return 0;
+                    }
+                });
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
@@ -412,7 +418,12 @@ public class ChatUtils {
         Observable.just(item).map(new Func1<BMXRosterItem, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXRosterItem s) {
-                return RosterManager.getInstance().downloadAvatar(s);
+                return RosterManager.getInstance().downloadAvatar(s, new FileProgressListener(){
+                    @Override
+                    public int onProgressChange(String total, String already) {
+                        return 0;
+                    }
+                });
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
@@ -506,7 +517,12 @@ public class ChatUtils {
         Observable.just(item).map(new Func1<BMXGroup, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXGroup s) {
-                return GroupManager.getInstance().downloadAvatar(s);
+                return GroupManager.getInstance().downloadAvatar(s, new FileProgressListener(){
+                    @Override
+                    public int onProgressChange(String total, String already) {
+                        return 0;
+                    }
+                });
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

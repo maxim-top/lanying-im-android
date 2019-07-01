@@ -8,7 +8,7 @@ import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.BMXRosterService;
 import im.floo.floolib.BMXRosterServiceListener;
 import im.floo.floolib.ListOfLongLong;
-import im.floo.floolib.SWIGTYPE_p_std__functionT_void_fintF_t;
+import im.floo.floolib.FileProgressListener;
 
 /**
  * Description : roster Created by Mango on 2018/12/2.
@@ -147,8 +147,8 @@ public class RosterManager extends BaseManager {
      * 
      * @param item
      */
-    public BMXErrorCode downloadAvatar(BMXRosterItem item) {
-        return mService.downloadAvatar(item, false, new SWIGTYPE_p_std__functionT_void_fintF_t());
+    public BMXErrorCode downloadAvatar(BMXRosterItem item, FileProgressListener listener) {
+        return mService.downloadAvatar(item, false,listener);
     }
 
     /**

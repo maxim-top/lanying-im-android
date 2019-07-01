@@ -21,6 +21,7 @@ import java.util.List;
 
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
+import im.floo.floolib.FileProgressListener;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -757,7 +758,12 @@ public class SettingUserActivity extends BaseTitleActivity {
         Observable.just(path).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return UserManager.getInstance().uploadAvatar(s);
+                return UserManager.getInstance().uploadAvatar(s, new FileProgressListener(){
+                    @Override
+                    public int onProgressChange(String total, String already) {
+                        return 0;
+                    }
+                });
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

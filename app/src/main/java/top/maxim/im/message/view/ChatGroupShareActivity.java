@@ -32,6 +32,7 @@ import java.util.Map;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupSharedFileList;
+import im.floo.floolib.FileProgressListener;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -191,7 +192,12 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
         Observable.just(file).map(new Func1<BMXGroup.SharedFile, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXGroup.SharedFile file) {
-                return GroupManager.getInstance().downloadSharedFile(mGroup, file);
+                return GroupManager.getInstance().downloadSharedFile(mGroup, file, new FileProgressListener(){
+                    @Override
+                    public int onProgressChange(String total, String already) {
+                        return 0;
+                    }
+                });
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
@@ -371,7 +377,12 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
             @Override
             public BMXErrorCode call(String s) {
                 return GroupManager.getInstance().uploadSharedFile(mGroup, s, displayName,
-                        extensionName);
+                        extensionName, new FileProgressListener(){
+                            @Override
+                            public int onProgressChange(String total, String already) {
+                                return 0;
+                            }
+                        });
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

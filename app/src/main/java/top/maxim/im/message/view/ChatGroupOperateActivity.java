@@ -25,6 +25,7 @@ import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupMemberList;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXRosterItemList;
+import im.floo.floolib.FileProgressListener;
 import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
 import rx.Subscriber;
@@ -958,7 +959,12 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         Observable.just(path).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return GroupManager.getInstance().setAvatar(mGroup, s);
+                return GroupManager.getInstance().setAvatar(mGroup, s, new FileProgressListener(){
+                    @Override
+                    public int onProgressChange(String total, String already) {
+                        return 0;
+                    }
+                });
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

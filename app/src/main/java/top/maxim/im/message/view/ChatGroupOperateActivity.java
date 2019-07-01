@@ -811,7 +811,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
             public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                ChatManager.getInstance().deleteConversation(mGroupId);
+                ChatManager.getInstance().deleteConversation(mGroupId, true);
                 return BaseManager.bmxFinish(errorCode, errorCode);
             }
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())

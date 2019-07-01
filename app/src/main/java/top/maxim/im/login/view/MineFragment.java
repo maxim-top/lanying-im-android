@@ -579,9 +579,9 @@ public class MineFragment extends BaseTitleFragment {
      * @param name
      */
     private void setPushName(final String name) {
-        if (TextUtils.isEmpty(name)) {
-            return;
-        }
+//        if (TextUtils.isEmpty(name)) {
+//            return;
+//        }
         showLoadingDialog(true);
         Observable.just(name).map(new Func1<String, BMXErrorCode>() {
             @Override

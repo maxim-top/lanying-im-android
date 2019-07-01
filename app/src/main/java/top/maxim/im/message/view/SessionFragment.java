@@ -385,7 +385,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                             return null;
                         }
                         ChatManager.getInstance()
-                                .deleteConversation(conversation.conversationId());
+                                .deleteConversation(conversation.conversationId(), true);
                         return BMXErrorCode.NoError;
                     }
                 }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {

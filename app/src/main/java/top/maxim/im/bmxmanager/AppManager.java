@@ -20,7 +20,7 @@ import top.maxim.im.net.HttpResponseCallback;
  */
 public class AppManager {
 
-    private static final String mBaseUrl = "http://39.104.4.219/app/";
+    private static final String mBaseUrl = "http://api.maxim.top/app/";
 
     private static final String TAG = AppManager.class.getSimpleName();
 
@@ -248,6 +248,96 @@ public class AppManager {
                                 if (data) {
                                     if (callback != null) {
                                         callback.onCallResponse(jsonObject.getString("qr_info"));
+                                    }
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (callback != null) {
+                            callback.onCallFailure(-1, "", new Throwable());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(-1, "", new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 微信登录
+     *
+     * @param code 微信返会code
+     */
+    public void weChatLogin(String code, HttpResponseCallback<String> callback) {
+        Map<String, String> params = new HashMap<>();
+        params.put("code", code);
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "wechat_login_android", params, null,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("data")) {
+                                String data = jsonObject.getString("data");
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (callback != null) {
+                            callback.onCallFailure(-1, "", new Throwable());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(-1, "", new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 绑定openId
+     */
+    public void bindOpenId(String token, String openId, HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        Map<String, String> params = new HashMap<>();
+        params.put("open_id", openId);
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "bind_openid", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (data) {
+                                    if (callback != null) {
+                                        callback.onCallResponse(jsonObject.getString(result));
                                     }
                                 }
                                 return;

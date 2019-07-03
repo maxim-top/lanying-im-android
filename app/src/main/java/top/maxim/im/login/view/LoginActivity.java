@@ -13,6 +13,9 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
 import rx.Observable;
@@ -30,6 +33,7 @@ import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 import top.maxim.im.wxapi.WXUtils;
 
@@ -37,6 +41,8 @@ import top.maxim.im.wxapi.WXUtils;
  * Description : 登陆 Created by Mango on 2018/11/21.
  */
 public class LoginActivity extends BaseTitleActivity {
+    
+    public static String LOGIN_CODE = "loginCode";
 
     /* 账号 */
     private EditText mInputName;
@@ -62,10 +68,17 @@ public class LoginActivity extends BaseTitleActivity {
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
-    private final int REGISTER_CODE = 1000;
+    private String mCode;
 
     public static void openLogin(Context context) {
+        openLogin(context, null);
+    }
+
+    public static void openLogin(Context context, String code) {
         Intent intent = new Intent(context, LoginActivity.class);
+        if (!TextUtils.isEmpty(code)) {
+            intent.putExtra(LOGIN_CODE, code);
+        }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
@@ -105,10 +118,9 @@ public class LoginActivity extends BaseTitleActivity {
 
     @Override
     protected void setViewListener() {
-
         // 注册
         mRegister.setOnClickListener(
-                v -> RegisterActivity.openRegister(LoginActivity.this, REGISTER_CODE));
+                v -> RegisterActivity.openRegister(LoginActivity.this));
         // 登陆
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
@@ -163,8 +175,100 @@ public class LoginActivity extends BaseTitleActivity {
         });
     }
 
+    @Override
+    protected void initDataFromFront(Intent intent) {
+        super.initDataFromFront(intent);
+        if (intent != null) {
+            mCode = intent.getStringExtra(LOGIN_CODE);
+        }
+    }
+
+    @Override
+    protected void initDataForActivity() {
+        super.initDataForActivity();
+        if (TextUtils.isEmpty(mCode)) {
+            return;
+        }
+        loginWeChat();
+    }
+
+    /**
+     * 微信登录
+     */
+    public void loginWeChat() {
+        showLoadingDialog(true);
+        AppManager.getInstance().weChatLogin(mCode, new HttpResponseCallback<String>() {
+            @Override
+            public void onResponse(String result) {
+                dismissLoadingDialog();
+                if (TextUtils.isEmpty(result)) {
+                    ToastUtil.showTextViewPrompt("登陆失败");
+                    return;
+                }
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (!jsonObject.has("openid")) {
+                        return;
+                    }
+                    if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
+                        // 没有userId 密码 需要跳转注册
+                        RegisterActivity.openRegister(LoginActivity.this,
+                                jsonObject.getString("openid"));
+                        return;
+                    }
+                    // 直接登录
+                    String userId = jsonObject.getString("user_id");
+                    String pwd = jsonObject.getString("password");
+                    login(LoginActivity.this, userId, pwd, true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                ToastUtil.showTextViewPrompt("登陆失败");
+                dismissLoadingDialog();
+            }
+        });
+    }
+
+    /**
+     * 绑定openId
+     * @param pwd
+     */
+    public static void bindOpenId(final Activity activity, String name, final String pwd,
+            final String openId) {
+        // 首先获取token
+        ((BaseTitleActivity)activity).showLoadingDialog(true);
+        AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
+            @Override
+            public void onResponse(String result) {
+                AppManager.getInstance().bindOpenId(result, openId,
+                        new HttpResponseCallback<String>() {
+                            @Override
+                            public void onResponse(String result) {
+                                ((BaseTitleActivity)activity).dismissLoadingDialog();
+                                login(activity, name, pwd, false);
+                            }
+
+                            @Override
+                            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                                ((BaseTitleActivity)activity).dismissLoadingDialog();
+                            }
+                        });
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                ToastUtil.showTextViewPrompt("绑定失败");
+                ((BaseTitleActivity)activity).dismissLoadingDialog();
+            }
+        });
+    }
+
     public static void login(final Activity activity, String name, final String pwd,
-            final boolean isLoginById) {
+                             final boolean isLoginById) {
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pwd)) {
             ToastUtil.showTextViewPrompt("不能为空");
@@ -174,9 +278,9 @@ public class LoginActivity extends BaseTitleActivity {
         Observable.just(name).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                // if (isLoginById) {
-                // return UserManager.getInstance().signInById(Long.valueOf(s), pwd);
-                // }
+                if (isLoginById) {
+                    return UserManager.getInstance().signInById(Long.valueOf(s), pwd);
+                }
                 // if (Pattern.matches("0?(13|14|15|17|18|19)[0-9]{9}", s)) {
                 // // 手机号
                 // return UserManager.getInstance().signInByPhone(s, pwd);

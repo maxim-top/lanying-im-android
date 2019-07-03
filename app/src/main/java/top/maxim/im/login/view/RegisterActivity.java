@@ -1,7 +1,6 @@
 
 package top.maxim.im.login.view;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.Editable;
@@ -61,10 +60,22 @@ public class RegisterActivity extends BaseTitleActivity {
     public static final String REFISTER_ACCOUNT = "registerAccount";
 
     public static final String REFISTER_PWD = "registerPwd";
+    
+    public static final String OPEN_ID = "openId";
+    
+    /* 微信登录返回的openId */
+    private String mOpenId;
 
-    public static void openRegister(Context context, int requestCode) {
+    public static void openRegister(Context context) {
+        openRegister(context, null);
+    }
+
+    public static void openRegister(Context context, String openId) {
         Intent intent = new Intent(context, RegisterActivity.class);
-        ((Activity)context).startActivityForResult(intent, requestCode);
+        if (!TextUtils.isEmpty(openId)) {
+            intent.putExtra(OPEN_ID, openId);
+        }
+        context.startActivity(intent);
     }
 
     @Override
@@ -84,6 +95,14 @@ public class RegisterActivity extends BaseTitleActivity {
         mInputVerify = view.findViewById(R.id.et_user_verify);
         mRegister = view.findViewById(R.id.tv_register);
         return view;
+    }
+
+    @Override
+    protected void initDataFromFront(Intent intent) {
+        super.initDataFromFront(intent);
+        if (intent != null) {
+            mOpenId = intent.getStringExtra(OPEN_ID);
+        }
     }
 
     @Override
@@ -188,9 +207,15 @@ public class RegisterActivity extends BaseTitleActivity {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
-                        LoginActivity.login(RegisterActivity.this,
-                                mInputName.getEditableText().toString().trim(),
-                                mInputPwd.getEditableText().toString().trim(), false);
+                        if (TextUtils.isEmpty(mOpenId)) {
+                            LoginActivity.login(RegisterActivity.this,
+                                    mInputName.getEditableText().toString().trim(),
+                                    mInputPwd.getEditableText().toString().trim(), false);
+                        } else {
+                            LoginActivity.bindOpenId(RegisterActivity.this,
+                                    mInputName.getEditableText().toString().trim(),
+                                    mInputPwd.getEditableText().toString().trim(), mOpenId);
+                        }
                     }
                 });
     }

@@ -266,6 +266,24 @@ public class RosterDetailActivity extends BaseTitleActivity {
     }
 
     private void bindRoster() {
+        // 是否是好友
+        BMXRosterItem.RosterRelation rosterRelation = mRosterItem.relation();
+        boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
+        TextView add = mHeader.getRightText();
+        if (friend) {
+            mTvOpenChat.setVisibility(View.VISIBLE);
+            add.setVisibility(View.GONE);
+        } else {
+            mTvOpenChat.setVisibility(View.GONE);
+            add.setVisibility(View.VISIBLE);
+            add.setText("添加");
+        }
+        if (friend) {
+            // 好友直接跳转单聊
+            ChatSingleActivity.startChatActivity(this, BMXMessage.MessageType.Single, mRosterId);
+            finish();
+            return;
+        }
         String name = mRosterItem.username();
         String nickName = mRosterItem.nickname();
         ChatUtils.getInstance().showRosterAvatar(mRosterItem, mUserIcon, mConfig);
@@ -295,18 +313,6 @@ public class RosterDetailActivity extends BaseTitleActivity {
         boolean isBlock = mRosterItem.isMuteNotification();
         mSetDistrub.setCheckStatus(isBlock);
 
-        // 是否是好友
-        BMXRosterItem.RosterRelation rosterRelation = mRosterItem.relation();
-        boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
-        TextView add = mHeader.getRightText();
-        if (friend) {
-            mTvOpenChat.setVisibility(View.VISIBLE);
-            add.setVisibility(View.GONE);
-        } else {
-            mTvOpenChat.setVisibility(View.GONE);
-            add.setVisibility(View.VISIBLE);
-            add.setText("添加");
-        }
     }
 
     /**

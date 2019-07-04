@@ -73,16 +73,19 @@ public class ScanResultActivity extends BaseTitleActivity {
             finish();
         } else if (mResult.startsWith(ScanConfigs.CODE_GROUP_PRE)) {
             // 群聊
-            long groupId = Long.valueOf(mResult.replace(ScanConfigs.CODE_GROUP_PRE, ""));
-            GroupQrcodeDetailActivity.openGroupQrcodeDetail(this, groupId);
+            String result = mResult.substring(2);
+            String[] info = result.split("_");
+            long groupId = Long.valueOf(info[0]);
+            String qrInfo = info[1];
+            GroupQrcodeDetailActivity.openGroupQrcodeDetail(this, groupId, qrInfo);
             finish();
         } else if (mResult.startsWith(ScanConfigs.CODE_DEMO)) {
             // 二维码体验功能
             String result = mResult.substring(2);
-            String[] userInfo = result.split("_");
-            ScanConfigs.CODE_APP_ID = userInfo[0];
-            ScanConfigs.CODE_USER_ID = userInfo[1];
-            ScanConfigs.CODE_USER_NAME = userInfo[2];
+            String[] info = result.split("_");
+            ScanConfigs.CODE_APP_ID = info[0];
+            ScanConfigs.CODE_USER_ID = info[1];
+            ScanConfigs.CODE_USER_NAME = info[2];
             LoginActivity.openLogin(this);
             finish();
         }

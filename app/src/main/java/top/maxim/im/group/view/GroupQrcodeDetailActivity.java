@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
+import im.floo.floolib.BMXMessage;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -29,12 +30,15 @@ import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.message.view.ChatGroupActivity;
 import top.maxim.im.net.HttpResponseCallback;
 
 /**
  * Description : 群二维码详情 Created by Mango on 2018/11/21.
  */
 public class GroupQrcodeDetailActivity extends BaseTitleActivity {
+
+    public static final String QR_INFO = "qr_info";
 
     private ShapeImageView mUserIcon;
 
@@ -47,14 +51,17 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
 
     private long mGroupId;
 
+    private String mQrInfo;
+
     private ImageRequestConfig mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
             .showImageForEmptyUri(R.drawable.default_group_icon)
             .showImageOnFail(R.drawable.default_group_icon).bitmapConfig(Bitmap.Config.RGB_565)
             .cacheOnDisk(true).showImageOnLoading(R.drawable.default_group_icon).build();
 
-    public static void openGroupQrcodeDetail(Context context, long groupId) {
+    public static void openGroupQrcodeDetail(Context context, long groupId, String qrInfo) {
         Intent intent = new Intent(context, GroupQrcodeDetailActivity.class);
         intent.putExtra(MessageConfig.CHAT_ID, groupId);
+        intent.putExtra(QR_INFO, qrInfo);
         context.startActivity(intent);
     }
 
@@ -81,6 +88,7 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
         super.initDataFromFront(intent);
         if (intent != null) {
             mGroupId = intent.getLongExtra(MessageConfig.CHAT_ID, 0);
+            mQrInfo = intent.getStringExtra(QR_INFO);
         }
     }
 
@@ -133,6 +141,12 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
     }
 
     private void bindGroup(BMXGroup group) {
+        if (group.isMember()) {
+            // 群成员直接跳转
+            ChatGroupActivity.startChatActivity(this, BMXMessage.MessageType.Group, mGroupId);
+            finish();
+            return;
+        }
         String name = group.name();
         ChatUtils.getInstance().showGroupAvatar(group, mUserIcon, mConfig);
         mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
@@ -145,7 +159,7 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
                 new HttpResponseCallback<String>() {
                     @Override
                     public void onResponse(String result) {
-                        getGroupSign(result);
+                        joinGroup(result);
                     }
 
                     @Override
@@ -156,34 +170,19 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
                 });
     }
 
-    private void getGroupSign(String token) {
-        AppManager.getInstance().getGroupSign(mGroupId, token, new HttpResponseCallback<String>() {
-            @Override
-            public void onResponse(String result) {
-                joinGroup(token, result);
-            }
-
-            @Override
-            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt("加入失败");
-            }
-        });
-    }
-
-    public void joinGroup(String token, String qrInfo) {
-        AppManager.getInstance().groupInvite(token, qrInfo, new HttpResponseCallback<String>() {
+    public void joinGroup(String token) {
+        AppManager.getInstance().groupInvite(token, mQrInfo, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
                 dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt("加入成功");
+                ToastUtil.showTextViewPrompt("申请成功");
                 finish();
             }
 
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
                 dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt("加入失败");
+                ToastUtil.showTextViewPrompt(TextUtils.isEmpty(errorMsg) ? "申请失败" : errorMsg);
             }
         });
     }

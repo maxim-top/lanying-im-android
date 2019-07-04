@@ -90,9 +90,10 @@ public class QRCodeShowUtils {
      *
      * @param groupId 群组id
      */
-    public static String generateGroupQRCode(String groupId) {
+    public static String generateGroupQRCode(String groupId, String qr_info) {
         StringBuilder stringBuilder = new StringBuilder(ScanConfigs.CODE_GROUP_PRE);
         stringBuilder.append(groupId);
+        stringBuilder.append("_").append(qr_info);
         return stringBuilder.toString();
     }
 

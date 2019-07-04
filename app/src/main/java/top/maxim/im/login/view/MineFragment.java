@@ -18,6 +18,7 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.BuildConfig;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleFragment;
@@ -35,6 +36,7 @@ import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.contact.view.BlockListActivity;
 import top.maxim.im.message.utils.ChatUtils;
+import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
 
@@ -93,6 +95,9 @@ public class MineFragment extends BaseTitleFragment {
 
     /* 设置多端提示 */
     private ItemLineSwitch.Builder otherDevTips;
+
+    /* 解绑微信 */
+    private ItemLineArrow.Builder mUnBindWeChat;
 
     /* app版本号 */
     private TextView mAppVersion;
@@ -244,6 +249,11 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(mDeviceList.build(), 10);
+
+        // 多设备列表
+        mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent("解除微信绑定")
+                .setArrowVisible(false).setOnItemClickListener(v -> unBindWeChat());
+        container.addView(mUnBindWeChat.build(), 11);
         return view;
     }
 
@@ -658,6 +668,40 @@ public class MineFragment extends BaseTitleFragment {
                 });
     }
 
+    /**
+     * 解除微信绑定
+     */
+    private void unBindWeChat() {
+        showLoadingDialog(true);
+        String name = SharePreferenceUtils.getInstance().getUserName();
+        String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+        AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
+            @Override
+            public void onResponse(String result) {
+                AppManager.getInstance().unBindOpenId(result, new HttpResponseCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt("解除成功");
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt("解除失败");
+                    }
+                });
+
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                dismissLoadingDialog();
+                ToastUtil.showTextViewPrompt("解除失败");
+            }
+        });
+    }
+    
     private void toastError(Throwable e) {
         String error = e != null ? e.getMessage() : "网络异常";
         ToastUtil.showTextViewPrompt(error);

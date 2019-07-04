@@ -64,21 +64,38 @@ public class AppManager {
                             }
                             return;
                         }
+                        int code = -1;
+                        String error = "";
+                        String token = "";
                         try {
                             JSONObject jsonObject = new JSONObject(result);
-                            if (jsonObject.has("token")) {
-                                String token = jsonObject.getString("token");
-                                SharePreferenceUtils.getInstance().putToken(token);
-                                if (callback != null) {
-                                    callback.onCallResponse(token);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                String data = jsonObject.getString("data");
+                                jsonObject = new JSONObject(data);
+                                if (jsonObject.has("token")) {
+                                    token = jsonObject.getString("token");
+                                    SharePreferenceUtils.getInstance().putToken(token);
                                 }
-                                return;
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(token);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
                         }
                     }
 
@@ -119,25 +136,38 @@ public class AppManager {
                             }
                             return;
                         }
+                        int code = -1;
+                        String error = "";
+                        String token = "";
                         try {
                             JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
                             if (jsonObject.has("data")) {
                                 String data = jsonObject.getString("data");
                                 jsonObject = new JSONObject(data);
                                 if (jsonObject.has("token")) {
-                                    String tokenResult = jsonObject.getString("token");
-                                    SharePreferenceUtils.getInstance().putToken(tokenResult);
-                                    if (callback != null) {
-                                        callback.onCallResponse(tokenResult);
-                                    }
+                                    token = jsonObject.getString("token");
+                                    SharePreferenceUtils.getInstance().putToken(token);
                                 }
-                                return;
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(token);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
                         }
                     }
 
@@ -170,30 +200,44 @@ public class AppManager {
                             }
                             return;
                         }
+                        int code = -1;
+                        String error = "";
+                        String qrInfo = "";
                         try {
                             JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
                             if (jsonObject.has("data")) {
                                 String data = jsonObject.getString("data");
                                 jsonObject = new JSONObject(data);
                                 if (jsonObject.has("qr_info")) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(jsonObject.getString("qr_info"));
-                                    }
+                                    qrInfo = jsonObject.getString("qr_info");
                                 }
-                                return;
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(qrInfo);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
                         }
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
                         }
                     }
                 });
@@ -212,12 +256,46 @@ public class AppManager {
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (data) {
+                                    if (callback != null) {
+                                        callback.onCallResponse(result);
+                                    }
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
                         }
                     }
                 });
@@ -241,13 +319,21 @@ public class AppManager {
                             }
                             return;
                         }
+                        int code = -1;
+                        String error = "";
                         try {
                             JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
                                 if (data) {
                                     if (callback != null) {
-                                        callback.onCallResponse(jsonObject.getString("qr_info"));
+                                        callback.onCallResponse(result);
                                     }
                                 }
                                 return;
@@ -255,15 +341,18 @@ public class AppManager {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
                         }
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
                         }
                     }
                 });
@@ -287,27 +376,40 @@ public class AppManager {
                             }
                             return;
                         }
+                        int code = -1;
+                        String error = "";
+                        String data = "";
                         try {
                             JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
                             if (jsonObject.has("data")) {
-                                String data = jsonObject.getString("data");
-                                if (callback != null) {
-                                    callback.onCallResponse(data);
-                                }
-                                return;
+                                data = jsonObject.getString("data");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(data);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
                         }
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
                         }
                     }
                 });
@@ -320,7 +422,9 @@ public class AppManager {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         Map<String, String> params = new HashMap<>();
-        params.put("open_id", openId);
+        if (!TextUtils.isEmpty(openId)) {
+            params.put("open_id", openId);
+        }
         params.put("type", "2");
         mClient.call(HttpClient.Method.GET, mBaseUrl + "bind_openid", params, header,
                 new HttpCallback<String>() {
@@ -332,13 +436,21 @@ public class AppManager {
                             }
                             return;
                         }
+                        int code = -1;
+                        String error = "";
                         try {
                             JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
                                 if (data) {
                                     if (callback != null) {
-                                        callback.onCallResponse(jsonObject.getString(result));
+                                        callback.onCallResponse(result);
                                     }
                                 }
                                 return;
@@ -346,18 +458,28 @@ public class AppManager {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
                         }
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
                         }
                     }
                 });
+    }
+
+    /**
+     * 解绑定openId
+     */
+    public void unBindOpenId(String token, HttpResponseCallback<String> callback) {
+        bindOpenId(token, "", callback);
     }
 
     /**
@@ -383,13 +505,21 @@ public class AppManager {
                             }
                             return;
                         }
+                        int code = -1;
+                        String error = "";
                         try {
                             JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
                                 if (data) {
                                     if (callback != null) {
-                                        callback.onCallResponse(jsonObject.getString(result));
+                                        callback.onCallResponse(result);
                                     }
                                 }
                                 return;
@@ -397,17 +527,61 @@ public class AppManager {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
                         }
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         if (callback != null) {
-                            callback.onCallFailure(-1, "", new Throwable());
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
                         }
                     }
                 });
+    }
+
+    /**
+     * 解析返回结果
+     * @param result
+     */
+    private <T> void parseResult(String result, HttpResponseCallback<T> callback, Class<T> clazz, String key) {
+        if (TextUtils.isEmpty(result)) {
+            if (callback != null) {
+                callback.onCallFailure(-1, "", new Throwable());
+            }
+            return;
+        }
+        int code = -1;
+        String error = "";
+        T t = null;
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+            if (jsonObject.has("code")) {
+                code = jsonObject.getInt("code");
+            }
+            if (jsonObject.has("message")) {
+                error = jsonObject.getString("message");
+            }
+            if (jsonObject.has(key)) {
+                t = (T)jsonObject.get(key);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (code == 200) {
+            // 成功
+            if (callback != null) {
+                callback.onCallResponse(t);
+            }
+        } else {
+            // 失败
+            if (callback != null) {
+                callback.onCallFailure(code, error, new Throwable(error));
+            }
+        }
     }
 }

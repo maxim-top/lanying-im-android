@@ -18,14 +18,18 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.utils.QRCodeShowUtils;
 
 /**
@@ -92,8 +96,7 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
         initQrCode();
         mTvGroupId.setText(mGroupId <= 0 ? "" : "群Id:" + mGroupId);
         final BMXGroup group = new BMXGroup();
-        Observable.just(mGroupId)
-                .map(id -> GroupManager.getInstance().search(id, group, false))
+        Observable.just(mGroupId).map(id -> GroupManager.getInstance().search(id, group, false))
                 .flatMap(errorCode -> BaseManager.bmxFinish(errorCode, errorCode))
                 .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BMXErrorCode>() {
@@ -120,8 +123,37 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
      * 设置二维码
      */
     private void initQrCode() {
-        String qrUrl = QRCodeShowUtils.generateGroupQRCode(String.valueOf(mGroupId));
-        Drawable drawable = QRCodeShowUtils.generateDrawable(qrUrl);
-        mIvQrCode.setImageDrawable(drawable);
+        showLoadingDialog(true);
+        AppManager.getInstance().getTokenByName(SharePreferenceUtils.getInstance().getUserName(),
+                SharePreferenceUtils.getInstance().getUserPwd(),
+                new HttpResponseCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        AppManager.getInstance().getGroupSign(mGroupId, result,
+                                new HttpResponseCallback<String>() {
+                                    @Override
+                                    public void onResponse(String result) {
+                                        dismissLoadingDialog();
+                                        String qrUrl = QRCodeShowUtils.generateGroupQRCode(
+                                                String.valueOf(mGroupId), result);
+                                        Drawable drawable = QRCodeShowUtils.generateDrawable(qrUrl);
+                                        mIvQrCode.setImageDrawable(drawable);
+                                    }
+
+                                    @Override
+                                    public void onFailure(int errorCode, String errorMsg,
+                                            Throwable t) {
+                                        dismissLoadingDialog();
+                                        ToastUtil.showTextViewPrompt("获取群二维码失败");
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt("获取群二维码失败");
+                    }
+                });
     }
 }

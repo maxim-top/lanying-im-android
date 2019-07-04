@@ -321,7 +321,59 @@ public class AppManager {
         header.put("access-token", token);
         Map<String, String> params = new HashMap<>();
         params.put("open_id", openId);
+        params.put("type", "2");
         mClient.call(HttpClient.Method.GET, mBaseUrl + "bind_openid", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (data) {
+                                    if (callback != null) {
+                                        callback.onCallResponse(jsonObject.getString(result));
+                                    }
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (callback != null) {
+                            callback.onCallFailure(-1, "", new Throwable());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(-1, "", new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 绑定证书名和用户名id
+     */
+    public void notifierBind(String token, String deviceToken, String appId, String userId, String notifierName,
+            HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("access-app_id", appId);
+        Map<String, String> params = new HashMap<>();
+        params.put("app_id", appId);
+        params.put("user_id", userId);
+        params.put("notifier_name", notifierName);
+        params.put("device_token", deviceToken);
+        mClient.call(HttpClient.Method.POST, "https://butler.maxim.top/notifier/bind", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {

@@ -16,4 +16,16 @@ public class ScanConfigs {
     /* 群聊二维码前缀 */
     public static final String CODE_GROUP_PRE = "G_";
 
+    /* 二维码Demo */
+    public static final String CODE_DEMO = "C_";
+
+    /* 扫码登陆appId */
+    public static String CODE_APP_ID;
+
+    /* 扫码登陆userId */
+    public static String CODE_USER_ID;
+
+    /* 扫码登陆userName */
+    public static String CODE_USER_NAME;
+
 }

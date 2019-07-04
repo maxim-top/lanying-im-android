@@ -10,6 +10,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,6 +35,8 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.scan.config.ScanConfigs;
+import top.maxim.im.scan.view.ScannerActivity;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 import top.maxim.im.wxapi.WXUtils;
 
@@ -43,7 +46,7 @@ import top.maxim.im.wxapi.WXUtils;
 public class LoginActivity extends BaseTitleActivity {
     
     public static String LOGIN_CODE = "loginCode";
-
+    
     /* 账号 */
     private EditText mInputName;
 
@@ -62,18 +65,22 @@ public class LoginActivity extends BaseTitleActivity {
     /* 微信登录 */
     private TextView mWXLogin;
 
+    /* 扫一扫 */
+    private ImageView mIvScan;
+    
     /* 是否是id登陆 */
     private boolean mLoginByUserId = false;
 
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
+    /* 微信返回code */
     private String mCode;
-
+    
     public static void openLogin(Context context) {
         openLogin(context, null);
     }
-
+    
     public static void openLogin(Context context, String code) {
         Intent intent = new Intent(context, LoginActivity.class);
         if (!TextUtils.isEmpty(code)) {
@@ -97,22 +104,19 @@ public class LoginActivity extends BaseTitleActivity {
         mLogin = view.findViewById(R.id.tv_login);
         mRegister = view.findViewById(R.id.tv_register);
         mWXLogin = view.findViewById(R.id.tv_wx_login);
+        mIvScan = view.findViewById(R.id.iv_scan);
         mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
         mSwitchLoginMode.setVisibility(View.GONE);
         // 三次点击 进入另一套环境配置
-        ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_login_tag), 3,
-                new ClickTimeUtils.IClick() {
-                    @Override
-                    public void onClick() {
-                        int newIndex = SharePreferenceUtils.getInstance().getCustomDns();
-                        if (newIndex < 0 || newIndex > 4) {
-                            newIndex = 0;
-                        }
-                        BaseManager.initTestBMXSDK(newIndex);
-                        SharePreferenceUtils.getInstance().putCustomDns(newIndex);
-                        ToastUtil.showTextViewPrompt("切换新的环境配置:" + newIndex);
-                    }
-                });
+        ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_login_tag), 3, () -> {
+            int newIndex = SharePreferenceUtils.getInstance().getCustomDns();
+            if (newIndex < 0 || newIndex > 4) {
+                newIndex = 0;
+            }
+            BaseManager.initTestBMXSDK(newIndex);
+            SharePreferenceUtils.getInstance().putCustomDns(newIndex);
+            ToastUtil.showTextViewPrompt("切换新的环境配置:" + newIndex);
+        });
         return view;
     }
 
@@ -127,7 +131,7 @@ public class LoginActivity extends BaseTitleActivity {
             String pwd = mInputPwd.getText().toString().trim();
             // MainActivity.openMain(LoginActivity.this);
 
-            login(LoginActivity.this, name, pwd, mLoginByUserId);
+            login(this, name, pwd, mLoginByUserId);
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
@@ -137,6 +141,8 @@ public class LoginActivity extends BaseTitleActivity {
             }
             WXUtils.getInstance().wxLogin();
         });
+        //扫一扫
+        mIvScan.setOnClickListener(v -> ScannerActivity.openScan(this));
         mInputWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -186,10 +192,16 @@ public class LoginActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        if (TextUtils.isEmpty(mCode)) {
+        if (!TextUtils.isEmpty(mCode)) {
+            // 微信登录
+            loginWeChat();
             return;
         }
-        loginWeChat();
+        // 判断当前是否是扫码登陆
+        String scanUserName = ScanConfigs.CODE_USER_NAME;
+        if (!TextUtils.isEmpty(scanUserName)) {
+            mInputName.setText(scanUserName);
+        }
     }
 
     /**
@@ -207,9 +219,6 @@ public class LoginActivity extends BaseTitleActivity {
                 }
                 try {
                     JSONObject jsonObject = new JSONObject(result);
-                    if (!jsonObject.has("openid")) {
-                        return;
-                    }
                     if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
                         // 没有userId 密码 需要跳转注册
                         RegisterActivity.openRegister(LoginActivity.this,
@@ -240,7 +249,9 @@ public class LoginActivity extends BaseTitleActivity {
     public static void bindOpenId(final Activity activity, String name, final String pwd,
             final String openId) {
         // 首先获取token
-        ((BaseTitleActivity)activity).showLoadingDialog(true);
+        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+            ((BaseTitleActivity)activity).showLoadingDialog(true);
+        }
         AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
@@ -248,13 +259,19 @@ public class LoginActivity extends BaseTitleActivity {
                         new HttpResponseCallback<String>() {
                             @Override
                             public void onResponse(String result) {
-                                ((BaseTitleActivity)activity).dismissLoadingDialog();
+                                if (activity instanceof BaseTitleActivity
+                                        && !activity.isFinishing()) {
+                                    ((BaseTitleActivity)activity).dismissLoadingDialog();
+                                }
                                 login(activity, name, pwd, false);
                             }
 
                             @Override
                             public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                                ((BaseTitleActivity)activity).dismissLoadingDialog();
+                                if (activity instanceof BaseTitleActivity
+                                        && !activity.isFinishing()) {
+                                    ((BaseTitleActivity)activity).dismissLoadingDialog();
+                                }
                             }
                         });
             }
@@ -262,11 +279,14 @@ public class LoginActivity extends BaseTitleActivity {
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
                 ToastUtil.showTextViewPrompt("绑定失败");
-                ((BaseTitleActivity)activity).dismissLoadingDialog();
+                if (activity instanceof BaseTitleActivity
+                        && !activity.isFinishing()) {
+                    ((BaseTitleActivity)activity).dismissLoadingDialog();
+                }
             }
         });
     }
-
+    
     public static void login(final Activity activity, String name, final String pwd,
                              final boolean isLoginById) {
 
@@ -274,7 +294,9 @@ public class LoginActivity extends BaseTitleActivity {
             ToastUtil.showTextViewPrompt("不能为空");
             return;
         }
-        ((BaseTitleActivity)activity).showLoadingDialog(true);
+        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+            ((BaseTitleActivity)activity).showLoadingDialog(true);
+        }
         Observable.just(name).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
@@ -315,14 +337,18 @@ public class LoginActivity extends BaseTitleActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        ((BaseTitleActivity)activity).dismissLoadingDialog();
+                        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+                            ((BaseTitleActivity)activity).dismissLoadingDialog();
+                        }
                         String error = e != null ? e.getMessage() : "网络异常";
                         ToastUtil.showTextViewPrompt(error);
                     }
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
-                        ((BaseTitleActivity)activity).dismissLoadingDialog();
+                        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+                            ((BaseTitleActivity)activity).dismissLoadingDialog();
+                        }
                         SharePreferenceUtils.getInstance().putLoginStatus(true);
                         MessageDispatcher.getDispatcher().initialize();
                         MainActivity.openMain(activity);

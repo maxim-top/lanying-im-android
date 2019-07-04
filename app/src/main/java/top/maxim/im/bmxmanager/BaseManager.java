@@ -76,7 +76,7 @@ public class BaseManager {
         bmxClient = BMXClient.create(conf);
     }
 
-    private static String getPushId() {
+    public static String getPushId() {
         Context context = AppContextUtils.getAppContext();
         if (context == null) {
             return "";

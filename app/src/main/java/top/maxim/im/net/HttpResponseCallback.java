@@ -2,6 +2,7 @@
 package top.maxim.im.net;
 
 import android.os.Handler;
+import android.os.Looper;
 
 /**
  * 网络代理回调
@@ -11,7 +12,7 @@ public abstract class HttpResponseCallback<T> {
     private static Handler mHandle;
 
     static {
-        mHandle = new Handler();
+        mHandle = new Handler(Looper.getMainLooper());
     }
 
     public abstract void onResponse(T result);

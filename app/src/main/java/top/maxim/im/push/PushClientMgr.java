@@ -20,14 +20,17 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.RomUtil;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.push.huawei.HWPushManager;
 import top.maxim.im.push.meizu.MZPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
+import top.maxim.im.scan.config.ScanConfigs;
 
 /**
  * Description : push
@@ -145,6 +148,60 @@ public final class PushClientMgr {
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
+
+                    }
+                });
+        notifierBind(token);
+    }
+
+    /**
+     * 绑定证书名和用户id
+     * @param deviceToken
+     */
+    private static void notifierBind(String deviceToken) {
+        if (TextUtils.isEmpty(deviceToken)) {
+            return;
+        }
+        String scanAppId = ScanConfigs.CODE_APP_ID;
+        String scanUserId = ScanConfigs.CODE_USER_ID;
+        String scanUserName = ScanConfigs.CODE_USER_NAME;
+        if (TextUtils.isEmpty(scanAppId) || TextUtils.isEmpty(scanUserId)
+                || TextUtils.isEmpty(scanUserName)) {
+            return;
+        }
+        String currentUserName = SharePreferenceUtils.getInstance().getUserName();
+        String currentUserId = String.valueOf(SharePreferenceUtils.getInstance().getUserId());
+        if (!TextUtils.equals(scanAppId, "1") || !TextUtils.equals(currentUserName, scanUserName)
+                || TextUtils.equals(currentUserId, scanUserId)) {
+            // 确保是扫码登陆 appId=1 userName必须是扫码返回的
+            return;
+        }
+        //每次调用完清除扫码登陆的数据
+        ScanConfigs.CODE_APP_ID = "";
+        ScanConfigs.CODE_USER_ID = "";
+        ScanConfigs.CODE_USER_NAME = "";
+        String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+        AppManager.getInstance().getTokenByName(scanUserName, pwd,
+                new HttpResponseCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        AppManager.getInstance().notifierBind(result, deviceToken, scanAppId,
+                                scanUserId, BaseManager.getPushId(), new HttpResponseCallback<String>() {
+                                    @Override
+                                    public void onResponse(String result) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(int errorCode, String errorMsg,
+                                            Throwable t) {
+
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
 
                     }
                 });

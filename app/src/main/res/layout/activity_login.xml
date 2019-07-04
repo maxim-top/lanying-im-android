@@ -12,10 +12,19 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
         android:text="@string/login"
         android:textColor="@color/color_333333"
         android:textSize="@dimen/dimen_24" />
+
+
+    <ImageView
+        android:id="@+id/iv_scan"
+        android:layout_width="@dimen/dimen_40"
+        android:layout_height="@dimen/dimen_40"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/tv_login_tag"
+        android:layout_marginLeft="@dimen/dimen_50"
+        android:src="@drawable/scan_icon" />
 
     <EditText
         android:id="@+id/et_user_name"

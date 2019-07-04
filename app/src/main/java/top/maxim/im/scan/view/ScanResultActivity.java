@@ -15,6 +15,7 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.contact.view.RosterDetailActivity;
 import top.maxim.im.group.view.GroupQrcodeDetailActivity;
+import top.maxim.im.login.view.LoginActivity;
 import top.maxim.im.login.view.SettingUserActivity;
 import top.maxim.im.scan.config.ScanConfigs;
 
@@ -74,6 +75,15 @@ public class ScanResultActivity extends BaseTitleActivity {
             // 群聊
             long groupId = Long.valueOf(mResult.replace(ScanConfigs.CODE_GROUP_PRE, ""));
             GroupQrcodeDetailActivity.openGroupQrcodeDetail(this, groupId);
+            finish();
+        } else if (mResult.startsWith(ScanConfigs.CODE_DEMO)) {
+            // 二维码体验功能
+            String result = mResult.substring(2);
+            String[] userInfo = result.split("_");
+            ScanConfigs.CODE_APP_ID = userInfo[0];
+            ScanConfigs.CODE_USER_ID = userInfo[1];
+            ScanConfigs.CODE_USER_NAME = userInfo[2];
+            LoginActivity.openLogin(this);
             finish();
         }
     }

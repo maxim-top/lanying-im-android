@@ -131,23 +131,7 @@ public class MessageItemVideo extends MessageItemBaseView {
             BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
         } else {
             BMImageLoader.getInstance().display(mImageView, "", mImageConfig);
-            ChatManager.getInstance().downloadAttachment(mMaxMessage, new FileCallback(body.url()) {
-                @Override
-                protected void onProgress(long percent, String path, boolean isThumbnail) {
-
-                }
-
-                @Override
-                protected void onFinish(String url, boolean isThumbnail) {
-                    BMImageLoader.getInstance().display(mImageView, "file://" + body.path(),
-                            mImageConfig);
-                }
-
-                @Override
-                protected void onFail(String path, boolean isThumbnail) {
-
-                }
-            });
+            ChatManager.getInstance().downloadAttachment(mMaxMessage);
         }
     }
 

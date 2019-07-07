@@ -54,10 +54,8 @@ android {
 }
 
 dependencies {
-    implementation 'com.squareup.okhttp3:okhttp:3.7.0'
     implementation 'com.squareup.okio:okio:1.12.0'
     implementation 'com.aliyun.dpa:oss-android-sdk:+'
-    //implementation(name:'floo-android_1.0.1.20190221',ext:'aar')
     implementation 'com.google.code.gson:gson:2.7'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'

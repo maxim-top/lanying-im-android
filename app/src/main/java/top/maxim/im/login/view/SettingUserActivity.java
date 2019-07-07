@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -760,7 +761,8 @@ public class SettingUserActivity extends BaseTitleActivity {
             public BMXErrorCode call(String s) {
                 return UserManager.getInstance().uploadAvatar(s, new FileProgressListener(){
                     @Override
-                    public int onProgressChange(String total, String already) {
+                    public int onProgressChange(String percent) {
+                        Log.i("uploadUserAvatar", "onProgressChange:"+ path + "-" + percent);
                         return 0;
                     }
                 });

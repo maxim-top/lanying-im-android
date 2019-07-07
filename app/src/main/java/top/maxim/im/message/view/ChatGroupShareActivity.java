@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.Formatter;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -194,7 +195,8 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
             public BMXErrorCode call(BMXGroup.SharedFile file) {
                 return GroupManager.getInstance().downloadSharedFile(mGroup, file, new FileProgressListener(){
                     @Override
-                    public int onProgressChange(String total, String already) {
+                    public int onProgressChange(String percent) {
+                        Log.i("ChatGroupShareActivity", "onProgressChange:"+ mGroup.groupId() + "-" + percent);
                         return 0;
                     }
                 });
@@ -379,7 +381,8 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
                 return GroupManager.getInstance().uploadSharedFile(mGroup, s, displayName,
                         extensionName, new FileProgressListener(){
                             @Override
-                            public int onProgressChange(String total, String already) {
+                            public int onProgressChange(String percent) {
+                                Log.i("ChatGroupShareActivity", "onProgressChange:"+ mGroup.groupId() + "-" + percent);
                                 return 0;
                             }
                         });

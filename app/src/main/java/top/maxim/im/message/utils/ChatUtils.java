@@ -4,6 +4,7 @@ package top.maxim.im.message.utils;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +43,7 @@ import top.maxim.im.message.interfaces.FileCallback;
 public class ChatUtils {
 
     private static ChatUtils mInstance;
+    private static final String TAG = "ChatUtils";
 
     /* view缓存 以view的hash作为key 以cardId作为value */
     private static Map<Integer, Long> mViewCache = Collections
@@ -326,7 +328,8 @@ public class ChatUtils {
             public BMXErrorCode call(String s) {
                 return UserManager.getInstance().downloadAvatar(profile, new FileProgressListener(){
                     @Override
-                    public int onProgressChange(String total, String already) {
+                    public int onProgressChange(String percent) {
+                        Log.i(TAG, "onProgressChange:"+ profile.userId() + "-" + percent);
                         return 0;
                     }
                 });
@@ -420,7 +423,8 @@ public class ChatUtils {
             public BMXErrorCode call(BMXRosterItem s) {
                 return RosterManager.getInstance().downloadAvatar(s, new FileProgressListener(){
                     @Override
-                    public int onProgressChange(String total, String already) {
+                    public int onProgressChange(String percent) {
+                        Log.i(TAG, "onProgressChange roster:"+ s.rosterId() + "-" + percent);
                         return 0;
                     }
                 });
@@ -519,7 +523,8 @@ public class ChatUtils {
             public BMXErrorCode call(BMXGroup s) {
                 return GroupManager.getInstance().downloadAvatar(s, new FileProgressListener(){
                     @Override
-                    public int onProgressChange(String total, String already) {
+                    public int onProgressChange(String percent) {
+                        Log.i(TAG, "onProgressChange roster:"+ s.groupId() + "-" + percent);
                         return 0;
                     }
                 });

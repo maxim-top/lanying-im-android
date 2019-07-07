@@ -461,7 +461,7 @@ public class MessageDispatcher {
             public BMXErrorCode call(String s) {
                 return UserManager.getInstance().downloadAvatar(profile, new FileProgressListener(){
                     @Override
-                    public int onProgressChange(String total, String already) {
+                    public int onProgressChange(String percent) {
                         return 0;
                     }
                 });
@@ -503,7 +503,7 @@ public class MessageDispatcher {
             public BMXErrorCode call(BMXRosterItem s) {
                 return RosterManager.getInstance().downloadAvatar(s, new FileProgressListener(){
                     @Override
-                    public int onProgressChange(String total, String already) {
+                    public int onProgressChange(String percent) {
                         return 0;
                     }
                 });
@@ -545,7 +545,7 @@ public class MessageDispatcher {
             public BMXErrorCode call(BMXGroup s) {
                 return GroupManager.getInstance().downloadAvatar(s, new FileProgressListener(){
                     @Override
-                    public int onProgressChange(String total, String already) {
+                    public int onProgressChange(String percent) {
                         return 0;
                     }
                 });

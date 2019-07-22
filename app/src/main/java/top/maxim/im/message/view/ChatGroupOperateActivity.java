@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -963,7 +962,6 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 return GroupManager.getInstance().setAvatar(mGroup, s, new FileProgressListener(){
                     @Override
                     public int onProgressChange(String percent) {
-                        Log.i("ChatGroupOperateActivity", "onProgressChange:"+ mGroup.groupId() + "-" + percent);
                         return 0;
                     }
                 });

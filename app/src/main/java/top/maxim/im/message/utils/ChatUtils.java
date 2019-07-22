@@ -47,7 +47,7 @@ public class ChatUtils {
 
     /* view缓存 以view的hash作为key 以cardId作为value */
     private static Map<Integer, Long> mViewCache = Collections
-            .synchronizedMap(new HashMap<Integer, Long>());
+            .synchronizedMap(new HashMap<>());
 
     private ChatUtils() {
     }

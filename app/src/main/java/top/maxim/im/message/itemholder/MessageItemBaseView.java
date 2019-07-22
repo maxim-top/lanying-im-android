@@ -253,7 +253,7 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         });
     }
 
-    private class ItemLongClickListener implements View.OnLongClickListener {
+    class ItemLongClickListener implements View.OnLongClickListener {
         @Override
         public boolean onLongClick(View v) {
             if (mActionListener != null) {

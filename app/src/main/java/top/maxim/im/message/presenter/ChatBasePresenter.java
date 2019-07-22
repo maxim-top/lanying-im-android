@@ -74,6 +74,7 @@ import top.maxim.im.common.utils.video.PhotoRecorderActivity;
 import top.maxim.im.contact.view.ForwardMsgRosterActivity;
 import top.maxim.im.message.contract.ChatBaseContract;
 import top.maxim.im.message.customviews.MessageInputBar;
+import top.maxim.im.message.utils.ChatAttachmentManager;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.view.ChooseFileActivity;
@@ -181,7 +182,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
         @Override
         public void onAttachmentStatusChanged(BMXMessage msg, BMXErrorCode error, int percent) {
-            Log.d("onAttachmentStatusChanged", percent + "");
+            // 附件消息下载进度
+            ChatAttachmentManager.getInstance().onProgressCallback(msg, percent);
+            Log.d("statusChanged", percent + "");
         }
 
         @Override
@@ -276,9 +279,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         @Override
         public void onAttachmentUploadProgressChanged(BMXMessage msg, int percent) {
             // 附件消息上传进度
-            if (msg != null && isCurrentSession(msg)) {
-                mView.updateChatMessage(msg);
-            }
+            ChatAttachmentManager.getInstance().onProgressCallback(msg, percent);
             Log.d("progressChanged", percent + "");
         }
     };
@@ -934,6 +935,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             playVoice(voiceUrl, bean);
             return;
         }
+        ToastUtil.showTextViewPrompt("正在下载");
         BMXMessageAttachment.DownloadStatus status = body.downloadStatus();
         if (status == BMXMessageAttachment.DownloadStatus.Downloaing) {
             return;
@@ -1600,6 +1602,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             provider = LocationManager.NETWORK_PROVIDER;
         } else if (providers.contains(LocationManager.GPS_PROVIDER)) {
             provider = LocationManager.GPS_PROVIDER;
+        } else if (providers.contains(LocationManager.PASSIVE_PROVIDER)) {
+            provider = LocationManager.PASSIVE_PROVIDER;
         }
         if (!TextUtils.isEmpty(provider)) {
             Location location;

@@ -39,6 +39,22 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/fl_file_progress_left"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_12"
+            android:layout_marginLeft="@dimen/dimen_12"
+            android:layout_marginRight="@dimen/dimen_17"
+            android:layout_marginTop="@dimen/dimen_5"
+            android:visibility="gone">
+
+            <top.maxim.im.message.customviews.FileProgressView
+                android:id="@+id/file_progress_left"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_2" />
+
+        </RelativeLayout>
+
     </LinearLayout>
 
 </LinearLayout>

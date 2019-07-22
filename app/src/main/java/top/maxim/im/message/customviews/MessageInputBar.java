@@ -171,7 +171,7 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 int action = event.getAction();
-                float height = mPanel.getY();
+                float height = v.getY();
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         actionDown();
@@ -192,6 +192,7 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
                         }
                         break;
                     case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
                         if (event.getY() < height) {
                             // 超出范围抬起 返回录音取消
                             if (mListener != null) {
@@ -204,11 +205,7 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
                         }
                         actionUp();
                         break;
-                    case MotionEvent.ACTION_CANCEL:
-                        if (null != mListener) {
-                            mListener.onSendVoiceRequest(VOICE_CANCEL, mCurrentTime);
-                        }
-                        actionUp();
+                    default:
                         break;
                 }
                 return true;

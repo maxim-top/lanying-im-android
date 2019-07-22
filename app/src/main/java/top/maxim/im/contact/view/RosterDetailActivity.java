@@ -278,12 +278,12 @@ public class RosterDetailActivity extends BaseTitleActivity {
             add.setVisibility(View.VISIBLE);
             add.setText("添加");
         }
-        if (friend) {
-            // 好友直接跳转单聊
-            ChatSingleActivity.startChatActivity(this, BMXMessage.MessageType.Single, mRosterId);
-            finish();
-            return;
-        }
+//        if (friend) {
+//            // 好友直接跳转单聊
+//            ChatSingleActivity.startChatActivity(this, BMXMessage.MessageType.Single, mRosterId);
+//            finish();
+//            return;
+//        }
         String name = mRosterItem.username();
         String nickName = mRosterItem.nickname();
         ChatUtils.getInstance().showRosterAvatar(mRosterItem, mUserIcon, mConfig);

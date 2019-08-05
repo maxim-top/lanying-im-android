@@ -326,6 +326,8 @@ public class LoginActivity extends BaseTitleActivity {
                     SharePreferenceUtils.getInstance().putUserName(profile.username());
                     SharePreferenceUtils.getInstance().putUserPwd(pwd);
                     AppManager.getInstance().getTokenByName(profile.username(), pwd, null);
+                    // 登陆成功消息预加载
+                    WelcomeActivity.initData();
                 }
                 return bmxErrorCode;
             }

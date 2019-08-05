@@ -3,6 +3,7 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -54,6 +55,9 @@ public class RegisterActivity extends BaseTitleActivity {
     /* 发送验证码 */
     private TextView mSendVerify;
 
+    /* 验证码倒计时 */
+    private TextView mVerifyCountDown;
+
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
@@ -65,6 +69,19 @@ public class RegisterActivity extends BaseTitleActivity {
     
     /* 微信登录返回的openId */
     private String mOpenId;
+
+    private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            mVerifyCountDown.setText(millisUntilFinished / 1000 + "s");
+        }
+
+        @Override
+        public void onFinish() {
+            mVerifyCountDown.setText("");
+        }
+    };
 
     public static void openRegister(Context context) {
         openRegister(context, null);
@@ -92,6 +109,7 @@ public class RegisterActivity extends BaseTitleActivity {
         mInputPwd = view.findViewById(R.id.et_user_pwd);
         mInputPhone = view.findViewById(R.id.et_user_phone);
         mSendVerify = view.findViewById(R.id.tv_send_verify);
+        mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
         mInputVerify = view.findViewById(R.id.et_user_verify);
         mRegister = view.findViewById(R.id.tv_register);
         return view;
@@ -155,19 +173,23 @@ public class RegisterActivity extends BaseTitleActivity {
         mInputVerify.addTextChangedListener(mInputWatcher);
         // 发送验证码
         mSendVerify.setOnClickListener(v -> {
-            showLoadingDialog(true);
+            verifyCountDown();
             String phone = mInputPhone.getEditableText().toString().trim();
             AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<String>() {
                 @Override
                 public void onResponse(String result) {
-                    dismissLoadingDialog();
                     ToastUtil.showTextViewPrompt("获取验证码成功");
+                    mSendVerify.setEnabled(true);
+                    mVerifyCountDown.setText("");
+                    timer.cancel();
                 }
 
                 @Override
                 public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                    dismissLoadingDialog();
                     ToastUtil.showTextViewPrompt("获取验证码失败");
+                    mSendVerify.setEnabled(true);
+                    mVerifyCountDown.setText("");
+                    timer.cancel();
                 }
             });
         });
@@ -218,5 +240,13 @@ public class RegisterActivity extends BaseTitleActivity {
                         }
                     }
                 });
+    }
+
+    /**
+     * 验证码倒计时60s
+     */
+    public void verifyCountDown() {
+        mSendVerify.setEnabled(false);
+        timer.start();
     }
 }

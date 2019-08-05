@@ -45,23 +45,40 @@
         android:textColorHint="@color/color_666666"
         android:textSize="@dimen/dimen_14" />
 
-    <TextView
-        android:id="@+id/tv_send_verify"
+    <LinearLayout
+        android:id="@+id/ll_send_verify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/et_user_phone"
         android:layout_marginLeft="@dimen/dimen_48"
         android:layout_marginTop="@dimen/dimen_10"
         android:layout_marginRight="@dimen/dimen_48"
-        android:textSize="@dimen/dimen_14"
-        android:textColor="#007aff"
-        android:text="发送验证码" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_send_verify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="发送验证码"
+            android:enabled="true"
+            android:textColor="@drawable/verify_selector"
+            android:textSize="@dimen/dimen_14" />
+
+        <TextView
+            android:id="@+id/tv_send_verify_count_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dimen_10"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen_14" />
+
+    </LinearLayout>
 
     <EditText
         android:id="@+id/et_user_name"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_48"
-        android:layout_below="@id/tv_send_verify"
+        android:layout_below="@id/ll_send_verify"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="@dimen/dimen_48"

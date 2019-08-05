@@ -22,6 +22,7 @@ import top.maxim.im.MainActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
@@ -161,11 +162,16 @@ public class WelcomeActivity extends BaseTitleActivity {
     /**
      * 预加载数据 每次登陆获取service的profile  roster
      */
-    private void initData() {
+    public static void initData() {
         Observable.just("").map(s -> {
+            // 自己的profile
             UserManager.getInstance().getProfile(new BMXUserProfile(), true);
+            // roster列表信息
             RosterManager.getInstance().get(new ListOfLongLong(), true);
+            // 群列表信息
             GroupManager.getInstance().search(new BMXGroupList(), true);
+            // 消息列表信息
+            ChatManager.getInstance().getAllConversations();
             String name = SharePreferenceUtils.getInstance().getUserName();
             String pwd = SharePreferenceUtils.getInstance().getUserPwd();
             AppManager.getInstance().getTokenByName(name, pwd, null);

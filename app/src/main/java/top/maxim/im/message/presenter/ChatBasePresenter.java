@@ -174,9 +174,15 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
         @Override
         public void onStatusChanged(BMXMessage msg, BMXErrorCode error) {
-            //发送状态更新页面
+            // 发送状态更新页面
             if (msg != null && isCurrentSession(msg)) {
                 mView.updateChatMessage(msg);
+                // 如果失败判断弹出提示
+                if (error != null && error.swigValue() != BMXErrorCode.NoError.swigValue()) {
+                    String errorMsg = error.name();
+                    ((Activity)mView.getContext())
+                            .runOnUiThread(() -> ToastUtil.showTextViewPrompt(errorMsg));
+                }
             }
         }
 

@@ -22,7 +22,7 @@ public abstract class MsgAttachmentCallback {
         if (percent >= 100) {
             mainHandler.post(() -> onFinish(msgId));
         } else {
-            mainHandler.post(() -> onProgress(msgId, percent));
+            mainHandler.post(() -> onProgress(msgId, percent <= 0 ? 0 : percent));
         }
     }
     

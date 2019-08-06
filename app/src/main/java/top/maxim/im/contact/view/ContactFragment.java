@@ -267,7 +267,7 @@ public class ContactFragment extends BaseTitleFragment {
     @Override
     public void onResume() {
         super.onResume();
-        initRoster(false);
+        initRoster(true);
     }
 
     private void initRoster(boolean forceRefresh) {

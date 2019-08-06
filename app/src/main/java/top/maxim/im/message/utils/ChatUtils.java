@@ -272,12 +272,12 @@ public class ChatUtils {
         if (!TextUtils.isEmpty(groupItem.avatarThumbnailPath())
                 && new File(groupItem.avatarThumbnailPath()).exists()
                 && new File(groupItem.avatarThumbnailPath()).isFile()) {
-            avatarUrl = "file://" + groupItem.avatarThumbnailPath();
+            avatarUrl = groupItem.avatarThumbnailPath();
             BMImageLoader.getInstance().display(imageView, avatarUrl, config);
         } else if (!TextUtils.isEmpty(groupItem.avatarPath())
                 && new File(groupItem.avatarPath()).exists()
                 && new File(groupItem.avatarPath()).isFile()) {
-            avatarUrl = "file://" + groupItem.avatarPath();
+            avatarUrl = groupItem.avatarPath();
             BMImageLoader.getInstance().display(imageView, avatarUrl, config);
         } else {
             BMImageLoader.getInstance().display(imageView, "", config);
@@ -329,7 +329,24 @@ public class ChatUtils {
                 return UserManager.getInstance().downloadAvatar(profile, new FileProgressListener(){
                     @Override
                     public int onProgressChange(String percent) {
-                        Log.i(TAG, "onProgressChange:"+ profile.userId() + "-" + percent);
+//                                if (Integer.valueOf(percent) >= 100) {
+//                                    String avatarUrl = "";
+//                                    if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
+//                                            && new File(profile.avatarThumbnailPath()).exists()
+//                                            && new File(profile.avatarThumbnailPath()).isFile()) {
+//                                        avatarUrl = "file://" + profile.avatarThumbnailPath();
+//                                    } else
+//                                        if (!TextUtils.isEmpty(profile.avatarPath())
+//                                            && new File(profile.avatarPath()).exists()
+//                                            && new File(profile.avatarPath()).isFile()) {
+//                                        avatarUrl = "file://" + profile.avatarPath();
+//                                    }
+//                                    String finalAvatarUrl = avatarUrl;
+//                                    TaskDispatcher.postMainDelayed(() -> {
+//                                        BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
+//                                    }, 500);
+//                                }
+                        Log.i(TAG, "onProgressChange profile:"+ profile.userId() + "-" + percent);
                         return 0;
                     }
                 });
@@ -356,12 +373,12 @@ public class ChatUtils {
                         // // if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
                         // // && new File(profile.avatarThumbnailPath()).exists()
                         // // && new File(profile.avatarThumbnailPath()).isFile()) {
-                        // // avatarUrl = "file://" + profile.avatarThumbnailPath();
+                        // // avatarUrl = + profile.avatarThumbnailPath();
                         // // } else
                         // if (!TextUtils.isEmpty(profile.avatarPath())
                         // && new File(profile.avatarPath()).exists()
                         // && new File(profile.avatarPath()).isFile()) {
-                        // avatarUrl = "file://" + profile.avatarPath();
+                        // avatarUrl = + profile.avatarPath();
                         // }
                         // RosterFetcher.getFetcher().putProfile(profile);
                         // BMImageLoader.getInstance().display(imageView, avatarUrl, config);
@@ -421,10 +438,33 @@ public class ChatUtils {
         Observable.just(item).map(new Func1<BMXRosterItem, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXRosterItem s) {
-                return RosterManager.getInstance().downloadAvatar(s, new FileProgressListener(){
+                return RosterManager.getInstance().downloadAvatar(s, new FileProgressListener() {
                     @Override
                     public int onProgressChange(String percent) {
-                        Log.i(TAG, "onProgressChange roster:"+ s.rosterId() + "-" + percent);
+//                        if (Integer.valueOf(percent) >= 100) {
+//                            // 成功
+//                            if (!mViewCache.containsKey(hashCode)
+//                                    || mViewCache.get(hashCode) != item.rosterId()) {
+//                                return 0;
+//                            }
+//                            mViewCache.remove(hashCode);
+//                            String avatarUrl = "";
+//                            if (!TextUtils.isEmpty(item.avatarThumbnailPath())
+//                                    && new File(item.avatarThumbnailPath()).exists()
+//                                    && new File(item.avatarThumbnailPath()).isFile()) {
+//                                avatarUrl = "file://" + item.avatarThumbnailPath();
+//                            } else
+//                                if (!TextUtils.isEmpty(item.avatarPath())
+//                                    && new File(item.avatarPath()).exists()
+//                                    && new File(item.avatarPath()).isFile()) {
+//                                avatarUrl = "file://" + item.avatarPath();
+//                            }
+//                            String finalAvatarUrl = avatarUrl;
+//                            TaskDispatcher.postMainDelayed(() -> {
+//                                BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
+//                            }, 500);
+//                        }
+                        Log.i(TAG, "onProgressChange roster:" + s.rosterId() + "-" + percent);
                         return 0;
                     }
                 });
@@ -455,12 +495,12 @@ public class ChatUtils {
                         // // if (!TextUtils.isEmpty(item.avatarThumbnailPath())
                         // // && new File(item.avatarThumbnailPath()).exists()
                         // // && new File(item.avatarThumbnailPath()).isFile()) {
-                        // // avatarUrl = "file://" + item.avatarThumbnailPath();
+                        // // avatarUrl = + item.avatarThumbnailPath();
                         // // } else
                         // if (!TextUtils.isEmpty(item.avatarPath())
                         // && new File(item.avatarPath()).exists()
                         // && new File(item.avatarPath()).isFile()) {
-                        // avatarUrl = "file://" + item.avatarPath();
+                        // avatarUrl = + item.avatarPath();
                         // }
                         // RosterFetcher.getFetcher().putRoster(item);
                         // if (!mViewCache.containsKey(hashCode)
@@ -521,10 +561,31 @@ public class ChatUtils {
         Observable.just(item).map(new Func1<BMXGroup, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXGroup s) {
-                return GroupManager.getInstance().downloadAvatar(s, new FileProgressListener(){
+                return GroupManager.getInstance().downloadAvatar(s, new FileProgressListener() {
                     @Override
                     public int onProgressChange(String percent) {
-                        Log.i(TAG, "onProgressChange roster:"+ s.groupId() + "-" + percent);
+//                        if (Integer.valueOf(percent) >= 100) {
+//                            String avatarUrl = "";
+//                            if (!TextUtils.isEmpty(item.avatarThumbnailPath())
+//                                    && new File(item.avatarThumbnailPath()).exists()
+//                                    && new File(item.avatarThumbnailPath()).isFile()) {
+//                                avatarUrl = "file://" + item.avatarThumbnailPath();
+//                            } else if (!TextUtils.isEmpty(item.avatarPath())
+//                                    && new File(item.avatarPath()).exists()
+//                                    && new File(item.avatarPath()).isFile()) {
+//                                avatarUrl = "file://" + item.avatarPath();
+//                            }
+//                            if (!mViewCache.containsKey(hashCode)
+//                                    || mViewCache.get(hashCode) != item.groupId()) {
+//                                return 0;
+//                            }
+//                            mViewCache.remove(hashCode);
+//                            String finalAvatarUrl = avatarUrl;
+//                            TaskDispatcher.postMainDelayed(() -> {
+//                                BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
+//                            }, 500);
+//                        }
+                        Log.i(TAG, "onProgressChange group:"+ s.groupId() + "-" + percent);
                         return 0;
                     }
                 });
@@ -555,12 +616,12 @@ public class ChatUtils {
                         // // if (!TextUtils.isEmpty(item.avatarThumbnailPath())
                         // // && new File(item.avatarThumbnailPath()).exists()
                         // // && new File(item.avatarThumbnailPath()).isFile()) {
-                        // // avatarUrl = "file://" + item.avatarThumbnailPath();
+                        // // avatarUrl = + item.avatarThumbnailPath();
                         // // } else
                         // if (!TextUtils.isEmpty(item.avatarPath())
                         // && new File(item.avatarPath()).exists()
                         // && new File(item.avatarPath()).isFile()) {
-                        // avatarUrl = "file://" + item.avatarPath();
+                        // avatarUrl = + item.avatarPath();
                         // }
                         // RosterFetcher.getFetcher().putGroup(item);
                         // if (!mViewCache.containsKey(hashCode)

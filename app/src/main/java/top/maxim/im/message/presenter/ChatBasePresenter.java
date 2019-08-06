@@ -693,19 +693,24 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         // 自己发送的消息才有撤回
         if (!message.isReceiveMsg()) {
             // 撤回
-            TextView revoke = new TextView(mView.getContext());
-            revoke.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
-                    0);
-            revoke.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
-            revoke.setTextColor(mView.getContext().getResources().getColor(R.color.color_black));
-            revoke.setBackgroundColor(
-                    mView.getContext().getResources().getColor(R.color.color_white));
-            revoke.setText(mView.getContext().getString(R.string.chat_msg_revoke));
-            revoke.setOnClickListener(v -> {
-                dialog.dismiss();
-                revokeMessage(message);
-            });
-            ll.addView(revoke, params);
+            BMXMessage.DeliveryStatus sendStatus = message.deliveryStatus();
+            // 发送成功才有撤回
+            if (sendStatus == null || sendStatus == BMXMessage.DeliveryStatus.Deliveried) {
+                TextView revoke = new TextView(mView.getContext());
+                revoke.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                        ScreenUtils.dp2px(15), 0);
+                revoke.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+                revoke.setTextColor(
+                        mView.getContext().getResources().getColor(R.color.color_black));
+                revoke.setBackgroundColor(
+                        mView.getContext().getResources().getColor(R.color.color_white));
+                revoke.setText(mView.getContext().getString(R.string.chat_msg_revoke));
+                revoke.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    revokeMessage(message);
+                });
+                ll.addView(revoke, params);
+            }
         }
         // 对方发送的消息才有标记已读
         if (message.isReceiveMsg()) {

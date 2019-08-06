@@ -54,12 +54,12 @@ public abstract class FileCallback {
 
     /* C层回调回来是子线程 切换到主线程 */
     public final void onCallFinish(final String url, final boolean isThumbnail) {
-        mainHandler.post(new Runnable() {
+        mainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 onFinish(url, isThumbnail);
             }
-        });
+        }, 500);
     }
 
     /* C层回调回来是子线程 切换到主线程 */

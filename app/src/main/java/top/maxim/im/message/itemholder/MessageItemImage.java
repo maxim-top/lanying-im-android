@@ -208,10 +208,11 @@ public class MessageItemImage extends MessageItemBaseView {
         }
         mImageView.setLayoutParams(imgLayoutParams);
         String picUrl = null;
-        if (!TextUtils.isEmpty(body.thumbnailPath()) && new File(body.thumbnailPath()).exists()) {
-            picUrl = "file://" + body.thumbnailPath();
-            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
-        } else if (!TextUtils.isEmpty(body.path()) && new File(body.path()).exists()) {
+//        if (!TextUtils.isEmpty(body.thumbnailPath()) && new File(body.thumbnailPath()).exists()) {
+//            picUrl = "file://" + body.thumbnailPath();
+//            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+//        } else 
+        if (!TextUtils.isEmpty(body.path()) && new File(body.path()).exists()) {
             picUrl = "file://" + body.path();
             BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
         } else {

@@ -272,12 +272,12 @@ public class ChatUtils {
         if (!TextUtils.isEmpty(groupItem.avatarThumbnailPath())
                 && new File(groupItem.avatarThumbnailPath()).exists()
                 && new File(groupItem.avatarThumbnailPath()).isFile()) {
-            avatarUrl = groupItem.avatarThumbnailPath();
+            avatarUrl = "file://" + groupItem.avatarThumbnailPath();
             BMImageLoader.getInstance().display(imageView, avatarUrl, config);
         } else if (!TextUtils.isEmpty(groupItem.avatarPath())
                 && new File(groupItem.avatarPath()).exists()
                 && new File(groupItem.avatarPath()).isFile()) {
-            avatarUrl = groupItem.avatarPath();
+            avatarUrl = "file://" + groupItem.avatarPath();
             BMImageLoader.getInstance().display(imageView, avatarUrl, config);
         } else {
             BMImageLoader.getInstance().display(imageView, "", config);

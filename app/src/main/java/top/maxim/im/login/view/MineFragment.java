@@ -660,6 +660,7 @@ public class MineFragment extends BaseTitleFragment {
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
                         SharePreferenceUtils.getInstance().putLoginStatus(false);
+                        SharePreferenceUtils.getInstance().putToken("");
                         PushClientMgr.getManager().unRegister();
                         PushUtils.getInstance()
                                 .unregisterActivityListener(AppContextUtils.getApplication());

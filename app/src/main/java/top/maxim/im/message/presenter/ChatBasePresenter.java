@@ -63,6 +63,7 @@ import top.maxim.im.common.utils.CameraUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.ScreenUtils;
+import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.VoicePlayHelper;
 import top.maxim.im.common.utils.VoiceRecordHelper;
@@ -331,7 +332,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        if (e != null && !TextUtils.isEmpty(e.getMessage())) {
+                            TaskDispatcher
+                                    .postMain(() -> ToastUtil.showTextViewPrompt(e.getMessage()));
+                        }
                     }
 
                     @Override

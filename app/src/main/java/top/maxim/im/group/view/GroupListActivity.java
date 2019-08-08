@@ -181,22 +181,14 @@ public class GroupListActivity extends BaseTitleActivity {
                         String error = e != null ? e.getMessage() : "网络错误";
                         ToastUtil.showTextViewPrompt(error);
                         GroupManager.getInstance().search(list, false);
-                        List<BMXGroup> groupList = new ArrayList<>();
-                        for (int i = 0; i < list.size(); i++) {
-                            groupList.add(list.get(i));
-                        }
                         RosterFetcher.getFetcher().putGroups(list);
-                        mAdapter.replaceList(groupList);
+                        mAdapter.replaceList(filterGroup(list));
                     }
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
-                        List<BMXGroup> groupList = new ArrayList<>();
-                        for (int i = 0; i < list.size(); i++) {
-                            groupList.add(list.get(i));
-                        }
                         RosterFetcher.getFetcher().putGroups(list);
-                        mAdapter.replaceList(groupList);
+                        mAdapter.replaceList(filterGroup(list));
                     }
                 });
     }
@@ -276,6 +268,22 @@ public class GroupListActivity extends BaseTitleActivity {
 
                     }
                 });
+    }
+    
+    private List<BMXGroup> filterGroup(BMXGroupList groupList) {
+        List<BMXGroup> list = new ArrayList<>();
+        if (groupList != null && !groupList.isEmpty()) {
+            for (int i = 0; i < groupList.size(); i++) {
+                BMXGroup group = groupList.get(i);
+                if (group != null && group.groupStatus() != null) {
+                    BMXGroup.GroupStatus status = group.groupStatus();
+                    if (status == BMXGroup.GroupStatus.Normal) {
+                        list.add(group);
+                    }
+                }
+            }
+        }
+        return list;
     }
 
     /**

@@ -74,9 +74,9 @@ public class ScanResultActivity extends BaseTitleActivity {
         } else if (mResult.startsWith(ScanConfigs.CODE_GROUP_PRE)) {
             // 群聊
             String result = mResult.substring(2);
-            String[] info = result.split("_");
-            long groupId = Long.valueOf(info[0]);
-            String qrInfo = info[1];
+            int index = result.indexOf("_");
+            long groupId = Long.valueOf(result.substring(0, index));
+            String qrInfo = result.substring(index + 1);
             GroupQrcodeDetailActivity.openGroupQrcodeDetail(this, groupId, qrInfo);
             finish();
         } else if (mResult.startsWith(ScanConfigs.CODE_DEMO)) {

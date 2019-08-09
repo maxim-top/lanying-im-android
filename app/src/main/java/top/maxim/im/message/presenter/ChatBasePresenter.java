@@ -1642,14 +1642,21 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         int maxLine = address.getMaxAddressLineIndex();
                         if (maxLine >= 2) {
                             add = address.getAddressLine(1) + address.getAddressLine(2);
+                        } else if (maxLine >= 1) {
+                            add = address.getAddressLine(0) + address.getAddressLine(1);
+                        } else if (maxLine >= 0) {
+                            add = address.getAddressLine(0);
+                        }
+                        if (!TextUtils.isEmpty(add)) {
+                            mView.sendChatMessage(mSendUtils.sendLocationMessage(mChatType,
+                                    mMyUserId, mChatId, latitude, longitude, add));
                         } else {
-                            add = address.getAddressLine(1);
+                            ToastUtil.showTextViewPrompt("获取位置失败");
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
+                        ToastUtil.showTextViewPrompt("获取位置失败");
                     }
-                    mView.sendChatMessage(mSendUtils.sendLocationMessage(mChatType, mMyUserId,
-                            mChatId, latitude, longitude, add));
                 } else {
                     ToastUtil.showTextViewPrompt("未插卡,暂不支持");
                 }

@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:ellipsize="end"
-            android:maxLines="1"
+            android:maxLines="3"
             android:textColor="@color/color_black"
             android:textSize="@dimen/dimen_15" />
 
@@ -39,7 +39,7 @@
             android:layout_below="@id/txt_local_title_right"
             android:layout_alignParentLeft="true"
             android:ellipsize="end"
-            android:maxLines="2"
+            android:maxLines="3"
             android:textColor="@color/color_black"
             android:textSize="@dimen/dimen_13" />
     </RelativeLayout>

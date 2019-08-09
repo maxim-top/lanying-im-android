@@ -18,7 +18,13 @@ android {
                 "MEIZU_APP_KEY"  : "ba1881e1356d4c9ea622772c64873c41",
 
                 "WEIXIN_APPID"   : "wxf0f8e197ecfb0925",
+
+                "BUGLY_APPID"    : "ae2c13667e"
         ]
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
     }
 
     signingConfigs {
@@ -104,4 +110,7 @@ dependencies {
     //微信
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
 
+    //bugly
+    implementation 'com.tencent.bugly:crashreport:latest.release'
+    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
 }

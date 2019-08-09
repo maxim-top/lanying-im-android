@@ -451,6 +451,16 @@
             </intent-filter>
         </receiver>
 
+        <!-- *************BUGLY START************** -->
+
+        <!-- 配置APP ID -->
+        <meta-data
+            android:name="BUGLY_APPID"
+            android:value="${BUGLY_APPID}" />
+        <meta-data
+            android:name="BUGLY_ENABLE_DEBUG"
+            android:value="true" />
+
     </application>
 
 </manifest>

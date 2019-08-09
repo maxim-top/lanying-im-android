@@ -15,6 +15,7 @@ import java.io.File;
 
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.BuglyTask;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -53,9 +54,10 @@ public class MaxIMApplication extends Application {
     private void initUtils() {
         AppContextUtils.initApp(this);
         initImageLoader();
-        //push
+        // push
         PushClientMgr.initManager(this);
         PushUtils.getInstance().registerActivityListener(this);
+        BuglyTask.get().init(this);
     }
 
     /**

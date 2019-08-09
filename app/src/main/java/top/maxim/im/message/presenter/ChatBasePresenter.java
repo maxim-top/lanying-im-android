@@ -1611,6 +1611,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         String provider = "";
         List<String> providers = manager.getProviders(true);
         if (providers == null) {
+            ToastUtil.showTextViewPrompt("未插卡,暂不支持");
             return;
         }
         if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
@@ -1649,8 +1650,12 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     }
                     mView.sendChatMessage(mSendUtils.sendLocationMessage(mChatType, mMyUserId,
                             mChatId, latitude, longitude, add));
+                } else {
+                    ToastUtil.showTextViewPrompt("未插卡,暂不支持");
                 }
             }
+        } else {
+            ToastUtil.showTextViewPrompt("未插卡,暂不支持");
         }
     }
 

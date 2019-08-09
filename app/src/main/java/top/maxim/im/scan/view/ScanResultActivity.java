@@ -12,6 +12,7 @@ import android.widget.TextView;
 import top.maxim.im.R;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.contact.view.RosterDetailActivity;
 import top.maxim.im.group.view.GroupQrcodeDetailActivity;
@@ -59,6 +60,15 @@ public class ScanResultActivity extends BaseTitleActivity {
         if (TextUtils.isEmpty(mResult)) {
             finish();
             return;
+        }
+        boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
+        if (!mResult.startsWith(ScanConfigs.CODE_DEMO)) {
+            // 非二维码体验功能 如果未登录不能识别
+            if (!isLogin) {
+                ToastUtil.showTextViewPrompt("未能识别二维码信息");
+                finish();
+                return;
+            }
         }
         if (mResult.startsWith(ScanConfigs.CODE_ROSTER_PRE)) {
             // roster

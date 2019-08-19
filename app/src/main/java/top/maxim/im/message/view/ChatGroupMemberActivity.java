@@ -65,6 +65,9 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
     /* 减人 */
     private final int REMOVE_MEMBER_REQUEST = 1001;
 
+    /* 是否是群聊创建者 */
+    private boolean mIsOwner;
+    
     public static void startGroupMemberActivity(Context context, long groupId) {
         Intent intent = new Intent(context, ChatGroupMemberActivity.class);
         intent.putExtra(MessageConfig.CHAT_ID, groupId);
@@ -162,6 +165,7 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
+                        mIsOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
                         initGroupMembers();
                     }
                 });
@@ -220,11 +224,14 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
         for (int i = 0; i < memberList.size(); i++) {
             members.add(memberList.get(i));
         }
-        // 增加添加 移除
-        BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "", 0);
-        BMXGroup.Member remove = new BMXGroup.Member(MessageConfig.MEMBER_REMOVE, "", 0);
-        members.add(add);
-        members.add(remove);
+        // 群主才有添加 删除功能
+        if (mIsOwner) {
+            // 增加添加 移除
+            BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "", 0);
+            BMXGroup.Member remove = new BMXGroup.Member(MessageConfig.MEMBER_REMOVE, "", 0);
+            members.add(add);
+            members.add(remove);
+        }
         mAdapter.replaceList(members);
     }
 

@@ -84,9 +84,9 @@ public class ImageRequestConfig {
 
         private Drawable imageOnFail = null;
 
-        private boolean cacheInMemory = true;
+        private boolean cacheInMemory = false;
 
-        private boolean cacheOnDisk = true;
+        private boolean cacheOnDisk = false;
 
         private boolean considerExifParams = false;
 

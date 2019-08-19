@@ -1,10 +1,18 @@
 
 package top.maxim.im.message.utils;
 
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
+import com.nostra13.universalimageloader.utils.DiskCacheUtils;
+import com.nostra13.universalimageloader.utils.MemoryCacheUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -248,7 +256,27 @@ public class ChatUtils {
         } else {
             downloadUserAvatar(rosterItem, imageView, config);
         }
-        BMImageLoader.getInstance().display(imageView, avatarUrl, config);
+        BMImageLoader.getInstance().display(imageView, avatarUrl, config, new ImageLoadingListener() {
+            @Override
+            public void onLoadingStarted(String imageUri, View view) {
+
+            }
+
+            @Override
+            public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+
+            }
+
+            @Override
+            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+
+            }
+
+            @Override
+            public void onLoadingCancelled(String imageUri, View view) {
+
+            }
+        });
     }
 
     /**
@@ -699,5 +727,20 @@ public class ChatUtils {
             return messageBean;
         }
         return null;
+    }
+
+
+    /**
+     * 清除头像缓存
+     *
+     * @param url 地址
+     */
+    public void removeAvatarCache(String url) {
+        if (!TextUtils.isEmpty(url)) {
+            DiskCacheUtils.removeFromCache(url, ImageLoader.getInstance().getDiskCache());
+            MemoryCacheUtils.removeFromCache(url, ImageLoader.getInstance().getMemoryCache());
+        }
+//        ImageLoader.getInstance().clearDiskCache();
+//        ImageLoader.getInstance().clearMemoryCache();
     }
 }

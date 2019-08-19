@@ -76,7 +76,6 @@
             android:paddingLeft="@dimen/dimen_11"
             android:paddingRight="@dimen/dimen_11"
             android:textColor="@color/color_5c5c5c"
-            android:textCursorDrawable="@color/c2"
             android:textSize="@dimen/dimen_14" />
 
         <TextView

@@ -68,6 +68,8 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
     /* 是否是群聊创建者 */
     private boolean mIsOwner;
     
+    private List<String> memberIdList;
+    
     public static void startGroupMemberActivity(Context context, long groupId) {
         Intent intent = new Intent(context, ChatGroupMemberActivity.class);
         intent.putExtra(MessageConfig.CHAT_ID, groupId);
@@ -119,7 +121,7 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
                 if (memberId == MessageConfig.MEMBER_ADD) {
                     // 添加
                     RosterChooseActivity.startRosterListActivity(ChatGroupMemberActivity.this, true,
-                            true, ADD_MEMBER_REQUEST);
+                            true, memberIdList, ADD_MEMBER_REQUEST);
                 } else if (memberId == MessageConfig.MEMBER_REMOVE) {
                     // 移除
                     ChatGroupListMemberActivity.startGroupMemberListActivity(
@@ -221,8 +223,16 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
 
     protected void bindData(BMXGroupMemberList memberList) {
         List<BMXGroup.Member> members = new ArrayList<>();
+        if (memberIdList == null) {
+            memberIdList = new ArrayList<>();
+        }
+        memberIdList.clear();
         for (int i = 0; i < memberList.size(); i++) {
-            members.add(memberList.get(i));
+            BMXGroup.Member member = memberList.get(i);
+            if (member != null) {
+                members.add(member);
+                memberIdList.add(String.valueOf(member.getMUid()));
+            }
         }
         // 群主才有添加 删除功能
         if (mIsOwner) {

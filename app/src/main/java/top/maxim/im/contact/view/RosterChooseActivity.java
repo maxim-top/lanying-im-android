@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,9 @@ public class RosterChooseActivity extends BaseTitleActivity {
 
     private boolean multi = true;
 
+    /* 筛选列表 */
+    private List<String> mFilterList;
+
     protected Map<Long, Boolean> mSelected = new HashMap<>();
 
     protected BMXRosterItemList itemList = new BMXRosterItemList();
@@ -65,6 +69,8 @@ public class RosterChooseActivity extends BaseTitleActivity {
 
     private static final String MULTI_CHOOSE = "multi_choose";
 
+    public static final String FILTER_LIST = "filterList";
+
     public static final String CHOOSE_DATA = "chooseData";
 
     public static void startRosterListActivity(Activity context, boolean isChoose, boolean isMulti,
@@ -72,6 +78,15 @@ public class RosterChooseActivity extends BaseTitleActivity {
         Intent intent = new Intent(context, RosterChooseActivity.class);
         intent.putExtra(CHOOSE, isChoose);
         intent.putExtra(MULTI_CHOOSE, isMulti);
+        context.startActivityForResult(intent, requestCode);
+    }
+
+    public static void startRosterListActivity(Activity context, boolean isChoose, boolean isMulti,
+            List<String> filterList, int requestCode) {
+        Intent intent = new Intent(context, RosterChooseActivity.class);
+        intent.putExtra(CHOOSE, isChoose);
+        intent.putExtra(MULTI_CHOOSE, isMulti);
+        intent.putExtra(FILTER_LIST, (Serializable)filterList);
         context.startActivityForResult(intent, requestCode);
     }
 
@@ -155,6 +170,7 @@ public class RosterChooseActivity extends BaseTitleActivity {
         if (intent != null) {
             mChoose = intent.getBooleanExtra(CHOOSE, false);
             multi = intent.getBooleanExtra(MULTI_CHOOSE, true);
+            mFilterList = (List<String>)intent.getSerializableExtra(FILTER_LIST);
         }
     }
 
@@ -255,7 +271,13 @@ public class RosterChooseActivity extends BaseTitleActivity {
     protected void bindData() {
         List<BMXRosterItem> rosterItems = new ArrayList<>();
         for (int i = 0; i < itemList.size(); i++) {
-            rosterItems.add(itemList.get(i));
+            BMXRosterItem item = itemList.get(i);
+            if (item == null) {
+                continue;
+            }
+            if (mFilterList == null || !mFilterList.contains(String.valueOf(item.rosterId()))) {
+                rosterItems.add(itemList.get(i));
+            }
         }
         mAdapter.replaceList(rosterItems);
     }
@@ -273,8 +295,7 @@ public class RosterChooseActivity extends BaseTitleActivity {
             super(context);
             mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
                     .showImageForEmptyUri(R.drawable.default_avatar_icon)
-                    .showImageOnFail(R.drawable.default_avatar_icon)
-                    .cacheOnDisk(true)
+                    .showImageOnFail(R.drawable.default_avatar_icon).cacheOnDisk(true)
                     .bitmapConfig(Bitmap.Config.RGB_565)
                     .showImageOnLoading(R.drawable.default_avatar_icon).build();
         }

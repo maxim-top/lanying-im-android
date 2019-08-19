@@ -145,6 +145,8 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     /* 是否是群聊创建者 */
     private boolean mIsOwner;
 
+    private List<String> memberIdList;
+
     public static void startGroupOperateActivity(Context context, long groupId) {
         Intent intent = new Intent(context, ChatGroupOperateActivity.class);
         intent.putExtra(MessageConfig.CHAT_ID, groupId);
@@ -512,7 +514,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 if (memberId == MessageConfig.MEMBER_ADD) {
                     // 添加
                     RosterChooseActivity.startRosterListActivity(ChatGroupOperateActivity.this,
-                            true, true, ADD_MEMBER_REQUEST);
+                            true, true, memberIdList, ADD_MEMBER_REQUEST);
                 } else if (memberId == MessageConfig.MEMBER_REMOVE) {
                     // 移除
                     ChatGroupListMemberActivity.startGroupMemberListActivity(
@@ -591,7 +593,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         mViewChatGroupManager.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
         mViewChatGroupRename.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
         mViewGroupAvatar.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-        mViewGroupMyNickName.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+//        mViewGroupMyNickName.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
         mViewChatGroupManagerList.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
 
         mViewChatGroupDesc.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
@@ -653,8 +655,16 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         List<BMXGroup.Member> members = new ArrayList<>();
+                        if (memberIdList == null) {
+                            memberIdList = new ArrayList<>();
+                        }
+                        memberIdList.clear();
                         for (int i = 0; i < memberList.size(); i++) {
-                            members.add(memberList.get(i));
+                            BMXGroup.Member member = memberList.get(i);
+                            if (member != null) {
+                                members.add(member);
+                                memberIdList.add(String.valueOf(member.getMUid()));
+                            }
                         }
                         // 群人数
                         long memberCount = memberList.size();

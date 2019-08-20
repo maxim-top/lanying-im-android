@@ -1,7 +1,7 @@
 
 package top.maxim.im.contact.view;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -56,10 +56,10 @@ public class ForwardMsgRosterActivity extends BaseTitleActivity {
 
     private final int FORWARD_GROUP_REQUEST = 1000;
 
-    public static void openForwardMsgRosterActivity(Context context, MessageBean message) {
+    public static void openForwardMsgRosterActivity(Activity context, MessageBean message, int requestCode) {
         Intent intent = new Intent(context, ForwardMsgRosterActivity.class);
         intent.putExtra(MessageConfig.CHAT_MSG, message);
-        context.startActivity(intent);
+        context.startActivityForResult(intent, requestCode);
     }
 
     @Override
@@ -138,11 +138,11 @@ public class ForwardMsgRosterActivity extends BaseTitleActivity {
         if (messageBean == null) {
             return;
         }
-        BMXMessage.MessageType type = BMXMessage.MessageType.Single;
-        BMXMessage message = mSendUtils.forwardMessage(messageBean, type, mUserId, rosterId);
-        if (messageBean.getType() == type && messageBean.getChatId() == rosterId) {
-            // 转发给当前会话 直接跳转新的
-        }
+        Intent intent = new Intent();
+        intent.putExtra(MessageConfig.CHAT_ID, rosterId);
+        intent.putExtra(MessageConfig.CHAT_TYPE, BMXMessage.MessageType.Single);
+        intent.putExtra(MessageConfig.CHAT_MSG, messageBean);
+        setResult(RESULT_OK, intent);
         finish();
     }
 
@@ -204,6 +204,14 @@ public class ForwardMsgRosterActivity extends BaseTitleActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == FORWARD_GROUP_REQUEST && resultCode == RESULT_OK) {
+            if (data != null) {
+                Intent intent = new Intent();
+                intent.putExtra(MessageConfig.CHAT_ID, data.getLongExtra(MessageConfig.CHAT_ID, 0));
+                intent.putExtra(MessageConfig.CHAT_TYPE,
+                        data.getSerializableExtra(MessageConfig.CHAT_TYPE));
+                intent.putExtra(MessageConfig.CHAT_MSG, messageBean);
+                setResult(RESULT_OK, intent);
+            }
             finish();
         }
     }

@@ -158,15 +158,10 @@ public class ForwardMsgGroupActivity extends BaseTitleActivity {
     }
 
     private void forwardMessage(long groupId) {
-        if (messageBean == null) {
-            return;
-        }
-        BMXMessage.MessageType type = BMXMessage.MessageType.Group;
-        BMXMessage message = mSendUtils.forwardMessage(messageBean, type, mUserId, groupId);
-        if (messageBean.getType() == type && messageBean.getChatId() == groupId) {
-            // 转发给当前会话 直接跳转新的
-        }
-        setResult(Activity.RESULT_OK);
+        Intent intent = new Intent();
+        intent.putExtra(MessageConfig.CHAT_ID, groupId);
+        intent.putExtra(MessageConfig.CHAT_TYPE, BMXMessage.MessageType.Group);
+        setResult(Activity.RESULT_OK, intent);
         finish();
     }
 

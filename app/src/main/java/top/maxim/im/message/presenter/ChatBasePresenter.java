@@ -1,3 +1,4 @@
+
 package top.maxim.im.message.presenter;
 
 import android.Manifest;
@@ -19,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -47,21 +49,25 @@ import im.floo.floolib.BMXVideoAttachment;
 import im.floo.floolib.BMXVoiceAttachment;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.PermissionActivity;
 import top.maxim.im.common.bean.FileBean;
+import top.maxim.im.common.bean.MessageBean;
 import top.maxim.im.common.bean.PhotoViewBean;
 import top.maxim.im.common.bean.PhotoViewListBean;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.CameraUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
@@ -78,6 +84,7 @@ import top.maxim.im.message.customviews.MessageInputBar;
 import top.maxim.im.message.utils.ChatAttachmentManager;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.message.utils.RefreshChatActivityEvent;
 import top.maxim.im.message.view.ChooseFileActivity;
 import top.maxim.im.message.view.PhotoDetailActivity;
 import top.maxim.im.message.view.VideoDetailActivity;
@@ -102,6 +109,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     /* 视频 */
     private final int VIDEO_REQUEST = 1003;
     
+    /* 转发 */
+    private final int FORWARD_REQUEST = 1004;
+
     /* 拍照权限 */
     private final int TYPE_CAMERA_PERMISSION = 1;
 
@@ -171,6 +181,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     private String myUserName;
 
+    private CompositeSubscription mSubcription;
+
     private BMXChatServiceListener mListener = new BMXChatServiceListener() {
 
         @Override
@@ -201,6 +213,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             }
             boolean success = error != null
                     && error.swigValue() == BMXErrorCode.NoError.swigValue();
+            String errorMsg = error != null && !TextUtils.isEmpty(error.name()) ? error.name()
+                    : "撤回失败";
             if (success) {
                 // 撤回成功需要删除原始消息
                 if (mView != null) {
@@ -208,8 +222,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 }
             } else {
                 // 原始消息不为空 则没有撤回成功
-                ((Activity) mView.getContext())
-                        .runOnUiThread(() -> ToastUtil.showTextViewPrompt("撤回失败"));
+                ((Activity)mView.getContext())
+                        .runOnUiThread(() -> ToastUtil.showTextViewPrompt(errorMsg));
             }
         }
 
@@ -274,7 +288,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     if (message != null && isCurrentSession(message)) {
                         // 当前会话
                         if (mView != null) {
-                            ((Activity) mView.getContext())
+                            ((Activity)mView.getContext())
                                     .runOnUiThread(() -> ToastUtil.showTextViewPrompt("对方撤回一条消息"));
                             mView.deleteChatMessage(message);
                         }
@@ -493,6 +507,77 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     public void setChatBaseView(ChatBaseContract.View view, ChatBaseContract.Model model) {
         mView = view;
         mModel = model;
+        mSubcription = new CompositeSubscription();
+        receiveRxBus();
+    }
+
+    private void receiveRxBus() {
+        Subscription subscription = RxBus.getInstance().toObservable(RefreshChatActivityEvent.class)
+                .map(new Func1<RefreshChatActivityEvent, Pair<Integer, List<BMXMessage>>>() {
+                    @Override
+                    public Pair<Integer, List<BMXMessage>> call(
+                            RefreshChatActivityEvent refreshChatActivityEvent) {
+                        List<String> list = refreshChatActivityEvent == null ? null
+                                : refreshChatActivityEvent.getMsgBeans();
+                        if (list != null && !list.isEmpty()) {
+                            List<BMXMessage> msgs = new ArrayList<>();
+                            for (String msgId : list) {
+                                BMXMessage msg = ChatManager.getInstance()
+                                        .getMessage(Long.valueOf(msgId));
+                                if (isCurrentSession(msg)) {
+                                    msgs.add(msg);
+                                }
+                            }
+                            return new Pair<>(refreshChatActivityEvent.getRefreshType(), msgs);
+                        }
+                        return null;
+                    }
+                }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Pair<Integer, List<BMXMessage>>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Pair<Integer, List<BMXMessage>> pair) {
+                        if (pair == null || pair.second == null || pair.second.isEmpty()) {
+                            return;
+                        }
+                        int type = pair.first;
+                        List<BMXMessage> msgs = pair.second;
+                        switch (type) {
+                            case RefreshChatActivityEvent.TYPE_ADD:
+                                // 添加
+                                if (mView != null) {
+                                    mView.sendChatMessages(msgs);
+                                }
+                                break;
+                            case RefreshChatActivityEvent.TYPE_DELETE:
+                                for (BMXMessage msg : msgs) {
+                                    if (mView != null) {
+                                        mView.deleteChatMessage(msg);
+                                    }
+                                }
+                                break;
+                            case RefreshChatActivityEvent.TYPE_UPDATE:
+                                for (BMXMessage msg : msgs) {
+                                    if (mView != null) {
+                                        mView.updateChatMessage(msg);
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+        mSubcription.add(subscription);
     }
 
     @Override
@@ -502,7 +587,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 // 选择相册 需要SD卡读写权限
                 if (hasPermission(PermissionsConstant.READ_STORAGE,
                         PermissionsConstant.WRITE_STORAGE)) {
-                    CameraUtils.getInstance().takeGalley((Activity) mView.getContext(),
+                    CameraUtils.getInstance().takeGalley((Activity)mView.getContext(),
                             IMAGE_REQUEST);
                 } else {
                     requestPermissions(TYPE_PHOTO_PERMISSION, PermissionsConstant.READ_STORAGE);
@@ -689,8 +774,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         relay.setText(mView.getContext().getString(R.string.chat_msg_relay));
         relay.setOnClickListener(v -> {
             dialog.dismiss();
-            ForwardMsgRosterActivity.openForwardMsgRosterActivity(mView.getContext(),
-                    ChatUtils.getInstance().buildMessage(message, mChatType, mChatId));
+            ForwardMsgRosterActivity.openForwardMsgRosterActivity((Activity)mView.getContext(),
+                    ChatUtils.getInstance().buildMessage(message, mChatType, mChatId),
+                    FORWARD_REQUEST);
         });
         ll.addView(relay, params);
 
@@ -750,7 +836,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }
 
         dialog.setCustomView(ll);
-        dialog.showDialog((Activity) mView.getContext());
+        dialog.showDialog((Activity)mView.getContext());
     }
 
     /**
@@ -762,7 +848,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (message == null || message.contentType() != BMXMessage.ContentType.Text) {
             return;
         }
-        ClipboardManager clipboard = (ClipboardManager) mView.getContext()
+        ClipboardManager clipboard = (ClipboardManager)mView.getContext()
                 .getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard == null) {
             return;
@@ -929,7 +1015,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             return;
         }
         if (mVoicePlayHelper == null) {
-            mVoicePlayHelper = new VoicePlayHelper((Activity) mView.getContext());
+            mVoicePlayHelper = new VoicePlayHelper((Activity)mView.getContext());
             registerSensor();
         }
         if (mVoicePlayHelper.isPlaying()) {
@@ -965,14 +1051,14 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         // 停止其他占用音频的地方
         stopAudio();
         if (mVoiceRecordHelper == null) {
-            mVoiceRecordHelper = new VoiceRecordHelper((Activity) mView.getContext());
+            mVoiceRecordHelper = new VoiceRecordHelper((Activity)mView.getContext());
         }
         // 录制音量
         mVoiceRecordHelper.setCallBackSoundDecibel(new VoiceRecordHelper.OnCallBackSoundDecibel() {
             @Override
             public void callBackSoundDecibel(float decibel) {
                 if (mView != null) {
-                    mView.showRecordMicView((int) decibel);
+                    mView.showRecordMicView((int)decibel);
                 }
             }
         });
@@ -1004,7 +1090,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             if (new File(mVoiceName).exists() && new File(mVoiceName).length() > 0) {
                 // 文件长度大于0才发送 否则就是没有录制成功
                 mView.sendChatMessage(mSendUtils.sendAudioMessage(mChatType, mMyUserId, mChatId,
-                        mVoiceName, (int) time));
+                        mVoiceName, (int)time));
             } else {
                 // 录制失败 停止录音并删除文件
                 mVoiceRecordHelper.stopVoiceRecord(true, mVoiceName);
@@ -1148,7 +1234,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             picUrl = body.path();
         }
         if (TextUtils.isEmpty(picUrl)) {
-            //正在下载
+            // 正在下载
             return;
         }
         List<PhotoViewBean> photoViewBeans = new ArrayList<>();
@@ -1300,7 +1386,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 // 文件
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null) {
-                        List<FileBean> beans = (List<FileBean>) data
+                        List<FileBean> beans = (List<FileBean>)data
                                 .getSerializableExtra(ChooseFileActivity.CHOOSE_FILE_DATA);
                         if (beans == null || beans.isEmpty()) {
                             return;
@@ -1308,6 +1394,29 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         for (FileBean bean : beans) {
                             mView.sendChatMessage(mSendUtils.sendFileMessage(mChatType, mMyUserId,
                                     mChatId, bean.getPath(), bean.getDesc()));
+                        }
+                    }
+                }
+                break;
+            case FORWARD_REQUEST:
+                //转发
+                if (resultCode == Activity.RESULT_OK) {
+                    if (data != null) {
+                        BMXMessage.MessageType type = (BMXMessage.MessageType)data
+                                .getSerializableExtra(MessageConfig.CHAT_TYPE);
+                        MessageBean messageBean = (MessageBean)data
+                                .getSerializableExtra(MessageConfig.CHAT_MSG);
+                        long chatId = data.getLongExtra(MessageConfig.CHAT_ID, 0);
+                        if (messageBean != null && chatId > 0 && mSendUtils != null) {
+                            if (mChatType == type && mChatId == chatId) {
+                                // 转发给当前会话
+                                if (mView != null) {
+                                    mView.sendChatMessage(mSendUtils.forwardMessage(messageBean,
+                                            type, mMyUserId, chatId));
+                                }
+                            } else {
+                                mSendUtils.forwardMessage(messageBean, type, mMyUserId, chatId);
+                            }
                         }
                     }
                 }
@@ -1349,7 +1458,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      */
     private boolean hasPermission(String... permissions) {
         if (mView.getContext() instanceof PermissionActivity) {
-            PermissionActivity activity = (PermissionActivity) mView.getContext();
+            PermissionActivity activity = (PermissionActivity)mView.getContext();
             return activity.hasPermission(permissions);
         } else {
             throw new IllegalArgumentException("is not allow request permission");
@@ -1369,7 +1478,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             return;
         }
         PermissionsMgr.getInstance().requestPermissionsIfNecessaryForResult(
-                (Activity) mView.getContext(), permissions, new PermissionsResultAction() {
+                (Activity)mView.getContext(), permissions, new PermissionsResultAction() {
 
                     @Override
                     public void onGranted(List<String> perms) {
@@ -1467,7 +1576,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 case PermissionsConstant.READ_STORAGE:
                 case PermissionsConstant.WRITE_STORAGE:
                     // 读写SD权限拒绝
-                    CommonProvider.openAppPermission((Activity) mView.getContext());
+                    CommonProvider.openAppPermission((Activity)mView.getContext());
                     break;
                 case PermissionsConstant.CAMERA:
                     if (requestType == TYPE_CAMERA_PERMISSION) {
@@ -1520,7 +1629,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 break;
             case TYPE_PHOTO_PERMISSION:
                 // 相册
-                CameraUtils.getInstance().takeGalley((Activity) mView.getContext(), IMAGE_REQUEST);
+                CameraUtils.getInstance().takeGalley((Activity)mView.getContext(), IMAGE_REQUEST);
                 break;
             case TYPE_VOICE_PERMISSION:
                 // 语音权限
@@ -1580,7 +1689,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         mCameraName = CameraUtils.getInstance().getCameraName();
         mCameraDir = FileConfig.DIR_APP_CACHE_CAMERA + "/";
         mCameraPath = FileConfig.DIR_APP_CACHE_CAMERA + "/" + mCameraName + ".jpg";
-        CameraUtils.getInstance().takePhoto(mCameraDir, mCameraPath, (Activity) mView.getContext(),
+        CameraUtils.getInstance().takePhoto(mCameraDir, mCameraPath, (Activity)mView.getContext(),
                 CAMERA_REQUEST);
     }
 
@@ -1670,6 +1779,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     public void onDestroyPresenter() {
         if (mConversation != null) {
             mConversation = null;
+        }
+        if (mSubcription != null) {
+            mSubcription.unsubscribe();
+            mSubcription = null;
         }
         ChatManager.getInstance().removeChatListener(mListener);
     }

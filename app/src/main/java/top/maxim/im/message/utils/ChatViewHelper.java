@@ -239,6 +239,18 @@ public class ChatViewHelper implements ChatActionListener {
     }
 
     /**
+     * 获取最后一条消息
+     *
+     * @return BMXMessage
+     */
+    public BMXMessage getLastMessage() {
+        if (mMessageListHelper != null) {
+            return mMessageListHelper.getLastData();
+        }
+        return null;
+    }
+
+    /**
      * 获取第一条消息
      *
      * @return BMXMessage

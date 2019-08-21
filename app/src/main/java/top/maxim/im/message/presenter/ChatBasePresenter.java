@@ -445,6 +445,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (mConversation != null) {
             mConversation.setEditMessage(mView == null ? "" : mView.getControlBarText());
         }
+        // 同步未读
+        readAllMessage();
     }
 
     @Override
@@ -1448,6 +1450,35 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     @Override
     public void clearAtFeed() {
 
+    }
+
+    @Override
+    public void readAllMessage() {
+        Observable.just("").map(new Func1<String, String>() {
+            @Override
+            public String call(String s) {
+                //获取当前最后一条消息
+                BMXMessage message = mView.getLastMessage();
+                ChatManager.getInstance().readAllMessage(message);
+                return s;
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        Log.d("ChatBasePresenter", "readAllMessage is success");
+                    }
+                });
     }
 
     /**

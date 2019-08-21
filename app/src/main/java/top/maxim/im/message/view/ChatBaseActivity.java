@@ -267,6 +267,10 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
             // }
         }
         mChatViewHelper.initMessages(beans, isHasData);
+        // 同步未读
+        if (mPresenter != null) {
+            mPresenter.readAllMessage();
+        }
     }
 
     @Override
@@ -338,6 +342,14 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
         if (mChatViewHelper != null) {
             mChatViewHelper.updateListView();
         }
+    }
+
+    @Override
+    public BMXMessage getLastMessage() {
+        if (mChatViewHelper != null) {
+            return mChatViewHelper.getLastMessage();
+        }
+        return null;
     }
 
     @Override

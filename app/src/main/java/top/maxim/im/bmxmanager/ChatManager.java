@@ -64,6 +64,10 @@ public class ChatManager extends BaseManager {
         mService.forwardMessage(msg);
     }
 
+    /**
+     * 设置所有消息已读
+     * @param msg 最后一条消息
+     */
     public void readAllMessage(BMXMessage msg) {
         mService.readAllMessage(msg);
     }

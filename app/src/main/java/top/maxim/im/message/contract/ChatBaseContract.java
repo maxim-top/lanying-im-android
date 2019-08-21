@@ -67,7 +67,16 @@ public interface ChatBaseContract {
          */
         void deleteChatMessage(BMXMessage bean);
 
+        /**
+         * 更新列表
+         */
         void updateListView();
+
+        /**
+         * 获取最后一条消息
+         * @return BMXMessage
+         */
+        BMXMessage getLastMessage();
 
         /**
          * 清除消息
@@ -235,6 +244,11 @@ public interface ChatBaseContract {
         Map<String, String> getChatAtMembers();
 
         void clearAtFeed();
+
+        /**
+         * 设置群聊已读
+         */
+        void readAllMessage();
     }
 
     /**

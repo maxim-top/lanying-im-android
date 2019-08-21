@@ -4,7 +4,6 @@ package top.maxim.im.message.presenter;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +20,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.BaseManager;
-import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatGroupContract;
@@ -157,36 +155,6 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     @Override
     public void onChatAtMember() {
         ChatGroupAtActivity.startGroupAtActivity(mView.getContext(), mChatId, AT_REQUEST);
-    }
-
-    @Override
-    public void readAllMessage(final BMXMessage message) {
-        if (message == null) {
-            return;
-        }
-        Observable.just("").map(new Func1<String, String>() {
-            @Override
-            public String call(String s) {
-                ChatManager.getInstance().readAllMessage(message);
-                return s;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(String s) {
-                        Log.e("GroupChat", "readAllMessage is success");
-                    }
-                });
     }
 
     @Override

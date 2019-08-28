@@ -34,6 +34,8 @@ public class ChatViewHelper implements ChatActionListener {
 
     private static final int DELETE_CHAT_MESSAGES = 10007;
 
+    private static final int READ_ACK_CHAT_MESSAGES = 10008;
+
     private ChatRecyclerView mChatRecyclerView;
 
     private Activity mContext;
@@ -100,6 +102,11 @@ public class ChatViewHelper implements ChatActionListener {
                     case DELETE_CHAT_MESSAGES:
                         long msgId = (long)msg.obj;
                         mMessageListHelper.deleteMessage(msgId);
+                        break;
+                    case READ_ACK_CHAT_MESSAGES:
+                        boolean ackRead = (boolean) msg.obj;
+                        mChatRecyclerView.showReadAck(ackRead);
+                        mMessageListHelper.notifyAdapter();
                         break;
                     default:
                         break;
@@ -347,5 +354,12 @@ public class ChatViewHelper implements ChatActionListener {
         if (mPresenter != null) {
             mPresenter.onReSendMessage(bean);
         }
+    }
+
+    public void showReadAck(boolean showReadAck) {
+        Message msg = Message.obtain();
+        msg.what = READ_ACK_CHAT_MESSAGES;
+        msg.obj = showReadAck;
+        mHandler.sendMessage(msg);
     }
 }

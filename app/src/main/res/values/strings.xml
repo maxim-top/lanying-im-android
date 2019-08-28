@@ -24,6 +24,7 @@
     <string name="group_notice">群公告</string>
     <string name="group_ext">群扩展信息</string>
     <string name="group_share">群共享列表</string>
+    <string name="group_read_mode">群已读</string>
     <string name="group_quit">删除并退出</string>
     <string name="group_quit_notice">确定退出群聊?</string>
     <string name="group_setting">群设置</string>

@@ -50,6 +50,10 @@ public class ChatRecyclerView extends RecyclerView {
         mAdapter.setActionListener(listener);
     }
 
+    public void showReadAck(boolean showReadAck) {
+        mAdapter.showReadAck(showReadAck);
+    }
+
     public MessageListHelper getMessageListHelper() {
         return mMessageListHelper;
     }

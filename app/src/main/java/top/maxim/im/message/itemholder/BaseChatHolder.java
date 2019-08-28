@@ -12,9 +12,9 @@ public class BaseChatHolder extends BaseHolder {
         super(view, chatPanel);
     }
 
-    public void showChatTime(boolean showTime) {
+    public void showChatExtra(boolean showTime, boolean showReadAck) {
         if (mFactory != null) {
-            ((IItemChatFactory)mFactory).showChatTime(showTime);
+            ((IItemChatFactory)mFactory).showChatExtra(showTime, showReadAck);
         }
     }
 

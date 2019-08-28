@@ -43,6 +43,7 @@ import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.CameraUtils;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.RosterFetcher;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonDialog;
@@ -54,6 +55,7 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
+import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseRecyclerAdapter;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
@@ -87,42 +89,58 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /* 群聊管理 */
     private ItemLineArrow.Builder mChatGroupManager;
+
     private View mViewChatGroupManager;
 
     /* 修改名称 */
     private ItemLineArrow.Builder mChatGroupRename;
+
     private View mViewChatGroupRename;
 
     /* 群头像 */
     private ItemLineArrow.Builder mGroupAvatar;
+
     private View mViewGroupAvatar;
 
     /* 我在群里的昵称 */
     private ItemLineArrow.Builder mGroupMyNickName;
+
     private View mViewGroupMyNickName;
 
     /* 管理员列表 */
     private ItemLineArrow.Builder mChatGroupManagerList;
+
     private View mViewChatGroupManagerList;
 
     /* 群描述 */
     private ItemLineArrow.Builder mChatGroupDesc;
+
     private View mViewChatGroupDesc;
+
     private TextView mViewGroupDesc;
 
     /* 群公告 */
     private ItemLineArrow.Builder mChatGroupNotice;
+
     private View mViewChatGroupNotice;
+
     private TextView mViewGroupNotice;
 
     /* 群扩展 */
     private ItemLineArrow.Builder mChatGroupExt;
+
     private View mViewChatGroupExt;
+
     private TextView mViewGroupExt;
 
     /* 群共享 */
     private ItemLineArrow.Builder mChatGroupShare;
+
     private View mViewChatGroupShare;
+
+    /* 设置群已读 */
+    private ItemLineSwitch.Builder mChatGroupReadMode;
+    private View mChatGroupReadModeView;
 
     /* 群聊成员gridView */
     private RecyclerView mGvGroupMember;
@@ -141,7 +159,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /* 减人 */
     private final int REMOVE_MEMBER_REQUEST = 1002;
-    
+
     /* 是否是群聊创建者 */
     private boolean mIsOwner;
 
@@ -461,6 +479,20 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         ItemLine.Builder itemLine11 = new ItemLine.Builder(this, container);
         container.addView(itemLine11.build());
 
+        /* 群已读 */
+        mChatGroupReadMode = new ItemLineSwitch.Builder(this)
+                .setLeftText(getString(R.string.group_read_mode))
+                .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
+                    @Override
+                    public void onItemSwitch(View v, boolean curCheck) {
+                        setGroupReadAck(curCheck);
+                    }
+                });
+        container.addView(mChatGroupReadModeView = mChatGroupReadMode.build());
+        // 分割线
+        ItemLine.Builder itemLine12 = new ItemLine.Builder(this, container);
+        container.addView(itemLine12.build());
+
         // 退出群聊
         mQuitGroup = new TextView(this);
         mQuitGroup.setTextColor(getResources().getColor(R.color.color_white));
@@ -528,10 +560,10 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     private void bindGroupInfo() {
         mIsOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
-        
+
         long groupId = mGroup.groupId();
         mChatGroupId.setEndContent(groupId > 0 ? String.valueOf(groupId) : "");
-        
+
         long ownerId = mGroup.ownerId();
         mChatGroupOwnerId.setEndContent(ownerId > 0 ? String.valueOf(ownerId) : "");
         mChatGroupOwnerId.setOnItemClickListener(v -> {
@@ -582,7 +614,11 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         // 群共享列表
         int shares = mGroup.sharedFilesCount();
         mChatGroupShare.setEndContent(shares <= 0 ? "" : String.valueOf(shares));
-        
+
+        // 群已读
+        boolean readAck = mGroup.enableReadAck();
+        mChatGroupReadMode.setCheckStatus(readAck);
+
         setManagerVisible();
     }
 
@@ -593,7 +629,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         mViewChatGroupManager.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
         mViewChatGroupRename.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
         mViewGroupAvatar.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-//        mViewGroupMyNickName.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        // mViewGroupMyNickName.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
         mViewChatGroupManagerList.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
 
         mViewChatGroupDesc.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
@@ -606,8 +642,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         mViewGroupExt.setVisibility(mIsOwner ? mViewGroupExt.getVisibility() : View.GONE);
 
         mViewChatGroupShare.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        mChatGroupReadModeView.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
     }
-    
+
     /**
      * 初始化群成员
      */
@@ -710,30 +747,30 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         // 移除 添加群成员 暂时不加输入框 reason直接传入""
         if (TextUtils.equals(title, getString(R.string.group_add_members))) {
             addMembers(member, "");
-        } else if (TextUtils.equals(title,
-                getString(R.string.group_remove_members))) {
+        } else if (TextUtils.equals(title, getString(R.string.group_remove_members))) {
             removeMembers(member, "");
         }
-//        DialogUtils.getInstance().showEditDialog(this, title, getString(R.string.confirm),
-//                getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
-//                    @Override
-//                    public void onConfirmListener(String content) {
-//                        if (TextUtils.isEmpty(content)) {
-//                            return;
-//                        }
-//                        if (TextUtils.equals(title, getString(R.string.group_add_members))) {
-//                            addMembers(member, content);
-//                        } else if (TextUtils.equals(title,
-//                                getString(R.string.group_remove_members))) {
-//                            removeMembers(member, content);
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelListener() {
-//
-//                    }
-//                });
+        // DialogUtils.getInstance().showEditDialog(this, title,
+        // getString(R.string.confirm),
+        // getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
+        // @Override
+        // public void onConfirmListener(String content) {
+        // if (TextUtils.isEmpty(content)) {
+        // return;
+        // }
+        // if (TextUtils.equals(title, getString(R.string.group_add_members))) {
+        // addMembers(member, content);
+        // } else if (TextUtils.equals(title,
+        // getString(R.string.group_remove_members))) {
+        // removeMembers(member, content);
+        // }
+        // }
+        //
+        // @Override
+        // public void onCancelListener() {
+        //
+        // }
+        // });
     }
 
     /**
@@ -845,6 +882,46 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 });
     }
 
+    /**
+     * 设置群已读开关
+     * @param enable 是否开启
+     */
+    private void setGroupReadAck(boolean enable) {
+        showLoadingDialog(true);
+        Observable.just("").map(new Func1<String, BMXErrorCode>() {
+            @Override
+            public BMXErrorCode call(String s) {
+                return GroupManager.getInstance().setEnableReadAck(mGroup, enable);
+            }
+        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
+            @Override
+            public Observable<BMXErrorCode> call(BMXErrorCode bmxErrorCode) {
+                return BaseManager.bmxFinish(bmxErrorCode, bmxErrorCode);
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BMXErrorCode>() {
+                    @Override
+                    public void onCompleted() {
+                        dismissLoadingDialog();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        dismissLoadingDialog();
+                        toastError(e);
+                        mChatGroupReadMode.setCheckStatus(!enable);
+                    }
+
+                    @Override
+                    public void onNext(BMXErrorCode bmxErrorCode) {
+                        Intent intent = new Intent();
+                        intent.setAction("onShowReadAckUpdated");
+                        intent.putExtra("onShowReadAckUpdated", enable);
+                        RxBus.getInstance().send(intent);
+                    }
+                });
+    }
+
     @Override
     public void onPermissionGranted(List<String> permissions) {
         super.onPermissionGranted(permissions);
@@ -909,8 +986,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
             super(context);
             mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
                     .showImageForEmptyUri(R.drawable.default_avatar_icon)
-                    .showImageOnFail(R.drawable.default_avatar_icon)
-                    .cacheOnDisk(true)
+                    .showImageOnFail(R.drawable.default_avatar_icon).cacheOnDisk(true)
                     .bitmapConfig(Bitmap.Config.RGB_565)
                     .showImageOnLoading(R.drawable.default_avatar_icon).build();
         }
@@ -931,10 +1007,12 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
             long memberId = member.getMUid();
             if (memberId == MessageConfig.MEMBER_ADD) {
                 tvName.setText("添加");
-                BMImageLoader.getInstance().display(icon, "drawable://" + R.drawable.default_add_icon);
+                BMImageLoader.getInstance().display(icon,
+                        "drawable://" + R.drawable.default_add_icon);
             } else if (memberId == MessageConfig.MEMBER_REMOVE) {
                 tvName.setText("移除");
-                BMImageLoader.getInstance().display(icon, "drawable://" + R.drawable.default_remove_icon);
+                BMImageLoader.getInstance().display(icon,
+                        "drawable://" + R.drawable.default_remove_icon);
             } else {
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(memberId);
                 String name;
@@ -969,7 +1047,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         Observable.just(path).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return GroupManager.getInstance().setAvatar(mGroup, s, new FileProgressListener(){
+                return GroupManager.getInstance().setAvatar(mGroup, s, new FileProgressListener() {
                     @Override
                     public int onProgressChange(String percent) {
                         return 0;

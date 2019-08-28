@@ -20,6 +20,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatGroupContract;
@@ -91,6 +92,7 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                         RosterFetcher.getFetcher().putGroup(mGroup);
                         if (mView != null) {
                             mView.setHeadTitle(mGroup.name());
+                            mView.showReadAck(mGroup.enableReadAck());
                         }
                         syncGroupMember();
                     }
@@ -196,5 +198,31 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
             // @的内容️以ForegroundColorSpan转换
             mView.insertInAt(names);
         }
+    }
+
+    @Override
+    protected void ackMessage(BMXMessage message) {
+        Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
+            @Override
+            public BMXMessage call(BMXMessage message) {
+                ChatManager.getInstance().ackMessage(message);
+                return message;
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BMXMessage>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(BMXMessage message) {
+                    }
+                });
     }
 }

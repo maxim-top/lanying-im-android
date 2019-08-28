@@ -266,6 +266,10 @@ public class MessageDispatcher {
             toastListener("onGroupInfoUpdate");
             RosterFetcher.getFetcher().putGroup(group);
             downloadGroupAvatar(group);
+            Intent intent = new Intent();
+            intent.setAction("onShowReadAckUpdated");
+            intent.putExtra("onShowReadAckUpdated", group != null && group.enableReadAck());
+            RxBus.getInstance().send(intent);
         }
 
         @Override

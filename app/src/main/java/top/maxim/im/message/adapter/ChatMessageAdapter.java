@@ -35,6 +35,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
 
     private Map<Class<? extends MessageItemBaseView>, Integer> holder2ViewType;
 
+    private boolean showReadAck;
+
     public ChatMessageAdapter(Context context) {
         mContext = context;
     }
@@ -73,8 +75,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
         if (holder == null) {
             return;
         }
+        holder.showChatExtra(isShowTime(position), showReadAck);
         holder.setData(mBeans.get(position));
-        holder.showChatTime(isShowTime(position));
     }
 
     @Override
@@ -92,7 +94,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
     /**
      * 根据类型获取holder
      *
-     * @param parent 父布局
+     * @param parent   父布局
      * @param viewType 类型
      * @return BaseChatHolder
      */
@@ -179,4 +181,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
         return showtime;
     }
 
+    public void showReadAck(boolean showReadAck) {
+        this.showReadAck = showReadAck;
+    }
 }

@@ -72,6 +72,8 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
 
     /* 发送中图片 */
     private ProgressBar mSendingImg;
+    
+    private boolean mShowReadAck;
 
     public MessageItemBaseView(Context context, ChatActionListener listener, int itemPos) {
         super(context);
@@ -141,12 +143,13 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
     protected abstract void bindData();
 
     @Override
-    public void showChatTime(boolean isShowTime) {
+    public void showChatExtra(boolean isShowTime, boolean showReadAck) {
         if (isShowTime) {
             mTxtMessageTime.setVisibility(VISIBLE);
         } else {
             mTxtMessageTime.setVisibility(GONE);
         }
+        mShowReadAck = showReadAck;
     }
 
     /**
@@ -203,14 +206,23 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         if (mItemPos != ITEM_RIGHT || mTvReadStatus == null) {
             return;
         }
-        if (mMaxMessage == null || mMaxMessage.type() != BMXMessage.MessageType.Single) {
-            // 只有单聊才有未读
+        if (mMaxMessage == null) {
             mTvReadStatus.setVisibility(View.GONE);
             return;
         }
-        mTvReadStatus.setVisibility(View.VISIBLE);
-        boolean isRead = mMaxMessage.isReadAcked();
-        mTvReadStatus.setText(isRead ? "已读" : "未读");
+        if (mMaxMessage.type() == BMXMessage.MessageType.Single) {
+            // 单聊
+            mTvReadStatus.setVisibility(View.VISIBLE);
+            boolean isRead = mMaxMessage.isReadAcked();
+            mTvReadStatus.setText(isRead ? "已读" : "未读");
+        } else if (mMaxMessage.type() == BMXMessage.MessageType.Group) {
+            // 群聊
+            mTvReadStatus.setVisibility(mShowReadAck ? View.VISIBLE : View.GONE);
+            int readCount = mMaxMessage.groupAckCount();
+            mTvReadStatus.setText(readCount > 0 ? readCount + "人已读" : "0人已读");
+        } else {
+            mTvReadStatus.setVisibility(View.GONE);
+        }
     }
 
     /**

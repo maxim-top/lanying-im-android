@@ -73,6 +73,12 @@ public interface ChatBaseContract {
         void updateListView();
 
         /**
+         * 是否显示未读显示
+         * @param readAck 是否显示
+         */
+        void showReadAck(boolean readAck);
+
+        /**
          * 获取最后一条消息
          * @return BMXMessage
          */

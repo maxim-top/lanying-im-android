@@ -969,21 +969,16 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      * @param message 消息
      */
     protected void ackMessage(final BMXMessage message) {
-    }
-
-    /**
-     * 设置未读
-     *
-     * @param message 消息
-     */
-    private void setUnReadMessage(BMXMessage message) {
         // 已读不在发送 自己发送的消息不设置已读
-        if (message == null || !message.isReceiveMsg()) {
+        if (message == null || message.isReadAcked() || !message.isReceiveMsg()) {
             return;
         }
-        Observable.just(message).map(msg -> {
-            ChatManager.getInstance().readCancel(msg);
-            return msg;
+        Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
+            @Override
+            public BMXMessage call(BMXMessage message) {
+                ChatManager.getInstance().ackMessage(message);
+                return message;
+            }
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BMXMessage>() {
                     @Override
@@ -1000,6 +995,14 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     public void onNext(BMXMessage message) {
                     }
                 });
+    }
+
+    /**
+     * 设置未读
+     *
+     * @param message 消息
+     */
+    private void setUnReadMessage(BMXMessage message) {
     }
 
     /**

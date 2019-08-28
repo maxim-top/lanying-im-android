@@ -8,7 +8,7 @@ import im.floo.floolib.BMXMessage;
  */
 public interface IItemChatFactory extends IItemFactory<BMXMessage> {
 
-    void showChatTime(boolean isShowTime);
+    void showChatExtra(boolean isShowTime, boolean showReadAck);
 
     /**
      * view进入window

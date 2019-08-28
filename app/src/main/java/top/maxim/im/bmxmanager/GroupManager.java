@@ -67,7 +67,8 @@ public class GroupManager extends BaseManager {
     /**
      * 入群通知
      */
-    public BMXErrorCode getApplicationList(BMXGroupList list, GroupApplicationPage result, String cursor, int pageSize) {
+    public BMXErrorCode getApplicationList(BMXGroupList list, GroupApplicationPage result,
+            String cursor, int pageSize) {
         return mService.getApplicationList(list, result, cursor, pageSize);
     }
 
@@ -240,8 +241,7 @@ public class GroupManager extends BaseManager {
      **/
     public BMXErrorCode uploadSharedFile(BMXGroup group, String filePath, String displayName,
             String extensionName, FileProgressListener listener) {
-        return mService.uploadSharedFile(group, filePath, displayName, extensionName,
-                listener);
+        return mService.uploadSharedFile(group, filePath, displayName, extensionName, listener);
     }
 
     /**
@@ -254,7 +254,8 @@ public class GroupManager extends BaseManager {
     /**
      * 下载群共享文件
      **/
-    public BMXErrorCode downloadSharedFile(BMXGroup group, BMXGroup.SharedFile sharedFile, FileProgressListener listener) {
+    public BMXErrorCode downloadSharedFile(BMXGroup group, BMXGroup.SharedFile sharedFile,
+            FileProgressListener listener) {
         return mService.downloadSharedFile(group, sharedFile, listener);
     }
 
@@ -279,7 +280,8 @@ public class GroupManager extends BaseManager {
         return mService.getLatestAnnouncement(group, announcement, forceRefresh);
     }
 
-    public BMXErrorCode getAnnouncementList(BMXGroup group, BMXGroupAnnouncementList list, boolean forceRefresh) {
+    public BMXErrorCode getAnnouncementList(BMXGroup group, BMXGroupAnnouncementList list,
+            boolean forceRefresh) {
         return mService.getAnnouncementList(group, list, forceRefresh);
     }
 
@@ -343,8 +345,9 @@ public class GroupManager extends BaseManager {
     /**
      * 设置群头像
      **/
-    public BMXErrorCode setAvatar(BMXGroup group, String avatarPath, FileProgressListener listener) {
-        return mService.setAvatar(group, avatarPath,listener);
+    public BMXErrorCode setAvatar(BMXGroup group, String avatarPath,
+            FileProgressListener listener) {
+        return mService.setAvatar(group, avatarPath, listener);
     }
 
     /**
@@ -374,5 +377,12 @@ public class GroupManager extends BaseManager {
     public boolean isGroupOwner(long ownerId) {
         long userId = SharePreferenceUtils.getInstance().getUserId();
         return userId == ownerId;
+    }
+
+    /**
+     * 设置群已读开关
+     */
+    public BMXErrorCode setEnableReadAck(BMXGroup group, boolean enable) {
+        return mService.setEnableReadAck(group, enable);
     }
 }

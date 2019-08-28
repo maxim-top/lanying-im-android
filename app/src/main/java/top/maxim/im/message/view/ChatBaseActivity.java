@@ -154,6 +154,9 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
                             updateListView();
                         } else if (TextUtils.equals(action, "onInfoUpdated")) {
                             updateListView();
+                        } else if (TextUtils.equals(action, "onShowReadAckUpdated")) {
+                            boolean ack = intent.getBooleanExtra("onShowReadAckUpdated", false);
+                            showReadAck(ack);
                         }
                     }
                 });
@@ -341,6 +344,13 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
     public void updateListView() {
         if (mChatViewHelper != null) {
             mChatViewHelper.updateListView();
+        }
+    }
+
+    @Override
+    public void showReadAck(boolean readAck) {
+        if (mChatViewHelper != null) {
+            mChatViewHelper.showReadAck(readAck);
         }
     }
 

@@ -36,10 +36,10 @@ import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.bean.MessageBean;
+import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.view.BMImageLoader;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
-import top.maxim.im.message.interfaces.FileCallback;
 
 /**
  * Description : 聊天工具类 Created by Mango on 2018/11/18.
@@ -297,59 +297,29 @@ public class ChatUtils {
         if (profile == null || imageView == null) {
             return;
         }
-        FileCallback callback = new FileCallback(profile.avatarUrl()) {
-            @Override
-            protected void onProgress(long percent, String path, boolean isThumbnail) {
-
-            }
-
-            @Override
-            protected void onFinish(String url, boolean isThumbnail) {
-                String avatarUrl = "";
-                if (isThumbnail) {
-                    if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
-                            && new File(profile.avatarThumbnailPath()).exists()
-                            && new File(profile.avatarThumbnailPath()).isFile()) {
-                        avatarUrl = "file://" + profile.avatarThumbnailPath();
-                    }
-                } else {
-                    if (!TextUtils.isEmpty(profile.avatarPath())
-                            && new File(profile.avatarPath()).exists()
-                            && new File(profile.avatarPath()).isFile()) {
-                        avatarUrl = "file://" + profile.avatarPath();
-                    }
-                }
-                BMImageLoader.getInstance().display(imageView, avatarUrl, config);
-            }
-
-            @Override
-            protected void onFail(String path, boolean isThumbnail) {
-                BMImageLoader.getInstance().display(imageView, "", config);
-            }
-        };
         Observable.just("").map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
                 return UserManager.getInstance().downloadAvatar(profile, new FileProgressListener(){
                     @Override
                     public int onProgressChange(String percent) {
-//                                if (Integer.valueOf(percent) >= 100) {
-//                                    String avatarUrl = "";
-//                                    if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
-//                                            && new File(profile.avatarThumbnailPath()).exists()
-//                                            && new File(profile.avatarThumbnailPath()).isFile()) {
-//                                        avatarUrl = "file://" + profile.avatarThumbnailPath();
-//                                    } else
-//                                        if (!TextUtils.isEmpty(profile.avatarPath())
-//                                            && new File(profile.avatarPath()).exists()
-//                                            && new File(profile.avatarPath()).isFile()) {
-//                                        avatarUrl = "file://" + profile.avatarPath();
-//                                    }
-//                                    String finalAvatarUrl = avatarUrl;
-//                                    TaskDispatcher.postMainDelayed(() -> {
-//                                        BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
-//                                    }, 500);
-//                                }
+                                if (Integer.valueOf(percent) >= 100) {
+                                    String avatarUrl = "";
+                                    if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
+                                            && new File(profile.avatarThumbnailPath()).exists()
+                                            && new File(profile.avatarThumbnailPath()).isFile()) {
+                                        avatarUrl = "file://" + profile.avatarThumbnailPath();
+                                    } else
+                                        if (!TextUtils.isEmpty(profile.avatarPath())
+                                            && new File(profile.avatarPath()).exists()
+                                            && new File(profile.avatarPath()).isFile()) {
+                                        avatarUrl = "file://" + profile.avatarPath();
+                                    }
+                                    String finalAvatarUrl = avatarUrl;
+                                    TaskDispatcher.postMainDelayed(() -> {
+                                        BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
+                                    }, 500);
+                                }
                         Log.i(TAG, "onProgressChange profile:"+ profile.userId() + "-" + percent);
                         return 0;
                     }
@@ -400,74 +370,35 @@ public class ChatUtils {
         }
         final int hashCode = imageView.hashCode();
         mViewCache.put(hashCode, item.rosterId());
-        FileCallback callback = new FileCallback(item.avatarUrl()) {
-            @Override
-            protected void onProgress(long percent, String path, boolean isThumbnail) {
-
-            }
-
-            @Override
-            protected void onFinish(String url, boolean isThumbnail) {
-                if (!mViewCache.containsKey(hashCode)
-                        || mViewCache.get(hashCode) != item.rosterId()) {
-                    return;
-                }
-                mViewCache.remove(hashCode);
-                String avatarUrl = "";
-                if (isThumbnail) {
-                    if (!TextUtils.isEmpty(item.avatarThumbnailPath())
-                            && new File(item.avatarThumbnailPath()).exists()
-                            && new File(item.avatarThumbnailPath()).isFile()) {
-                        avatarUrl = "file://" + item.avatarThumbnailPath();
-                    }
-                } else {
-                    if (!TextUtils.isEmpty(item.avatarPath())
-                            && new File(item.avatarPath()).exists()
-                            && new File(item.avatarPath()).isFile()) {
-                        avatarUrl = "file://" + item.avatarPath();
-                    }
-                }
-                BMImageLoader.getInstance().display(imageView, avatarUrl, config);
-            }
-
-            @Override
-            protected void onFail(String path, boolean isThumbnail) {
-                if (mViewCache.containsKey(hashCode)
-                        && mViewCache.get(hashCode) == item.rosterId()) {
-                    mViewCache.remove(hashCode);
-                }
-                BMImageLoader.getInstance().display(imageView, "", config);
-            }
-        };
         Observable.just(item).map(new Func1<BMXRosterItem, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXRosterItem s) {
                 return RosterManager.getInstance().downloadAvatar(s, new FileProgressListener() {
                     @Override
                     public int onProgressChange(String percent) {
-//                        if (Integer.valueOf(percent) >= 100) {
-//                            // 成功
-//                            if (!mViewCache.containsKey(hashCode)
-//                                    || mViewCache.get(hashCode) != item.rosterId()) {
-//                                return 0;
-//                            }
-//                            mViewCache.remove(hashCode);
-//                            String avatarUrl = "";
-//                            if (!TextUtils.isEmpty(item.avatarThumbnailPath())
-//                                    && new File(item.avatarThumbnailPath()).exists()
-//                                    && new File(item.avatarThumbnailPath()).isFile()) {
-//                                avatarUrl = "file://" + item.avatarThumbnailPath();
-//                            } else
-//                                if (!TextUtils.isEmpty(item.avatarPath())
-//                                    && new File(item.avatarPath()).exists()
-//                                    && new File(item.avatarPath()).isFile()) {
-//                                avatarUrl = "file://" + item.avatarPath();
-//                            }
-//                            String finalAvatarUrl = avatarUrl;
-//                            TaskDispatcher.postMainDelayed(() -> {
-//                                BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
-//                            }, 500);
-//                        }
+                        if (Integer.valueOf(percent) >= 100) {
+                            // 成功
+                            if (!mViewCache.containsKey(hashCode)
+                                    || mViewCache.get(hashCode) != item.rosterId()) {
+                                return 0;
+                            }
+                            mViewCache.remove(hashCode);
+                            String avatarUrl = "";
+                            if (!TextUtils.isEmpty(item.avatarThumbnailPath())
+                                    && new File(item.avatarThumbnailPath()).exists()
+                                    && new File(item.avatarThumbnailPath()).isFile()) {
+                                avatarUrl = "file://" + item.avatarThumbnailPath();
+                            } else
+                                if (!TextUtils.isEmpty(item.avatarPath())
+                                    && new File(item.avatarPath()).exists()
+                                    && new File(item.avatarPath()).isFile()) {
+                                avatarUrl = "file://" + item.avatarPath();
+                            }
+                            String finalAvatarUrl = avatarUrl;
+                            TaskDispatcher.postMainDelayed(() -> {
+                                BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
+                            }, 500);
+                        }
                         Log.i(TAG, "onProgressChange roster:" + s.rosterId() + "-" + percent);
                         return 0;
                     }
@@ -527,68 +458,33 @@ public class ChatUtils {
         }
         final int hashCode = imageView.hashCode();
         mViewCache.put(hashCode, item.groupId());
-        FileCallback callback = new FileCallback(item.avatarUrl()) {
-            @Override
-            protected void onProgress(long percent, String path, boolean isThumbnail) {
-
-            }
-
-            @Override
-            protected void onFinish(String url, boolean isThumbnail) {
-                String avatarUrl = "";
-                if (!TextUtils.isEmpty(item.avatarThumbnailPath())
-                        && new File(item.avatarThumbnailPath()).exists()
-                        && new File(item.avatarThumbnailPath()).isFile()) {
-                    avatarUrl = "file://" + item.avatarThumbnailPath();
-                } else if (!TextUtils.isEmpty(item.avatarPath())
-                        && new File(item.avatarPath()).exists()
-                        && new File(item.avatarPath()).isFile()) {
-                    avatarUrl = "file://" + item.avatarPath();
-                }
-                if (!mViewCache.containsKey(hashCode)
-                        || mViewCache.get(hashCode) != item.groupId()) {
-                    return;
-                }
-                mViewCache.remove(hashCode);
-                BMImageLoader.getInstance().display(imageView, avatarUrl, config);
-            }
-
-            @Override
-            protected void onFail(String path, boolean isThumbnail) {
-                if (mViewCache.containsKey(hashCode)
-                        && mViewCache.get(hashCode) == item.groupId()) {
-                    mViewCache.remove(hashCode);
-                }
-                BMImageLoader.getInstance().display(imageView, "", config);
-            }
-        };
         Observable.just(item).map(new Func1<BMXGroup, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXGroup s) {
                 return GroupManager.getInstance().downloadAvatar(s, new FileProgressListener() {
                     @Override
                     public int onProgressChange(String percent) {
-//                        if (Integer.valueOf(percent) >= 100) {
-//                            String avatarUrl = "";
-//                            if (!TextUtils.isEmpty(item.avatarThumbnailPath())
-//                                    && new File(item.avatarThumbnailPath()).exists()
-//                                    && new File(item.avatarThumbnailPath()).isFile()) {
-//                                avatarUrl = "file://" + item.avatarThumbnailPath();
-//                            } else if (!TextUtils.isEmpty(item.avatarPath())
-//                                    && new File(item.avatarPath()).exists()
-//                                    && new File(item.avatarPath()).isFile()) {
-//                                avatarUrl = "file://" + item.avatarPath();
-//                            }
-//                            if (!mViewCache.containsKey(hashCode)
-//                                    || mViewCache.get(hashCode) != item.groupId()) {
-//                                return 0;
-//                            }
-//                            mViewCache.remove(hashCode);
-//                            String finalAvatarUrl = avatarUrl;
-//                            TaskDispatcher.postMainDelayed(() -> {
-//                                BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
-//                            }, 500);
-//                        }
+                        if (Integer.valueOf(percent) >= 100) {
+                            String avatarUrl = "";
+                            if (!TextUtils.isEmpty(item.avatarThumbnailPath())
+                                    && new File(item.avatarThumbnailPath()).exists()
+                                    && new File(item.avatarThumbnailPath()).isFile()) {
+                                avatarUrl = "file://" + item.avatarThumbnailPath();
+                            } else if (!TextUtils.isEmpty(item.avatarPath())
+                                    && new File(item.avatarPath()).exists()
+                                    && new File(item.avatarPath()).isFile()) {
+                                avatarUrl = "file://" + item.avatarPath();
+                            }
+                            if (!mViewCache.containsKey(hashCode)
+                                    || mViewCache.get(hashCode) != item.groupId()) {
+                                return 0;
+                            }
+                            mViewCache.remove(hashCode);
+                            String finalAvatarUrl = avatarUrl;
+                            TaskDispatcher.postMainDelayed(() -> {
+                                BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
+                            }, 500);
+                        }
                         Log.i(TAG, "onProgressChange group:"+ s.groupId() + "-" + percent);
                         return 0;
                     }

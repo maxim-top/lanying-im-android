@@ -232,6 +232,9 @@ public final class MessageSendUtils {
                     messageBean.getDisplayName());
             message = BMXMessage.createMessage(from, to, type, to, locationAttachment);
         }
+        if (message != null && type == BMXMessage.MessageType.Group) {
+            message.setEnableGroupAck(true);
+        }
         Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
             @Override
             public BMXMessage call(BMXMessage msg) {
@@ -261,6 +264,9 @@ public final class MessageSendUtils {
     private BMXMessage handlerMessage(BMXMessage msg) {
         if (msg == null) {
             return null;
+        }
+        if (msg.type() == BMXMessage.MessageType.Group) {
+            msg.setEnableGroupAck(true);
         }
         Observable.just(msg).map(new Func1<BMXMessage, BMXMessage>() {
             @Override

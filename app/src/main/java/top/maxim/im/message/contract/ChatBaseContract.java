@@ -226,6 +226,11 @@ public interface ChatBaseContract {
         void onReSendMessage(BMXMessage bean);
 
         /**
+         * 群聊已读点击
+         */
+        void onGroupAck(BMXMessage bean);
+
+        /**
          * 返回数据
          * @param requestCode  请求码
          * @param resultCode   返回码

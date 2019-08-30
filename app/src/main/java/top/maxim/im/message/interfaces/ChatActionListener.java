@@ -33,4 +33,9 @@ public interface ChatActionListener {
      * @param bean 消息体
      */
     void onReSendMessage(BMXMessage bean);
+
+    /**
+     * 群聊已读点击
+     */
+    void onGroupAck(BMXMessage bean);
 }

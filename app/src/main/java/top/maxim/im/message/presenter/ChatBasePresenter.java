@@ -726,6 +726,11 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         reSendMessage(bean);
     }
 
+    @Override
+    public void onGroupAck(BMXMessage bean) {
+
+    }
+
     private void showOperateMessage(final BMXMessage message) {
         if (message == null) {
             return;

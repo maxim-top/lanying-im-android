@@ -14,6 +14,7 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupMemberList;
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -23,8 +24,10 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.utils.RosterFetcher;
+import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.message.contract.ChatGroupContract;
 import top.maxim.im.message.view.ChatGroupAtActivity;
+import top.maxim.im.message.view.GroupAckActivity;
 
 /**
  * Description : 群聊presenter Created by Mango on 2018/11/11.
@@ -41,6 +44,8 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
     /* 文本@的对象列表 以feedId作为唯一标志 */
     private Map<String, String> mAtMap;
+
+    private List<Long> mMemberIdList;
 
     public ChatGroupPresenter(ChatGroupContract.View view) {
         super();
@@ -103,11 +108,11 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
      * 同步群成员
      */
     private void syncGroupMember() {
+        BMXGroupMemberList memberList = new BMXGroupMemberList();
         Observable.just(mGroup).map(new Func1<BMXGroup, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXGroup group) {
-                return GroupManager.getInstance().getMembers(mGroup, new BMXGroupMemberList(),
-                        true);
+                return GroupManager.getInstance().getMembers(mGroup, memberList, true);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
@@ -128,7 +133,14 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
-
+                        if (mMemberIdList == null) {
+                            mMemberIdList = new ArrayList<>();
+                        }
+                        if (memberList != null && !memberList.isEmpty()) {
+                            for (int i = 0; i < memberList.size(); i++) {
+                                mMemberIdList.add(memberList.get(i).getMUid());
+                            }
+                        }
                     }
                 });
     }
@@ -222,6 +234,49 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
                     @Override
                     public void onNext(BMXMessage message) {
+                    }
+                });
+    }
+
+    @Override
+    public void onGroupAck(BMXMessage bean) {
+        if (bean == null || mMemberIdList == null || mMemberIdList.isEmpty()) {
+            return;
+        }
+        ListOfLongLong list = new ListOfLongLong();
+        Observable.just(bean).map(new Func1<BMXMessage, BMXErrorCode>() {
+            @Override
+            public BMXErrorCode call(BMXMessage msg) {
+                return ChatManager.getInstance().getGroupAckMessageUserIdList(msg, list);
+            }
+        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
+            @Override
+            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
+                return BaseManager.bmxFinish(errorCode, errorCode);
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BMXErrorCode>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ToastUtil.showTextViewPrompt("获取已读列表失败");
+                    }
+
+                    @Override
+                    public void onNext(BMXErrorCode errorCode) {
+                        List<Long> readList = new ArrayList<>();
+                        if (list != null && !list.isEmpty()) {
+                            for (int i = 0; i < list.size(); i++) {
+                                readList.add(list.get(i));
+                            }
+                        }
+                        GroupAckActivity.openGroupAckActivity(mView.getContext(), mMemberIdList,
+                                readList);
+
                     }
                 });
     }

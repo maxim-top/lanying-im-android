@@ -72,7 +72,7 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
 
     /* 发送中图片 */
     private ProgressBar mSendingImg;
-    
+
     private boolean mShowReadAck;
 
     public MessageItemBaseView(Context context, ChatActionListener listener, int itemPos) {
@@ -223,6 +223,12 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         } else {
             mTvReadStatus.setVisibility(View.GONE);
         }
+        mTvReadStatus.setOnClickListener((v) -> {
+            if (!mShowReadAck || mActionListener == null) {
+                return;
+            }
+            mActionListener.onGroupAck(mMaxMessage);
+        });
     }
 
     /**

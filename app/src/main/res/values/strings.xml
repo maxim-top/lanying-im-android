@@ -59,6 +59,11 @@
     <string name="chat_clear_msg">清除聊天记录</string>
     <string name="chat_at_message">%s&#160;</string>
 
+    <!--群未读-->
+    <string name="group_read_list">消息接收人列表</string>
+    <string name="readed_list">已读列表</string>
+    <string name="unRead_list">未读列表</string>
+
     <!--Common-->
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>

@@ -9,6 +9,7 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXMessageListList;
+import im.floo.floolib.ListOfLongLong;
 
 /**
  * Description : chat Created by Mango on 2018/12/2.
@@ -66,6 +67,7 @@ public class ChatManager extends BaseManager {
 
     /**
      * 设置所有消息已读
+     * 
      * @param msg 最后一条消息
      */
     public void readAllMessage(BMXMessage msg) {
@@ -160,6 +162,11 @@ public class ChatManager extends BaseManager {
     public BMXErrorCode searchMessages(String keywords, long refTime, long size,
             BMXMessageListList result) {
         return mService.searchMessages(keywords, refTime, size, result);
+    }
+
+    public BMXErrorCode getGroupAckMessageUserIdList(BMXMessage msg,
+            ListOfLongLong groupMemberIdList) {
+        return mService.getGroupAckMessageUserIdList(msg, groupMemberIdList);
     }
 
     /**

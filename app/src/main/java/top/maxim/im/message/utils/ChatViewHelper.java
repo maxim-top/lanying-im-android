@@ -356,6 +356,13 @@ public class ChatViewHelper implements ChatActionListener {
         }
     }
 
+    @Override
+    public void onGroupAck(BMXMessage bean) {
+        if (mPresenter != null) {
+            mPresenter.onGroupAck(bean);
+        }
+    }
+
     public void showReadAck(boolean showReadAck) {
         Message msg = Message.obtain();
         msg.what = READ_ACK_CHAT_MESSAGES;

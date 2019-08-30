@@ -282,6 +282,11 @@
             android:name=".scan.view.ScanResultActivity"
             android:screenOrientation="portrait" />
 
+        <!--群未读-->
+        <activity
+            android:name=".message.view.GroupAckActivity"
+            android:screenOrientation="portrait" />
+
         <activity
             android:name=".wxapi.WXEntryActivity"
             android:exported="true"

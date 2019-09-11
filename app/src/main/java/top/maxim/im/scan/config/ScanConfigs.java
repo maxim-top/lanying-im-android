@@ -19,8 +19,11 @@ public class ScanConfigs {
     /* 二维码Demo */
     public static final String CODE_DEMO = "C_";
 
+    /* 二维码Demo */
+    public static final String CODE_APP_DEMO = "Capp_";
+
     /* 扫码登陆appId */
-    public static String CODE_APP_ID;
+    public static String CODE_APP_ID = "dxgeuidhhutk";
 
     /* 扫码登陆userId */
     public static String CODE_USER_ID;

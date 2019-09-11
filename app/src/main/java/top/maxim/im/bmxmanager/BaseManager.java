@@ -15,6 +15,7 @@ import rx.Observable;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.RxError;
 import top.maxim.im.push.PushClientMgr;
+import top.maxim.im.scan.config.ScanConfigs;
 
 public class BaseManager {
 
@@ -23,23 +24,6 @@ public class BaseManager {
     }
 
     protected static BMXClient bmxClient;
-
-    public static void initBMXSDK() {
-        String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
-        File dataPath = new File(appPath + "/data_dir");
-        File cachePath = new File(appPath + "/cache_dir");
-        dataPath.mkdirs();
-        cachePath.mkdirs();
-
-        String pushId = getPushId();
-        BMXSDKConfig conf = new BMXSDKConfig(BMXClientType.Android, "1", dataPath.getAbsolutePath(),
-                cachePath.getAbsolutePath(), TextUtils.isEmpty(pushId) ? "MaxIM" : pushId);
-        conf.setConsoleOutput(true);
-        conf.setLoadAllServerConversations(true);
-        conf.setLogLevel(BMXLogLevel.Debug);
-        bmxClient = BMXClient.create(conf);
-
-    }
 
     /**
      * 配置环境
@@ -57,6 +41,7 @@ public class BaseManager {
         conf.setConsoleOutput(true);
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
+        conf.setAppID(ScanConfigs.CODE_APP_ID);
 
         BMXSDKConfig.HostConfig hostConfig;
         if (index == 1) {

@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -61,8 +62,9 @@ public class ScanResultActivity extends BaseTitleActivity {
             finish();
             return;
         }
-        boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
-        if (!mResult.startsWith(ScanConfigs.CODE_DEMO)) {
+        if (!mResult.startsWith(ScanConfigs.CODE_DEMO)
+                && !mResult.startsWith(ScanConfigs.CODE_APP_DEMO)) {
+            boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
             // 非二维码体验功能 如果未登录不能识别
             if (!isLogin) {
                 ToastUtil.showTextViewPrompt("未能识别二维码信息");
@@ -96,7 +98,27 @@ public class ScanResultActivity extends BaseTitleActivity {
             ScanConfigs.CODE_APP_ID = info[0];
             ScanConfigs.CODE_USER_ID = info[1];
             ScanConfigs.CODE_USER_NAME = info[2];
+            // 需要重新初始化SDK 传入新的appId
+            int custom = SharePreferenceUtils.getInstance().getCustomDns();
+            if (custom < 0 || custom > 4) {
+                custom = 0;
+            }
+            BaseManager.initTestBMXSDK(custom);
             LoginActivity.openLogin(this);
+            finish();
+        } else if (mResult.startsWith(ScanConfigs.CODE_APP_DEMO)) {
+            // 二维码体验功能
+            String result = mResult.substring(ScanConfigs.CODE_APP_DEMO.length());
+            String[] info = result.split("_");
+            ScanConfigs.CODE_APP_ID = info[0];
+            // 需要重新初始化SDK 传入新的appId
+            int custom = SharePreferenceUtils.getInstance().getCustomDns();
+            if (custom < 0 || custom > 4) {
+                custom = 0;
+            }
+            BaseManager.initTestBMXSDK(custom);
+            //每次调用完清除扫码登陆的数据
+            ScanConfigs.CODE_APP_ID = "";
             finish();
         }
     }

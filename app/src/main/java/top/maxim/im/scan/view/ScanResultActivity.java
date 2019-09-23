@@ -117,8 +117,7 @@ public class ScanResultActivity extends BaseTitleActivity {
                 custom = 0;
             }
             BaseManager.initTestBMXSDK(custom);
-            //每次调用完清除扫码登陆的数据
-            ScanConfigs.CODE_APP_ID = "";
+            LoginActivity.openLogin(this);
             finish();
         }
     }

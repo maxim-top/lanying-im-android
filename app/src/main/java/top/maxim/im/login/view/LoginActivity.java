@@ -77,6 +77,8 @@ public class LoginActivity extends BaseTitleActivity {
     /* 微信返回code */
     private String mCode;
     
+    private TextView mTvAppId;
+    
     public static void openLogin(Context context) {
         openLogin(context, null);
     }
@@ -105,6 +107,7 @@ public class LoginActivity extends BaseTitleActivity {
         mRegister = view.findViewById(R.id.tv_register);
         mWXLogin = view.findViewById(R.id.tv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
+        mTvAppId = view.findViewById(R.id.tv_login_appid);
         mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
         mSwitchLoginMode.setVisibility(View.GONE);
         // 三次点击 进入另一套环境配置
@@ -202,6 +205,8 @@ public class LoginActivity extends BaseTitleActivity {
         if (!TextUtils.isEmpty(scanUserName)) {
             mInputName.setText(scanUserName);
         }
+        String appId = ScanConfigs.CODE_APP_ID;
+        mTvAppId.setText("APPID:" + appId);
     }
 
     /**

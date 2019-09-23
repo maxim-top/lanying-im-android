@@ -26,15 +26,25 @@
         android:layout_marginLeft="@dimen/dimen_50"
         android:src="@drawable/scan_icon" />
 
+    <TextView
+        android:id="@+id/tv_login_appid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/dimen_16"
+        android:layout_marginTop="@dimen/dimen_20"
+        android:layout_below="@id/tv_login_tag"
+        android:layout_marginLeft="@dimen/dimen_48"
+        android:textColor="@color/color_333333"/>
+
     <EditText
         android:id="@+id/et_user_name"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_48"
-        android:layout_below="@id/tv_login_tag"
+        android:layout_below="@id/tv_login_appid"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="@dimen/dimen_48"
-        android:layout_marginTop="@dimen/dimen_30"
+        android:layout_marginTop="@dimen/dimen_20"
         android:layout_marginRight="@dimen/dimen_48"
         android:background="@drawable/common_edit_corner_bg"
         android:gravity="center_vertical"

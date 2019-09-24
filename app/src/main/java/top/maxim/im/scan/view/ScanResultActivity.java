@@ -11,8 +11,10 @@ import android.widget.TextView;
 
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.contact.view.RosterDetailActivity;
@@ -95,28 +97,20 @@ public class ScanResultActivity extends BaseTitleActivity {
             // 二维码体验功能
             String result = mResult.substring(2);
             String[] info = result.split("_");
-            ScanConfigs.CODE_APP_ID = info[0];
+            String appId = info[0];
             ScanConfigs.CODE_USER_ID = info[1];
             ScanConfigs.CODE_USER_NAME = info[2];
-            // 需要重新初始化SDK 传入新的appId
-            int custom = SharePreferenceUtils.getInstance().getCustomDns();
-            if (custom < 0 || custom > 4) {
-                custom = 0;
-            }
-            BaseManager.initTestBMXSDK(custom);
+            SharePreferenceUtils.getInstance().putAppId(appId);
+            UserManager.getInstance().changeAppId(appId);
             LoginActivity.openLogin(this);
             finish();
         } else if (mResult.startsWith(ScanConfigs.CODE_APP_DEMO)) {
             // 二维码体验功能
             String result = mResult.substring(ScanConfigs.CODE_APP_DEMO.length());
             String[] info = result.split("_");
-            ScanConfigs.CODE_APP_ID = info[0];
-            // 需要重新初始化SDK 传入新的appId
-            int custom = SharePreferenceUtils.getInstance().getCustomDns();
-            if (custom < 0 || custom > 4) {
-                custom = 0;
-            }
-            BaseManager.initTestBMXSDK(custom);
+            String appId = info[0];
+            SharePreferenceUtils.getInstance().putAppId(appId);
+            UserManager.getInstance().changeAppId(appId);
             LoginActivity.openLogin(this);
             finish();
         }

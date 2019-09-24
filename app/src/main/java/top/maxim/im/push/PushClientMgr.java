@@ -162,7 +162,7 @@ public final class PushClientMgr {
         if (TextUtils.isEmpty(deviceToken)) {
             return;
         }
-        String scanAppId = ScanConfigs.CODE_APP_ID;
+        String scanAppId = SharePreferenceUtils.getInstance().getAppId();
         String scanUserId = ScanConfigs.CODE_USER_ID;
         String scanUserName = ScanConfigs.CODE_USER_NAME;
         if (TextUtils.isEmpty(scanAppId) || TextUtils.isEmpty(scanUserId)
@@ -177,7 +177,6 @@ public final class PushClientMgr {
             return;
         }
         //每次调用完清除扫码登陆的数据
-        ScanConfigs.CODE_APP_ID = "";
         ScanConfigs.CODE_USER_ID = "";
         ScanConfigs.CODE_USER_NAME = "";
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();

@@ -9,6 +9,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import im.floo.floolib.BMXClient;
+import im.floo.floolib.flooJNI;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.net.DefaultOkhttpClient;
 import top.maxim.im.net.HttpCallback;
@@ -38,7 +40,7 @@ public class AppManager {
 
     /**
      * 根据userId获取token
-     * 
+     *
      * @param id
      * @param pwd
      * @param callback
@@ -110,7 +112,7 @@ public class AppManager {
 
     /**
      * 根据userName获取token
-     * 
+     *
      * @param name
      * @param pwd
      * @param callback
@@ -182,7 +184,7 @@ public class AppManager {
 
     /**
      * 获取群邀请的二维码信息
-     * 
+     *
      * @param groupId 群id
      */
     public void getGroupSign(long groupId, String token, HttpResponseCallback<String> callback) {
@@ -303,7 +305,7 @@ public class AppManager {
 
     /**
      * 获取手机验证码
-     * 
+     *
      * @param mobile 手机号
      */
     public void captchaSMS(String mobile, HttpResponseCallback<String> callback) {

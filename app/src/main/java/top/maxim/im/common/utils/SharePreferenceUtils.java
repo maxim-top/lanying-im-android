@@ -3,6 +3,9 @@ package top.maxim.im.common.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
+
+import top.maxim.im.scan.config.ScanConfigs;
 
 /**
  * Description : sp缓存工具类 Created by Mango on 2018/11/06.
@@ -31,6 +34,8 @@ public class SharePreferenceUtils {
     private static String DEV_TIPS = "devTips";
 
     private static String CUSTOM_DNS = "customDns";
+
+    private static String APP_ID = "app_id";
 
     private static volatile SharePreferenceUtils instance;
 
@@ -158,6 +163,19 @@ public class SharePreferenceUtils {
             return saveInfo.getInt(CUSTOM_DNS, 0);
         }
         return 0;
+    }
+
+    public boolean putAppId(String appId) {
+        saveEditor.putString(APP_ID, appId);
+        return saveEditor.commit();
+    }
+
+    public String getAppId() {
+        if (saveInfo != null) {
+            String appId = saveInfo.getString(APP_ID, ScanConfigs.CODE_APP_ID);
+            return TextUtils.isEmpty(appId) ? ScanConfigs.CODE_APP_ID : appId;
+        }
+        return ScanConfigs.CODE_APP_ID;
     }
 
     /**

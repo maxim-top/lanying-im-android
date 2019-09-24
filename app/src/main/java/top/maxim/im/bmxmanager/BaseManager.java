@@ -14,8 +14,8 @@ import im.floo.floolib.BMXSDKConfig;
 import rx.Observable;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.RxError;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.push.PushClientMgr;
-import top.maxim.im.scan.config.ScanConfigs;
 
 public class BaseManager {
 
@@ -41,7 +41,7 @@ public class BaseManager {
         conf.setConsoleOutput(true);
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
-        conf.setAppID(ScanConfigs.CODE_APP_ID);
+        conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
 
         BMXSDKConfig.HostConfig hostConfig;
         if (index == 1) {

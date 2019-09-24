@@ -267,4 +267,12 @@ public class UserManager extends BaseManager {
     public void removeUserListener(BMXUserServiceListener listener) {
         mService.removeUserListener(listener);
     }
+
+    /**
+     * 切换appId
+     * @param appId appId
+     */
+    public void changeAppId(String appId) {
+        bmxClient.changeAppId(appId);
+    }
 }

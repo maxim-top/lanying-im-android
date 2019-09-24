@@ -205,7 +205,7 @@ public class LoginActivity extends BaseTitleActivity {
         if (!TextUtils.isEmpty(scanUserName)) {
             mInputName.setText(scanUserName);
         }
-        String appId = ScanConfigs.CODE_APP_ID;
+        String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
     }
 

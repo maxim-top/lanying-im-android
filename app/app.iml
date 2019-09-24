@@ -119,10 +119,10 @@
     <orderEntry type="library" name="Gradle: com.android.support:multidex:1.0.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:recyclerview-v7:27.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: io.reactivex:rxandroid:1.2.1@aar" level="project" />
-    <orderEntry type="library" name="Gradle: :floo-android_1.0.7.20190916:@aar" level="project" />
+    <orderEntry type="library" name="Gradle: :floo-android_1.0.8.20190923:@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.meizu.flyme.internet:push-ups:1.1.4@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.huawei.android.hms:push:2.6.3.301@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.tencent.bugly:crashreport:3.0.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.tencent.bugly:crashreport:3.1.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.tencent.bugly:nativecrashreport:3.7.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-fragment:27.1.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:animated-vector-drawable:27.1.1@aar" level="project" />

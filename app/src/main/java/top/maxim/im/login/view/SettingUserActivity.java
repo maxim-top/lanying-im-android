@@ -56,7 +56,11 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     private ShapeImageView mUserIcon;
 
-    private TextView mUserName;
+    /* Id */
+    private ItemLineArrow.Builder mUserId;
+
+    /* 二维码 */
+    private ItemLineArrow.Builder mQrCode;
 
     /* 设置昵称 */
     private ItemLineArrow.Builder mSetName;
@@ -108,7 +112,7 @@ public class SettingUserActivity extends BaseTitleActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setTitle(R.string.setting);
+        builder.setTitle(R.string.user_info);
         builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,12 +127,35 @@ public class SettingUserActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.activity_setting_user, null);
         LinearLayout container = view.findViewById(R.id.ll_setting_container);
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
-        mUserName = view.findViewById(R.id.tv_user_name);
+
+        // Id
+        mUserId = new ItemLineArrow.Builder(this)
+                .setStartContent("ID");
+        container.addView(mUserId.build());
+
+        // 分割线
+        ItemLine.Builder itemLine1 = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(itemLine1.build());
+
+        // 二维码
+        mQrCode = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.my_qrcode))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                    }
+                });
+        container.addView(mQrCode.build());
+
+        // 分割线
+        ItemLine.Builder itemLine2 = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(itemLine2.build());
 
         // 推送昵称
         mSetName = new ItemLineArrow.Builder(this)
                 .setStartContent(getString(R.string.setting_user_name))
-                .setMarginTop(ScreenUtils.dp2px(10))
                 .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
@@ -138,9 +165,9 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mSetName.build());
 
         // 分割线
-        ItemLine.Builder itemLine1 = new ItemLine.Builder(this, container)
+        ItemLine.Builder itemLine3 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine1.build());
+        container.addView(itemLine3.build());
 
         // 手机号
         mSetPhone = new ItemLineArrow.Builder(this)
@@ -154,9 +181,9 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mSetPhone.build());
 
         // 分割线
-        ItemLine.Builder itemLine2 = new ItemLine.Builder(this, container)
+        ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine2.build());
+        container.addView(itemLine4.build());
 
         // 公开扩展信息
         mSetPublic = new ItemLineArrow.Builder(this)
@@ -170,9 +197,9 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mSetPublic.build());
 
         // 分割线
-        ItemLine.Builder itemLine3 = new ItemLine.Builder(this, container)
+        ItemLine.Builder itemLine5 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine3.build());
+        container.addView(itemLine5.build());
 
         mTvPublic = new TextView(this);
         LinearLayout.LayoutParams publicP = new LinearLayout.LayoutParams(
@@ -187,9 +214,9 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mTvPublic);
 
         // 分割线
-        ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
+        ItemLine.Builder itemLine6 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine4.build());
+        container.addView(itemLine6.build());
 
         // 私密扩展信息
         mSetPrivate = new ItemLineArrow.Builder(this)
@@ -203,9 +230,9 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mSetPrivate.build());
 
         // 分割线
-        ItemLine.Builder itemLine5 = new ItemLine.Builder(this, container)
+        ItemLine.Builder itemLine7 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine5.build());
+        container.addView(itemLine7.build());
 
         mTvPrivate = new TextView(this);
         LinearLayout.LayoutParams privateP = new LinearLayout.LayoutParams(
@@ -220,9 +247,9 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mTvPrivate);
 
         // 分割线
-        ItemLine.Builder itemLine6 = new ItemLine.Builder(this, container)
+        ItemLine.Builder itemLine8 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine6.build());
+        container.addView(itemLine8.build());
 
         // 好友验证类型
         mSetAddFriendAuthMode = new ItemLineArrow.Builder(this)
@@ -236,9 +263,9 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mSetAddFriendAuthMode.build());
 
         // 分割线
-        ItemLine.Builder itemLine7 = new ItemLine.Builder(this, container)
+        ItemLine.Builder itemLine9 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine7.build());
+        container.addView(itemLine9.build());
 
         mLlAuthQuestion = new LinearLayout(this);
         mLlAuthQuestion.setOrientation(LinearLayout.VERTICAL);
@@ -350,10 +377,10 @@ public class SettingUserActivity extends BaseTitleActivity {
     }
 
     private void initUser(BMXUserProfile profile) {
-        String name = profile.username();
+        long id = profile.userId();
         String nickName = profile.nickname();
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
-        mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
+        mUserId.setEndContent(String.valueOf(id));
         mSetName.setEndContent(TextUtils.isEmpty(nickName) ? "" : nickName);
 
         String phone = profile.mobilePhone();

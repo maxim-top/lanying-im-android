@@ -27,9 +27,7 @@
         android:layout_width="@dimen/dimen_40"
         android:layout_height="@dimen/dimen_40"
         android:layout_gravity="center_vertical"
-        app:radius_x="3"
-        app:radius_y="3"
-        app:shape="round_rectangle" />
+        app:shape="circle" />
 
     <TextView
         android:id="@+id/txt_name"

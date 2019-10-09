@@ -9,7 +9,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -47,6 +46,7 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
 import top.maxim.im.message.adapter.SessionAdapter;
 import top.maxim.im.message.contract.SessionContract;
+import top.maxim.im.scan.view.ScannerActivity;
 
 /**
  * Description : 消息列表 Created by Mango on 2018/11/06
@@ -107,12 +107,12 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(getActivity(), headerContainer);
-        builder.setTitle(R.string.recent_chat);
         return builder.build();
     }
 
     @Override
     protected View onCreateView() {
+        hideHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_session, null);
         mRecyclerView = view.findViewById(R.id.session_recycler);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -129,9 +129,11 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
      * 设置headerView
      */
     private void buildContactHeaderView() {
-        View headerView = View.inflate(getActivity(), R.layout.item_contact_header, null);
-        FrameLayout search = headerView.findViewById(R.id.fl_contact_header_search);
-        search.setOnClickListener(v -> MessageSearchActivity.openMessageSearch(getActivity()));
+        View headerView = View.inflate(getActivity(), R.layout.session_header, null);
+        headerView.findViewById(R.id.iv_session_search)
+                .setOnClickListener(v -> MessageSearchActivity.openMessageSearch(getActivity()));
+        headerView.findViewById(R.id.iv_session_scan)
+                .setOnClickListener(v -> ScannerActivity.openScan(getActivity()));
         mAdapter.addHeaderView(headerView);
     }
 

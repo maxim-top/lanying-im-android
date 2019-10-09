@@ -10,12 +10,12 @@
         android:id="@+id/container_status_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/c2"
+        android:background="@color/color_background"
         android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/container_header"
         android:layout_width="match_parent"
-        android:background="@color/c2"
+        android:background="@color/color_background"
         android:layout_height="@dimen/dimen_56" />
 </top.maxim.im.common.view.ImmerseLinearLayout>

@@ -30,9 +30,7 @@
             android:layout_height="@dimen/dimen_40"
             android:layout_centerVertical="true"
             android:src="@drawable/default_avatar_icon"
-            app:radius_x="3"
-            app:radius_y="3"
-            app:shape="round_rectangle" />
+            app:shape="circle" />
 
         <TextView
             android:id="@+id/contact_title"

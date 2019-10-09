@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -132,6 +133,7 @@ public class Header {
             ImageView backIcon = new ImageView(mContext);
             backIcon.setImageResource(resId);
             backIcon.setOnClickListener(listener);
+            backIcon.setId(R.id.header_back_icon);
             pHc.mBackIcon = backIcon;
             return this;
         }
@@ -147,6 +149,7 @@ public class Header {
             backText.setGravity(Gravity.CENTER);
             backText.setTextColor(mContext.getResources().getColor(R.color.color_333333));
             backText.setOnClickListener(listener);
+            backText.setId(R.id.header_back_title);
             pHc.mBackTv = backText;
             return this;
         }
@@ -160,6 +163,7 @@ public class Header {
             ImageView rightIcon = new ImageView(mContext);
             rightIcon.setImageResource(resId);
             rightIcon.setOnClickListener(listener);
+            rightIcon.setId(R.id.header_right_icon);
             pHc.mRightIcon = rightIcon;
             return this;
         }
@@ -185,6 +189,7 @@ public class Header {
             if (listener != null) {
                 rightText.setOnClickListener(listener);
             }
+            rightText.setId(R.id.header_right_title);
             pHc.mRightTv = rightText;
             return this;
         }
@@ -204,7 +209,7 @@ public class Header {
         public Builder setTitle(CharSequence content, View.OnClickListener listener) {
             TextView titleView = new TextView(this.mContext);
             titleView.setText(content);
-            titleView.setGravity(Gravity.CENTER);
+            titleView.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
             titleView.setSingleLine(true);
             titleView.setEllipsize(TextUtils.TruncateAt.END);
             titleView.setMaxEms(12);
@@ -213,6 +218,7 @@ public class Header {
             if (listener != null) {
                 titleView.setOnClickListener(listener);
             }
+            titleView.setId(R.id.header_title);
             pHc.mTitleView = titleView;
             return this;
         }
@@ -237,6 +243,10 @@ public class Header {
 
         private RelativeLayout mContainer;
 
+        private FrameLayout mBackContainer;
+
+        private FrameLayout mRightContainer;
+
         private View mDefineView;
 
         private ImageView mRightIcon;
@@ -247,6 +257,10 @@ public class Header {
 
         private HeaderController(Context context) {
             mContainer = new RelativeLayout(context);
+            mBackContainer = new FrameLayout(context);
+            mBackContainer.setId(R.id.header_back_container);
+            mRightContainer = new FrameLayout(context);
+            mRightContainer.setId(R.id.header_right_container);
         }
 
         void apply() {
@@ -256,53 +270,65 @@ public class Header {
 
             // 返回按钮icon
             if (mBackIcon != null) {
+                mBackContainer.removeAllViews();
                 params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.MATCH_PARENT);
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-                mBackIcon.setPadding(ScreenUtils.dp2px(16), 0, 0, 0);
-                mContainer.addView(mBackIcon, params);
+                mBackIcon.setPadding(ScreenUtils.dp2px(14), 0, 0, 0);
+                mBackContainer.addView(mBackIcon);
+                mContainer.addView(mBackContainer, params);
             }
 
             // 返回文本
             if (mBackTv != null) {
+                mBackContainer.removeAllViews();
                 params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.MATCH_PARENT);
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-                mBackIcon.setPadding(ScreenUtils.dp2px(16), 0, 0, 0);
+                mBackIcon.setPadding(ScreenUtils.dp2px(14), 0, 0, 0);
                 mBackTv.setGravity(Gravity.CENTER);
-                mContainer.addView(mBackTv, params);
+                mBackContainer.addView(mBackTv);
+                mContainer.addView(mBackContainer, params);
             }
 
             // 标题文本
             if (mTitleView != null) {
-                params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT,
                         RelativeLayout.LayoutParams.MATCH_PARENT);
-                params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-                mTitleView.setGravity(Gravity.CENTER);
+                params.addRule(RelativeLayout.RIGHT_OF, R.id.header_back_container);
+                params.addRule(RelativeLayout.LEFT_OF, R.id.header_right_container);
+                mTitleView.setPadding(mBackContainer.getChildCount() > 0 ? ScreenUtils.dp2px(10)
+                        : ScreenUtils.dp2px(19), 0, ScreenUtils.dp2px(10), 0);
+                mTitleView.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
                 mContainer.addView(mTitleView, params);
             }
 
             // 右上角icon
             if (mRightIcon != null) {
+                mRightContainer.removeAllViews();
                 params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.MATCH_PARENT);
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                mRightIcon.setPadding(ScreenUtils.dp2px(16), 0, ScreenUtils.dp2px(16), 0);
-                mContainer.addView(mRightIcon, params);
+                mRightIcon.setPadding(ScreenUtils.dp2px(14), 0, ScreenUtils.dp2px(14), 0);
+                mRightContainer.addView(mRightIcon);
+                mContainer.addView(mRightContainer, params);
+
             }
 
             // 右上角文本
             if (mRightTv != null) {
+                mRightContainer.removeAllViews();
                 params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
                         RelativeLayout.LayoutParams.MATCH_PARENT);
                 params.addRule(RelativeLayout.CENTER_VERTICAL);
                 params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 mRightTv.setGravity(Gravity.CENTER);
-                mRightTv.setPadding(0, 0, ScreenUtils.dp2px(16), 0);
-                mContainer.addView(mRightTv, params);
+                mRightTv.setPadding(0, 0, ScreenUtils.dp2px(14), 0);
+                mRightContainer.addView(mRightTv);
+                mContainer.addView(mRightContainer, params);
             }
 
             // 自定义view

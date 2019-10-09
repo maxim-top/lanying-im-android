@@ -13,9 +13,7 @@
         android:layout_height="@dimen/dimen_80"
         android:layout_gravity="center_horizontal"
         android:src="@drawable/default_avatar_icon"
-        app:radius_x="5"
-        app:radius_y="5"
-        app:shape="round_rectangle" />
+        app:shape="circle" />
 
     <TextView
         android:id="@+id/tv_user_name"

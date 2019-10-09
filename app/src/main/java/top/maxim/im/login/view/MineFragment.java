@@ -111,12 +111,12 @@ public class MineFragment extends BaseTitleFragment {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(getActivity(), headerContainer);
-        builder.setTitle(R.string.tab_mine);
         return builder.build();
     }
 
     @Override
     protected View onCreateView() {
+        hideHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_mine, null);
         mUserInfo = view.findViewById(R.id.rl_user_info);
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
@@ -296,8 +296,8 @@ public class MineFragment extends BaseTitleFragment {
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
         long userId = profile.userId();
         mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
-        mNickName.setText(TextUtils.isEmpty(nickName) ? "" : "昵称:" + nickName);
-        mUserId.setText(userId <= 0 ? "" : "BMXID:" + userId);
+        mNickName.setText(TextUtils.isEmpty(nickName) ? "" : nickName);
+        mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
         // push
         BMXUserProfile.MessageSetting setting = profile.messageSetting();
         boolean isPush = setting != null && setting.getMPushEnabled();

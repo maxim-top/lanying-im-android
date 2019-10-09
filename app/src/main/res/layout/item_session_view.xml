@@ -23,9 +23,7 @@
             android:layout_marginTop="@dimen/dimen_3"
             android:layout_marginRight="@dimen/dimen_3"
             android:src="@drawable/default_avatar_icon"
-            app:radius_x="24"
-            app:radius_y="24"
-            app:shape="round_rectangle" />
+            app:shape="circle" />
 
         <TextView
             android:id="@+id/session_unread_num"

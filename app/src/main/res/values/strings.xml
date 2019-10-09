@@ -8,7 +8,7 @@
 
     <!--Chat-->
     <string name="block_message">MaxIM</string>
-    <string name="recent_chat">最近会话</string>
+    <string name="recent_chat">美信拓扑</string>
     <string name="group">群组</string>
     <string name="group_info">群详情(%s)</string>
     <string name="choose_group_member">选择群成员</string>
@@ -106,6 +106,7 @@
     <string name="weixin_login">微信登录</string>
 
     <!--设置-->
+    <string name="user_info">个人信息</string>
     <string name="user_protocol">用户协议</string>
     <string name="version_info">版本信息</string>
     <string name="quit_app">退出</string>

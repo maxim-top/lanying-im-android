@@ -17,7 +17,8 @@
             android:paddingLeft="@dimen/dimen_15"
             android:paddingTop="@dimen/dimen_10"
             android:paddingRight="@dimen/dimen_15"
-            android:paddingBottom="@dimen/dimen_10">
+            android:paddingBottom="@dimen/dimen_10"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="match_parent"

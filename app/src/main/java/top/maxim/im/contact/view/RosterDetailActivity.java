@@ -100,7 +100,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
 
     @Override
     protected View onCreateView() {
-        View view = View.inflate(this, R.layout.activity_setting_user, null);
+        View view = View.inflate(this, R.layout.activity_roster_detail, null);
         LinearLayout container = view.findViewById(R.id.ll_setting_container);
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
         mUserName = view.findViewById(R.id.tv_user_name);

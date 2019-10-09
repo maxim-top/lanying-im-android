@@ -7,7 +7,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,12 +34,9 @@ import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CustomDialog;
 import top.maxim.im.common.view.Header;
-import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
 import top.maxim.im.contact.adapter.ContactAdapter;
-import top.maxim.im.group.view.GroupListActivity;
-import top.maxim.im.scan.view.ScannerActivity;
 
 /**
  * Description : 通讯录 Created by Mango on 2018/11/06
@@ -108,13 +104,12 @@ public class ContactFragment extends BaseTitleFragment {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(getActivity(), headerContainer);
-        builder.setTitle(R.string.tab_contact);
-        builder.setRightText(R.string.contact_scan, v -> ScannerActivity.openScan(getActivity()));
         return builder.build();
     }
 
     @Override
     protected View onCreateView() {
+        hideHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_contact, null);
         mRecycler = view.findViewById(R.id.contact_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -132,13 +127,13 @@ public class ContactFragment extends BaseTitleFragment {
      */
     private void buildContactHeaderView() {
         View headerView = View.inflate(getActivity(), R.layout.item_contact_header, null);
-        FrameLayout search = headerView.findViewById(R.id.fl_contact_header_search);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ContactSearchActivity.openRosterSearch(getActivity());
-            }
-        });
+//        FrameLayout search = headerView.findViewById(R.id.fl_contact_header_search);
+//        search.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                ContactSearchActivity.openRosterSearch(getActivity());
+//            }
+//        });
         LinearLayout ll = headerView.findViewById(R.id.ll_contact_header);
         // 申请
         View applyView = View.inflate(getActivity(), R.layout.item_contact_view, null);
@@ -154,24 +149,24 @@ public class ContactFragment extends BaseTitleFragment {
                 .setImageResource(R.drawable.icon_apply_notice);
         ll.addView(applyView);
 
-        // 分割线
-        ItemLine.Builder itemLine = new ItemLine.Builder(getActivity(), ll)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        ll.addView(itemLine.build());
-
-        // 群组
-        View groupView = View.inflate(getActivity(), R.layout.item_contact_view, null);
-        groupView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GroupListActivity.openGroup(getActivity());
-            }
-        });
-        ((TextView)groupView.findViewById(R.id.contact_title))
-                .setText(getString(R.string.contact_group));
-        ((ShapeImageView)groupView.findViewById(R.id.contact_avatar))
-                .setImageResource(R.drawable.icon_group);
-        ll.addView(groupView);
+//        // 分割线
+//        ItemLine.Builder itemLine = new ItemLine.Builder(getActivity(), ll)
+//                .setMarginLeft(ScreenUtils.dp2px(15));
+//        ll.addView(itemLine.build());
+//
+//        // 群组
+//        View groupView = View.inflate(getActivity(), R.layout.item_contact_view, null);
+//        groupView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                GroupListActivity.openGroup(getActivity());
+//            }
+//        });
+//        ((TextView)groupView.findViewById(R.id.contact_title))
+//                .setText(getString(R.string.contact_group));
+//        ((ShapeImageView)groupView.findViewById(R.id.contact_avatar))
+//                .setImageResource(R.drawable.icon_group);
+//        ll.addView(groupView);
         mAdapter.addHeaderView(headerView);
     }
 

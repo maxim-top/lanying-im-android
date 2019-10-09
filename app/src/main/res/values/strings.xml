@@ -77,11 +77,15 @@
     <string name="send">发送</string>
 
     <!--Contact-->
-    <string name="contact_apply_notice">申请与通知</string>
+    <string name="contact_apply_notice">新的朋友</string>
     <string name="contact_group">群组</string>
     <string name="create_group">创建群组</string>
     <string name="choose_contact">选择联系人</string>
-    <string name="group_invite">群聊邀请通知</string>
+    <string name="group_invite">群系统消息</string>
+
+    <string name="pop_add_friend">添加朋友</string>
+    <string name="pop_create_group">创建群组</string>
+    <string name="pop_scan">扫一扫</string>
 
     <!--权限-->
     <string name="permission_title">权限申请</string>

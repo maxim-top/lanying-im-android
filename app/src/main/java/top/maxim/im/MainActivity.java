@@ -9,7 +9,7 @@ import android.os.Bundle;
 import java.util.List;
 
 import top.maxim.im.common.base.BaseSwitchActivity;
-import top.maxim.im.contact.view.ContactFragment;
+import top.maxim.im.contact.view.AllContactFragment;
 import top.maxim.im.login.view.MineFragment;
 import top.maxim.im.message.view.SessionFragment;
 import top.maxim.im.push.PushClientMgr;
@@ -44,7 +44,7 @@ public class MainActivity extends BaseSwitchActivity {
         tabSwitch.add(mSessionTab);
 
         mContactTab = new BaseSwitchActivity.TabSwitchView(R.drawable.contact_icon_selector,
-                R.string.tab_contact, new ContactFragment(), 1);
+                R.string.tab_contact, new AllContactFragment(), 1);
         tabSwitch.add(mContactTab);
 
         mSettingTab = new BaseSwitchActivity.TabSwitchView(R.drawable.mine_icon_selector,

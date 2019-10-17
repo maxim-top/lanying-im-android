@@ -84,9 +84,7 @@ public abstract class BaseTitleFragment extends BaseFragment {
     }
 
     public void hideHeader() {
-        if (mHeader != null) {
-            mHeader.hideHeader();
-        }
+        hideTitleHeader();
         mStatusBar.setVisibility(View.GONE);
     }
 

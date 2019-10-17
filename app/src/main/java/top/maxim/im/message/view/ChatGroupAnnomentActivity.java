@@ -76,7 +76,6 @@ public class ChatGroupAnnomentActivity extends BaseTitleActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setHeaderBgColor(getResources().getColor(R.color.c2));
         builder.setTitle(R.string.group_notice);
         builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {
             @Override

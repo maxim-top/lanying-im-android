@@ -28,6 +28,8 @@ public abstract class BaseTitleFragment extends BaseFragment {
 
     protected Header mHeader;
 
+    private View mHeaderDiver;
+
     private View mStatusBar;
 
     private LoadingDialog mLoadingDialog;
@@ -36,8 +38,9 @@ public abstract class BaseTitleFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.base_activity, container, false);
-        mContainer = ((LinearLayout)view.findViewById(R.id.container));
-        RelativeLayout headerContainer = (RelativeLayout)view.findViewById(R.id.container_header);
+        mContainer = view.findViewById(R.id.container);
+        mHeaderDiver = view.findViewById(R.id.header_diver);
+        RelativeLayout headerContainer = view.findViewById(R.id.container_header);
         mStatusBar = view.findViewById(R.id.container_status_bar);
         if (isFullScreen() && Build.VERSION.SDK_INT >= 21) {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -91,6 +94,7 @@ public abstract class BaseTitleFragment extends BaseFragment {
         if (mHeader != null) {
             mHeader.hideHeader();
         }
+        mHeaderDiver.setVisibility(View.GONE);
     }
 
     protected abstract Header onCreateHeader(RelativeLayout headerContainer);

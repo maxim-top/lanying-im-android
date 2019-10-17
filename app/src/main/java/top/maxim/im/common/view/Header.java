@@ -257,6 +257,7 @@ public class Header {
 
         private HeaderController(Context context) {
             mContainer = new RelativeLayout(context);
+            mContainer.setBackgroundColor(context.getResources().getColor(R.color.color_white));
             mBackContainer = new FrameLayout(context);
             mBackContainer.setId(R.id.header_back_container);
             mRightContainer = new FrameLayout(context);

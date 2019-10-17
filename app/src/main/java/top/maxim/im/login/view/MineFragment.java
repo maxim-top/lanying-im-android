@@ -45,8 +45,7 @@ import top.maxim.im.push.PushUtils;
  */
 public class MineFragment extends BaseTitleFragment {
 
-    /* 用户信息 */
-    private RelativeLayout mUserInfo;
+    private ImageView mUserEdit;
 
     private ShapeImageView mUserIcon;
 
@@ -118,7 +117,7 @@ public class MineFragment extends BaseTitleFragment {
     protected View onCreateView() {
         hideHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_mine, null);
-        mUserInfo = view.findViewById(R.id.rl_user_info);
+        mUserEdit = view.findViewById(R.id.iv_user_info_edit);
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
         mUserName = view.findViewById(R.id.tv_user_name);
         mNickName = view.findViewById(R.id.tv_nick_name);
@@ -333,7 +332,7 @@ public class MineFragment extends BaseTitleFragment {
     protected void setViewListener() {
         mQuitView.setOnClickListener(v -> logout());
 
-        mUserInfo.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
+        mUserEdit.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
 
         mMyQrCode.setOnClickListener(v -> MyQrCodeActivity.openMyQrcode(getActivity()));
     }

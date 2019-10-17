@@ -87,7 +87,6 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setHeaderBgColor(getResources().getColor(R.color.c2));
         builder.setTitle(R.string.group_member);
         if (mChoose) {
             builder.setRightText(R.string.confirm, new View.OnClickListener() {

@@ -38,7 +38,6 @@ public class ChatGroupAtActivity extends ChatGroupListMemberActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setHeaderBgColor(getResources().getColor(R.color.c2));
         builder.setTitle(R.string.choose_group_member);
         builder.setRightText(R.string.confirm, new View.OnClickListener() {
             @Override

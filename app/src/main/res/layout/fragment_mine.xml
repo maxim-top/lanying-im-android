@@ -17,10 +17,20 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_150"
             android:background="@drawable/mine_bg"
-            android:paddingRight="@dimen/dimen_36"
             android:paddingLeft="@dimen/dimen_36"
             android:clipChildren="false"
             android:clipToPadding="false">
+
+            <ImageView
+                android:id="@+id/iv_user_info_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:paddingTop="@dimen/dimen_20"
+                android:paddingRight="@dimen/dimen_18"
+                android:paddingBottom="@dimen/dimen_10"
+                android:paddingLeft="@dimen/dimen_10"
+                android:src="@drawable/my_info_edit_icon"/>
 
             <LinearLayout
                 android:id="@+id/ll_user_info"
@@ -47,10 +57,10 @@
 
                     <ImageView
                         android:id="@+id/icon_qrcode"
-                        android:layout_width="@dimen/dimen_30"
-                        android:layout_height="@dimen/dimen_30"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/dimen_10"
-                        android:src="@drawable/qrcode_icon" />
+                        android:src="@drawable/my_qrcode_icon" />
 
                 </LinearLayout>
 
@@ -78,6 +88,7 @@
                 android:id="@+id/iv_user_avatar"
                 android:layout_width="@dimen/dimen_100"
                 android:layout_height="@dimen/dimen_100"
+                android:layout_marginRight="@dimen/dimen_36"
                 android:layout_alignParentRight="true"
                 android:layout_marginLeft="@dimen/dimen_20"
                 android:src="@drawable/default_avatar_icon"
@@ -116,7 +127,7 @@
             android:background="@color/color_white"
             android:gravity="center"
             android:text="@string/quit_app"
-            android:textColor="@color/color_333333"
+            android:textColor="@color/color_FF475A"
             android:textSize="@dimen/dimen_16" />
 
     </LinearLayout>

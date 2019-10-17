@@ -45,7 +45,6 @@ public class ChatGroupBlockActivity extends ChatGroupListMemberActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setHeaderBgColor(getResources().getColor(R.color.c2));
         builder.setTitle(R.string.group_black);
         builder.setRightText(R.string.edit, new View.OnClickListener() {
             @Override

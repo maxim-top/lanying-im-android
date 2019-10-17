@@ -29,6 +29,8 @@ public abstract class BaseTitleActivity extends BaseActivity {
 
     protected Header mHeader;
 
+    private View mHeaderDiver;
+
     private LoadingDialog mLoadingDialog;
 
     private View mStatusBar;
@@ -38,6 +40,7 @@ public abstract class BaseTitleActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.base_activity);
         mContainer = ((ImmerseLinearLayout)findViewById(R.id.container));
+        mHeaderDiver = findViewById(R.id.header_diver);
         RelativeLayout headerContainer = (RelativeLayout)findViewById(R.id.container_header);
         mStatusBar = findViewById(R.id.container_status_bar);
         if (isFullScreen() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -136,6 +139,7 @@ public abstract class BaseTitleActivity extends BaseActivity {
         if (mHeader != null) {
             mHeader.hideHeader();
         }
+        mHeaderDiver.setVisibility(View.GONE);
     }
 
     /**

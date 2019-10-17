@@ -174,7 +174,6 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setHeaderBgColor(getResources().getColor(R.color.c2));
         builder.setTitle("");
         builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {
             @Override
@@ -495,11 +494,11 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
         // 退出群聊
         mQuitGroup = new TextView(this);
-        mQuitGroup.setTextColor(getResources().getColor(R.color.color_white));
+        mQuitGroup.setTextColor(getResources().getColor(R.color.color_FF475A));
         mQuitGroup.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
         mQuitGroup.setGravity(Gravity.CENTER);
         mQuitGroup.setText(getString(R.string.group_quit));
-        mQuitGroup.setBackgroundResource(R.drawable.common_red_btn_corner_bg);
+        mQuitGroup.setBackgroundResource(R.color.color_white);
         mQuitGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -519,11 +518,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
             }
         });
         LinearLayout.LayoutParams quitP = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.dp2px(44));
-        quitP.topMargin = ScreenUtils.dp2px(5);
-        quitP.bottomMargin = ScreenUtils.dp2px(5);
-        quitP.leftMargin = ScreenUtils.dp2px(15);
-        quitP.rightMargin = ScreenUtils.dp2px(15);
+                ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.dp2px(54));
         mQuitGroup.setLayoutParams(quitP);
         container.addView(mQuitGroup);
 

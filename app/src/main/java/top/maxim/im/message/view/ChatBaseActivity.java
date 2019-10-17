@@ -75,7 +75,6 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setHeaderBgColor(getResources().getColor(R.color.color_white));
         builder.setTitle("");
         builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {
             @Override

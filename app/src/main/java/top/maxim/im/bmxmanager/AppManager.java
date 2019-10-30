@@ -9,8 +9,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-import im.floo.floolib.BMXClient;
-import im.floo.floolib.flooJNI;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.net.DefaultOkhttpClient;
 import top.maxim.im.net.HttpCallback;
@@ -22,7 +20,7 @@ import top.maxim.im.net.HttpResponseCallback;
  */
 public class AppManager {
 
-    private static final String mBaseUrl = "http://api.maxim.top/app/";
+    private static final String mBaseUrl = "https://api.maximtop.com/app/";
 
     private static final String TAG = AppManager.class.getSimpleName();
 
@@ -56,7 +54,10 @@ public class AppManager {
         Map<String, String> params = new HashMap<>();
         params.put("user_id", String.valueOf(id));
         params.put("password", pwd);
-        mClient.call(HttpClient.Method.POST, mBaseUrl + "token_id", params,
+        
+        Map<String, String> header = new HashMap<>();
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "token_id", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
@@ -128,7 +129,10 @@ public class AppManager {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("password", pwd);
-        mClient.call(HttpClient.Method.POST, mBaseUrl + "token", params,
+
+        Map<String, String> header = new HashMap<>();
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "token", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
@@ -192,6 +196,7 @@ public class AppManager {
         params.put("group_id", String.valueOf(groupId));
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         mClient.call(HttpClient.Method.GET, mBaseUrl + "qrcode/group_sign", params, header,
                 new HttpCallback<String>() {
                     @Override
@@ -254,6 +259,7 @@ public class AppManager {
         params.put("qr_info", qrInfo);
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         mClient.call(HttpClient.Method.POST, mBaseUrl + "qrcode/group_invite", params, header,
                 new HttpCallback<String>() {
                     @Override
@@ -311,7 +317,9 @@ public class AppManager {
     public void captchaSMS(String mobile, HttpResponseCallback<String> callback) {
         Map<String, String> params = new HashMap<>();
         params.put("mobile", mobile);
-        mClient.call(HttpClient.Method.GET, mBaseUrl + "captcha/sms", params, null,
+        Map<String, String> header = new HashMap<>();
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "captcha/sms", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
@@ -368,7 +376,9 @@ public class AppManager {
     public void weChatLogin(String code, HttpResponseCallback<String> callback) {
         Map<String, String> params = new HashMap<>();
         params.put("code", code);
-        mClient.call(HttpClient.Method.GET, mBaseUrl + "wechat_login_android", params, null,
+        Map<String, String> header = new HashMap<>();
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "wechat_login_android", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
@@ -423,6 +433,7 @@ public class AppManager {
     public void bindOpenId(String token, String openId, HttpResponseCallback<String> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         Map<String, String> params = new HashMap<>();
         if (!TextUtils.isEmpty(openId)) {
             params.put("open_id", openId);
@@ -492,12 +503,13 @@ public class AppManager {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("access-app_id", appId);
+        header.put("app_id", appId);
         Map<String, String> params = new HashMap<>();
         params.put("app_id", appId);
         params.put("user_id", userId);
         params.put("notifier_name", notifierName);
         params.put("device_token", deviceToken);
-        mClient.call(HttpClient.Method.POST, "https://butler.maxim.top/notifier/bind", params, header,
+        mClient.call(HttpClient.Method.POST, "https://butler.maximtop.com/notifier/bind", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {

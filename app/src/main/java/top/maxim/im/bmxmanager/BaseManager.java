@@ -56,8 +56,8 @@ public class BaseManager {
         } else if (index == 4) {
             hostConfig = new BMXSDKConfig.HostConfig("47.93.11.47", 1729, "http://47.93.11.47");
         } else {
-            hostConfig = new BMXSDKConfig.HostConfig("sync.maxim.top", 443,
-                    "https://api.maxim.top");
+            hostConfig = new BMXSDKConfig.HostConfig("sync.maximtop.com", 443,
+                    "https://api.maximtop.com");
         }
         conf.setHostConfig(hostConfig);
         bmxClient = BMXClient.create(conf);

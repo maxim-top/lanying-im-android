@@ -139,13 +139,9 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(itemLine1.build());
 
         // 二维码
-        mQrCode = new ItemLineArrow.Builder(this)
-                .setStartContent(getString(R.string.my_qrcode))
-                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
-                    @Override
-                    public void onItemClick(View v) {
-                    }
-                });
+        mQrCode = new ItemLineArrow.Builder(this).setStartContent(getString(R.string.my_qrcode))
+                .setOnItemClickListener(
+                        v -> MyQrCodeActivity.openMyQrcode(SettingUserActivity.this));
         container.addView(mQrCode.build());
 
         // 分割线

@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.google.gson.Gson;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.DecodeHintType;
@@ -32,14 +33,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.scan.QRCodeUtil;
-import top.maxim.im.scan.config.ScanConfigs;
+import top.maxim.im.scan.bean.QrCodeBean;
 
 /**
  * Description :二维码utils
@@ -80,9 +83,14 @@ public class QRCodeShowUtils {
      * @param rosterId
      */
     public static String generateRosterQRCode(String rosterId) {
-        StringBuilder stringBuilder = new StringBuilder(ScanConfigs.CODE_ROSTER_PRE);
-        stringBuilder.append(rosterId);
-        return stringBuilder.toString();
+        Gson gson = new Gson();
+        QrCodeBean bean = new QrCodeBean();
+        bean.setResource(QRCodeConfig.SOURCE.APP);
+        bean.setAction(QRCodeConfig.ACTION.PROFILE);
+        Map<String, String> map = new HashMap<>();
+        map.put("uid", rosterId);
+        bean.setInfo(gson.toJson(map));
+        return gson.toJson(bean);
     }
 
     /**
@@ -91,10 +99,15 @@ public class QRCodeShowUtils {
      * @param groupId 群组id
      */
     public static String generateGroupQRCode(String groupId, String qr_info) {
-        StringBuilder stringBuilder = new StringBuilder(ScanConfigs.CODE_GROUP_PRE);
-        stringBuilder.append(groupId);
-        stringBuilder.append("_").append(qr_info);
-        return stringBuilder.toString();
+        Gson gson = new Gson();
+        QrCodeBean bean = new QrCodeBean();
+        bean.setResource(QRCodeConfig.SOURCE.APP);
+        bean.setAction(QRCodeConfig.ACTION.GROUP);
+        Map<String, String> map = new HashMap<>();
+        map.put("group_id", groupId);
+        map.put("info", qr_info);
+        bean.setInfo(gson.toJson(map));
+        return gson.toJson(bean);
     }
 
     /**

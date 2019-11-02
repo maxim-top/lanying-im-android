@@ -33,6 +33,8 @@ import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonEditDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
@@ -44,9 +46,9 @@ import top.maxim.im.wxapi.WXUtils;
  * Description : 登陆 Created by Mango on 2018/11/21.
  */
 public class LoginActivity extends BaseTitleActivity {
-    
+
     public static String LOGIN_CODE = "loginCode";
-    
+
     /* 账号 */
     private EditText mInputName;
 
@@ -63,11 +65,13 @@ public class LoginActivity extends BaseTitleActivity {
     private TextView mSwitchLoginMode;
 
     /* 微信登录 */
-    private TextView mWXLogin;
+    private ImageView mWXLogin;
 
     /* 扫一扫 */
     private ImageView mIvScan;
-    
+
+    private ImageView mIvChangeAppId;
+
     /* 是否是id登陆 */
     private boolean mLoginByUserId = false;
 
@@ -76,13 +80,15 @@ public class LoginActivity extends BaseTitleActivity {
 
     /* 微信返回code */
     private String mCode;
-    
+
     private TextView mTvAppId;
     
+    private String mChangeAppId;
+
     public static void openLogin(Context context) {
         openLogin(context, null);
     }
-    
+
     public static void openLogin(Context context, String code) {
         Intent intent = new Intent(context, LoginActivity.class);
         if (!TextUtils.isEmpty(code)) {
@@ -105,8 +111,9 @@ public class LoginActivity extends BaseTitleActivity {
         mInputPwd = view.findViewById(R.id.et_user_pwd);
         mLogin = view.findViewById(R.id.tv_login);
         mRegister = view.findViewById(R.id.tv_register);
-        mWXLogin = view.findViewById(R.id.tv_wx_login);
+        mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
+        mIvChangeAppId = view.findViewById(R.id.iv_app_id);
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
         mSwitchLoginMode.setVisibility(View.GONE);
@@ -126,15 +133,14 @@ public class LoginActivity extends BaseTitleActivity {
     @Override
     protected void setViewListener() {
         // 注册
-        mRegister.setOnClickListener(
-                v -> RegisterActivity.openRegister(LoginActivity.this));
+        mRegister.setOnClickListener(v -> RegisterActivity.openRegister(LoginActivity.this));
         // 登陆
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
             // MainActivity.openMain(LoginActivity.this);
 
-            login(this, name, pwd, mLoginByUserId);
+            login(this, name, pwd, mLoginByUserId, mChangeAppId);
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
@@ -144,7 +150,7 @@ public class LoginActivity extends BaseTitleActivity {
             }
             WXUtils.getInstance().wxLogin();
         });
-        //扫一扫
+        // 扫一扫
         mIvScan.setOnClickListener(v -> ScannerActivity.openScan(this));
         mInputWatcher = new TextWatcher() {
             @Override
@@ -182,6 +188,22 @@ public class LoginActivity extends BaseTitleActivity {
             }
             mLoginByUserId = !mLoginByUserId;
         });
+        
+        // 修改appId
+        mIvChangeAppId.setOnClickListener(v -> DialogUtils.getInstance().showEditDialog(this,
+                "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
+                new CommonEditDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener(String content) {
+                        mChangeAppId = content;
+                        mTvAppId.setText("APPID:" + content);
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                }));
     }
 
     @Override
@@ -249,6 +271,7 @@ public class LoginActivity extends BaseTitleActivity {
 
     /**
      * 绑定openId
+     * 
      * @param pwd
      */
     public static void bindOpenId(final Activity activity, String name, final String pwd,
@@ -284,16 +307,19 @@ public class LoginActivity extends BaseTitleActivity {
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
                 ToastUtil.showTextViewPrompt("绑定失败");
-                if (activity instanceof BaseTitleActivity
-                        && !activity.isFinishing()) {
+                if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
                     ((BaseTitleActivity)activity).dismissLoadingDialog();
                 }
             }
         });
     }
-    
+
+    public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
+        login(activity, name, pwd, isLoginById, null);
+    }
+
     public static void login(final Activity activity, String name, final String pwd,
-                             final boolean isLoginById) {
+            final boolean isLoginById, final String changeAppId) {
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pwd)) {
             ToastUtil.showTextViewPrompt("不能为空");
@@ -331,6 +357,10 @@ public class LoginActivity extends BaseTitleActivity {
                     SharePreferenceUtils.getInstance().putUserName(profile.username());
                     SharePreferenceUtils.getInstance().putUserPwd(pwd);
                     AppManager.getInstance().getTokenByName(profile.username(), pwd, null);
+                    if(!TextUtils.isEmpty(changeAppId)){
+                        SharePreferenceUtils.getInstance().putAppId(changeAppId);
+                        UserManager.getInstance().changeAppId(changeAppId);
+                    }
                     // 登陆成功消息预加载
                     WelcomeActivity.initData();
                 }

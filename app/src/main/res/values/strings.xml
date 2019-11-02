@@ -99,15 +99,18 @@
 
     <!--登录-->
     <string name="login">登录</string>
+    <string name="login_by_pwd">密码登录</string>
     <string name="register">注册</string>
     <string name="login_user_name_hint">请输入用户名或手机号</string>
     <string name="login_user_id_hint">请输入用户id</string>
     <string name="login_user_pwd_hint">请输入密码</string>
-    <string name="register_user_phone_hint">手机号</string>
-    <string name="register_user_name_hint">用户名</string>
-    <string name="register_user_verify_hint">验证码</string>
-    <string name="register_user_pwd_hint">密码</string>
-    <string name="weixin_login">微信登录</string>
+    <string name="register_user_phone_hint">请输入手机号</string>
+    <string name="register_user_name_hint">请输入用户名</string>
+    <string name="register_user_verify_hint">请输入验证码</string>
+    <string name="register_user_pwd_hint">请输入密码</string>
+    <string name="quick_login">快捷登录</string>
+    <string name="register_protocol1">注册即代表同意</string>
+    <string name="register_protocol2">用户服务及隐私政策</string>
 
     <!--设置-->
     <string name="user_info">个人信息</string>

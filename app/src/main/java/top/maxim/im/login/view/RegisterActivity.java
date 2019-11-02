@@ -4,9 +4,15 @@ package top.maxim.im.login.view;
 import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,7 +31,10 @@ import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonEditDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
 
@@ -35,7 +44,7 @@ import top.maxim.im.net.HttpResponseCallback;
 public class RegisterActivity extends BaseTitleActivity {
 
     /* 关闭 */
-    private ImageView mClose;
+    private TextView mClose;
 
     /* 账号 */
     private EditText mInputName;
@@ -61,12 +70,20 @@ public class RegisterActivity extends BaseTitleActivity {
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
+    private TextView mTvAppId;
+
+    private ImageView mIvChangeAppId;
+
+    private String mChangeAppId;
+
+    private TextView mTvRegisterProtocol;
+
     public static final String REFISTER_ACCOUNT = "registerAccount";
 
     public static final String REFISTER_PWD = "registerPwd";
-    
+
     public static final String OPEN_ID = "openId";
-    
+
     /* 微信登录返回的openId */
     private String mOpenId;
 
@@ -104,7 +121,7 @@ public class RegisterActivity extends BaseTitleActivity {
     protected View onCreateView() {
         hideHeader();
         View view = View.inflate(this, R.layout.activity_register, null);
-        mClose = view.findViewById(R.id.iv_register_close);
+        mClose = view.findViewById(R.id.tv_register_close);
         mInputName = view.findViewById(R.id.et_user_name);
         mInputPwd = view.findViewById(R.id.et_user_pwd);
         mInputPhone = view.findViewById(R.id.et_user_phone);
@@ -112,6 +129,10 @@ public class RegisterActivity extends BaseTitleActivity {
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
         mInputVerify = view.findViewById(R.id.et_user_verify);
         mRegister = view.findViewById(R.id.tv_register);
+        mIvChangeAppId = view.findViewById(R.id.iv_app_id);
+        mTvAppId = view.findViewById(R.id.tv_login_appid);
+        mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
+        buildProtocol();
         return view;
     }
 
@@ -121,6 +142,35 @@ public class RegisterActivity extends BaseTitleActivity {
         if (intent != null) {
             mOpenId = intent.getStringExtra(OPEN_ID);
         }
+    }
+
+    @Override
+    protected void initDataForActivity() {
+        String appId = SharePreferenceUtils.getInstance().getAppId();
+        mTvAppId.setText("APPID:" + appId);
+    }
+
+    private void buildProtocol() {
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append(getResources().getString(R.string.register_protocol1));
+        ClickableSpan span = new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+
+            }
+        };
+        SpannableString spannableString = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol2) + "》");
+        spannableString.setSpan(span, 0, spannableString.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString);
+        mTvRegisterProtocol.setText(builder);
     }
 
     @Override
@@ -193,6 +243,21 @@ public class RegisterActivity extends BaseTitleActivity {
                 }
             });
         });
+        // 修改appId
+        mIvChangeAppId.setOnClickListener(v -> DialogUtils.getInstance().showEditDialog(this,
+                "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
+                new CommonEditDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener(String content) {
+                        mChangeAppId = content;
+                        mTvAppId.setText("APPID:" + content);
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                }));
     }
 
     void register(final String account, final String pwd, final String phone, final String verify) {
@@ -232,7 +297,8 @@ public class RegisterActivity extends BaseTitleActivity {
                         if (TextUtils.isEmpty(mOpenId)) {
                             LoginActivity.login(RegisterActivity.this,
                                     mInputName.getEditableText().toString().trim(),
-                                    mInputPwd.getEditableText().toString().trim(), false);
+                                    mInputPwd.getEditableText().toString().trim(), false,
+                                    mChangeAppId);
                         } else {
                             LoginActivity.bindOpenId(RegisterActivity.this,
                                     mInputName.getEditableText().toString().trim(),

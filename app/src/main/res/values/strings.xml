@@ -171,4 +171,9 @@
     <string name="im_push_msg_action">%1$s.action.push.msg</string>
     <string name="push_receiver_rec_msg_count">您收到了%1$s条消息</string>
 
+
+    <string name="about_us_desc">一键启用多云架构的即时通讯云服务</string>
+    <string name="about_us_contact">联系商务请访问官网https://www.maximtop.com或致电400-666-0162</string>
+    <string name="about_us_company">copyright@ 2019 美信拓扑</string>
+
 </resources>

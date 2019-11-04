@@ -7,7 +7,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.gavin.view.flexible.FlexibleLayout;
 
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
@@ -44,6 +47,10 @@ import top.maxim.im.push.PushUtils;
  * Description : 我的 Created by Mango on 2018/11/06
  */
 public class MineFragment extends BaseTitleFragment {
+
+    private FlexibleLayout mFlexibleLayout;
+
+    private ScrollView mScrollView;
 
     private ImageView mUserEdit;
 
@@ -120,6 +127,8 @@ public class MineFragment extends BaseTitleFragment {
     protected View onCreateView() {
         hideHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_mine, null);
+        mFlexibleLayout = view.findViewById(R.id.flexible_layout);
+        mScrollView = view.findViewById(R.id.scroll_user);
         mUserEdit = view.findViewById(R.id.iv_user_info_edit);
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
         mUserName = view.findViewById(R.id.tv_user_name);
@@ -128,10 +137,14 @@ public class MineFragment extends BaseTitleFragment {
         mQuitView = view.findViewById(R.id.tv_quit_app);
         mAppVersion = view.findViewById(R.id.tv_version_app);
         mMyQrCode = view.findViewById(R.id.icon_qrcode);
+
+        mFlexibleLayout.setHeader(view.findViewById(R.id.rl_user_info)).setReadyListener(() ->
+        // 下拉放大的条件
+        mScrollView.getScrollY() == 0);
         // 获取app版本
         int versionCode = BuildConfig.VERSION_CODE;
         String versionName = BuildConfig.VERSION_NAME;
-        if (versionCode > 0 && !TextUtils.isEmpty(versionName)) {
+        if (!TextUtils.isEmpty(versionName)) {
             mAppVersion.setText(versionName + "(Build " + versionCode + ")");
         }
         LinearLayout container = view.findViewById(R.id.ll_mine_container);

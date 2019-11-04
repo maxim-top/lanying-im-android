@@ -260,9 +260,16 @@ public class ContactFragment extends BaseTitleFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    protected void initDataForActivity() {
+        super.initDataForActivity();
         initRoster(true);
+    }
+
+    @Override
+    public void onShow() {
+        if (mContentView != null) {
+            initRoster(true);
+        }
     }
 
     private void initRoster(boolean forceRefresh) {

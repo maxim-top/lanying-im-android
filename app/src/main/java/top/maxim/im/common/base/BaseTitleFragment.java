@@ -1,6 +1,7 @@
 
 package top.maxim.im.common.base;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,7 +25,7 @@ public abstract class BaseTitleFragment extends BaseFragment {
 
     private LinearLayout mContainer;
 
-    private View mContentView;
+    protected View mContentView;
 
     protected Header mHeader;
 
@@ -95,6 +96,9 @@ public abstract class BaseTitleFragment extends BaseFragment {
         mHeaderDiver.setVisibility(View.GONE);
     }
 
+    public void onShow() {
+    }
+
     protected abstract Header onCreateHeader(RelativeLayout headerContainer);
 
     protected abstract View onCreateView();
@@ -135,4 +139,8 @@ public abstract class BaseTitleFragment extends BaseFragment {
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

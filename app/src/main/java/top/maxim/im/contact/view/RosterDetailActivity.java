@@ -290,7 +290,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
         long userId = mRosterItem.rosterId();
         mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
         mNickName.setText(TextUtils.isEmpty(nickName) ? "" : "昵称:" + nickName);
-        mUserId.setText(userId <= 0 ? "" : "BMXID:" + userId);
+        mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
         String publicInfo = mRosterItem.publicInfo();
         if (TextUtils.isEmpty(publicInfo)) {
             mTvPublic.setVisibility(View.GONE);

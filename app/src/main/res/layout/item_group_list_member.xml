@@ -37,7 +37,6 @@
         android:layout_marginLeft="@dimen/dimen_20"
         android:ellipsize="end"
         android:gravity="center_vertical"
-        android:maxWidth="@dimen/dimen_54"
         android:singleLine="true"
         android:textColor="@color/color_333333"
         android:textSize="@dimen/dimen_14" />

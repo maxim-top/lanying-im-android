@@ -3,13 +3,18 @@ package top.maxim.im.bmxmanager;
 
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import top.maxim.im.common.utils.GsonParameterizedType;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.contact.bean.SupportBean;
 import top.maxim.im.net.DefaultOkhttpClient;
 import top.maxim.im.net.HttpCallback;
 import top.maxim.im.net.HttpClient;
@@ -28,12 +33,15 @@ public class AppManager {
 
     private DefaultOkhttpClient mClient;
 
+    private Gson mGson;
+
     public static AppManager getInstance() {
         return sInstance;
     }
 
     private AppManager() {
         mClient = new DefaultOkhttpClient();
+        mGson = new Gson();
     }
 
     /**
@@ -488,6 +496,36 @@ public class AppManager {
                 });
     }
 
+
+    /**
+     * 绑定openId
+     */
+    public void getSupportStaff(String token, HttpResponseCallback<List<SupportBean>> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "support_staff", null, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        parseListResult(200, result, callback, SupportBean.class);
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
     /**
      * 解绑定openId
      */
@@ -587,6 +625,49 @@ public class AppManager {
             e.printStackTrace();
         }
         if (code == 200) {
+            // 成功
+            if (callback != null) {
+                callback.onCallResponse(t);
+            }
+        } else {
+            // 失败
+            if (callback != null) {
+                callback.onCallFailure(code, error, new Throwable(error));
+            }
+        }
+    }
+
+    /**
+     * 解析返回结果
+     *
+     * @param result
+     */
+    <T> void parseListResult(int successCode, String result, HttpResponseCallback<List<T>> callback,
+                             Class<T> clazz) {
+        if (TextUtils.isEmpty(result)) {
+            if (callback != null) {
+                callback.onCallFailure(-1, "", new Throwable());
+            }
+            return;
+        }
+        int code = -1;
+        String error = "";
+        List<T> t = null;
+        try {
+            JSONObject jsonObject = new JSONObject(result);
+            if (jsonObject.has("code")) {
+                code = jsonObject.getInt("code");
+            }
+            if (jsonObject.has("message")) {
+                error = jsonObject.getString("message");
+            }
+            if (jsonObject.has("data")) {
+                t = mGson.fromJson(jsonObject.getString("data"), new GsonParameterizedType(clazz));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (code == successCode) {
             // 成功
             if (callback != null) {
                 callback.onCallResponse(t);

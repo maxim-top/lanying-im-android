@@ -23,7 +23,7 @@ import top.maxim.im.common.view.Header;
  */
 public abstract class BaseSwitchActivity extends BaseTitleActivity {
 
-    private BaseFragment mCurrentFragment;
+    protected BaseFragment mCurrentFragment;
 
     private int mCurrentIndex = -1;
 

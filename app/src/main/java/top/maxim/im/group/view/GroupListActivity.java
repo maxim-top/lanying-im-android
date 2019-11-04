@@ -95,9 +95,16 @@ public class GroupListActivity extends BaseTitleFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    protected void initDataForActivity() {
+        super.initDataForActivity();
         getAllGroup();
+    }
+
+    @Override
+    public void onShow() {
+        if (mContentView != null) {
+            getAllGroup();
+        }
     }
 
     /**

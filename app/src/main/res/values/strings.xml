@@ -127,6 +127,7 @@
     <string name="black_list">黑名单列表</string>
     <string name="other_device_tips">是否多端提示</string>
     <string name="device_list">多设备列表</string>
+    <string name="about_us">关于我们</string>
     <string name="setting_user_name">设置昵称</string>
     <string name="setting_user_phone">设置手机号</string>
     <string name="setting_user_public">设置公开信息</string>

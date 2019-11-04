@@ -98,6 +98,9 @@ public class MineFragment extends BaseTitleFragment {
     /* 解绑微信 */
     private ItemLineArrow.Builder mUnBindWeChat;
 
+    /* 关于我们 */
+    private ItemLineArrow.Builder mAboutUs;
+
     /* app版本号 */
     private TextView mAppVersion;
 
@@ -253,6 +256,12 @@ public class MineFragment extends BaseTitleFragment {
         mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent("解除微信绑定")
                 .setArrowVisible(false).setOnItemClickListener(v -> unBindWeChat());
         container.addView(mUnBindWeChat.build(), 11);
+
+        // 关于我们
+        mAboutUs = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.about_us)).setArrowVisible(false)
+                .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
+        container.addView(mAboutUs.build(), 12);
         return view;
     }
 
@@ -578,9 +587,9 @@ public class MineFragment extends BaseTitleFragment {
      * @param name
      */
     private void setPushName(final String name) {
-//        if (TextUtils.isEmpty(name)) {
-//            return;
-//        }
+        // if (TextUtils.isEmpty(name)) {
+        // return;
+        // }
         showLoadingDialog(true);
         Observable.just(name).map(new Func1<String, BMXErrorCode>() {
             @Override
@@ -704,7 +713,7 @@ public class MineFragment extends BaseTitleFragment {
             }
         });
     }
-    
+
     private void toastError(Throwable e) {
         String error = e != null ? e.getMessage() : "网络异常";
         ToastUtil.showTextViewPrompt(error);

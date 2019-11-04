@@ -7,7 +7,7 @@
     android:overScrollMode="never"
     android:scrollbars="none">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -17,20 +17,20 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_150"
             android:background="@drawable/mine_bg"
-            android:paddingLeft="@dimen/dimen_36"
             android:clipChildren="false"
-            android:clipToPadding="false">
+            android:clipToPadding="false"
+            android:paddingLeft="@dimen/dimen_36">
 
             <ImageView
                 android:id="@+id/iv_user_info_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:paddingLeft="@dimen/dimen_10"
                 android:paddingTop="@dimen/dimen_20"
                 android:paddingRight="@dimen/dimen_18"
                 android:paddingBottom="@dimen/dimen_10"
-                android:paddingLeft="@dimen/dimen_10"
-                android:src="@drawable/my_info_edit_icon"/>
+                android:src="@drawable/my_info_edit_icon" />
 
             <LinearLayout
                 android:id="@+id/ll_user_info"
@@ -51,9 +51,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:maxLines="1"
-                        android:textStyle="bold"
                         android:textColor="@color/color_white"
-                        android:textSize="@dimen/dimen_26" />
+                        android:textSize="@dimen/dimen_26"
+                        android:textStyle="bold" />
 
                     <ImageView
                         android:id="@+id/icon_qrcode"
@@ -84,24 +84,24 @@
 
             </LinearLayout>
 
-            <top.maxim.im.common.view.ShapeImageView
-                android:id="@+id/iv_user_avatar"
-                android:layout_width="@dimen/dimen_100"
-                android:layout_height="@dimen/dimen_100"
-                android:layout_marginRight="@dimen/dimen_36"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="@dimen/dimen_20"
-                android:src="@drawable/default_avatar_icon"
-                android:layout_marginBottom="-10dp"
-                android:layout_alignParentBottom="true"
-                app:shape="circle" />
-
         </RelativeLayout>
+
+        <top.maxim.im.common.view.ShapeImageView
+            android:id="@+id/iv_user_avatar"
+            android:layout_width="@dimen/dimen_100"
+            android:layout_height="@dimen/dimen_100"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="@dimen/dimen_20"
+            android:layout_marginTop="@dimen/dimen_55"
+            android:layout_marginRight="@dimen/dimen_36"
+            android:src="@drawable/default_avatar_icon"
+            app:shape="circle" />
 
         <LinearLayout
             android:id="@+id/ll_mine_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/rl_user_info"
             android:layout_marginTop="@dimen/dimen_10"
             android:orientation="vertical">
 
@@ -111,7 +111,8 @@
             android:id="@+id/tv_version_app"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_below="@id/ll_mine_container"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="@dimen/dimen_20"
             android:layout_marginBottom="@dimen/dimen_10"
             android:gravity="center"
@@ -122,6 +123,7 @@
             android:id="@+id/tv_quit_app"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_50"
+            android:layout_below="@id/tv_version_app"
             android:layout_marginTop="@dimen/dimen_20"
             android:layout_marginBottom="@dimen/dimen_30"
             android:background="@color/color_white"
@@ -130,5 +132,5 @@
             android:textColor="@color/color_FF475A"
             android:textSize="@dimen/dimen_16" />
 
-    </LinearLayout>
+    </RelativeLayout>
 </ScrollView>

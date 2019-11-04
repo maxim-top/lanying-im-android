@@ -96,6 +96,11 @@
             android:name=".login.view.DeviceListActivity"
             android:screenOrientation="portrait" />
 
+        <!--关于我们-->
+        <activity
+            android:name=".login.view.AboutUsActivity"
+            android:screenOrientation="portrait" />
+
         <!--首页-->
         <activity
             android:name=".MainActivity"

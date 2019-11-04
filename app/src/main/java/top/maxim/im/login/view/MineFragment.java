@@ -62,6 +62,8 @@ public class MineFragment extends BaseTitleFragment {
 
     private TextView mNickName;
 
+    private TextView mUserPubInfo;
+
     /* 退出登录 */
     private TextView mQuitView;
 
@@ -133,6 +135,7 @@ public class MineFragment extends BaseTitleFragment {
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
         mUserName = view.findViewById(R.id.tv_user_name);
         mNickName = view.findViewById(R.id.tv_nick_name);
+        mUserPubInfo = view.findViewById(R.id.tv_public_info);
         mUserId = view.findViewById(R.id.tv_user_id);
         mQuitView = view.findViewById(R.id.tv_quit_app);
         mAppVersion = view.findViewById(R.id.tv_version_app);
@@ -314,11 +317,13 @@ public class MineFragment extends BaseTitleFragment {
     private void initUser(BMXUserProfile profile) {
         String name = profile.username();
         String nickName = profile.nickname();
+        String publicInfo = profile.publicInfo();
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
         long userId = profile.userId();
         mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
-        mNickName.setText(TextUtils.isEmpty(nickName) ? "" : nickName);
+        mNickName.setText("昵称:" + (TextUtils.isEmpty(nickName) ? "请设置昵称" : nickName));
         mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
+        mUserPubInfo.setText("个性签名:" + (TextUtils.isEmpty(publicInfo) ? "赶快去设置签名吧" : publicInfo));
         // push
         BMXUserProfile.MessageSetting setting = profile.messageSetting();
         boolean isPush = setting != null && setting.getMPushEnabled();

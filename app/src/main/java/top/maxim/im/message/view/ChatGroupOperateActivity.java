@@ -140,6 +140,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /* 设置群已读 */
     private ItemLineSwitch.Builder mChatGroupReadMode;
+
     private View mChatGroupReadModeView;
 
     /* 群聊成员gridView */
@@ -150,6 +151,10 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /* 退出群聊 */
     private TextView mQuitGroup;
+
+    private View itemLine_1, itemLine_2, itemLine0, itemLine1, itemLine2, itemLine3, itemLine4,
+            itemLine5, itemLine6, itemLine7, itemLine8, itemLine9, itemLine10, itemLine11,
+            itemLine12;
 
     /* 相册 */
     private final int IMAGE_REQUEST = 1000;
@@ -266,9 +271,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mChatGroupId.build());
 
         // 分割线
-        ItemLine.Builder itemLine_1 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine_1.build());
+        itemLine_1 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine_1);
 
         /* 群主id */
         mChatGroupOwnerId = new ItemLineArrow.Builder(this)
@@ -276,9 +281,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mChatGroupOwnerId.build());
 
         // 分割线
-        ItemLine.Builder itemLine0 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine0.build());
+        itemLine0 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine0);
 
         /* 群二维码 */
         mChatGroupQrcode = new ItemLineArrow.Builder(this)
@@ -287,9 +292,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mChatGroupQrcode.build());
 
         // 分割线
-        ItemLine.Builder itemLine_2 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine_2.build());
+        itemLine_2 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine_2);
 
         /* 群管理 */
         mChatGroupManager = new ItemLineArrow.Builder(this)
@@ -299,9 +304,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mViewChatGroupManager = mChatGroupManager.build());
 
         // 分割线
-        ItemLine.Builder itemLine1 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine1.build());
+        itemLine1 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine1);
 
         /* 修改群名称 */
         mChatGroupRename = new ItemLineArrow.Builder(this)
@@ -334,9 +339,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mViewGroupAvatar = mGroupAvatar.build());
 
         // 分割线
-        ItemLine.Builder itemLine2 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine2.build());
+        itemLine2 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine2);
 
         /* 我在群里的昵称 */
         mGroupMyNickName = new ItemLineArrow.Builder(this)
@@ -350,9 +355,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mViewGroupMyNickName = mGroupMyNickName.build());
 
         // 分割线
-        ItemLine.Builder itemLine3 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine3.build());
+        itemLine3 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine3);
 
         /* 管理员列表 */
         mChatGroupManagerList = new ItemLineArrow.Builder(this)
@@ -366,9 +371,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 });
         container.addView(mViewChatGroupManagerList = mChatGroupManagerList.build());
         // 分割线
-        ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine4.build());
+        itemLine4 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine4);
 
         /* 群描述 */
         mChatGroupDesc = new ItemLineArrow.Builder(this)
@@ -382,9 +387,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mViewChatGroupDesc = mChatGroupDesc.build());
 
         // 分割线
-        ItemLine.Builder itemLine5 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine5.build());
+        itemLine5 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine5);
 
         mViewGroupDesc = new TextView(this);
         mViewGroupDesc.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
@@ -397,9 +402,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mViewGroupDesc);
 
         // 分割线
-        ItemLine.Builder itemLine6 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine6.build());
+        itemLine6 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine6);
 
         /* 群公告 */
         mChatGroupNotice = new ItemLineArrow.Builder(this)
@@ -413,9 +418,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 });
         container.addView(mViewChatGroupNotice = mChatGroupNotice.build());
         // 分割线
-        ItemLine.Builder itemLine7 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine7.build());
+        itemLine7 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine7);
 
         mViewGroupNotice = new TextView(this);
         mViewGroupNotice.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
@@ -428,9 +433,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mViewGroupNotice);
 
         // 分割线
-        ItemLine.Builder itemLine8 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine8.build());
+        itemLine8 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine8);
 
         /* 群扩展信息 */
         mChatGroupExt = new ItemLineArrow.Builder(this)
@@ -444,9 +449,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mViewChatGroupExt = mChatGroupExt.build());
 
         // 分割线
-        ItemLine.Builder itemLine9 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine9.build());
+        itemLine9 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine9);
 
         mViewGroupExt = new TextView(this);
         mViewGroupExt.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
@@ -459,9 +464,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         container.addView(mViewGroupExt);
 
         // 分割线
-        ItemLine.Builder itemLine10 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine10.build());
+        itemLine10 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build();
+        container.addView(itemLine10);
 
         /* 群共享 */
         mChatGroupShare = new ItemLineArrow.Builder(this)
@@ -475,8 +480,8 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 });
         container.addView(mViewChatGroupShare = mChatGroupShare.build());
         // 分割线
-        ItemLine.Builder itemLine11 = new ItemLine.Builder(this, container);
-        container.addView(itemLine11.build());
+        itemLine11 = new ItemLine.Builder(this, container).build();
+        container.addView(itemLine11);
 
         /* 群已读 */
         mChatGroupReadMode = new ItemLineSwitch.Builder(this)
@@ -489,8 +494,8 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 });
         container.addView(mChatGroupReadModeView = mChatGroupReadMode.build());
         // 分割线
-        ItemLine.Builder itemLine12 = new ItemLine.Builder(this, container);
-        container.addView(itemLine12.build());
+        itemLine12 = new ItemLine.Builder(this, container).build();
+        container.addView(itemLine12);
 
         // 退出群聊
         mQuitGroup = new TextView(this);
@@ -638,6 +643,14 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
         mViewChatGroupShare.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
         mChatGroupReadModeView.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+
+        View[] views = new View[] {
+                itemLine1, itemLine2, itemLine4, itemLine5, itemLine6, itemLine7, itemLine8,
+                itemLine9, itemLine10, itemLine11, itemLine12
+        };
+        for (View view : views) {
+            view.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        }
     }
 
     /**
@@ -879,6 +892,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /**
      * 设置群已读开关
+     * 
      * @param enable 是否开启
      */
     private void setGroupReadAck(boolean enable) {

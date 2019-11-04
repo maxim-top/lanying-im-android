@@ -90,6 +90,15 @@
                         android:textColor="@color/color_white"
                         android:textSize="@dimen/dimen_12" />
 
+                    <TextView
+                        android:id="@+id/tv_public_info"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dimen_5"
+                        android:maxLines="1"
+                        android:textColor="@color/color_white"
+                        android:textSize="@dimen/dimen_12" />
+
                 </LinearLayout>
 
                 <top.maxim.im.common.view.ShapeImageView
@@ -101,7 +110,7 @@
                     android:layout_marginLeft="@dimen/dimen_20"
                     android:layout_marginTop="@dimen/dimen_55"
                     android:layout_marginRight="@dimen/dimen_36"
-                    android:layout_marginBottom="-10dp"
+                    android:layout_marginBottom="-5dp"
                     android:src="@drawable/default_avatar_icon"
                     app:shape="circle" />
 
@@ -126,6 +135,7 @@
                 android:layout_marginTop="@dimen/dimen_20"
                 android:layout_marginBottom="@dimen/dimen_10"
                 android:gravity="center"
+                android:visibility="gone"
                 android:textColor="@color/color_black"
                 android:textSize="@dimen/dimen_16" />
 

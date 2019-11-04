@@ -31,7 +31,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_app_version"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dimen_20"
         android:textColor="@color/color_black"
         android:textSize="@dimen/dimen_12" />
 

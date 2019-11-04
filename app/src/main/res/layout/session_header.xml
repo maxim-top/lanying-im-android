@@ -32,8 +32,8 @@
 
             <ImageView
                 android:id="@+id/iv_session_search"
-                android:layout_width="@dimen/dimen_30"
-                android:layout_height="@dimen/dimen_30"
+                android:layout_width="@dimen/dimen_20"
+                android:layout_height="@dimen/dimen_20"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/icon_black_search"/>
 

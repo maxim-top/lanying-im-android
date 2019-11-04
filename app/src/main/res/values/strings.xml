@@ -75,6 +75,7 @@
     <string name="profile_public">公有信息</string>
     <string name="begin_chat">开始聊天</string>
     <string name="send">发送</string>
+    <string name="search_hint">搜索</string>
 
     <!--Contact-->
     <string name="contact_apply_notice">新的朋友</string>

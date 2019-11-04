@@ -21,7 +21,7 @@
             android:drawableLeft="@drawable/icon_search"
             android:drawablePadding="@dimen/dimen_10"
             android:gravity="center_vertical"
-            android:hint="搜索"
+            android:hint="请输入要搜索的聊天记录内容"
             android:imeOptions="actionSearch"
             android:paddingLeft="@dimen/dimen_10"
             android:singleLine="true" />

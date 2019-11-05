@@ -12,6 +12,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.EditText;
@@ -151,18 +152,20 @@ public class RegisterActivity extends BaseTitleActivity {
     }
 
     private void buildProtocol() {
+        mTvRegisterProtocol.setMovementMethod(LinkMovementMethod.getInstance());
         SpannableStringBuilder builder = new SpannableStringBuilder();
         builder.append(getResources().getString(R.string.register_protocol1));
         ClickableSpan span = new ClickableSpan() {
 
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_0079F4));
                 ds.setUnderlineText(false);
             }
 
             @Override
             public void onClick(@NonNull View widget) {
-
+                ProtocolActivity.openProtol(RegisterActivity.this);
             }
         };
         SpannableString spannableString = new SpannableString(

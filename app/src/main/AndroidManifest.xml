@@ -91,6 +91,11 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"></activity>
 
+        <!--用户协议-->
+        <activity
+            android:name=".login.view.ProtocolActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!--多设备-->
         <activity
             android:name=".login.view.DeviceListActivity"

@@ -34,6 +34,7 @@ import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.CameraUtils;
+import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -95,6 +96,9 @@ public class SettingUserActivity extends BaseTitleActivity {
     /* 显示答案的view */
     private TextView mTvAnswer;
 
+    /* 头像路径 */
+    private String mIconPath;
+
     private ImageRequestConfig mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
             .showImageForEmptyUri(R.drawable.default_avatar_icon)
             .showImageOnFail(R.drawable.default_avatar_icon).cacheOnDisk(true)
@@ -103,6 +107,9 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     /* 相册 */
     private final int IMAGE_REQUEST = 1000;
+
+    /* 裁剪图片 */
+    private final int IMAGE_CROP = 1001;
 
     public static void openSettingUser(Context context) {
         Intent intent = new Intent(context, SettingUserActivity.class);
@@ -129,8 +136,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
 
         // Id
-        mUserId = new ItemLineArrow.Builder(this)
-                .setStartContent("ID");
+        mUserId = new ItemLineArrow.Builder(this).setStartContent("ID");
         container.addView(mUserId.build());
 
         // 分割线
@@ -782,10 +788,10 @@ public class SettingUserActivity extends BaseTitleActivity {
         Observable.just(path).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return UserManager.getInstance().uploadAvatar(s, new FileProgressListener(){
+                return UserManager.getInstance().uploadAvatar(s, new FileProgressListener() {
                     @Override
                     public int onProgressChange(String percent) {
-                        Log.i("uploadUserAvatar", "onProgressChange:"+ path + "-" + percent);
+                        Log.i("uploadUserAvatar", "onProgressChange:" + path + "-" + percent);
                         return 0;
                     }
                 });
@@ -806,11 +812,13 @@ public class SettingUserActivity extends BaseTitleActivity {
                         dismissLoadingDialog();
                         String error = e != null ? e.getMessage() : "网络异常";
                         ToastUtil.showTextViewPrompt(error);
+                        mIconPath = "";
                     }
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
+                        mIconPath = "";
                     }
                 });
     }
@@ -825,11 +833,29 @@ public class SettingUserActivity extends BaseTitleActivity {
                     try {
                         Uri selectedImage = data.getData(); // 获取系统返回的照片的Uri
                         String path = FileUtils.getFilePathByUri(selectedImage);
-                        uploadUserAvatar(path);
+                        if (TextUtils.isEmpty(path)) {
+                            return;
+                        }
+                        File imageFileDir = new File(FileConfig.DIR_APP_CACHE_CAMERA);
+                        if (!imageFileDir.exists()) {
+                            imageFileDir.mkdirs();
+                        }
+                        mIconPath = FileConfig.DIR_APP_CACHE_CAMERA + "/"
+                                + System.currentTimeMillis() + "icon" + ".jpg";
+                        CameraUtils.getInstance().startPhotoZoom(new File(path),
+                                Uri.fromFile(new File(mIconPath)), FileConfig.DIR_APP_CACHE_CAMERA,
+                                600, 600, this, IMAGE_CROP);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
+                break;
+            case IMAGE_CROP:
+                // 裁剪图片
+                if (!TextUtils.isEmpty(mIconPath)) {
+                    uploadUserAvatar(mIconPath);
+                }
+                break;
             default:
                 break;
         }

@@ -141,15 +141,16 @@ public class SupportFragment extends BaseTitleFragment {
             if (bean == null) {
                 return;
             }
-            String userName = "", nickName = "", avatarUrl = "";
+            String userName = "", nickName = "";
             userName = bean.getUsername();
             nickName = bean.getNickname();
-            avatarUrl = bean.getAvatar();
-            StringBuilder builder = new StringBuilder(userName);
             if (!TextUtils.isEmpty(nickName)) {
-                builder.append("(").append(nickName).append(")");
+                title.setText(nickName);
+            } else if (!TextUtils.isEmpty(userName)) {
+                title.setText(userName);
+            } else {
+                title.setText("");
             }
-            title.setText(builder.toString());
 
             BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(bean.getUser_id());
             ChatUtils.getInstance().showRosterAvatar(rosterItem, avatar, mConfig);

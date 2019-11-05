@@ -134,7 +134,7 @@
     <TextView
         android:id="@+id/tv_login"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_55"
+        android:layout_height="@dimen/dimen_50"
         android:layout_below="@id/ll_et_user_pwd"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
@@ -145,7 +145,7 @@
         android:enabled="false"
         android:gravity="center"
         android:text="@string/login_by_pwd"
-        android:textColor="@color/color_333333"
+        android:textColor="@drawable/common_btn_corner_seleced_text_color"
         android:textSize="@dimen/dimen_16" />
 
     <TextView

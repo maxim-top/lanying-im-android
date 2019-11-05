@@ -83,14 +83,13 @@ public class QRCodeShowUtils {
      * @param rosterId
      */
     public static String generateRosterQRCode(String rosterId) {
-        Gson gson = new Gson();
         QrCodeBean bean = new QrCodeBean();
-        bean.setResource(QRCodeConfig.SOURCE.APP);
+        bean.setSource(QRCodeConfig.SOURCE.APP);
         bean.setAction(QRCodeConfig.ACTION.PROFILE);
         Map<String, String> map = new HashMap<>();
         map.put("uid", rosterId);
-        bean.setInfo(gson.toJson(map));
-        return gson.toJson(bean);
+        bean.setInfo(map);
+        return new Gson().toJson(bean);
     }
 
     /**
@@ -99,15 +98,14 @@ public class QRCodeShowUtils {
      * @param groupId 群组id
      */
     public static String generateGroupQRCode(String groupId, String qr_info) {
-        Gson gson = new Gson();
         QrCodeBean bean = new QrCodeBean();
-        bean.setResource(QRCodeConfig.SOURCE.APP);
+        bean.setSource(QRCodeConfig.SOURCE.APP);
         bean.setAction(QRCodeConfig.ACTION.GROUP);
         Map<String, String> map = new HashMap<>();
         map.put("group_id", groupId);
         map.put("info", qr_info);
-        bean.setInfo(gson.toJson(map));
-        return gson.toJson(bean);
+        bean.setInfo(map);
+        return new Gson().toJson(bean);
     }
 
     /**

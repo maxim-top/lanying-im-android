@@ -79,7 +79,8 @@ public class ScanResultActivity extends BaseTitleActivity {
         if (bean == null) {
             return;
         }
-        if (TextUtils.equals(bean.getResource(), QRCodeConfig.SOURCE.APP)) {
+        String source = bean.getSource();
+        if (TextUtils.equals(source, QRCodeConfig.SOURCE.APP)) {
             boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
             // 非二维码体验功能 如果未登录不能识别
             if (!isLogin) {
@@ -95,7 +96,7 @@ public class ScanResultActivity extends BaseTitleActivity {
                 // 群聊
                 dealAppGroup(bean);
             }
-        } else if (TextUtils.equals(bean.getResource(), QRCodeConfig.SOURCE.CONSOLE)) {
+        } else if (TextUtils.equals(source, QRCodeConfig.SOURCE.CONSOLE)) {
             String action = bean.getAction();
             // 二维码体验功能 login
             if (TextUtils.equals(action, QRCodeConfig.ACTION.LOGIN)) {
@@ -115,14 +116,14 @@ public class ScanResultActivity extends BaseTitleActivity {
      * @param bean
      */
     private void dealAppProfile(QrCodeBean bean) {
-        if (bean == null || !TextUtils.equals(bean.getResource(), QRCodeConfig.SOURCE.APP)
+        if (bean == null || !TextUtils.equals(bean.getSource(), QRCodeConfig.SOURCE.APP)
                 || !TextUtils.equals(bean.getAction(), QRCodeConfig.ACTION.PROFILE)
-                || TextUtils.isEmpty(bean.getInfo())) {
+                || TextUtils.isEmpty(bean.getInfo().toString())) {
             return;
         }
         long uid = 0;
         try {
-            JSONObject jsonObject = new JSONObject(bean.getInfo());
+            JSONObject jsonObject = new JSONObject(bean.getInfo().toString());
             if (jsonObject.has("uid")) {
                 uid = jsonObject.getLong("uid");
             }
@@ -145,15 +146,15 @@ public class ScanResultActivity extends BaseTitleActivity {
      * @param bean
      */
     private void dealAppGroup(QrCodeBean bean) {
-        if (bean == null || !TextUtils.equals(bean.getResource(), QRCodeConfig.SOURCE.APP)
+        if (bean == null || !TextUtils.equals(bean.getSource(), QRCodeConfig.SOURCE.APP)
                 || !TextUtils.equals(bean.getAction(), QRCodeConfig.ACTION.GROUP)
-                || TextUtils.isEmpty(bean.getInfo())) {
+                || TextUtils.isEmpty(bean.getInfo().toString())) {
             return;
         }
         long groupId = 0;
         String qrInfo = null;
         try {
-            JSONObject jsonObject = new JSONObject(bean.getInfo());
+            JSONObject jsonObject = new JSONObject(bean.getInfo().toString());
             if (jsonObject.has("group_id")) {
                 groupId = jsonObject.getLong("group_id");
             }
@@ -173,22 +174,22 @@ public class ScanResultActivity extends BaseTitleActivity {
      * @param bean
      */
     private void dealConsoleLogin(QrCodeBean bean) {
-        if (bean == null || !TextUtils.equals(bean.getResource(), QRCodeConfig.SOURCE.CONSOLE)
+        if (bean == null || !TextUtils.equals(bean.getSource(), QRCodeConfig.SOURCE.CONSOLE)
                 || !TextUtils.equals(bean.getAction(), QRCodeConfig.ACTION.LOGIN)
-                || TextUtils.isEmpty(bean.getInfo())) {
+                || TextUtils.isEmpty(bean.getInfo().toString())) {
             return;
         }
         String appId = null;
         try {
-            JSONObject jsonObject = new JSONObject(bean.getInfo());
-            if (jsonObject.has("appId")) {
-                appId = jsonObject.getString("appId");
+            JSONObject jsonObject = new JSONObject(bean.getInfo().toString());
+            if (jsonObject.has("app_id")) {
+                appId = jsonObject.getString("app_id");
             }
             if (jsonObject.has("uid")) {
                 ScanConfigs.CODE_USER_ID = jsonObject.getString("uid");
             }
-            if (jsonObject.has("userName")) {
-                ScanConfigs.CODE_USER_NAME = jsonObject.getString("userName");
+            if (jsonObject.has("username")) {
+                ScanConfigs.CODE_USER_NAME = jsonObject.getString("username");
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -207,16 +208,16 @@ public class ScanResultActivity extends BaseTitleActivity {
      * @param bean
      */
     private void dealConsoleApp(QrCodeBean bean) {
-        if (bean == null || !TextUtils.equals(bean.getResource(), QRCodeConfig.SOURCE.CONSOLE)
+        if (bean == null || !TextUtils.equals(bean.getSource(), QRCodeConfig.SOURCE.CONSOLE)
                 || !TextUtils.equals(bean.getAction(), QRCodeConfig.ACTION.APP)
-                || TextUtils.isEmpty(bean.getInfo())) {
+                || TextUtils.isEmpty(bean.getInfo().toString())) {
             return;
         }
         String appId = null;
         try {
-            JSONObject jsonObject = new JSONObject(bean.getInfo());
-            if (jsonObject.has("appId")) {
-                appId = jsonObject.getString("appId");
+            JSONObject jsonObject = new JSONObject(bean.getInfo().toString());
+            if (jsonObject.has("app_id")) {
+                appId = jsonObject.getString("app_id");
             }
         } catch (JSONException e) {
             e.printStackTrace();

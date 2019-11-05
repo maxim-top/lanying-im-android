@@ -203,7 +203,7 @@
     <TextView
         android:id="@+id/tv_register"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_55"
+        android:layout_height="@dimen/dimen_50"
         android:layout_below="@id/ll_et_user_verify"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/dimen_30"
@@ -212,7 +212,7 @@
         android:gravity="center"
         android:padding="@dimen/dimen_10"
         android:text="@string/register"
-        android:textColor="@color/color_333333"
+        android:textColor="@drawable/common_btn_corner_seleced_text_color"
         android:textSize="@dimen/dimen_14" />
 
     <TextView

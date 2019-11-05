@@ -34,18 +34,18 @@ import top.maxim.im.common.bean.BaseBean;
  */
 public class QrCodeBean extends BaseBean {
 
-    private String resource;
+    private String source;
 
     private String action;
 
-    private String info;
+    private Object info;
 
-    public String getResource() {
-        return resource;
+    public String getSource() {
+        return source;
     }
 
-    public void setResource(String resource) {
-        this.resource = resource;
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public String getAction() {
@@ -56,11 +56,11 @@ public class QrCodeBean extends BaseBean {
         this.action = action;
     }
 
-    public String getInfo() {
+    public Object getInfo() {
         return info;
     }
 
-    public void setInfo(String info) {
+    public void setInfo(Object info) {
         this.info = info;
     }
 }

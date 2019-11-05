@@ -268,10 +268,12 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(mDeviceList.build(), 10);
 
-        // 多设备列表
+        // 微信解绑
         mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent("解除微信绑定")
                 .setArrowVisible(false).setOnItemClickListener(v -> unBindWeChat());
-        container.addView(mUnBindWeChat.build(), 11);
+        View viewBindWeChat = mUnBindWeChat.build();
+        container.addView(viewBindWeChat, 11);
+        viewBindWeChat.setVisibility(View.GONE);
 
         // 关于我们
         mAboutUs = new ItemLineArrow.Builder(getActivity())

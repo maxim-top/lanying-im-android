@@ -171,21 +171,21 @@ public class SettingUserActivity extends BaseTitleActivity {
                 .setMarginLeft(ScreenUtils.dp2px(15));
         container.addView(itemLine3.build());
 
-        // 手机号
-        mSetPhone = new ItemLineArrow.Builder(this)
-                .setStartContent(getString(R.string.setting_user_phone))
-                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
-                    @Override
-                    public void onItemClick(View v) {
-                        showSettingDialog(getString(R.string.setting_user_phone));
-                    }
-                });
-        container.addView(mSetPhone.build());
-
-        // 分割线
-        ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine4.build());
+//        // 手机号
+//        mSetPhone = new ItemLineArrow.Builder(this)
+//                .setStartContent(getString(R.string.setting_user_phone))
+//                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+//                    @Override
+//                    public void onItemClick(View v) {
+//                        showSettingDialog(getString(R.string.setting_user_phone));
+//                    }
+//                });
+//        container.addView(mSetPhone.build());
+//
+//        // 分割线
+//        ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
+//                .setMarginLeft(ScreenUtils.dp2px(15));
+//        container.addView(itemLine4.build());
 
         // 公开扩展信息
         mSetPublic = new ItemLineArrow.Builder(this)

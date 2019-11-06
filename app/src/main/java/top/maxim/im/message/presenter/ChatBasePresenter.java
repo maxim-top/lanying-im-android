@@ -73,7 +73,9 @@ import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.VoicePlayHelper;
 import top.maxim.im.common.utils.VoiceRecordHelper;
+import top.maxim.im.common.utils.dialog.CommonDialog;
 import top.maxim.im.common.utils.dialog.CustomDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.utils.permissions.PermissionsMgr;
 import top.maxim.im.common.utils.permissions.PermissionsResultAction;
@@ -108,7 +110,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     /* 视频 */
     private final int VIDEO_REQUEST = 1003;
-    
+
     /* 转发 */
     private final int FORWARD_REQUEST = 1004;
 
@@ -1409,7 +1411,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 }
                 break;
             case FORWARD_REQUEST:
-                //转发
+                // 转发
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null) {
                         BMXMessage.MessageType type = (BMXMessage.MessageType)data
@@ -1465,7 +1467,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         Observable.just("").map(new Func1<String, String>() {
             @Override
             public String call(String s) {
-                //获取当前最后一条消息
+                // 获取当前最后一条消息
                 BMXMessage message = mView.getLastMessage();
                 ChatManager.getInstance().readAllMessage(message);
                 return s;
@@ -1796,8 +1798,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                             add = address.getAddressLine(0);
                         }
                         if (!TextUtils.isEmpty(add)) {
-                            mView.sendChatMessage(mSendUtils.sendLocationMessage(mChatType,
-                                    mMyUserId, mChatId, latitude, longitude, add));
+                            showSendLocationDialog(add, latitude, longitude);
                         } else {
                             ToastUtil.showTextViewPrompt("获取位置失败");
                         }
@@ -1812,6 +1813,22 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         } else {
             ToastUtil.showTextViewPrompt("未插卡,暂不支持");
         }
+    }
+
+    private void showSendLocationDialog(String address, double latitude, double longitude) {
+        DialogUtils.getInstance().showDialog((Activity)mView.getContext(), "确定发送?", address,
+                new CommonDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        mView.sendChatMessage(mSendUtils.sendLocationMessage(mChatType, mMyUserId,
+                                mChatId, latitude, longitude, address));
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
     }
 
     @Override

@@ -9,7 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 
@@ -86,7 +88,7 @@ public class NotificationUtils {
                         .setSmallIcon(R.drawable.bmx_icon48).setTicker(content);
         if (bitmap == null) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
-            opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            opt.inPreferredConfig = Bitmap.Config.RGB_565;
             opt.inPurgeable = true;
             opt.inInputShareable = true;
             opt.inJustDecodeBounds = false;
@@ -100,6 +102,7 @@ public class NotificationUtils {
         builder.setContentIntent(pIntent);
         Notification notification = builder.build();
         manager.notify(notifyId, notification);
+        setHuaWeiCorner(count);
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -154,5 +157,31 @@ public class NotificationUtils {
      */
     public void cancelAll() {
         manager.cancelAll();
+        setHuaWeiCorner(0);
+    }
+
+    /**
+     * 设置华为手机角标
+     *
+     * @param count
+     */
+    public void setHuaWeiCorner(int count) {
+        if (android.os.Build.BRAND.toLowerCase().contains("huawei")
+                || android.os.Build.BRAND.toLowerCase().contains("honor")) {
+            try {
+                Bundle bunlde = new Bundle();
+                bunlde.putString("package", AppContextUtils.getAppContext().getPackageName());
+                String launchClassName = AppContextUtils.getAppContext().getPackageManager()
+                        .getLaunchIntentForPackage(AppContextUtils.getAppContext().getPackageName())
+                        .getComponent().getClassName();
+                bunlde.putString("class", launchClassName);
+                bunlde.putInt("badgenumber", count);
+                AppContextUtils.getAppContext().getContentResolver().call(
+                        Uri.parse("content://com.huawei.android.launcher.settings/badge/"),
+                        "change_badge", null, bunlde);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

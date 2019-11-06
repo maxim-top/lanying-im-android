@@ -33,6 +33,7 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!--华为push permission-->
+    <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />
     <permission
         android:name="${applicationId}.permission.PROCESS_PUSH_MSG"
         android:protectionLevel="signatureOrSystem" />

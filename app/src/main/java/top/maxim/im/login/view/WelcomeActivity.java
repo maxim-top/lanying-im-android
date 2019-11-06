@@ -32,6 +32,7 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 
 public class WelcomeActivity extends BaseTitleActivity {
@@ -55,6 +56,7 @@ public class WelcomeActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
+        NotificationUtils.getInstance().cancelAll();
         if (checkPermission()) {
             initJump();
         } else {

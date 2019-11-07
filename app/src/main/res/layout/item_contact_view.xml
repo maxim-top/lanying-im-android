@@ -26,8 +26,8 @@
 
         <top.maxim.im.common.view.ShapeImageView
             android:id="@+id/contact_avatar"
-            android:layout_width="@dimen/dimen_40"
-            android:layout_height="@dimen/dimen_40"
+            android:layout_width="@dimen/dimen_48"
+            android:layout_height="@dimen/dimen_48"
             android:layout_centerVertical="true"
             android:src="@drawable/default_avatar_icon"
             app:shape="circle" />

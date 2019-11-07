@@ -105,6 +105,9 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
 
     private void initGroup() {
         mUserId.setText(mGroupId <= 0 ? "" : "群Id:" + mGroupId);
+        if (mGroupId <= 0) {
+            return;
+        }
         showLoadingDialog(true);
         BMXGroup group = new BMXGroup();
         Observable.just(mGroupId).map(new Func1<Long, BMXErrorCode>() {

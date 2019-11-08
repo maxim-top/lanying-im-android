@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_56"
+        android:background="@color/color_white">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tablayout"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/dimen_15"
+            app:tabBackground="@android:color/transparent"
+            app:tabIndicatorHeight="0dp" />
+
+        <ImageView
+            android:id="@+id/iv_contact_add"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:paddingLeft="@dimen/dimen_10"
+            android:paddingRight="@dimen/dimen_10"
+            android:src="@drawable/icon_add"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_0.3"
+            android:layout_alignParentBottom="true"
+            android:background="@color/color_E1E6EB"/>
+    </RelativeLayout>
+
+    <top.maxim.im.common.view.ViewPagerFixed
+        android:id="@+id/contact_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/dimen_10"/>
+
+</LinearLayout>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/dimen_20"
+    android:paddingTop="@dimen/dimen_50"
+    android:paddingRight="@dimen/dimen_20"
+    android:paddingBottom="@dimen/dimen_20">
+
+    <ImageView
+        android:id="@+id/iv_about_us"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/icon_about_us" />
+
+    <TextView
+        android:id="@+id/tv_app_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/iv_about_us"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dimen_40"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_12" />
+
+    <TextView
+        android:id="@+id/tv_floo_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_app_version"
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_12" />
+
+    <TextView
+        android:id="@+id/tv_about_us_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_floo_version"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dimen_20"
+        android:gravity="center"
+        android:text="@string/about_us_desc"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_16" />
+
+    <TextView
+        android:id="@+id/tv_about_us_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_about_us_desc"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dimen_20"
+        android:gravity="center"
+        android:text="@string/about_us_contact"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_14" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dimen_20"
+        android:gravity="center"
+        android:text="@string/about_us_company"
+        android:textColor="@color/color_666666"
+        android:textSize="@dimen/dimen_14" />
+</RelativeLayout>

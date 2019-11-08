@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?><!-- 左位置 -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_location_left"
+    android:layout_width="@dimen/dimen_220"
+    android:layout_height="@dimen/dimen_84"
+    android:layout_alignWithParentIfMissing="true"
+    android:background="@drawable/chat_item_common_left_bg">
+
+    <ImageView
+        android:id="@+id/iv_local_left_icon"
+        android:layout_width="@dimen/dimen_38"
+        android:layout_height="@dimen/dimen_42"
+        android:layout_marginLeft="@dimen/dimen_12"
+        android:layout_marginTop="@dimen/dimen_12"
+        android:layout_marginRight="@dimen/dimen_10"
+        android:src="@drawable/item_chat_location_icon" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/iv_local_left_icon"
+        android:layout_marginRight="@dimen/dimen_5"
+        android:layout_toRightOf="@id/iv_local_left_icon">
+
+        <TextView
+            android:id="@+id/txt_local_title_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen_15" />
+
+        <TextView
+            android:id="@+id/txt_local_name_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_local_title_left"
+            android:layout_alignParentLeft="true"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen_13" />
+    </RelativeLayout>
+</RelativeLayout>

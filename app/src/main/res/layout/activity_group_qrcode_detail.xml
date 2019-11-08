@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/dimen_50">
+
+    <top.maxim.im.common.view.ShapeImageView
+        android:id="@+id/iv_user_avatar"
+        android:layout_width="@dimen/dimen_80"
+        android:layout_height="@dimen/dimen_80"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/default_avatar_icon"
+        app:shape="circle" />
+
+    <TextView
+        android:id="@+id/tv_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dimen_20"
+        android:maxLines="1"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_20" />
+
+    <TextView
+        android:id="@+id/tv_user_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dimen_5"
+        android:maxLines="1"
+        android:textColor="@color/color_355522"
+        android:textSize="@dimen/dimen_13" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dimen_20"
+        android:maxLines="1"
+        android:text="确定要加入该群?"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_20" />
+
+    <TextView
+        android:id="@+id/tv_confirm_join"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_44"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="@dimen/dimen_15"
+        android:layout_marginTop="@dimen/dimen_20"
+        android:layout_marginRight="@dimen/dimen_15"
+        android:background="@drawable/common_yellow_btn_corner_bg"
+        android:gravity="center"
+        android:text="@string/confirm"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_17" />
+</LinearLayout>

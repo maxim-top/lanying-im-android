@@ -1,0 +1,3 @@
+[submodule "floo-android"]
+	path = floo-android
+	url = git@github.com:blockmessage/floo-android.git

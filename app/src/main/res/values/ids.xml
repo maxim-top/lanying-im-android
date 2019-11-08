@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="header_back_icon" type="id" />
+    <item name="header_back_title" type="id" />
+    <item name="header_back_container" type="id" />
+    <item name="header_title" type="id" />
+    <item name="header_right_icon" type="id" />
+    <item name="header_right_title" type="id" />
+    <item name="header_right_container" type="id" />
+</resources>

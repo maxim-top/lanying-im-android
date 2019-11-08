@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/dimen_15"
+        android:paddingTop="@dimen/dimen_10"
+        android:paddingRight="@dimen/dimen_15"
+        android:paddingBottom="@dimen/dimen_10">
+
+        <EditText
+            android:id="@+id/search_group"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_36"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/search_edit_corner_bg"
+            android:drawableLeft="@drawable/icon_search"
+            android:drawablePadding="@dimen/dimen_10"
+            android:gravity="center_vertical"
+            android:hint="请输入要搜索的聊天记录内容"
+            android:imeOptions="actionSearch"
+            android:paddingLeft="@dimen/dimen_10"
+            android:singleLine="true" />
+    </FrameLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/group_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never"
+        android:scrollbars="none" />
+</LinearLayout>

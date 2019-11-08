@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/contact_sticky"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_30"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/dimen_15"
+        android:textColor="@color/color_9B9BA9"
+        android:textSize="@dimen/dimen_14"
+        android:visibility="gone" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/list_selector"
+        android:paddingLeft="@dimen/dimen_15"
+        android:paddingTop="@dimen/dimen_10"
+        android:paddingRight="@dimen/dimen_15"
+        android:paddingBottom="@dimen/dimen_10">
+
+        <top.maxim.im.common.view.ShapeImageView
+            android:id="@+id/contact_avatar"
+            android:layout_width="@dimen/dimen_48"
+            android:layout_height="@dimen/dimen_48"
+            android:layout_centerVertical="true"
+            android:src="@drawable/default_avatar_icon"
+            app:shape="circle" />
+
+        <TextView
+            android:id="@+id/contact_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/dimen_17"
+            android:layout_toRightOf="@id/contact_avatar"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:textColor="@color/color_333333"
+            android:textSize="@dimen/dimen_16" />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

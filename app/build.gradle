@@ -1,0 +1,120 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "top.maxim.im"
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 1907071346
+        versionName "0.2.13"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders = [
+                "HUAWEI_APPID"   : "100565061",
+                "XIAOMI_APPID"   : "2882303761517923338",
+                "XIAOMI_APP_KEY" : "5221792385338",
+                "MEIZU_APPID"    : "117965",
+                "MEIZU_APP_KEY"  : "ba1881e1356d4c9ea622772c64873c41",
+
+                "WEIXIN_APPID"   : "wxf0f8e197ecfb0925",
+
+                "BUGLY_APPID"    : "ae2c13667e"
+        ]
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
+        multiDexEnabled true
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('maxim-android.jks')
+            storePassword 'Z3vnmxQ2FG'
+            keyAlias 'maxim-android'
+            keyPassword 'FLTB6q8xQb'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+    repositories {
+        flatDir {
+            dirs 'libs'   // aar目录
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation 'com.squareup.okio:okio:1.12.0'
+    implementation 'com.aliyun.dpa:oss-android-sdk:+'
+    implementation 'com.google.code.gson:gson:2.7'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:multidex:1.0.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    implementation 'com.gavin.view.flexible:library:1.0.2'
+
+    //recyclerView
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+
+    //RxJava
+    implementation 'io.reactivex:rxandroid:1.2.1'
+    implementation 'io.reactivex:rxjava:1.3.0'
+
+    //UIL
+    implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    implementation(name:'floo-android_1.0.11.20191106',ext:'aar')
+
+    implementation 'com.squareup.okhttp3:okhttp:3.12.3'
+
+//    implementation project(path: ':floo-android')
+//    implementation files('libs/floo-android.jar')
+
+//    //fresco图片控件
+//    implementation 'com.facebook.fresco:fresco:1.4.0'
+//    //增加webp图片格式支持
+//    implementation 'com.facebook.fresco:webpsupport:1.4.0'
+////    // 支持 GIF 动图，需要添加  添加gif会导致roundCircle失效  所以注释
+////    compile 'com.facebook.fresco:animated-gif:1.4.0'
+////    // 支持 WebP （静态图+动图），需要添加
+////    compile 'com.facebook.fresco:animated-webp:1.4.0'
+//
+//    //支持fresco的大图 手势放大缩小
+//    implementation 'me.relex:photodraweeview:1.1.3'
+
+    //华为push
+    implementation 'com.huawei.android.hms:push:2.6.3.301'
+    //魅族push
+    implementation 'com.meizu.flyme.internet:push-ups:1.1.+'
+
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    //微信
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
+
+    //bugly
+    implementation 'com.tencent.bugly:crashreport:latest.release'
+    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
+}

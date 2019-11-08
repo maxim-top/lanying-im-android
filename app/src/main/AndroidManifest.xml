@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="top.maxim.im">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+
+    <!-- 在SDCard中创建与删除文件权限 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <!-- 写SD卡权限 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Android O版本调用安装需要使用该权限 -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <!--华为push permission-->
+    <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />
+    <permission
+        android:name="${applicationId}.permission.PROCESS_PUSH_MSG"
+        android:protectionLevel="signatureOrSystem" />
+
+    <!--小米push permission-->
+    <permission
+        android:name="${applicationId}.permission.MIPUSH_RECEIVE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="${applicationId}.permission.MIPUSH_RECEIVE" />
+
+    <!--魅族 push permission start 魅族 push permission start 魅族 push permission start 魅族 push permission start 魅族 push permission start-->
+    <!-- 兼容 flyme5.0 以下版本，魅族内部集成 pushSDK 必填，不然无法收到消息-->
+    <uses-permission android:name="com.meizu.flyme.push.permission.RECEIVE" />
+    <permission
+        android:name="${applicationId}.push.permission.MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="${applicationId}.push.permission.MESSAGE" />
+    <!-- 兼容flyme3.0配置权限-->
+    <uses-permission android:name="com.meizu.c2dm.permission.RECEIVE" />
+    <permission
+        android:name="${applicationId}.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
+    <!-- 魅族 push permission end  魅族 push permission end 魅族 push permission end 魅族 push permission end 魅族 push permission end 魅族 push permission end-->
+
+    <application
+        android:name=".common.base.MaxIMApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/bmx_icon48"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/bmx_icon48"
+        android:supportsRtl="true"
+        android:theme="@style/ActivityAnimation"
+        android:usesCleartextTraffic="true"
+        tools:replace="android:icon,android:roundIcon,android:theme">
+
+        <activity
+            android:name=".login.view.WelcomeActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--登陆-->
+        <activity
+            android:name=".login.view.LoginActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--注册-->
+        <activity
+            android:name=".login.view.RegisterActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"></activity>
+
+        <!--用户协议-->
+        <activity
+            android:name=".login.view.ProtocolActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--多设备-->
+        <activity
+            android:name=".login.view.DeviceListActivity"
+            android:screenOrientation="portrait" />
+
+        <!--关于我们-->
+        <activity
+            android:name=".login.view.AboutUsActivity"
+            android:screenOrientation="portrait" />
+
+        <!--首页-->
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Main"></activity>
+
+        <!--单聊页面-->
+        <activity
+            android:name=".message.view.ChatSingleActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <!--群聊页面-->
+        <activity
+            android:name=".message.view.ChatGroupActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+
+        <!--消息搜索-->
+        <activity
+            android:name=".message.view.MessageSearchActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊设置页面-->
+        <activity
+            android:name=".message.view.ChatGroupOperateActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊成员页面-->
+        <activity
+            android:name=".message.view.ChatGroupMemberActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊成员页面-->
+        <activity
+            android:name=".message.view.ChatGroupListMemberActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊黑名单页面-->
+        <activity
+            android:name=".message.view.ChatGroupBlockActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊禁言页面-->
+        <activity
+            android:name=".message.view.ChatGroupBannedActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊管理员页面-->
+        <activity
+            android:name=".message.view.ChatGroupAdminActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊转让群主页面-->
+        <activity
+            android:name=".message.view.ChatGroupTransActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊转让群主页面-->
+        <activity
+            android:name=".message.view.ChatGroupAtActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群共享文件-->
+        <activity
+            android:name=".message.view.ChatGroupShareActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群公告-->
+        <activity
+            android:name=".message.view.ChatGroupAnnomentActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊管理页面-->
+        <activity
+            android:name=".message.view.ChatGroupSettingActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群聊二维码-->
+        <activity
+            android:name=".group.view.GroupQrCodeActivity"
+            android:screenOrientation="portrait" />
+
+        <!--加入群聊二维码-->
+        <activity
+            android:name=".group.view.GroupQrcodeDetailActivity"
+            android:screenOrientation="portrait" />
+
+        <!--用户设置-->
+        <activity
+            android:name=".login.view.SettingUserActivity"
+            android:screenOrientation="portrait" />
+
+        <!--我的二维码-->
+        <activity
+            android:name=".login.view.MyQrCodeActivity"
+            android:screenOrientation="portrait" />
+
+        <!--搜搜-->
+        <activity
+            android:name=".contact.view.ContactSearchActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群组-->
+        <activity
+            android:name=".group.view.GroupListActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群组搜索-->
+        <activity
+            android:name=".group.view.GroupSearchActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群组邀请-->
+        <activity
+            android:name=".group.view.GroupInviteActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群组申请-->
+        <activity
+            android:name=".group.view.GroupApplyActivity"
+            android:screenOrientation="portrait" />
+
+        <!--申请与通知-->
+        <activity
+            android:name=".contact.view.RosterApplyActivity"
+            android:screenOrientation="portrait" />
+
+        <!--选择联系人-->
+        <activity
+            android:name=".contact.view.RosterChooseActivity"
+            android:screenOrientation="portrait" />
+
+        <!--黑名单-->
+        <activity
+            android:name=".contact.view.BlockListActivity"
+            android:screenOrientation="portrait" />
+
+        <!--详情-->
+        <activity
+            android:name=".contact.view.RosterDetailActivity"
+            android:screenOrientation="portrait" />
+
+        <!--选择文件-->
+        <activity
+            android:name=".message.view.ChooseFileActivity"
+            android:screenOrientation="portrait" />
+
+        <!--转发联系人-->
+        <activity
+            android:name=".contact.view.ForwardMsgRosterActivity"
+            android:screenOrientation="portrait" />
+
+        <!--转发群组-->
+        <activity
+            android:name=".group.view.ForwardMsgGroupActivity"
+            android:screenOrientation="portrait" />
+
+        <!--大图-->
+        <activity
+            android:name=".message.view.PhotoDetailActivity"
+            android:screenOrientation="portrait" />
+
+        <!--视频-->
+        <activity
+            android:name=".message.view.VideoDetailActivity"
+            android:screenOrientation="portrait" />
+
+        <!--视频录制-->
+        <activity
+            android:name=".common.utils.video.PhotoRecorderActivity"
+            android:screenOrientation="portrait" />
+
+        <!--扫一扫-->
+        <activity
+            android:name=".scan.view.ScannerActivity"
+            android:screenOrientation="portrait" />
+
+        <!--扫一扫结果-->
+        <activity
+            android:name=".scan.view.ScanResultActivity"
+            android:screenOrientation="portrait" />
+
+        <!--群未读-->
+        <activity
+            android:name=".message.view.GroupAckActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".wxapi.WXEntryActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:taskAffinity="net.sourceforge.simcpux"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!-- fileProvider -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_path" />
+        </provider>
+
+        <!-- 聊天push广播 -->
+        <receiver
+            android:name=".push.PushReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="${applicationId}.action.push.msg" />
+            </intent-filter>
+        </receiver>
+
+
+        <!--华为push  配置-->
+        <meta-data
+            android:name="com.huawei.hms.client.appid"
+            android:value="${HUAWEI_APPID}" />
+
+        <meta-data
+            android:name="HUAWEI_APPID"
+            android:value="a_${HUAWEI_APPID}" />
+
+        <!--小米push  配置-->
+        <meta-data
+            android:name="XIAOMI_APPID"
+            android:value="a_${XIAOMI_APPID}" />
+        <meta-data
+            android:name="XIAOMI_APP_KEY"
+            android:value="a_${XIAOMI_APP_KEY}" />
+
+        <!--魅族push  配置-->
+        <meta-data
+            android:name="MEIZU_APPID"
+            android:value="a_${MEIZU_APPID}" />
+        <meta-data
+            android:name="MEIZU_APP_KEY"
+            android:value="a_${MEIZU_APP_KEY}" />
+
+        <!-- 微信 -->
+        <meta-data
+            android:name="WEIXIN_APPID"
+            android:value="${WEIXIN_APPID}" />
+
+
+        <!-- 接入HMSSDK 需要注册的provider，authorities 一定不能与其他应用一样，所以这边 ${PACKAGE_NAME} 要替换上您应用的包名
+    Access HMSSDK need to register provider,authorities must not be the same as other applications, so this side ${package_name} to replace the package name you applied-->
+        <provider
+            android:name="com.huawei.hms.update.provider.UpdateProvider"
+            android:authorities="${applicationId}.hms.update.provider"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+
+        <!-- BridgeActivity定义了HMS-SDK中一些跳转所需要的透明页面-->
+        <activity
+            android:name="com.huawei.hms.activity.BridgeActivity"
+            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:theme="@android:style/Theme.Translucent">
+            <meta-data
+                android:name="hwc-theme"
+                android:value="androidhwext:style/Theme.Emui.Translucent" />
+        </activity>
+
+        <receiver
+            android:name=".push.huawei.HuaWeiPushReceiver"
+            android:permission="${applicationId}.permission.PROCESS_PUSH_MSG">
+            <intent-filter>
+                <!-- 必须,用于接收token -->
+                <action android:name="com.huawei.android.push.intent.REGISTRATION" />
+                <!-- 必须, 用于接收透传消息 -->
+                <action android:name="com.huawei.android.push.intent.RECEIVE" />
+                <!-- 必须, 用于接收通知栏消息点击事件 此事件不需要开发者处理，只需注册就可以-->
+                <action android:name="com.huawei.intent.action.PUSH_DELAY_NOTIFY" />
+            </intent-filter>
+        </receiver>
+
+        <!--xiaomi push相关配置开始  xiaomi push相关配置开始  xiaomi push相关配置开始  xiaomi push相关配置开始  xiaomi push相关配置开始  xiaomi push相关配置开始  -->
+        <service
+            android:name="com.xiaomi.push.service.XMPushService"
+            android:enabled="true"
+            android:process=":pushservice" />
+        <service
+            android:name="com.xiaomi.push.service.XMJobService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:process=":pushservice" />
+        <service
+            android:name="com.xiaomi.mipush.sdk.PushMessageHandler"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name="com.xiaomi.mipush.sdk.MessageHandleService"
+            android:enabled="true" />
+
+        <!--注：此service必须在2.2.5版本以后（包括2.2.5版本）加入-->
+        <receiver
+            android:name="com.xiaomi.push.service.receivers.NetworkStatusReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.xiaomi.push.service.receivers.PingReceiver"
+            android:exported="false"
+            android:process=":pushservice">
+            <intent-filter>
+                <action android:name="com.xiaomi.push.PING_TIMER" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".push.xiaomi.MIPushReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.RECEIVE_MESSAGE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.MESSAGE_ARRIVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.ERROR" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 魅族SDK配置开始  魅族SDK配置开始 魅族SDK配置开始 魅族SDK配置开始 魅族SDK配置开始 魅族SDK配置开始 魅族SDK配置开始 魅族SDK配置开始 魅族SDK配置开始 -->
+        <service
+            android:name="com.meizu.cloud.pushsdk.NotificationService"
+            android:exported="true" />
+
+        <receiver android:name="com.meizu.cloud.pushsdk.SystemReceiver">
+            <intent-filter>
+                <action android:name="com.meizu.cloud.pushservice.action.PUSH_SERVICE_START" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".push.meizu.MZPushReceiver">
+            <intent-filter>
+                <action android:name="com.meizu.flyme.push.intent.MESSAGE" />
+                <action android:name="com.meizu.flyme.push.intent.REGISTER.FEEDBACK" />
+                <action android:name="com.meizu.flyme.push.intent.UNREGISTER.FEEDBACK" />
+                <action android:name="com.meizu.c2dm.intent.REGISTRATION" />
+                <action android:name="com.meizu.c2dm.intent.RECEIVE" />
+
+                <category android:name="${applicationId}" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 华为刘海 -->
+        <meta-data android:name="android.notch_support" android:value="true"/>
+
+        <!-- *************BUGLY START************** -->
+
+        <!-- 配置APP ID -->
+        <meta-data
+            android:name="BUGLY_APPID"
+            android:value="${BUGLY_APPID}" />
+        <meta-data
+            android:name="BUGLY_ENABLE_DEBUG"
+            android:value="true" />
+
+    </application>
+
+</manifest>

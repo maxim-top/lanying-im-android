@@ -57,6 +57,11 @@ public class SupportFragment extends BaseTitleFragment {
     }
 
     @Override
+    protected boolean isFullScreen() {
+        return false;
+    }
+
+    @Override
     protected void setViewListener() {
         mAdapter.setOnItemClickListener((parent, view, position, id) -> {
             SupportBean bean = mAdapter.getItem(position);

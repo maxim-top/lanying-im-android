@@ -467,6 +467,9 @@
             </intent-filter>
         </receiver>
 
+        <!-- 华为刘海 -->
+        <meta-data android:name="android.notch_support" android:value="true"/>
+
         <!-- *************BUGLY START************** -->
 
         <!-- 配置APP ID -->

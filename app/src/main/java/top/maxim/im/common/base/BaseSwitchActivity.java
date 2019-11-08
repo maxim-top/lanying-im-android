@@ -53,10 +53,13 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
         return view;
     }
 
+    @Override
+    protected void setStatusBar() {
+    }
+
     protected abstract void initFragment(List<TabSwitchView> mTabSwitch);
 
     protected void onTabClick() {
-
     }
 
     /**
@@ -108,6 +111,7 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
             transaction.show(mCurrentFragment);
         }
         transaction.commit();
+        mCurrentFragment.onShow();
     }
 
     protected BaseFragment getCurrentFrament() {
@@ -117,7 +121,7 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
     protected final class TabSwitchView implements View.OnClickListener {
 
         private int mDrawable;
-        
+
         private int mResString;
 
         private int mIndex = -1;
@@ -128,7 +132,8 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
 
         private View mSwitchView;
 
-        public TabSwitchView(@DrawableRes int drawable, int resString, BaseFragment baseFragment, int index) {
+        public TabSwitchView(@DrawableRes int drawable, int resString, BaseFragment baseFragment,
+                int index) {
             if (baseFragment != null && index > -1) {
                 mFragmentCache.put(index, baseFragment);
             }

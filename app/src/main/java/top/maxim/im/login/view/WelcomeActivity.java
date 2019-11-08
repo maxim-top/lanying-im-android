@@ -54,6 +54,12 @@ public class WelcomeActivity extends BaseTitleActivity {
     }
 
     @Override
+    protected void setStatusBar() {
+        super.setStatusBar();
+        mStatusBar.setVisibility(View.GONE);
+    }
+
+    @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
         NotificationUtils.getInstance().cancelAll();

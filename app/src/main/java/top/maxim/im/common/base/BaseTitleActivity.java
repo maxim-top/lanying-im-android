@@ -2,9 +2,10 @@
 package top.maxim.im.common.base;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.v4.graphics.ColorUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
@@ -33,7 +34,7 @@ public abstract class BaseTitleActivity extends BaseActivity {
 
     private LoadingDialog mLoadingDialog;
 
-    private View mStatusBar;
+    protected View mStatusBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,13 +72,29 @@ public abstract class BaseTitleActivity extends BaseActivity {
     /**
      * 设置沉浸式状态栏
      */
-    private void setStatusBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    protected void setStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Window window = getWindow();
-            window.getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            window.setStatusBarColor(Color.TRANSPARENT);
+            int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
+            systemUiVisibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            int color = getResources().getColor(R.color.color_background);
+            window.setStatusBarColor(color);
+            if (isLightColor(color)) {
+                window.getDecorView().setSystemUiVisibility(systemUiVisibility | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                window.getDecorView().setSystemUiVisibility(systemUiVisibility | View.SYSTEM_UI_FLAG_VISIBLE);
+            }
         }
+    }
+
+    /**
+     * 判断颜色是不是亮色
+     *
+     * @param color
+     * @return
+     */
+    private boolean isLightColor(@ColorInt int color) {
+        return ColorUtils.calculateLuminance(color) >= 0.5;
     }
 
     /**
@@ -97,7 +114,8 @@ public abstract class BaseTitleActivity extends BaseActivity {
 
     /**
      * 初始化传入数据
-     * @param intent  传入数据
+     * 
+     * @param intent 传入数据
      */
     protected void initDataFromFront(Intent intent) {
     }
@@ -124,7 +142,7 @@ public abstract class BaseTitleActivity extends BaseActivity {
      * @return boolean
      */
     protected boolean isFullScreen() {
-        return false;
+        return true;
     }
 
     /**
@@ -144,7 +162,8 @@ public abstract class BaseTitleActivity extends BaseActivity {
 
     /**
      * 展示加载框
-     * @param cancelable  是否可取消
+     * 
+     * @param cancelable 是否可取消
      */
     public void showLoadingDialog(boolean cancelable) {
         if (mLoadingDialog == null) {

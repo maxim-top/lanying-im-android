@@ -54,6 +54,7 @@ public class MainActivity extends BaseSwitchActivity {
 
     @Override
     protected void onTabClick() {
+        super.onTabClick();
     }
 
     @Override

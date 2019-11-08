@@ -2,8 +2,11 @@
 package top.maxim.im.login.view;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -51,6 +54,8 @@ public class MineFragment extends BaseTitleFragment {
     private FlexibleLayout mFlexibleLayout;
 
     private ScrollView mScrollView;
+
+    private RelativeLayout mRlUserInfo;
 
     private ImageView mUserEdit;
 
@@ -127,10 +132,11 @@ public class MineFragment extends BaseTitleFragment {
 
     @Override
     protected View onCreateView() {
-        hideHeader();
+        hideTitleHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_mine, null);
         mFlexibleLayout = view.findViewById(R.id.flexible_layout);
         mScrollView = view.findViewById(R.id.scroll_user);
+        mRlUserInfo = view.findViewById(R.id.rl_user_info);
         mUserEdit = view.findViewById(R.id.iv_user_info_edit);
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
         mUserName = view.findViewById(R.id.tv_user_name);
@@ -141,7 +147,7 @@ public class MineFragment extends BaseTitleFragment {
         mAppVersion = view.findViewById(R.id.tv_version_app);
         mMyQrCode = view.findViewById(R.id.icon_qrcode);
 
-        mFlexibleLayout.setHeader(view.findViewById(R.id.rl_user_info)).setReadyListener(() ->
+        mFlexibleLayout.setHeader(mRlUserInfo).setReadyListener(() ->
         // 下拉放大的条件
         mScrollView.getScrollY() == 0);
         // 获取app版本
@@ -281,6 +287,37 @@ public class MineFragment extends BaseTitleFragment {
                 .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
         container.addView(mAboutUs.build(), 12);
         return view;
+    }
+
+    @Override
+    protected void setStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (getActivity() == null) {
+                return;
+            }
+            Window window = getActivity().getWindow();
+            int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
+            systemUiVisibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            window.setStatusBarColor(Color.TRANSPARENT);
+            window.getDecorView()
+                    .setSystemUiVisibility(systemUiVisibility | View.SYSTEM_UI_FLAG_VISIBLE);
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mRlUserInfo
+                    .getLayoutParams();
+            params.height = ScreenUtils.dp2px(150) + ScreenUtils.getStatusBarHeight();
+            mRlUserInfo.setPadding(mRlUserInfo.getPaddingLeft(), ScreenUtils.getStatusBarHeight(),
+                    mRlUserInfo.getPaddingRight(), mRlUserInfo.getPaddingBottom());
+            mScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+                @Override
+                public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX,
+                        int oldScrollY) {
+                    if (ScreenUtils.getStatusBarHeight() < scrollY) {
+                        window.setStatusBarColor(getResources().getColor(R.color.color_0079F4));
+                    } else {
+                        window.setStatusBarColor(Color.TRANSPARENT);
+                    }
+                }
+            });
+        }
     }
 
     @Override

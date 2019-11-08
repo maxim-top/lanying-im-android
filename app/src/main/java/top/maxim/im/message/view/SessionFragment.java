@@ -112,7 +112,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
 
     @Override
     protected View onCreateView() {
-        hideHeader();
+        hideTitleHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_session, null);
         mRecyclerView = view.findViewById(R.id.session_recycler);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

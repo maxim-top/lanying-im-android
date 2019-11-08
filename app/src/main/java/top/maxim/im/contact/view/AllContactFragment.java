@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +16,7 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -89,7 +91,7 @@ public class AllContactFragment extends BaseTitleFragment {
 
     @Override
     protected View onCreateView() {
-        hideHeader();
+        hideTitleHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_all_contact, null);
         mViewPager = view.findViewById(R.id.contact_view_pager);
         mTabLayout = view.findViewById(R.id.tablayout);
@@ -118,6 +120,32 @@ public class AllContactFragment extends BaseTitleFragment {
         initTabLayoutClick();
         view.findViewById(R.id.iv_contact_add).setOnClickListener(v -> onNavigationAddClick(v));
         return view;
+    }
+
+    @Override
+    protected void setStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (getActivity() == null) {
+                return;
+            }
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, ScreenUtils.getStatusBarHeight());
+            mStatusBar.setLayoutParams(params);
+            mStatusBar.setVisibility(View.VISIBLE);
+            Window window = getActivity().getWindow();
+            int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
+            systemUiVisibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            int color = getResources().getColor(R.color.color_white);
+            window.setStatusBarColor(color);
+            if (isLightColor(color)) {
+                window.getDecorView().setSystemUiVisibility(
+                        systemUiVisibility | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                window.getDecorView()
+                        .setSystemUiVisibility(systemUiVisibility | View.SYSTEM_UI_FLAG_VISIBLE);
+            }
+            mStatusBar.setBackgroundColor(getResources().getColor(R.color.color_white));
+        }
     }
 
     /**

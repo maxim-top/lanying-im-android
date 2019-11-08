@@ -266,6 +266,11 @@ public class ContactFragment extends BaseTitleFragment {
     }
 
     @Override
+    protected boolean isFullScreen() {
+        return false;
+    }
+
+    @Override
     public void onShow() {
         if (mContentView != null) {
             initRoster(true);

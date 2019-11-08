@@ -22,4 +22,8 @@ public class BaseFragment extends PermissionFragment {
 
     public void onTabClickAgain() {
     }
+
+    public void onShow(){
+
+    }
 }

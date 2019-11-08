@@ -80,6 +80,11 @@ public class GroupListActivity extends BaseTitleFragment {
     }
 
     @Override
+    protected boolean isFullScreen() {
+        return false;
+    }
+
+    @Override
     protected void setViewListener() {
         mAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

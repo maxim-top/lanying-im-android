@@ -4,10 +4,13 @@ package top.maxim.im.common.base;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.Nullable;
+import android.support.v4.graphics.ColorUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
@@ -31,26 +34,24 @@ public abstract class BaseTitleFragment extends BaseFragment {
 
     private View mHeaderDiver;
 
-    private View mStatusBar;
+    protected View mStatusBar;
 
     private LoadingDialog mLoadingDialog;
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.base_activity, container, false);
         mContainer = view.findViewById(R.id.container);
         mHeaderDiver = view.findViewById(R.id.header_diver);
         RelativeLayout headerContainer = view.findViewById(R.id.container_header);
         mStatusBar = view.findViewById(R.id.container_status_bar);
-        if (isFullScreen() && Build.VERSION.SDK_INT >= 21) {
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    ScreenUtils.getStatusBarHeight());
-            mStatusBar.setLayoutParams(params);
-            mStatusBar.setVisibility(View.VISIBLE);
-        }
         mHeader = onCreateHeader(headerContainer);
         addView();
+        if (isFullScreen() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setStatusBar();
+        }
         return view;
     }
 
@@ -75,13 +76,57 @@ public abstract class BaseTitleFragment extends BaseFragment {
     protected void initDataForActivity() {
     }
 
+    @Override
+    public void onShow() {
+        super.onShow();
+        setStatusBar();
+    }
+
+    /**
+     * 设置沉浸式状态栏
+     */
+    protected void setStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (getActivity() == null) {
+                return;
+            }
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, ScreenUtils.getStatusBarHeight());
+            mStatusBar.setLayoutParams(params);
+            mStatusBar.setVisibility(View.VISIBLE);
+            int color = getResources().getColor(R.color.color_background);
+            mStatusBar.setBackgroundColor(getResources().getColor(R.color.color_background));
+            Window window = getActivity().getWindow();
+            int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
+            systemUiVisibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            window.setStatusBarColor(color);
+            if (isLightColor(color)) {
+                window.getDecorView().setSystemUiVisibility(
+                        systemUiVisibility | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            } else {
+                window.getDecorView()
+                        .setSystemUiVisibility(systemUiVisibility | View.SYSTEM_UI_FLAG_VISIBLE);
+            }
+        }
+    }
+
+    /**
+     * 判断颜色是不是亮色
+     *
+     * @param color
+     * @return
+     */
+    protected boolean isLightColor(@ColorInt int color) {
+        return ColorUtils.calculateLuminance(color) >= 0.5;
+    }
+
     /**
      * 是否启用沉浸式 默认true
      *
      * @return boolean
      */
     protected boolean isFullScreen() {
-        return false;
+        return true;
     }
 
     public void hideHeader() {
@@ -96,16 +141,14 @@ public abstract class BaseTitleFragment extends BaseFragment {
         mHeaderDiver.setVisibility(View.GONE);
     }
 
-    public void onShow() {
-    }
-
     protected abstract Header onCreateHeader(RelativeLayout headerContainer);
 
     protected abstract View onCreateView();
 
     /**
      * 展示加载框
-     * @param cancelable  是否可取消
+     * 
+     * @param cancelable 是否可取消
      */
     public void showLoadingDialog(boolean cancelable) {
         if (mLoadingDialog == null) {

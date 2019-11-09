@@ -357,7 +357,7 @@ public class LoginActivity extends BaseTitleActivity {
                     SharePreferenceUtils.getInstance().putUserName(profile.username());
                     SharePreferenceUtils.getInstance().putUserPwd(pwd);
                     AppManager.getInstance().getTokenByName(profile.username(), pwd, null);
-                    if(!TextUtils.isEmpty(changeAppId)){
+                    if (!TextUtils.isEmpty(changeAppId)) {
                         SharePreferenceUtils.getInstance().putAppId(changeAppId);
                         UserManager.getInstance().changeAppId(changeAppId);
                     }

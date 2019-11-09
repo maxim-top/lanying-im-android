@@ -296,11 +296,10 @@ public class MineFragment extends BaseTitleFragment {
                 return;
             }
             Window window = getActivity().getWindow();
-            int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
-            systemUiVisibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            int systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_VISIBLE;
             window.setStatusBarColor(Color.TRANSPARENT);
-            window.getDecorView()
-                    .setSystemUiVisibility(systemUiVisibility | View.SYSTEM_UI_FLAG_VISIBLE);
+            window.getDecorView().setSystemUiVisibility(systemUiVisibility);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mRlUserInfo
                     .getLayoutParams();
             params.height = ScreenUtils.dp2px(150) + ScreenUtils.getStatusBarHeight();
@@ -727,6 +726,7 @@ public class MineFragment extends BaseTitleFragment {
                         SharePreferenceUtils.getInstance().putLoginStatus(false);
                         SharePreferenceUtils.getInstance().putToken("");
                         SharePreferenceUtils.getInstance().putAppId("");
+                        SharePreferenceUtils.getInstance().putScanDeviceStatus(false);
                         UserManager.getInstance()
                                 .changeAppId(SharePreferenceUtils.getInstance().getAppId());
                         PushClientMgr.getManager().unRegister();

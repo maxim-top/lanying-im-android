@@ -22,6 +22,7 @@ import top.maxim.im.contact.view.RosterDetailActivity;
 import top.maxim.im.group.view.GroupQrcodeDetailActivity;
 import top.maxim.im.login.view.LoginActivity;
 import top.maxim.im.login.view.SettingUserActivity;
+import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.utils.QRCodeConfig;
 
@@ -97,14 +98,30 @@ public class ScanResultActivity extends BaseTitleActivity {
                 dealAppGroup(source, action, info);
             }
         } else if (TextUtils.equals(source, QRCodeConfig.SOURCE.CONSOLE)) {
-            // 二维码体验功能 login
-            if (TextUtils.equals(action, QRCodeConfig.ACTION.LOGIN)) {
-                dealConsoleLogin(source, action, info);
-            } else if (TextUtils.equals(action, QRCodeConfig.ACTION.UPLOAD_DEVICE_TOKEN)) {
-                // TODO
-            } else if (TextUtils.equals(action, QRCodeConfig.ACTION.APP)) {
-                // 二维码体验功能 app
-                dealConsoleApp(source, action, info);
+            boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
+            // 二维码体验功能
+            if (isLogin) {
+                // 如果已登录 只可以识别上传deviceToken
+                if (TextUtils.equals(action, QRCodeConfig.ACTION.UPLOAD_DEVICE_TOKEN)) {
+                    dealConsoleUploadToken(source, action, info);
+                } else {
+                    ToastUtil.showTextViewPrompt("未能识别二维码信息");
+                    finish();
+                    return;
+                }
+            } else {
+                // 如果未登录 可以识别上传login app
+                // 二维码体验功能 login
+                if (TextUtils.equals(action, QRCodeConfig.ACTION.LOGIN)) {
+                    dealConsoleLogin(source, action, info);
+                } else if (TextUtils.equals(action, QRCodeConfig.ACTION.APP)) {
+                    // 二维码体验功能 app
+                    dealConsoleApp(source, action, info);
+                } else {
+                    ToastUtil.showTextViewPrompt("未能识别二维码信息");
+                    finish();
+                    return;
+                }
             }
         }
     }
@@ -217,6 +234,34 @@ public class ScanResultActivity extends BaseTitleActivity {
             UserManager.getInstance().changeAppId(appId);
         }
         LoginActivity.openLogin(this);
+        finish();
+    }
+
+    /**
+     * 处理二维码体验功能 上传deviceToken
+     */
+    private void dealConsoleUploadToken(String source, String action, String info) {
+        if (!TextUtils.equals(source, QRCodeConfig.SOURCE.CONSOLE)
+                || !TextUtils.equals(action, QRCodeConfig.ACTION.UPLOAD_DEVICE_TOKEN)
+                || TextUtils.isEmpty(info)) {
+            return;
+        }
+        String platformType = null;
+        String deviceInfo = null;
+        try {
+            JSONObject jsonObject = new JSONObject(info);
+            if (jsonObject.has("platform_type")) {
+                platformType = jsonObject.getString("platform_type");
+            }
+            if (jsonObject.has("info")) {
+                deviceInfo = jsonObject.getString("info");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        SharePreferenceUtils.getInstance().putScanDeviceStatus(true);
+        PushClientMgr.sDevType = PushClientMgr.CUSTOM_TYPE;
+        PushClientMgr.setPushToken(deviceInfo);
         finish();
     }
 

@@ -27,10 +27,10 @@ import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.RomUtil;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.push.custom.CustomPushManager;
 import top.maxim.im.push.huawei.HWPushManager;
 import top.maxim.im.push.meizu.MZPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
-import top.maxim.im.scan.config.ScanConfigs;
 
 /**
  * Description : push
@@ -42,7 +42,9 @@ public final class PushClientMgr {
 
     private static boolean isInited = false;
 
-    private static int sDevType = 0;
+    public static int sDevType = 0;
+
+    public static final int CUSTOM_TYPE = 1000;
 
     public static final int HW_TYPE = 1;
 
@@ -61,7 +63,10 @@ public final class PushClientMgr {
         } else if (isInited) {
             return true;
         } else {
-            if (isHuawei(application.getApplicationContext())) {
+            if (SharePreferenceUtils.getInstance().getScanDeviceStatus()) {
+                sManager = new CustomPushManager();
+                sDevType = CUSTOM_TYPE;
+            } else if (isHuawei(application.getApplicationContext())) {
                 sManager = new HWPushManager(application);
                 sDevType = HW_TYPE;
             } else if (isXiaomi(application.getApplicationContext())) {
@@ -80,8 +85,8 @@ public final class PushClientMgr {
      * 判断华为
      */
     public static boolean isHuawei(Context context) {
-        return RomUtil.isHuawei() && HuaweiApiAvailability.getInstance().isHuaweiMobileServicesAvailable(context,
-                0) == ConnectionResult.SUCCESS;
+        return RomUtil.isHuawei() && HuaweiApiAvailability.getInstance()
+                .isHuaweiMobileServicesAvailable(context, 0) == ConnectionResult.SUCCESS;
     }
 
     /**
@@ -156,36 +161,24 @@ public final class PushClientMgr {
 
     /**
      * 绑定证书名和用户id
+     * 
      * @param deviceToken
      */
     private static void notifierBind(String deviceToken) {
         if (TextUtils.isEmpty(deviceToken)) {
             return;
         }
-        String scanAppId = SharePreferenceUtils.getInstance().getAppId();
-        String scanUserId = ScanConfigs.CODE_USER_ID;
-        String scanUserName = ScanConfigs.CODE_USER_NAME;
-        if (TextUtils.isEmpty(scanAppId) || TextUtils.isEmpty(scanUserId)
-                || TextUtils.isEmpty(scanUserName)) {
-            return;
-        }
+        String appId = SharePreferenceUtils.getInstance().getAppId();
         String currentUserName = SharePreferenceUtils.getInstance().getUserName();
         String currentUserId = String.valueOf(SharePreferenceUtils.getInstance().getUserId());
-        if (!TextUtils.equals(scanAppId, "1") || !TextUtils.equals(currentUserName, scanUserName)
-                || TextUtils.equals(currentUserId, scanUserId)) {
-            // 确保是扫码登陆 appId=1 userName必须是扫码返回的
-            return;
-        }
-        //每次调用完清除扫码登陆的数据
-        ScanConfigs.CODE_USER_ID = "";
-        ScanConfigs.CODE_USER_NAME = "";
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();
-        AppManager.getInstance().getTokenByName(scanUserName, pwd,
+        AppManager.getInstance().getTokenByName(currentUserName, pwd,
                 new HttpResponseCallback<String>() {
                     @Override
                     public void onResponse(String result) {
-                        AppManager.getInstance().notifierBind(result, deviceToken, scanAppId,
-                                scanUserId, BaseManager.getPushId(), new HttpResponseCallback<String>() {
+                        AppManager.getInstance().notifierBind(result, deviceToken, appId,
+                                currentUserId, BaseManager.getPushId(),
+                                new HttpResponseCallback<String>() {
                                     @Override
                                     public void onResponse(String result) {
 

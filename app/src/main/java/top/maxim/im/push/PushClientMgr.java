@@ -27,7 +27,6 @@ import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.RomUtil;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.net.HttpResponseCallback;
-import top.maxim.im.push.custom.CustomPushManager;
 import top.maxim.im.push.huawei.HWPushManager;
 import top.maxim.im.push.meizu.MZPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
@@ -42,9 +41,7 @@ public final class PushClientMgr {
 
     private static boolean isInited = false;
 
-    public static int sDevType = 0;
-
-    public static final int CUSTOM_TYPE = 1000;
+    private static int sDevType = 0;
 
     public static final int HW_TYPE = 1;
 
@@ -63,10 +60,7 @@ public final class PushClientMgr {
         } else if (isInited) {
             return true;
         } else {
-            if (SharePreferenceUtils.getInstance().getScanDeviceStatus()) {
-                sManager = new CustomPushManager();
-                sDevType = CUSTOM_TYPE;
-            } else if (isHuawei(application.getApplicationContext())) {
+            if (isHuawei(application.getApplicationContext())) {
                 sManager = new HWPushManager(application);
                 sDevType = HW_TYPE;
             } else if (isXiaomi(application.getApplicationContext())) {

@@ -726,7 +726,6 @@ public class MineFragment extends BaseTitleFragment {
                         SharePreferenceUtils.getInstance().putLoginStatus(false);
                         SharePreferenceUtils.getInstance().putToken("");
                         SharePreferenceUtils.getInstance().putAppId("");
-                        SharePreferenceUtils.getInstance().putScanDeviceStatus(false);
                         UserManager.getInstance()
                                 .changeAppId(SharePreferenceUtils.getInstance().getAppId());
                         PushClientMgr.getManager().unRegister();

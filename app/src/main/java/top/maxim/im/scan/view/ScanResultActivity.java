@@ -259,8 +259,6 @@ public class ScanResultActivity extends BaseTitleActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        SharePreferenceUtils.getInstance().putScanDeviceStatus(true);
-        PushClientMgr.sDevType = PushClientMgr.CUSTOM_TYPE;
         PushClientMgr.setPushToken(deviceInfo);
         finish();
     }

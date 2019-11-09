@@ -37,8 +37,6 @@ public class SharePreferenceUtils {
 
     private static String APP_ID = "app_id";
 
-    private static String IS_SCAN_DEVICE_TOKEN = "isScanDeviceToken";
-
     private static volatile SharePreferenceUtils instance;
 
     private static SharedPreferences.Editor saveEditor;
@@ -178,18 +176,6 @@ public class SharePreferenceUtils {
             return TextUtils.isEmpty(appId) ? ScanConfigs.CODE_APP_ID : appId;
         }
         return ScanConfigs.CODE_APP_ID;
-    }
-
-    public boolean putScanDeviceStatus(boolean status) {
-        saveEditor.putBoolean(IS_SCAN_DEVICE_TOKEN, status);
-        return saveEditor.commit();
-    }
-
-    public boolean getScanDeviceStatus() {
-        if (saveInfo != null) {
-            return saveInfo.getBoolean(IS_SCAN_DEVICE_TOKEN, false);
-        }
-        return false;
     }
 
     /**

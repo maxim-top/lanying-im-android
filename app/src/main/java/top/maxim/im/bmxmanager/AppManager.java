@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import top.maxim.im.common.utils.GsonParameterizedType;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -548,6 +549,67 @@ public class AppManager {
         params.put("notifier_name", notifierName);
         params.put("device_token", deviceToken);
         mClient.call(HttpClient.Method.POST, "https://butler.maximtop.com/notifier/bind", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (data) {
+                                    if (callback != null) {
+                                        callback.onCallResponse(result);
+                                    }
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 绑定证书名和用户名id
+     */
+    public void uploadPushInfo(String token, String deviceToken, String appId,
+            HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("access-app_id", appId);
+        header.put("app_id", appId);
+        Map<String, String> params = new HashMap<>();
+        params.put("uuid", UUID.randomUUID().toString());
+        params.put("device_token", deviceToken);
+        mClient.call(HttpClient.Method.POST, "https://butler.maximtop.com/notifier/upload_push_info", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {

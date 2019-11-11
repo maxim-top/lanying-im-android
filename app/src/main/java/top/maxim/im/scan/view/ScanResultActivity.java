@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -22,7 +23,7 @@ import top.maxim.im.contact.view.RosterDetailActivity;
 import top.maxim.im.group.view.GroupQrcodeDetailActivity;
 import top.maxim.im.login.view.LoginActivity;
 import top.maxim.im.login.view.SettingUserActivity;
-import top.maxim.im.push.PushClientMgr;
+import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.utils.QRCodeConfig;
 
@@ -34,6 +35,8 @@ public class ScanResultActivity extends BaseTitleActivity {
     private String mResult;
 
     private TextView textView;
+
+    private boolean isUploadToken = false;
 
     public static void openScanResult(Context context, String result) {
         Intent intent = new Intent(context, ScanResultActivity.class);
@@ -259,13 +262,55 @@ public class ScanResultActivity extends BaseTitleActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        PushClientMgr.setPushToken(deviceInfo);
-        finish();
+        if (TextUtils.isEmpty(platformType) || TextUtils.equals(platformType, "1")
+                || TextUtils.isEmpty(deviceInfo)) {
+            // 1 为ios
+            ToastUtil.showTextViewPrompt("上传deviceToken失败");
+            finish();
+            return;
+        }
+        isUploadToken = true;
+        showLoadingDialog(true);
+        String finalDeviceInfo = deviceInfo;
+        AppManager.getInstance().getTokenByName(SharePreferenceUtils.getInstance().getUserName(),
+                SharePreferenceUtils.getInstance().getUserPwd(),
+                new HttpResponseCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        AppManager.getInstance().uploadPushInfo(result, finalDeviceInfo,
+                                SharePreferenceUtils.getInstance().getAppId(),
+                                new HttpResponseCallback<String>() {
+                                    @Override
+                                    public void onResponse(String result) {
+                                        dismissLoadingDialog();
+                                        ToastUtil.showTextViewPrompt("上传deviceToken成功");
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onFailure(int errorCode, String errorMsg,
+                                            Throwable t) {
+                                        dismissLoadingDialog();
+                                        ToastUtil.showTextViewPrompt("上传deviceToken失败");
+                                        finish();
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt("获取token失败");
+                        finish();
+                    }
+                });
     }
 
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        textView.setText(mResult);
+        if (!isUploadToken) {
+            textView.setText(mResult);
+        }
     }
 }

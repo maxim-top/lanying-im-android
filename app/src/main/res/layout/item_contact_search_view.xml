@@ -28,7 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@color/c8"
+            android:background="@color/color_0079F4"
+            android:textColor="@color/color_white"
             android:padding="@dimen/dimen_10"
             android:text="添加" />
 

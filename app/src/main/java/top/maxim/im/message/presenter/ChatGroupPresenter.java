@@ -213,32 +213,6 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     }
 
     @Override
-    protected void ackMessage(BMXMessage message) {
-        Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
-            @Override
-            public BMXMessage call(BMXMessage message) {
-                ChatManager.getInstance().ackMessage(message);
-                return message;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXMessage>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXMessage message) {
-                    }
-                });
-    }
-
-    @Override
     public void onGroupAck(BMXMessage bean) {
         if (bean == null || mMemberIdList == null || mMemberIdList.isEmpty()) {
             return;

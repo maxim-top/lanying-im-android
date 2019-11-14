@@ -78,7 +78,7 @@
     <string name="search_hint">搜索</string>
 
     <!--Contact-->
-    <string name="contact_apply_notice">新的朋友</string>
+    <string name="contact_apply_notice">好友申请与通知</string>
     <string name="contact_group">群组</string>
     <string name="create_group">创建群组</string>
     <string name="choose_contact">选择联系人</string>

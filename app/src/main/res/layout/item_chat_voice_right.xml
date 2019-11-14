@@ -18,7 +18,7 @@
         android:id="@+id/fl_voice_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/color_0079F4">
+        android:background="@drawable/item_chat_txt_right_bg">
 
         <ImageView
             android:id="@+id/iv_voice_play"
@@ -26,6 +26,7 @@
             android:layout_height="@dimen/dimen_20"
             android:layout_gravity="start|center_vertical"
             android:layout_marginLeft="@dimen/dimen_20"
+            android:src="@drawable/voice_play_right3"
             android:contentDescription="@string/app_name" />
 
     </FrameLayout>

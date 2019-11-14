@@ -72,7 +72,6 @@
 
         <activity
             android:name=".login.view.WelcomeActivity"
-            android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Splash">
             <intent-filter>

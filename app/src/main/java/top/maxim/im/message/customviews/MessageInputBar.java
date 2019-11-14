@@ -113,8 +113,10 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
     private void requestEditTextFocus() {
         mChatEditText.setFocusableInTouchMode(true);
         mChatEditText.setFocusable(true);
-        mTvSend.setVisibility(VISIBLE);
-        mMoreView.setVisibility(GONE);
+        boolean isEmpty = TextUtils.isEmpty(mChatEditText.getEditableText().toString().trim());
+        mTvSend.setEnabled(!isEmpty);
+        mTvSend.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        mMoreView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
         if (!mChatEditText.hasFocus()) {
             mChatEditText.requestFocus();
         }
@@ -162,7 +164,10 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
 
             @Override
             public void afterTextChanged(Editable s) {
-                mTvSend.setEnabled(!TextUtils.isEmpty(s.toString().trim()));
+                boolean isEmpty = TextUtils.isEmpty(s.toString().trim());
+                mTvSend.setEnabled(!isEmpty);
+                mTvSend.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+                mMoreView.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
             }
         });
 

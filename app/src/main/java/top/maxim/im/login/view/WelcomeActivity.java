@@ -76,10 +76,10 @@ public class WelcomeActivity extends BaseTitleActivity {
 
     private void initJump() {
         boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
-        String userName = SharePreferenceUtils.getInstance().getUserName();
+        long userId = SharePreferenceUtils.getInstance().getUserId();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();
-        if (isLogin && !TextUtils.isEmpty(userName) && !TextUtils.isEmpty(pwd)) {
-            autoLogin(userName, pwd);
+        if (isLogin && userId > 0 && !TextUtils.isEmpty(pwd)) {
+            autoLogin(userId, pwd);
             return;
         }
         LoginActivity.openLogin(this);
@@ -135,11 +135,11 @@ public class WelcomeActivity extends BaseTitleActivity {
     /**
      * 自动登陆
      */
-    private void autoLogin(String userName, final String pwd) {
-        Observable.just(userName).map(new Func1<String, BMXErrorCode>() {
+    private void autoLogin(long userId, final String pwd) {
+        Observable.just(userId).map(new Func1<Long, BMXErrorCode>() {
             @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signInByName(s, pwd);
+            public BMXErrorCode call(Long s) {
+                return UserManager.getInstance().signInById(s, pwd);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
@@ -154,7 +154,7 @@ public class WelcomeActivity extends BaseTitleActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        ToastUtil.showTextViewPrompt("网络异常");
+                        ToastUtil.showTextViewPrompt("网络异常"+e.getMessage());
                     }
 
                     @Override
@@ -163,6 +163,7 @@ public class WelcomeActivity extends BaseTitleActivity {
                         SharePreferenceUtils.getInstance().putLoginStatus(true);
                         MessageDispatcher.getDispatcher().initialize();
                         MainActivity.openMain(WelcomeActivity.this);
+                        finish();
                     }
                 });
     }

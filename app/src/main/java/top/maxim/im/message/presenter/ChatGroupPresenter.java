@@ -47,6 +47,8 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
     private List<Long> mMemberIdList;
 
+    private boolean mShowAckRead = false;
+
     public ChatGroupPresenter(ChatGroupContract.View view) {
         super();
         mView = view;
@@ -97,7 +99,8 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                         RosterFetcher.getFetcher().putGroup(mGroup);
                         if (mView != null) {
                             mView.setHeadTitle(mGroup.name());
-                            mView.showReadAck(mGroup.enableReadAck());
+                            mShowAckRead = mGroup.enableReadAck();
+                            mView.showReadAck(mShowAckRead);
                         }
                         syncGroupMember();
                     }
@@ -172,6 +175,11 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     }
 
     @Override
+    public void setGroupAck(boolean ack) {
+        mShowAckRead = ack;
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AT_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
@@ -210,6 +218,14 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
             // @的内容️以ForegroundColorSpan转换
             mView.insertInAt(names);
         }
+    }
+
+    @Override
+    protected void ackMessage(BMXMessage message) {
+        if (!mShowAckRead) {
+            return;
+        }
+        super.ackMessage(message);
     }
 
     @Override

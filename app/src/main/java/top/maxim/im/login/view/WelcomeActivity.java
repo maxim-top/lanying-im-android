@@ -154,7 +154,7 @@ public class WelcomeActivity extends BaseTitleActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        ToastUtil.showTextViewPrompt("网络异常"+e.getMessage());
+                        ToastUtil.showTextViewPrompt("网络异常");
                     }
 
                     @Override

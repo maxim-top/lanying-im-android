@@ -39,6 +39,15 @@ public class ChatGroupActivity extends ChatBaseActivity implements ChatGroupCont
     }
 
     @Override
+    public void showReadAck(boolean readAck) {
+        if (mPresenter != null) {
+            mPresenter.setGroupAck(readAck);
+        }
+        super.showReadAck(readAck);
+
+    }
+
+    @Override
     public Context getContext() {
         return this;
     }

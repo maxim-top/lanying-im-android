@@ -56,7 +56,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
     private RecyclerView mRecyclerView;
 
     private SessionAdapter mAdapter;
-    
+
     private View mEmptyView;
 
     private SessionContract.Presenter mPresenter;
@@ -145,8 +145,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
      */
     private void buildFooterView() {
         mEmptyView = View.inflate(getActivity(), R.layout.view_empty, null);
-        mAdapter.addFooterView(mEmptyView, new RecyclerView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mAdapter.addFooterView(mEmptyView);
         mEmptyView.setVisibility(View.GONE);
     }
 
@@ -173,7 +172,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                     @Override
                     public void onNext(BMXConversationList bmxConversationList) {
                         if (bmxConversationList != null && !bmxConversationList.isEmpty()) {
-                            mEmptyView.setVisibility(View.GONE);
+                            showEmpty(false);
                             List<BMXConversation> conversationList = new ArrayList<>();
                             for (int i = 0; i < bmxConversationList.size(); i++) {
                                 conversationList.add(bmxConversationList.get(i));
@@ -182,10 +181,24 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                             mAdapter.replaceList(conversationList);
                             notifySession(conversationList);
                         } else {
-                            mEmptyView.setVisibility(View.VISIBLE);
+                            showEmpty(true);
                         }
                     }
                 });
+    }
+
+    private void showEmpty(boolean empty) {
+        RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)mEmptyView.getLayoutParams();
+        if (empty) {
+            mEmptyView.setVisibility(View.VISIBLE);
+            params.width = RecyclerView.LayoutParams.MATCH_PARENT;
+            params.height = RecyclerView.LayoutParams.MATCH_PARENT;
+        } else {
+            mEmptyView.setVisibility(View.GONE);
+            params.width = 0;
+            params.height = 0;
+        }
+        mEmptyView.setLayoutParams(params);
     }
 
     /**
@@ -402,8 +415,8 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                         if (conversation == null) {
                             return null;
                         }
-                        ChatManager.getInstance()
-                                .deleteConversation(conversation.conversationId(), true);
+                        ChatManager.getInstance().deleteConversation(conversation.conversationId(),
+                                true);
                         return BMXErrorCode.NoError;
                     }
                 }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
@@ -426,11 +439,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                             @Override
                             public void onNext(BMXErrorCode errorCode) {
                                 mAdapter.remove(position);
-                                if (mAdapter.getItemCount() <= 2) {
-                                    mEmptyView.setVisibility(View.VISIBLE);
-                                } else {
-                                    mEmptyView.setVisibility(View.GONE);
-                                }
+                                showEmpty(mAdapter.getItemCount() <= 2);
                             }
                         });
             }

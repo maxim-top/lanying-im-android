@@ -14,9 +14,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
 import rx.Observable;
@@ -47,7 +44,7 @@ import top.maxim.im.wxapi.WXUtils;
  */
 public class LoginActivity extends BaseTitleActivity {
 
-    public static String LOGIN_CODE = "loginCode";
+    public static String LOGIN_OPEN_ID = "loginOpenId";
 
     /* 账号 */
     private EditText mInputName;
@@ -79,7 +76,7 @@ public class LoginActivity extends BaseTitleActivity {
     private TextWatcher mInputWatcher;
 
     /* 微信返回code */
-    private String mCode;
+    private String mOpenId;
 
     private TextView mTvAppId;
     
@@ -89,10 +86,10 @@ public class LoginActivity extends BaseTitleActivity {
         openLogin(context, null);
     }
 
-    public static void openLogin(Context context, String code) {
+    public static void openLogin(Context context, String openId) {
         Intent intent = new Intent(context, LoginActivity.class);
-        if (!TextUtils.isEmpty(code)) {
-            intent.putExtra(LOGIN_CODE, code);
+        if (!TextUtils.isEmpty(openId)) {
+            intent.putExtra(LOGIN_OPEN_ID, openId);
         }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
@@ -139,8 +136,11 @@ public class LoginActivity extends BaseTitleActivity {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
             // MainActivity.openMain(LoginActivity.this);
-
-            login(this, name, pwd, mLoginByUserId, mChangeAppId);
+            if (!TextUtils.isEmpty(mOpenId)) {
+                bindOpenId(this, name, pwd, mOpenId);
+            } else {
+                login(this, name, pwd, mLoginByUserId, mChangeAppId);
+            }
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
@@ -210,18 +210,13 @@ public class LoginActivity extends BaseTitleActivity {
     protected void initDataFromFront(Intent intent) {
         super.initDataFromFront(intent);
         if (intent != null) {
-            mCode = intent.getStringExtra(LOGIN_CODE);
+            mOpenId = intent.getStringExtra(LOGIN_OPEN_ID);
         }
     }
 
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        if (!TextUtils.isEmpty(mCode)) {
-            // 微信登录
-            loginWeChat();
-            return;
-        }
         // 判断当前是否是扫码登陆
         String scanUserName = ScanConfigs.CODE_USER_NAME;
         if (!TextUtils.isEmpty(scanUserName)) {
@@ -229,44 +224,6 @@ public class LoginActivity extends BaseTitleActivity {
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
-    }
-
-    /**
-     * 微信登录
-     */
-    public void loginWeChat() {
-        showLoadingDialog(true);
-        AppManager.getInstance().weChatLogin(mCode, new HttpResponseCallback<String>() {
-            @Override
-            public void onResponse(String result) {
-                dismissLoadingDialog();
-                if (TextUtils.isEmpty(result)) {
-                    ToastUtil.showTextViewPrompt("登陆失败");
-                    return;
-                }
-                try {
-                    JSONObject jsonObject = new JSONObject(result);
-                    if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
-                        // 没有userId 密码 需要跳转注册
-                        RegisterActivity.openRegister(LoginActivity.this,
-                                jsonObject.getString("openid"));
-                        return;
-                    }
-                    // 直接登录
-                    String userId = jsonObject.getString("user_id");
-                    String pwd = jsonObject.getString("password");
-                    login(LoginActivity.this, userId, pwd, true);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                ToastUtil.showTextViewPrompt("登陆失败");
-                dismissLoadingDialog();
-            }
-        });
     }
 
     /**

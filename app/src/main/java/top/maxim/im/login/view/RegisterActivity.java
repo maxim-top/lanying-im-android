@@ -182,6 +182,7 @@ public class RegisterActivity extends BaseTitleActivity {
         mClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                LoginActivity.openLogin(RegisterActivity.this, mOpenId);
                 finish();
             }
         });

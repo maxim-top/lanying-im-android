@@ -20,6 +20,12 @@ public interface ChatGroupContract {
 
         /* 群成员@*/
         void onChatAtMember();
+
+        /**
+         * 设置群聊ack
+         * @param ack
+         */
+        void setGroupAck(boolean ack);
     }
 
     /**

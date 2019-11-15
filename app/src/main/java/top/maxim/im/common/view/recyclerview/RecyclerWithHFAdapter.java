@@ -46,9 +46,21 @@ public abstract class RecyclerWithHFAdapter<T> extends BaseRecyclerAdapter<T> {
      * @param footerView
      */
     public void addFooterView(View footerView) {
+        addFooterView(footerView, null);
+    }
+
+    /**
+     * 添加footerView
+     * 
+     * @param footerView
+     */
+    public void addFooterView(View footerView, RecyclerView.LayoutParams params) {
         mFooterView = footerView;
-        mFooterView.setLayoutParams(new RecyclerView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        mFooterView.setLayoutParams(
+                params == null
+                        ? new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT)
+                        : params);
     }
 
     /**

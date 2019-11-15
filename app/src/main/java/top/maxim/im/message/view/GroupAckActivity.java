@@ -138,6 +138,10 @@ public class GroupAckActivity extends BaseTitleActivity {
     }
 
     private void initRoster(ListOfLongLong list, boolean forceRefresh) {
+        if (list == null || list.isEmpty()) {
+            mAdapter.removeAll();
+            return;
+        }
         showLoadingDialog(true);
         final BMXRosterItemList itemList = new BMXRosterItemList();
         Observable.just(list).map(new Func1<ListOfLongLong, BMXErrorCode>() {

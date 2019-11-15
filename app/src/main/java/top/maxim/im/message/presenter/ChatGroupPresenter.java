@@ -47,6 +47,8 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
     private List<Long> mMemberIdList;
 
+    private boolean mShowAckRead = false;
+
     public ChatGroupPresenter(ChatGroupContract.View view) {
         super();
         mView = view;
@@ -97,7 +99,8 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                         RosterFetcher.getFetcher().putGroup(mGroup);
                         if (mView != null) {
                             mView.setHeadTitle(mGroup.name());
-                            mView.showReadAck(mGroup.enableReadAck());
+                            mShowAckRead = mGroup.enableReadAck();
+                            mView.showReadAck(mShowAckRead);
                         }
                         syncGroupMember();
                     }
@@ -172,6 +175,11 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     }
 
     @Override
+    public void setGroupAck(boolean ack) {
+        mShowAckRead = ack;
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AT_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
@@ -214,28 +222,10 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
     @Override
     protected void ackMessage(BMXMessage message) {
-        Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
-            @Override
-            public BMXMessage call(BMXMessage message) {
-                ChatManager.getInstance().ackMessage(message);
-                return message;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXMessage>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXMessage message) {
-                    }
-                });
+        if (!mShowAckRead) {
+            return;
+        }
+        super.ackMessage(message);
     }
 
     @Override

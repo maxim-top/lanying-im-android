@@ -54,6 +54,8 @@ public class GroupInviteActivity extends BaseTitleActivity {
 
     private InviteAdapter mAdapter;
 
+    private View mEmptyView;
+
     private final int DEFAULT_PAGE_SIZE = 10;
 
     public static void openGroupInvite(Context context) {
@@ -76,12 +78,22 @@ public class GroupInviteActivity extends BaseTitleActivity {
 
     @Override
     protected View onCreateView() {
+        buildEmptyView();
         View view = View.inflate(this, R.layout.activity_group, null);
         mRecycler = view.findViewById(R.id.group_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new InviteAdapter(this);
         mRecycler.setAdapter(mAdapter);
         return view;
+    }
+
+    /**
+     * 设置headerView
+     */
+    private View buildEmptyView() {
+        mEmptyView = View.inflate(this, R.layout.view_empty, null);
+        mEmptyView.setVisibility(View.GONE);
+        return mEmptyView;
     }
 
     @Override
@@ -137,6 +149,8 @@ public class GroupInviteActivity extends BaseTitleActivity {
                         dismissLoadingDialog();
                         String error = e == null ? "网络错误" : e.getMessage();
                         ToastUtil.showTextViewPrompt(error);
+                        mRecycler.setVisibility(View.GONE);
+                        mEmptyView.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -148,6 +162,11 @@ public class GroupInviteActivity extends BaseTitleActivity {
                                 invitations.add(list.get(i));
                             }
                             mAdapter.replaceList(invitations);
+                            mRecycler.setVisibility(View.VISIBLE);
+                            mEmptyView.setVisibility(View.GONE);
+                        } else {
+                            mRecycler.setVisibility(View.GONE);
+                            mEmptyView.setVisibility(View.VISIBLE);
                         }
                     }
                 });

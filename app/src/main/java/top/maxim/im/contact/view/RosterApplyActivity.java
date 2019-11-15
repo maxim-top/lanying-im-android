@@ -56,6 +56,8 @@ public class RosterApplyActivity extends BaseTitleActivity {
 
     private ApplyAdapter mAdapter;
 
+    private View mEmptyView;
+
     private final int DEFAULT_PAGE_SIZE = 10;
 
     public static void openRosterApply(Context context) {
@@ -79,11 +81,24 @@ public class RosterApplyActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         View view = View.inflate(this, R.layout.activity_group, null);
+        buildEmptyView();
+        RelativeLayout rl = view.findViewById(R.id.group_container);
         mRecycler = view.findViewById(R.id.group_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new ApplyAdapter(this);
         mRecycler.setAdapter(mAdapter);
+        rl.addView(mEmptyView, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
         return view;
+    }
+
+    /**
+     * 设置headerView
+     */
+    private View buildEmptyView() {
+        mEmptyView = View.inflate(this, R.layout.view_empty, null);
+        mEmptyView.setVisibility(View.GONE);
+        return mEmptyView;
     }
 
     @Override
@@ -137,6 +152,9 @@ public class RosterApplyActivity extends BaseTitleActivity {
                         dismissLoadingDialog();
                         String error = e == null ? "网络错误" : e.getMessage();
                         ToastUtil.showTextViewPrompt(error);
+                        String cursor = ap.cursor();
+                        mRecycler.setVisibility(View.GONE);
+                        mEmptyView.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -149,6 +167,11 @@ public class RosterApplyActivity extends BaseTitleActivity {
                                 applications.add(list.get(i));
                             }
                             mAdapter.replaceList(applications);
+                            mRecycler.setVisibility(View.VISIBLE);
+                            mEmptyView.setVisibility(View.GONE);
+                        } else {
+                            mRecycler.setVisibility(View.GONE);
+                            mEmptyView.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -162,8 +185,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
             super(context);
             mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
                     .showImageForEmptyUri(R.drawable.default_avatar_icon)
-                    .showImageOnFail(R.drawable.default_avatar_icon)
-                    .cacheOnDisk(true)
+                    .showImageOnFail(R.drawable.default_avatar_icon).cacheOnDisk(true)
                     .bitmapConfig(Bitmap.Config.RGB_565)
                     .showImageOnLoading(R.drawable.default_avatar_icon).build();
         }

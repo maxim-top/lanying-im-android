@@ -56,6 +56,8 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
     private RecyclerView mRecyclerView;
 
     private SessionAdapter mAdapter;
+    
+    private View mEmptyView;
 
     private SessionContract.Presenter mPresenter;
 
@@ -121,6 +123,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                 .addItemDecoration(new DividerItemDecoration(getActivity(), R.color.guide_divider));
         ChatManager.getInstance().addChatListener(mListener);
         buildContactHeaderView();
+        buildFooterView();
         receiveRxBus();
         return view;
     }
@@ -135,6 +138,16 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
         headerView.findViewById(R.id.iv_session_scan)
                 .setOnClickListener(v -> ScannerActivity.openScan(getActivity()));
         mAdapter.addHeaderView(headerView);
+    }
+
+    /**
+     * 设置headerView
+     */
+    private void buildFooterView() {
+        mEmptyView = View.inflate(getActivity(), R.layout.view_empty, null);
+        mAdapter.addFooterView(mEmptyView, new RecyclerView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mEmptyView.setVisibility(View.GONE);
     }
 
     @Override
@@ -160,6 +173,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                     @Override
                     public void onNext(BMXConversationList bmxConversationList) {
                         if (bmxConversationList != null && !bmxConversationList.isEmpty()) {
+                            mEmptyView.setVisibility(View.GONE);
                             List<BMXConversation> conversationList = new ArrayList<>();
                             for (int i = 0; i < bmxConversationList.size(); i++) {
                                 conversationList.add(bmxConversationList.get(i));
@@ -167,6 +181,8 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                             sortSession(conversationList);
                             mAdapter.replaceList(conversationList);
                             notifySession(conversationList);
+                        } else {
+                            mEmptyView.setVisibility(View.VISIBLE);
                         }
                     }
                 });
@@ -410,6 +426,11 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                             @Override
                             public void onNext(BMXErrorCode errorCode) {
                                 mAdapter.remove(position);
+                                if (mAdapter.getItemCount() <= 2) {
+                                    mEmptyView.setVisibility(View.VISIBLE);
+                                } else {
+                                    mEmptyView.setVisibility(View.GONE);
+                                }
                             }
                         });
             }

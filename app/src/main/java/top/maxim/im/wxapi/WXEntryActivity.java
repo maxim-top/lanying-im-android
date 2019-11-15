@@ -43,6 +43,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     @Override
     public void onResp(BaseResp baseResp) {
         if (baseResp == null) {
+            finish();
             return;
         }
         switch (baseResp.errCode) {
@@ -50,6 +51,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                 // 同意
                 String code = ((SendAuth.Resp)baseResp).code;
                 LoginActivity.openLogin(this, code);
+                finish();
                 return;
             case BaseResp.ErrCode.ERR_AUTH_DENIED:
                 // 拒绝

@@ -5,9 +5,16 @@
     android:fitsSystemWindows="true">
 
     <ImageView
+        android:id="@+id/view_splash_img"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:background="@drawable/splash"/>
+    
+    <top.maxim.im.common.view.SplashVideoPlayView
+        android:id="@+id/view_splash_video"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
 </FrameLayout>

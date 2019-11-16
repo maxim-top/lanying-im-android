@@ -37,6 +37,8 @@ public class SharePreferenceUtils {
 
     private static String APP_ID = "app_id";
 
+    private static String IS_FIRST = "isFirst";
+
     private static volatile SharePreferenceUtils instance;
 
     private static SharedPreferences.Editor saveEditor;
@@ -194,5 +196,17 @@ public class SharePreferenceUtils {
             return saveInfo.getInt(currentInputMethod, 0);
         }
         return 0;
+    }
+
+    public boolean putIsFirst(boolean first) {
+        saveEditor.putBoolean(IS_FIRST, first);
+        return saveEditor.commit();
+    }
+
+    public boolean getFirst() {
+        if (saveInfo != null) {
+            return saveInfo.getBoolean(IS_FIRST, true);
+        }
+        return false;
     }
 }

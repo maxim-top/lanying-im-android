@@ -85,7 +85,7 @@ dependencies {
 
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_2.0.0.20191114',ext:'aar')
+    implementation(name:'floo-android_2.0.1.20191116',ext:'aar')
 
     implementation 'com.squareup.okhttp3:okhttp:3.12.3'
 

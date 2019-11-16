@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import java.util.List;
@@ -32,11 +33,16 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.common.view.SplashVideoPlayView;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 
 public class WelcomeActivity extends BaseTitleActivity {
 
+    private ImageView mIvSplash;
+    
+    private SplashVideoPlayView mVideoSplash;
+    
     public static void openWelcome(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
         context.startActivity(intent);
@@ -50,7 +56,12 @@ public class WelcomeActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         hideHeader();
-        return View.inflate(this, R.layout.activity_welcome, null);
+        View view = View.inflate(this, R.layout.activity_welcome, null);
+        mIvSplash = view.findViewById(R.id.view_splash_img);
+        mVideoSplash = view.findViewById(R.id.view_splash_video);
+        mIvSplash.setVisibility(View.VISIBLE);
+        mVideoSplash.setVisibility(View.GONE);
+        return view;
     }
 
     @Override
@@ -82,8 +93,41 @@ public class WelcomeActivity extends BaseTitleActivity {
             autoLogin(userId, pwd);
             return;
         }
-        LoginActivity.openLogin(this);
-        finish();
+        boolean isFirst = SharePreferenceUtils.getInstance().getFirst();
+        if (!isFirst) {
+            LoginActivity.openLogin(this);
+            finish();
+            return;
+        }
+        showVideo();
+    }
+
+    /**
+     * 展示视频
+     */
+    private void showVideo() {
+        SharePreferenceUtils.getInstance().putIsFirst(false);
+        mIvSplash.setVisibility(View.GONE);
+        mVideoSplash.setVisibility(View.VISIBLE);
+        mVideoSplash.setPlayListener(new SplashVideoPlayView.OnPlayVideoListener() {
+
+            @Override
+            public void onStart() {
+            }
+
+            @Override
+            public void onFinish() {
+                LoginActivity.openLogin(WelcomeActivity.this);
+                finish();
+            }
+
+            @Override
+            public void onError() {
+                LoginActivity.openLogin(WelcomeActivity.this);
+                finish();
+            }
+        });
+        mVideoSplash.setPrepareVideoPath(R.raw.splash_video);
     }
 
     @Override

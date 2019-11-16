@@ -13,15 +13,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-
-import java.util.List;
 
 import im.floo.floolib.BMXConversation;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;
+import im.floo.floolib.ListOfLongLong;
 import top.maxim.im.R;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -31,7 +30,6 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.common.view.recyclerview.RecyclerWithHFAdapter;
 import top.maxim.im.message.utils.ChatUtils;
-import top.maxim.im.sdk.bean.MentionBean;
 
 /**
  * Description : 消息列表 Created by Mango on 2018/11/05.
@@ -126,18 +124,22 @@ public class SessionAdapter extends RecyclerWithHFAdapter<BMXConversation> {
             desc.setText(spannable);
         } else {
             String msgDesc = ChatUtils.getInstance().getMessageDesc(lastMsg);
-            if (lastMsg != null && lastMsg.isReceiveMsg() && !TextUtils.isEmpty(lastMsg.config())) {
+            if (lastMsg != null && lastMsg.isReceiveMsg() && lastMsg.config() != null) {
                 // 有@
                 try {
-                    MentionBean mentionBean = new Gson().fromJson(lastMsg.config(),
-                            MentionBean.class);
-                    if (mentionBean != null && mentionBean.isMentionAll()) {
+                    BMXMessageConfig config = lastMsg.config();
+                    if (config.getMentionAll()) {
                         msgDesc = "[有人@你]" + msgDesc;
-                    } else if (mentionBean != null) {
-                        List<Long> atList = mentionBean.getMentionList();
-                        if (atList != null && !atList.isEmpty() && atList
-                                .contains(SharePreferenceUtils.getInstance().getUserId())) {
-                            msgDesc = "[有人@你]" + msgDesc;
+                    } else {
+                        ListOfLongLong atList = config.getMentionList();
+                        if (atList != null && !atList.isEmpty()) {
+                            for (int i = 0; i < atList.size(); i++) {
+                                if (atList.get(
+                                        i) == (SharePreferenceUtils.getInstance().getUserId())) {
+                                    msgDesc = "[有人@你]" + msgDesc;
+                                    break;
+                                }
+                            }
                         }
                     }
                 } catch (Exception e) {

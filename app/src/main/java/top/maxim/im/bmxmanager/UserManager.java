@@ -9,7 +9,6 @@ import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.BMXUserService;
 import im.floo.floolib.BMXUserServiceListener;
 import im.floo.floolib.FileProgressListener;
-import im.floo.floolib.SWIGTYPE_p_BMXUserProfilePtr;
 
 /**
  * Description : 用户 Created by Mango on 2018/12/2.
@@ -41,7 +40,8 @@ public class UserManager extends BaseManager {
      */
     public BMXErrorCode signUpNewUser(String mobile, String verifyCode, String password,
             String username, BMXUserProfile profile) {
-        return bmxClient.signUpNewUser(mobile, verifyCode, password, username, profile);
+        return null;
+//        return bmxClient.signUpNewUser(mobile, verifyCode, password, username, profile);
     }
 
     /**
@@ -53,17 +53,6 @@ public class UserManager extends BaseManager {
      */
     public BMXErrorCode signInByName(String name, String password) {
         return bmxClient.signInByName(name, password);
-    }
-
-    /**
-     * 手机号登陆
-     *
-     * @param phone
-     * @param password
-     * @return
-     */
-    public BMXErrorCode signInByPhone(String phone, String password) {
-        return bmxClient.signInByPhone(phone, password);
     }
 
     /**

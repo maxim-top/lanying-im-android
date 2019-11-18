@@ -48,14 +48,26 @@
         android:textSize="@dimen/dimen_16" />
 
     <TextView
-        android:id="@+id/tv_about_us_contact"
+        android:id="@+id/tv_about_us_net"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_about_us_desc"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/dimen_30"
         android:gravity="center"
-        android:text="@string/about_us_contact"
+        android:text="@string/about_us_net"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_14" />
+
+    <TextView
+        android:id="@+id/tv_about_us_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_about_us_net"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dimen_15"
+        android:gravity="center"
+        android:text="@string/about_us_phone"
         android:textColor="@color/color_black"
         android:textSize="@dimen/dimen_14" />
 

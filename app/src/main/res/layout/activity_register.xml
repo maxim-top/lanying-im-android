@@ -44,18 +44,6 @@
         android:textColor="@color/color_333333"
         android:textSize="@dimen/dimen_24" />
 
-    <TextView
-        android:id="@+id/tv_register_close"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/dimen_30"
-        android:layout_below="@id/ll_app_id"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="@dimen/dimen_50"
-        android:gravity="center"
-        android:text="直接登录"
-        android:textColor="@color/color_333333"
-        android:textSize="@dimen/dimen_14" />
-
     <LinearLayout
         android:id="@+id/ll_et_user_name"
         android:layout_width="wrap_content"
@@ -201,12 +189,23 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/tv_register_protocol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ll_et_user_verify"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dimen_24"
+        android:gravity="center"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_12" />
+
+    <TextView
         android:id="@+id/tv_register"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_50"
-        android:layout_below="@id/ll_et_user_verify"
+        android:layout_below="@id/tv_register_protocol"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dimen_30"
+        android:layout_marginTop="@dimen/dimen_10"
         android:background="@drawable/common_btn_corner_seleced_bg"
         android:enabled="false"
         android:gravity="center"
@@ -216,15 +215,16 @@
         android:textSize="@dimen/dimen_14" />
 
     <TextView
-        android:id="@+id/tv_register_protocol"
+        android:id="@+id/tv_register_close"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/dimen_30"
         android:layout_below="@id/tv_register"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dimen_20"
+        android:layout_marginTop="@dimen/dimen_18"
         android:gravity="center"
-        android:textColor="@color/color_black"
-        android:textSize="@dimen/dimen_10" />
+        android:layout_centerHorizontal="true"
+        android:text="已有账号,去登录"
+        android:textColor="@color/color_576B95"
+        android:textSize="@dimen/dimen_14" />
 
 
 </RelativeLayout>

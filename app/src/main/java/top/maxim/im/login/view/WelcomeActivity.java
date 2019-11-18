@@ -40,9 +40,9 @@ import top.maxim.im.sdk.utils.MessageDispatcher;
 public class WelcomeActivity extends BaseTitleActivity {
 
     private ImageView mIvSplash;
-    
+
     private SplashVideoPlayView mVideoSplash;
-    
+
     public static void openWelcome(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
         context.startActivity(intent);
@@ -139,17 +139,10 @@ public class WelcomeActivity extends BaseTitleActivity {
         for (String permission : permissions) {
             switch (permission) {
                 case PermissionsConstant.READ_STORAGE:
-                    // 读SD权限
-                    if (hasPermission(PermissionsConstant.WRITE_STORAGE)) {
-                        // 如果有读写权限都有 则直接操作
-                        initJump();
-                    } else {
-                        requestPermissions(PermissionsConstant.WRITE_STORAGE);
-                    }
+                    // SD权限
+                    initJump();
                     break;
                 case PermissionsConstant.WRITE_STORAGE:
-                    // 写SD权限 如果有读写权限都有 则直接操作
-                    initJump();
                     break;
                 default:
                     break;
@@ -166,9 +159,10 @@ public class WelcomeActivity extends BaseTitleActivity {
         for (String permission : permissions) {
             switch (permission) {
                 case PermissionsConstant.READ_STORAGE:
-                case PermissionsConstant.WRITE_STORAGE:
                     // 读写SD权限拒绝
                     CommonProvider.openAppPermission(this);
+                    break;
+                case PermissionsConstant.WRITE_STORAGE:
                     break;
                 default:
                     break;
@@ -213,7 +207,7 @@ public class WelcomeActivity extends BaseTitleActivity {
     }
 
     /**
-     * 预加载数据 每次登陆获取service的profile  roster
+     * 预加载数据 每次登陆获取service的profile roster
      */
     public static void initData() {
         Observable.just("").map(s -> {

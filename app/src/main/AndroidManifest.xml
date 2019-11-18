@@ -85,6 +85,11 @@
             android:name=".login.view.LoginActivity"
             android:screenOrientation="portrait"></activity>
 
+        <!--登陆-->
+        <activity
+            android:name=".login.view.LoginByVerifyActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!--注册-->
         <activity
             android:name=".login.view.RegisterActivity"

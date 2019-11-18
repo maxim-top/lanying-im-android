@@ -134,6 +134,8 @@ public class RegisterActivity extends BaseTitleActivity {
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
         buildProtocol();
+        view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
+        view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
         return view;
     }
 
@@ -159,7 +161,7 @@ public class RegisterActivity extends BaseTitleActivity {
 
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
-                ds.setColor(getResources().getColor(R.color.color_0079F4));
+                ds.setColor(getResources().getColor(R.color.color_4A90E2));
                 ds.setUnderlineText(false);
             }
 
@@ -169,7 +171,7 @@ public class RegisterActivity extends BaseTitleActivity {
             }
         };
         SpannableString spannableString = new SpannableString(
-                "《" + getResources().getString(R.string.register_protocol2) + "》");
+                getResources().getString(R.string.register_protocol2));
         spannableString.setSpan(span, 0, spannableString.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString);

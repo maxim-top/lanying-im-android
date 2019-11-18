@@ -4,11 +4,11 @@ package top.maxim.im.login.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -27,7 +27,6 @@ import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
-import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
@@ -42,7 +41,7 @@ import top.maxim.im.wxapi.WXUtils;
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
  */
-public class LoginActivity extends BaseTitleActivity {
+public class LoginByVerifyActivity extends BaseTitleActivity {
 
     public static String LOGIN_OPEN_ID = "loginOpenId";
 
@@ -55,13 +54,16 @@ public class LoginActivity extends BaseTitleActivity {
     /* 登陆 */
     private TextView mLogin;
 
-    /* 注册 */
-    private TextView mRegister;
-    
     private TextView mVerifyLogin;
 
-    /* 切换登陆模式 */
-    private TextView mSwitchLoginMode;
+    /* 发送验证码 */
+    private TextView mSendVerify;
+
+    /* 验证码倒计时 */
+    private TextView mVerifyCountDown;
+
+    /* 注册 */
+    private TextView mRegister;
 
     /* 微信登录 */
     private ImageView mWXLogin;
@@ -84,16 +86,28 @@ public class LoginActivity extends BaseTitleActivity {
     
     private String mChangeAppId;
 
+    private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            mVerifyCountDown.setText(millisUntilFinished / 1000 + "s");
+        }
+
+        @Override
+        public void onFinish() {
+            mVerifyCountDown.setText("");
+        }
+    };
+
     public static void openLogin(Context context) {
         openLogin(context, null);
     }
 
     public static void openLogin(Context context, String openId) {
-        Intent intent = new Intent(context, LoginActivity.class);
+        Intent intent = new Intent(context, LoginByVerifyActivity.class);
         if (!TextUtils.isEmpty(openId)) {
             intent.putExtra(LOGIN_OPEN_ID, openId);
         }
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
@@ -105,37 +119,27 @@ public class LoginActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         hideHeader();
-        View view = View.inflate(this, R.layout.activity_login, null);
-        mInputName = view.findViewById(R.id.et_user_name);
-        mInputPwd = view.findViewById(R.id.et_user_pwd);
+        View view = View.inflate(this, R.layout.activity_login_verify, null);
+        mInputName = view.findViewById(R.id.et_user_phone);
+        mInputPwd = view.findViewById(R.id.et_user_verify);
         mLogin = view.findViewById(R.id.tv_login);
-        mRegister = view.findViewById(R.id.tv_register);
         mVerifyLogin = view.findViewById(R.id.tv_verify);
+        mSendVerify = view.findViewById(R.id.tv_send_verify);
+        mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
+        mRegister = view.findViewById(R.id.tv_register);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
         mTvAppId = view.findViewById(R.id.tv_login_appid);
-        mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
-        mSwitchLoginMode.setVisibility(View.GONE);
-        // 三次点击 进入另一套环境配置
-        ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_login_tag), 3, () -> {
-            int newIndex = SharePreferenceUtils.getInstance().getCustomDns();
-            if (newIndex < 0 || newIndex > 4) {
-                newIndex = 0;
-            }
-            BaseManager.initTestBMXSDK(newIndex);
-            SharePreferenceUtils.getInstance().putCustomDns(newIndex);
-            ToastUtil.showTextViewPrompt("切换新的环境配置:" + newIndex);
-        });
         return view;
     }
 
     @Override
     protected void setViewListener() {
         // 注册
-        mRegister.setOnClickListener(v -> RegisterActivity.openRegister(LoginActivity.this));
+        mRegister.setOnClickListener(v -> RegisterActivity.openRegister(LoginByVerifyActivity.this));
         //验证码登录
-        mVerifyLogin.setOnClickListener(v -> LoginByVerifyActivity.openLogin(LoginActivity.this));
+        mVerifyLogin.setOnClickListener(v -> finish());
         // 登陆
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
@@ -181,19 +185,6 @@ public class LoginActivity extends BaseTitleActivity {
         };
         mInputName.addTextChangedListener(mInputWatcher);
         mInputPwd.addTextChangedListener(mInputWatcher);
-        // 切换登陆模式
-        mSwitchLoginMode.setOnClickListener(v -> {
-            if (mLoginByUserId) {
-                // id登陆 切换为用户名
-                mInputName.setHint(R.string.login_user_name_hint);
-                mInputName.setInputType(EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            } else {
-                mInputName.setHint(R.string.login_user_id_hint);
-                mInputName.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
-            }
-            mLoginByUserId = !mLoginByUserId;
-        });
-        
         // 修改appId
         mIvChangeAppId.setOnClickListener(v -> DialogUtils.getInstance().showEditDialog(this,
                 "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
@@ -209,6 +200,37 @@ public class LoginActivity extends BaseTitleActivity {
 
                     }
                 }));
+        // 发送验证码
+        mSendVerify.setOnClickListener(v -> {
+            verifyCountDown();
+            String phone = mInputName.getEditableText().toString().trim();
+            AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<String>() {
+                @Override
+                public void onResponse(String result) {
+                    ToastUtil.showTextViewPrompt("获取验证码成功");
+                    mSendVerify.setEnabled(true);
+                    mVerifyCountDown.setText("");
+                    timer.cancel();
+                }
+
+                @Override
+                public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                    ToastUtil.showTextViewPrompt("获取验证码失败");
+                    mSendVerify.setEnabled(true);
+                    mVerifyCountDown.setText("");
+                    timer.cancel();
+                }
+            });
+        });
+    }
+
+
+    /**
+     * 验证码倒计时60s
+     */
+    public void verifyCountDown() {
+        mSendVerify.setEnabled(false);
+        timer.start();
     }
 
     @Override

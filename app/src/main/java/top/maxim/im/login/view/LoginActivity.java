@@ -93,7 +93,6 @@ public class LoginActivity extends BaseTitleActivity {
         if (!TextUtils.isEmpty(openId)) {
             intent.putExtra(LOGIN_OPEN_ID, openId);
         }
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
@@ -140,7 +139,6 @@ public class LoginActivity extends BaseTitleActivity {
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
-            // MainActivity.openMain(LoginActivity.this);
             if (!TextUtils.isEmpty(mOpenId)) {
                 bindOpenId(this, name, pwd, mOpenId);
             } else {

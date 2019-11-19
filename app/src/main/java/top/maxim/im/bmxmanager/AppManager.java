@@ -378,6 +378,65 @@ public class AppManager {
     }
 
     /**
+     * 根据手机号 验证码获取用户信息
+     *
+     * @param mobile 手机号
+     */
+    public void getInfoPwdByCaptcha(String mobile, String captcha,
+            HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        params.put("mobile", mobile);
+        params.put("captcha", captcha);
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "user/info_pwd", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                String data = jsonObject.getString("data");
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
      * 微信登录
      *
      * @param code 微信返会code

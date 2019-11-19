@@ -1,7 +1,6 @@
 
 package top.maxim.im.login.view;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
@@ -14,18 +13,11 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXUserProfile;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
-import top.maxim.im.MainActivity;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
-import top.maxim.im.bmxmanager.BaseManager;
-import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -35,7 +27,6 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
-import top.maxim.im.sdk.utils.MessageDispatcher;
 import top.maxim.im.wxapi.WXUtils;
 
 /**
@@ -83,7 +74,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     private String mOpenId;
 
     private TextView mTvAppId;
-    
+
     private String mChangeAppId;
 
     private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
@@ -137,19 +128,15 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     @Override
     protected void setViewListener() {
         // 注册
-        mRegister.setOnClickListener(v -> RegisterActivity.openRegister(LoginByVerifyActivity.this));
-        //验证码登录
+        mRegister
+                .setOnClickListener(v -> RegisterActivity.openRegister(LoginByVerifyActivity.this));
+        // 验证码登录
         mVerifyLogin.setOnClickListener(v -> finish());
         // 登陆
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
-            // MainActivity.openMain(LoginActivity.this);
-            if (!TextUtils.isEmpty(mOpenId)) {
-                bindOpenId(this, name, pwd, mOpenId);
-            } else {
-                login(this, name, pwd, mLoginByUserId, mChangeAppId);
-            }
+            loginByCaptcha(name, pwd);
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
@@ -224,7 +211,6 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
         });
     }
 
-
     /**
      * 验证码倒计时60s
      */
@@ -253,126 +239,45 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
         mTvAppId.setText("APPID:" + appId);
     }
 
-    /**
-     * 绑定openId
-     * 
-     * @param pwd
-     */
-    public static void bindOpenId(final Activity activity, String name, final String pwd,
-            final String openId) {
-        // 首先获取token
-        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-            ((BaseTitleActivity)activity).showLoadingDialog(true);
-        }
-        AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
-            @Override
-            public void onResponse(String result) {
-                AppManager.getInstance().bindOpenId(result, openId,
-                        new HttpResponseCallback<String>() {
-                            @Override
-                            public void onResponse(String result) {
-                                if (activity instanceof BaseTitleActivity
-                                        && !activity.isFinishing()) {
-                                    ((BaseTitleActivity)activity).dismissLoadingDialog();
-                                }
-                                login(activity, name, pwd, false);
-                            }
-
-                            @Override
-                            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                                if (activity instanceof BaseTitleActivity
-                                        && !activity.isFinishing()) {
-                                    ((BaseTitleActivity)activity).dismissLoadingDialog();
-                                }
-                            }
-                        });
-            }
-
-            @Override
-            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                ToastUtil.showTextViewPrompt("绑定失败");
-                if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-                    ((BaseTitleActivity)activity).dismissLoadingDialog();
-                }
-            }
-        });
-    }
-
-    public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
-        login(activity, name, pwd, isLoginById, null);
-    }
-
-    public static void login(final Activity activity, String name, final String pwd,
-            final boolean isLoginById, final String changeAppId) {
-
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pwd)) {
-            ToastUtil.showTextViewPrompt("不能为空");
-            return;
-        }
-        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-            ((BaseTitleActivity)activity).showLoadingDialog(true);
-        }
-        Observable.just(name).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                if (isLoginById) {
-                    return UserManager.getInstance().signInById(Long.valueOf(s), pwd);
-                }
-                // if (Pattern.matches("0?(13|14|15|17|18|19)[0-9]{9}", s)) {
-                // // 手机号
-                // return UserManager.getInstance().signInByPhone(s, pwd);
-                // }
-                return UserManager.getInstance().signInByName(s, pwd);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode bmxErrorCode) {
-                // 登陆成功后 需要将userId存储SP 作为下次自动登陆
-                BMXUserProfile profile = new BMXUserProfile();
-                BMXErrorCode errorCode = UserManager.getInstance().getProfile(profile, true);
-                if (errorCode != null && errorCode.swigValue() == BMXErrorCode.NoError.swigValue()
-                        && profile.userId() > 0) {
-                    SharePreferenceUtils.getInstance().putUserId(profile.userId());
-                    SharePreferenceUtils.getInstance().putUserName(profile.username());
-                    SharePreferenceUtils.getInstance().putUserPwd(pwd);
-                    AppManager.getInstance().getTokenByName(profile.username(), pwd, null);
-                    if (!TextUtils.isEmpty(changeAppId)) {
-                        SharePreferenceUtils.getInstance().putAppId(changeAppId);
-                        UserManager.getInstance().changeAppId(changeAppId);
-                    }
-                    // 登陆成功消息预加载
-                    WelcomeActivity.initData();
-                }
-                return bmxErrorCode;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
+    private void loginByCaptcha(String mobile, String captcha) {
+        showLoadingDialog(true);
+        AppManager.getInstance().getInfoPwdByCaptcha(mobile, captcha,
+                new HttpResponseCallback<String>() {
                     @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-                            ((BaseTitleActivity)activity).dismissLoadingDialog();
+                    public void onResponse(String result) {
+                        dismissLoadingDialog();
+                        if (TextUtils.isEmpty(result)) {
+                            ToastUtil.showTextViewPrompt("登录失败");
+                            return;
                         }
-                        String error = e != null ? e.getMessage() : "网络异常";
-                        ToastUtil.showTextViewPrompt(error);
+                        String username = "", password = "", user_id = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("username")) {
+                                username = jsonObject.getString("username");
+                            }
+                            if (jsonObject.has("password")) {
+                                password = jsonObject.getString("password");
+                            }
+                            if (jsonObject.has("user_id")) {
+                                user_id = jsonObject.getString("user_id");
+                            }
+                            if (!TextUtils.isEmpty(mOpenId)) {
+                                LoginActivity.bindOpenId(LoginByVerifyActivity.this, username,
+                                        password, mOpenId);
+                            } else {
+                                LoginActivity.login(LoginByVerifyActivity.this, username, password,
+                                        false);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-                            ((BaseTitleActivity)activity).dismissLoadingDialog();
-                        }
-                        SharePreferenceUtils.getInstance().putLoginStatus(true);
-                        MessageDispatcher.getDispatcher().initialize();
-                        MainActivity.openMain(activity);
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt(errorMsg);
                     }
                 });
     }

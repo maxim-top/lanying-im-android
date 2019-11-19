@@ -27,6 +27,7 @@ public class MainActivity extends BaseSwitchActivity {
 
     public static void openMain(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
         ((Activity)context).finish();
     }

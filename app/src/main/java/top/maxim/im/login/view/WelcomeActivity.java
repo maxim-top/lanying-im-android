@@ -45,6 +45,7 @@ public class WelcomeActivity extends BaseTitleActivity {
 
     public static void openWelcome(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 

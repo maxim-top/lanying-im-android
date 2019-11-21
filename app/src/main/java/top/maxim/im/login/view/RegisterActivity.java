@@ -134,8 +134,8 @@ public class RegisterActivity extends BaseTitleActivity {
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
         buildProtocol();
-        view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
-        view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
+//        view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
+//        view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
         return view;
     }
 

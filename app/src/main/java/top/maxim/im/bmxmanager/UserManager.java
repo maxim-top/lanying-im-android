@@ -40,8 +40,8 @@ public class UserManager extends BaseManager {
      */
     public BMXErrorCode signUpNewUser(String mobile, String verifyCode, String password,
             String username, BMXUserProfile profile) {
-        return null;
-//        return bmxClient.signUpNewUser(mobile, verifyCode, password, username, profile);
+//        return null;
+        return bmxClient.signUpNewUser(username, password, profile);
     }
 
     /**

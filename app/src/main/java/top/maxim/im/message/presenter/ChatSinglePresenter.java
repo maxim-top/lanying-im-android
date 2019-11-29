@@ -14,7 +14,6 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.BaseManager;
-import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatSingleContract;
@@ -162,36 +161,5 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
     @Override
     public void sendInputStatus(String extension) {
         mSendUtils.sendInputStatusMessage(mChatType, mMyUserId, mChatId, extension);
-    }
-
-    @Override
-    protected void ackMessage(BMXMessage message) {
-        super.ackMessage(message);
-        // 已读不在发送 自己发送的消息不设置已读
-        if (message == null || message.isReadAcked() || !message.isReceiveMsg()) {
-            return;
-        }
-        Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
-            @Override
-            public BMXMessage call(BMXMessage message) {
-                ChatManager.getInstance().ackMessage(message);
-                return message;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXMessage>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXMessage message) {
-                    }
-                });
     }
 }

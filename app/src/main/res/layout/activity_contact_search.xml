@@ -35,7 +35,7 @@
             android:imeOptions="actionSearch"
             android:singleLine="true"
             android:paddingLeft="@dimen/dimen_10"
-            android:hint="搜索名称" />
+            android:hint="输入要查找的好友用户名" />
     </FrameLayout>
 
     <android.support.v7.widget.RecyclerView

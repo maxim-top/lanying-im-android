@@ -57,6 +57,8 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
 
     private SessionAdapter mAdapter;
 
+    private View mEmptyView;
+
     private SessionContract.Presenter mPresenter;
 
     private BMXChatServiceListener mListener = new BMXChatServiceListener() {
@@ -121,6 +123,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                 .addItemDecoration(new DividerItemDecoration(getActivity(), R.color.guide_divider));
         ChatManager.getInstance().addChatListener(mListener);
         buildContactHeaderView();
+        buildFooterView();
         receiveRxBus();
         return view;
     }
@@ -135,6 +138,15 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
         headerView.findViewById(R.id.iv_session_scan)
                 .setOnClickListener(v -> ScannerActivity.openScan(getActivity()));
         mAdapter.addHeaderView(headerView);
+    }
+
+    /**
+     * 设置headerView
+     */
+    private void buildFooterView() {
+        mEmptyView = View.inflate(getActivity(), R.layout.view_empty, null);
+        mAdapter.addFooterView(mEmptyView);
+        mEmptyView.setVisibility(View.GONE);
     }
 
     @Override
@@ -160,6 +172,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                     @Override
                     public void onNext(BMXConversationList bmxConversationList) {
                         if (bmxConversationList != null && !bmxConversationList.isEmpty()) {
+                            showEmpty(false);
                             List<BMXConversation> conversationList = new ArrayList<>();
                             for (int i = 0; i < bmxConversationList.size(); i++) {
                                 conversationList.add(bmxConversationList.get(i));
@@ -167,9 +180,25 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                             sortSession(conversationList);
                             mAdapter.replaceList(conversationList);
                             notifySession(conversationList);
+                        } else {
+                            showEmpty(true);
                         }
                     }
                 });
+    }
+
+    private void showEmpty(boolean empty) {
+        RecyclerView.LayoutParams params = (RecyclerView.LayoutParams)mEmptyView.getLayoutParams();
+        if (empty) {
+            mEmptyView.setVisibility(View.VISIBLE);
+            params.width = RecyclerView.LayoutParams.MATCH_PARENT;
+            params.height = RecyclerView.LayoutParams.MATCH_PARENT;
+        } else {
+            mEmptyView.setVisibility(View.GONE);
+            params.width = 0;
+            params.height = 0;
+        }
+        mEmptyView.setLayoutParams(params);
     }
 
     /**
@@ -386,8 +415,8 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                         if (conversation == null) {
                             return null;
                         }
-                        ChatManager.getInstance()
-                                .deleteConversation(conversation.conversationId(), true);
+                        ChatManager.getInstance().deleteConversation(conversation.conversationId(),
+                                true);
                         return BMXErrorCode.NoError;
                     }
                 }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
@@ -410,6 +439,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                             @Override
                             public void onNext(BMXErrorCode errorCode) {
                                 mAdapter.remove(position);
+                                showEmpty(mAdapter.getItemCount() <= 2);
                             }
                         });
             }

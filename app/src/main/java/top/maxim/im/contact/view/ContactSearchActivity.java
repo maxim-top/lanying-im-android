@@ -106,10 +106,10 @@ public class ContactSearchActivity extends BaseTitleActivity {
             public void onClick(View v) {
                 if (mSearchByUserId) {
                     // id搜索
-                    mSearch.setHint("搜索名称");
+                    mSearch.setHint("输入要查找的好友用户名");
                     mSearch.setInputType(EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                 } else {
-                    mSearch.setHint("搜索id");
+                    mSearch.setHint("输入要查找的好友用户id");
                     mSearch.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
                 }
                 mSearchByUserId = !mSearchByUserId;

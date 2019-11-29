@@ -25,7 +25,11 @@ public abstract class MsgAttachmentCallback {
             mainHandler.post(() -> onProgress(msgId, percent <= 0 ? 0 : percent));
         }
     }
-    
+
+    public void onStart(long msgId) {
+
+    }
+
     public abstract void onProgress(long msgId, int percent);
 
     public abstract void onFinish(long msgId);

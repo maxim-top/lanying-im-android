@@ -33,7 +33,8 @@
                 android:id="@+id/tv_accept"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/c8"
+                android:background="@color/color_0079F4"
+                android:textColor="@color/color_white"
                 android:padding="@dimen/dimen_10"
                 android:text="处理" />
 

@@ -87,6 +87,7 @@ import top.maxim.im.message.utils.ChatAttachmentManager;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.utils.RefreshChatActivityEvent;
+import top.maxim.im.message.utils.VoicePlayManager;
 import top.maxim.im.message.view.ChooseFileActivity;
 import top.maxim.im.message.view.PhotoDetailActivity;
 import top.maxim.im.message.view.VideoDetailActivity;
@@ -1171,20 +1172,19 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (body == null) {
             return;
         }
-        mView.updateChatMessage(bean);
         mVoicePlayHelper.setOnVoiceFinishListener(new VoicePlayHelper.OnVoiceFinishListener() {
             @Override
             public void onFinish() {
                 if (mView == null) {
                     return;
                 }
-                mView.updateChatMessage(bean);
+                VoicePlayManager.getInstance().onFinishCallback(bean);
                 // mView.getVoiceMessageMsgId(chatBean.getMsgId());
             }
 
             @Override
             public void onStart() {
-
+                VoicePlayManager.getInstance().onStartCallback(bean);
             }
 
             @Override

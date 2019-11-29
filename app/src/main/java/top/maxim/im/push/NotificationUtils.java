@@ -85,7 +85,7 @@ public class NotificationUtils {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 AppContextUtils.getAppContext(), channelId).setWhen(when).setAutoCancel(true)
                         .setContentTitle(title).setContentText(content)
-                        .setSmallIcon(R.drawable.bmx_icon48).setTicker(content);
+                        .setSmallIcon(R.drawable.bmx_icon144).setTicker(content);
         if (bitmap == null) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.inPreferredConfig = Bitmap.Config.RGB_565;
@@ -94,7 +94,7 @@ public class NotificationUtils {
             opt.inJustDecodeBounds = false;
             opt.inSampleSize = 1;// 设置缩放比例
             bitmap = BitmapFactory.decodeResource(AppContextUtils.getAppContext().getResources(),
-                    R.drawable.bmx_icon48, opt);
+                    R.drawable.bmx_icon144, opt);
         }
         builder.setLargeIcon(bitmap);
         PendingIntent pIntent = PendingIntent.getActivity(AppContextUtils.getAppContext(), notifyId,

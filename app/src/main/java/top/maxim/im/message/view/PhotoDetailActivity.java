@@ -71,6 +71,11 @@ public class PhotoDetailActivity extends BaseTitleActivity {
     }
 
     @Override
+    protected boolean isFullScreen() {
+        return false;
+    }
+
+    @Override
     protected void initDataForActivity() {
         mViewPager.setCurrentItem(mIndex);
         if (mPhotoBeans == null || mPhotoBeans.isEmpty()) {

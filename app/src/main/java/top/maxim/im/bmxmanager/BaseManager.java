@@ -59,7 +59,7 @@ public class BaseManager {
             hostConfig = new BMXSDKConfig.HostConfig("sync.maximtop.com", 443,
                     "https://api.maximtop.com");
         }
-//        conf.setHostConfig(hostConfig);
+        // conf.setHostConfig(hostConfig);
         bmxClient = BMXClient.create(conf);
     }
 
@@ -95,5 +95,9 @@ public class BaseManager {
                     error == null ? -1 : error.swigValue(), error == null ? "" : error.name()));
         }
         return Observable.just(t);
+    }
+
+    public static BMXClient getBMXClient() {
+        return bmxClient;
     }
 }

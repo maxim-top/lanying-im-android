@@ -4,26 +4,26 @@ package top.maxim.im.message.utils;
 import android.util.LongSparseArray;
 
 import im.floo.floolib.BMXMessage;
-import top.maxim.im.message.interfaces.MsgAttachmentCallback;
+import top.maxim.im.message.interfaces.VoicePlayCallback;
 
 ;
 
 /**
- * Description :聊天模块文件上传下载管理
+ * Description :语音播放管理
  */
-public final class ChatAttachmentManager {
+public final class VoicePlayManager {
 
-    private static final ChatAttachmentManager manager = new ChatAttachmentManager();
+    private static final VoicePlayManager manager = new VoicePlayManager();
 
-    private static final String TAG = ChatAttachmentManager.class.getSimpleName();
+    private static final String TAG = VoicePlayManager.class.getSimpleName();
 
     // model 监听，每个任务只有一个
-    private LongSparseArray<MsgAttachmentCallback> mListeners = new LongSparseArray<>();
+    private LongSparseArray<VoicePlayCallback> mListeners = new LongSparseArray<>();
 
-    private ChatAttachmentManager() {
+    private VoicePlayManager() {
     }
 
-    public static ChatAttachmentManager getInstance() {
+    public static VoicePlayManager getInstance() {
         return manager;
     }
 
@@ -33,7 +33,7 @@ public final class ChatAttachmentManager {
      * @param referenceId 资源标识id
      * @param callback 回调
      */
-    public void registerListener(long referenceId, MsgAttachmentCallback callback) {
+    public void registerListener(long referenceId, VoicePlayCallback callback) {
         mListeners.put(referenceId, callback);
     }
 
@@ -46,15 +46,6 @@ public final class ChatAttachmentManager {
         mListeners.remove(referenceId);
     }
 
-    public void onProgressCallback(BMXMessage msg, int percent) {
-        if (msg == null) {
-            return;
-        }
-        long msgId = msg.msgId();
-        if (mListeners.get(msgId) != null) {
-            mListeners.get(msgId).onCallProgress(msg, percent);
-        }
-    }
 
     public void onStartCallback(BMXMessage msg) {
         if (msg == null) {
@@ -72,7 +63,17 @@ public final class ChatAttachmentManager {
         }
         long msgId = msg.msgId();
         if (mListeners.get(msgId) != null) {
-            mListeners.get(msgId).onCallProgress(msg, 100);
+            mListeners.get(msgId).onFinish(msgId);
+        }
+    }
+
+    public void onFailCallback(BMXMessage msg) {
+        if (msg == null) {
+            return;
+        }
+        long msgId = msg.msgId();
+        if (mListeners.get(msgId) != null) {
+            mListeners.get(msgId).onFail(msgId);
         }
     }
 }

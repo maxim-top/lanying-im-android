@@ -262,7 +262,7 @@ public class ContactFragment extends BaseTitleFragment {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        initRoster(true);
+        initRoster(false);
     }
 
     @Override
@@ -273,7 +273,7 @@ public class ContactFragment extends BaseTitleFragment {
     @Override
     public void onShow() {
         if (mContentView != null) {
-            initRoster(true);
+            initRoster(false);
         }
     }
 

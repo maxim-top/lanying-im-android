@@ -33,7 +33,7 @@ public abstract class BaseDialog extends DialogFragment {
     /**
      * 初始化dialog
      */
-    private void init() {
+    protected void init() {
         setStyle(R.style.dialog_normal, 0);
         if (getDialog() != null) {
             getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);

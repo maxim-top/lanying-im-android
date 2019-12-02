@@ -30,6 +30,7 @@ import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.push.NotificationUtils;
@@ -82,8 +83,7 @@ public class WelcomeActivity extends BaseTitleActivity {
             autoLogin(userId, pwd);
             return;
         }
-        LoginActivity.openLogin(this);
-        finish();
+        showProtocol();
     }
 
     @Override
@@ -169,7 +169,7 @@ public class WelcomeActivity extends BaseTitleActivity {
     }
 
     /**
-     * 预加载数据 每次登陆获取service的profile  roster
+     * 预加载数据 每次登陆获取service的profile roster
      */
     public static void initData() {
         Observable.just("").map(s -> {
@@ -202,5 +202,30 @@ public class WelcomeActivity extends BaseTitleActivity {
 
                     }
                 });
+    }
+
+    /**
+     * 展示用户协议
+     */
+    private void showProtocol() {
+        boolean show = SharePreferenceUtils.getInstance().getPrococolDialogStatus();
+        if (show) {
+            LoginActivity.openLogin(WelcomeActivity.this);
+            finish();
+            return;
+        }
+        DialogUtils.getInstance().showProtocolDialog(this, new ProtocolDialog.OnDialogListener() {
+            @Override
+            public void onConfirmListener() {
+                SharePreferenceUtils.getInstance().putPrococolDialogStatus(true);
+                LoginActivity.openLogin(WelcomeActivity.this);
+                finish();
+            }
+
+            @Override
+            public void onCancelListener() {
+
+            }
+        });
     }
 }

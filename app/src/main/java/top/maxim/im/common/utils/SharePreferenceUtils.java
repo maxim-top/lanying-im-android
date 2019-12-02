@@ -37,6 +37,8 @@ public class SharePreferenceUtils {
 
     private static String APP_ID = "app_id";
 
+    private static String IS_SHOW_PROTOCOL_DIALOG= "isShowProtocolDialog";
+
     private static volatile SharePreferenceUtils instance;
 
     private static SharedPreferences.Editor saveEditor;
@@ -194,5 +196,17 @@ public class SharePreferenceUtils {
             return saveInfo.getInt(currentInputMethod, 0);
         }
         return 0;
+    }
+
+    public boolean putPrococolDialogStatus(boolean status) {
+        saveEditor.putBoolean(IS_SHOW_PROTOCOL_DIALOG, status);
+        return saveEditor.commit();
+    }
+
+    public boolean getPrococolDialogStatus() {
+        if (saveInfo != null) {
+            return saveInfo.getBoolean(IS_SHOW_PROTOCOL_DIALOG, false);
+        }
+        return false;
     }
 }

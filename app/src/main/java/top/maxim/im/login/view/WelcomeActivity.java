@@ -3,9 +3,17 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -30,6 +38,7 @@ import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
@@ -214,18 +223,68 @@ public class WelcomeActivity extends BaseTitleActivity {
             finish();
             return;
         }
-        DialogUtils.getInstance().showProtocolDialog(this, new ProtocolDialog.OnDialogListener() {
+        // 标题
+        StringBuilder title = new StringBuilder(getString(R.string.register_protocol2))
+                .append(getString(R.string.register_protocol3))
+                .append(getString(R.string.register_protocol4));
+
+        // 内容
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append(getResources().getString(R.string.register_protocol_content1));
+
+        // 用户服务
+        SpannableString spannableString = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol2) + "》");
+        spannableString.setSpan(new ClickableSpan() {
+
             @Override
-            public void onConfirmListener() {
-                SharePreferenceUtils.getInstance().putPrococolDialogStatus(true);
-                LoginActivity.openLogin(WelcomeActivity.this);
-                finish();
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_0079F4));
+                ds.setUnderlineText(false);
             }
 
             @Override
-            public void onCancelListener() {
-
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(WelcomeActivity.this, 1);
             }
-        });
+        }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString);
+        // 隐私政策
+        builder.append(getResources().getString(R.string.register_protocol3));
+        SpannableString spannableString1 = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol4) + "》");
+        spannableString1.setSpan(new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_0079F4));
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(WelcomeActivity.this, 0);
+            }
+        }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString1);
+        builder.append(getString(R.string.register_protocol_content2));
+
+        TextView tv = new TextView(this);
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
+        tv.setText(builder);
+        DialogUtils.getInstance().showCustomDialog(this, tv, title.toString(), "同意", "暂不使用",
+                new CommonCustomDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        SharePreferenceUtils.getInstance().putPrococolDialogStatus(true);
+                        LoginActivity.openLogin(WelcomeActivity.this);
+                        finish();
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+                        finish();
+                    }
+                });
     }
 }

@@ -115,8 +115,11 @@ public class MineFragment extends BaseTitleFragment {
     /* 关于我们 */
     private ItemLineArrow.Builder mAboutUs;
 
-    /* 协议 */
-    private ItemLineArrow.Builder mProtocol;
+    /* 用户服务 */
+    private ItemLineArrow.Builder mProtocolTerms;
+
+    /* 隐私政策 */
+    private ItemLineArrow.Builder mProtocolPrivacy;
 
     /* app版本号 */
     private TextView mAppVersion;
@@ -290,11 +293,17 @@ public class MineFragment extends BaseTitleFragment {
                 .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
         container.addView(mAboutUs.build(), 12);
 
-        // 关于我们
-        mProtocol = new ItemLineArrow.Builder(getActivity())
+        // 用户服务
+        mProtocolTerms = new ItemLineArrow.Builder(getActivity())
                 .setStartContent(getString(R.string.register_protocol2))
-                .setOnItemClickListener(v -> ProtocolActivity.openProtol(getActivity()));
-        container.addView(mProtocol.build(), 13);
+                .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 1));
+        container.addView(mProtocolTerms.build(), 13);
+
+        // 隐私政策
+        mProtocolPrivacy = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.register_protocol4))
+                .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 0));
+        container.addView(mProtocolPrivacy.build(), 14);
         return view;
     }
 

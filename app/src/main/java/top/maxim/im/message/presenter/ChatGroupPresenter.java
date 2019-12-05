@@ -99,7 +99,7 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                         RosterFetcher.getFetcher().putGroup(mGroup);
                         if (mView != null) {
                             mView.setHeadTitle(mGroup.name());
-                            mShowAckRead = mGroup.enableReadAck();
+//                            mShowAckRead = mGroup.enableReadAck();
                             mView.showReadAck(mShowAckRead);
                         }
                         syncGroupMember();

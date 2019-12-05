@@ -16,8 +16,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import top.maxim.im.bmxmanager.AppManager;
+import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.login.view.LoginActivity;
+import top.maxim.im.login.view.LoginByVerifyActivity;
 import top.maxim.im.login.view.RegisterActivity;
 import top.maxim.im.net.HttpResponseCallback;
 
@@ -29,8 +31,9 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
         if (WXUtils.getInstance().getWXApi() != null) {
-            WXUtils.getInstance().getWXApi().handleIntent(getIntent(), this);
+            WXUtils.getInstance().getWXApi().handleIntent(intent, this);
         }
     }
 
@@ -77,6 +80,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
      * 微信登录
      */
     public void loginWeChat(String code) {
+        int source = WXUtils.getInstance().getSource();
         AppManager.getInstance().weChatLogin(code, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
@@ -87,9 +91,13 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
+                        String openId = jsonObject.getString("openid");
                         // 没有userId 密码 需要跳转注册
-                        RegisterActivity.openRegister(WXEntryActivity.this,
-                                jsonObject.getString("openid"));
+                        if (source == CommonConfig.SourceToWX.TYPE_LOGIN_VERIFY) {
+                            LoginByVerifyActivity.openLogin(WXEntryActivity.this, openId);
+                        } else {
+                            RegisterActivity.openRegister(WXEntryActivity.this, openId);
+                        }
                         finish();
                         return;
                     }
@@ -97,6 +105,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                     String userId = jsonObject.getString("user_id");
                     String pwd = jsonObject.getString("password");
                     LoginActivity.login(WXEntryActivity.this, userId, pwd, true);
+                    finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

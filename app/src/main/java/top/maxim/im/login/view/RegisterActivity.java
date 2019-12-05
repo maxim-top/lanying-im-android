@@ -32,12 +32,14 @@ import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.wxapi.WXUtils;
 
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
@@ -78,6 +80,9 @@ public class RegisterActivity extends BaseTitleActivity {
     private String mChangeAppId;
 
     private TextView mTvRegisterProtocol;
+
+    /* 微信登录 */
+    private ImageView mWXLogin;
 
     public static final String REFISTER_ACCOUNT = "registerAccount";
 
@@ -133,6 +138,7 @@ public class RegisterActivity extends BaseTitleActivity {
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
+        mWXLogin = view.findViewById(R.id.iv_wx_login);
         buildProtocol();
         view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
         view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
@@ -157,8 +163,10 @@ public class RegisterActivity extends BaseTitleActivity {
         mTvRegisterProtocol.setMovementMethod(LinkMovementMethod.getInstance());
         SpannableStringBuilder builder = new SpannableStringBuilder();
         builder.append(getResources().getString(R.string.register_protocol1));
-        //用户服务
-        ClickableSpan span = new ClickableSpan() {
+        // 用户服务
+        SpannableString spannableString = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol2) + "》");
+        spannableString.setSpan(new ClickableSpan() {
 
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
@@ -170,19 +178,17 @@ public class RegisterActivity extends BaseTitleActivity {
             public void onClick(@NonNull View widget) {
                 ProtocolActivity.openProtocol(RegisterActivity.this, 1);
             }
-        };
-        SpannableString spannableString = new SpannableString(
-                "《" + getResources().getString(R.string.register_protocol2) + "》");
-        spannableString.setSpan(span, 0, spannableString.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString);
         // 隐私政策
         builder.append(getResources().getString(R.string.register_protocol3));
-        ClickableSpan span1 = new ClickableSpan() {
+        SpannableString spannableString1 = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol4) + "》");
+        spannableString1.setSpan(new ClickableSpan() {
 
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
-                ds.setColor(getResources().getColor(R.color.color_0079F4));
+                ds.setColor(getResources().getColor(R.color.color_4A90E2));
                 ds.setUnderlineText(false);
             }
 
@@ -190,11 +196,7 @@ public class RegisterActivity extends BaseTitleActivity {
             public void onClick(@NonNull View widget) {
                 ProtocolActivity.openProtocol(RegisterActivity.this, 0);
             }
-        };
-        SpannableString spannableString1 = new SpannableString(
-                "《" + getResources().getString(R.string.register_protocol4) + "》");
-        spannableString1.setSpan(span1, 0, spannableString1.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString1);
         mTvRegisterProtocol.setText(builder);
     }
@@ -208,6 +210,14 @@ public class RegisterActivity extends BaseTitleActivity {
                 LoginActivity.openLogin(RegisterActivity.this, mOpenId);
                 finish();
             }
+        });
+        // 微信登录
+        mWXLogin.setOnClickListener(v -> {
+            if (!WXUtils.getInstance().wxSupported()) {
+                ToastUtil.showTextViewPrompt("请安装微信");
+                return;
+            }
+            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER);
         });
         // 注册成功
         mRegister.setOnClickListener(new View.OnClickListener() {

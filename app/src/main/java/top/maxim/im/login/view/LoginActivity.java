@@ -28,6 +28,7 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ClickTimeUtils;
+import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
@@ -93,6 +94,7 @@ public class LoginActivity extends BaseTitleActivity {
         if (!TextUtils.isEmpty(openId)) {
             intent.putExtra(LOGIN_OPEN_ID, openId);
         }
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
@@ -151,7 +153,7 @@ public class LoginActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
-            WXUtils.getInstance().wxLogin();
+            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN);
         });
         // 扫一扫
         mIvScan.setOnClickListener(v -> ScannerActivity.openScan(this));

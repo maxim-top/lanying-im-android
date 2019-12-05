@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
@@ -63,9 +64,6 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     private ImageView mIvScan;
 
     private ImageView mIvChangeAppId;
-
-    /* 是否是id登陆 */
-    private boolean mLoginByUserId = false;
 
     /* 输入监听 */
     private TextWatcher mInputWatcher;
@@ -130,8 +128,11 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
         // 注册
         mRegister
                 .setOnClickListener(v -> RegisterActivity.openRegister(LoginByVerifyActivity.this));
-        // 验证码登录
-        mVerifyLogin.setOnClickListener(v -> finish());
+        // 密码登录
+        mVerifyLogin.setOnClickListener(v -> {
+            LoginActivity.openLogin(LoginByVerifyActivity.this, mOpenId);
+            finish();
+        });
         // 登陆
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
@@ -144,7 +145,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
-            WXUtils.getInstance().wxLogin();
+            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN_VERIFY);
         });
         // 扫一扫
         mIvScan.setOnClickListener(v -> ScannerActivity.openScan(this));

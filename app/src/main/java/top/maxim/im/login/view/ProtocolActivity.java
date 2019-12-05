@@ -11,13 +11,12 @@ import android.widget.RelativeLayout;
 
 import top.maxim.im.R;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.view.Header;
 
 public class ProtocolActivity extends BaseTitleActivity {
 
     private WebView mWebView;
-
-    private String mProtocolUrl = "https://www.maximtop.com/privacy";
 
     public static void openProtol(Context context) {
         Intent intent = new Intent(context, ProtocolActivity.class);
@@ -74,6 +73,6 @@ public class ProtocolActivity extends BaseTitleActivity {
             }
         });
 
-        mWebView.loadUrl(mProtocolUrl);
+        mWebView.loadUrl(CommonConfig.PROTOCOL_URL);
     }
 }

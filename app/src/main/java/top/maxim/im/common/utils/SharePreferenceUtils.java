@@ -39,6 +39,8 @@ public class SharePreferenceUtils {
 
     private static String IS_FIRST = "isFirst";
 
+    private static String IS_SHOW_PROTOCOL_DIALOG= "isShowProtocolDialog";
+
     private static volatile SharePreferenceUtils instance;
 
     private static SharedPreferences.Editor saveEditor;
@@ -206,6 +208,18 @@ public class SharePreferenceUtils {
     public boolean getFirst() {
         if (saveInfo != null) {
             return saveInfo.getBoolean(IS_FIRST, true);
+        }
+        return false;
+    }
+
+    public boolean putProtocolDialogStatus(boolean status) {
+        saveEditor.putBoolean(IS_SHOW_PROTOCOL_DIALOG, status);
+        return saveEditor.commit();
+    }
+
+    public boolean getProtocolDialogStatus() {
+        if (saveInfo != null) {
+            return saveInfo.getBoolean(IS_SHOW_PROTOCOL_DIALOG, false);
         }
         return false;
     }

@@ -31,6 +31,7 @@ import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.SplashVideoPlayView;
@@ -94,19 +95,19 @@ public class WelcomeActivity extends BaseTitleActivity {
             autoLogin(userId, pwd);
             return;
         }
-        boolean isFirst = SharePreferenceUtils.getInstance().getFirst();
-        if (!isFirst) {
-            LoginActivity.openLogin(this);
-            finish();
-            return;
-        }
-        showVideo();
+        showProtocol();
     }
 
     /**
      * 展示视频
      */
     private void showVideo() {
+        boolean isFirst = SharePreferenceUtils.getInstance().getFirst();
+        if (!isFirst) {
+            LoginActivity.openLogin(this);
+            finish();
+            return;
+        }
         SharePreferenceUtils.getInstance().putIsFirst(false);
         mIvSplash.setVisibility(View.GONE);
         mVideoSplash.setVisibility(View.VISIBLE);
@@ -241,5 +242,28 @@ public class WelcomeActivity extends BaseTitleActivity {
 
                     }
                 });
+    }
+
+    /**
+     * 展示用户协议
+     */
+    private void showProtocol() {
+        boolean show = SharePreferenceUtils.getInstance().getProtocolDialogStatus();
+        if (show) {
+            showVideo();
+            return;
+        }
+        DialogUtils.getInstance().showProtocolDialog(this, new ProtocolDialog.OnDialogListener() {
+            @Override
+            public void onConfirmListener() {
+                SharePreferenceUtils.getInstance().putProtocolDialogStatus(true);
+                showVideo();
+            }
+
+            @Override
+            public void onCancelListener() {
+
+            }
+        });
     }
 }

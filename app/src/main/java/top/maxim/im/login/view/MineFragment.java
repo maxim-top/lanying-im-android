@@ -115,6 +115,9 @@ public class MineFragment extends BaseTitleFragment {
     /* 关于我们 */
     private ItemLineArrow.Builder mAboutUs;
 
+    /* 协议 */
+    private ItemLineArrow.Builder mProtocol;
+
     /* app版本号 */
     private TextView mAppVersion;
 
@@ -283,9 +286,15 @@ public class MineFragment extends BaseTitleFragment {
 
         // 关于我们
         mAboutUs = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.about_us)).setArrowVisible(false)
+                .setStartContent(getString(R.string.about_us))
                 .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
         container.addView(mAboutUs.build(), 12);
+
+        // 关于我们
+        mProtocol = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.register_protocol2))
+                .setOnItemClickListener(v -> ProtocolActivity.openProtol(getActivity()));
+        container.addView(mProtocol.build(), 13);
         return view;
     }
 

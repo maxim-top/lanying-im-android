@@ -134,8 +134,8 @@ public class RegisterActivity extends BaseTitleActivity {
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
         buildProtocol();
-//        view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
-//        view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
+        view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
+        view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
         return view;
     }
 
@@ -157,6 +157,7 @@ public class RegisterActivity extends BaseTitleActivity {
         mTvRegisterProtocol.setMovementMethod(LinkMovementMethod.getInstance());
         SpannableStringBuilder builder = new SpannableStringBuilder();
         builder.append(getResources().getString(R.string.register_protocol1));
+        //用户服务
         ClickableSpan span = new ClickableSpan() {
 
             @Override
@@ -167,14 +168,34 @@ public class RegisterActivity extends BaseTitleActivity {
 
             @Override
             public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtol(RegisterActivity.this);
+                ProtocolActivity.openProtocol(RegisterActivity.this, 1);
             }
         };
         SpannableString spannableString = new SpannableString(
-                getResources().getString(R.string.register_protocol2));
+                "《" + getResources().getString(R.string.register_protocol2) + "》");
         spannableString.setSpan(span, 0, spannableString.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString);
+        // 隐私政策
+        builder.append(getResources().getString(R.string.register_protocol3));
+        ClickableSpan span1 = new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_0079F4));
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(RegisterActivity.this, 0);
+            }
+        };
+        SpannableString spannableString1 = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol4) + "》");
+        spannableString1.setSpan(span1, 0, spannableString1.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString1);
         mTvRegisterProtocol.setText(builder);
     }
 

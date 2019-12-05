@@ -18,15 +18,20 @@ public class ProtocolActivity extends BaseTitleActivity {
 
     private WebView mWebView;
 
-    public static void openProtol(Context context) {
+    public int mProtocolType;
+
+    public static final String PROTOCOL_TYPE = "protocolType";
+
+    public static void openProtocol(Context context, int type) {
         Intent intent = new Intent(context, ProtocolActivity.class);
+        intent.putExtra(PROTOCOL_TYPE, type);
         context.startActivity(intent);
     }
 
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setTitle(R.string.register_protocol2);
+        builder.setTitle("");
         builder.setBackIcon(R.drawable.header_back_icon, v -> finish());
         return builder.build();
     }
@@ -35,7 +40,17 @@ public class ProtocolActivity extends BaseTitleActivity {
     protected View onCreateView() {
         View view = View.inflate(this, R.layout.activity_protocol, null);
         mWebView = view.findViewById(R.id.webview);
+        mHeader.setTitle(mProtocolType == 0 ? R.string.register_protocol4
+                : R.string.register_protocol2);
         return view;
+    }
+
+    @Override
+    protected void initDataFromFront(Intent intent) {
+        super.initDataFromFront(intent);
+        if (intent != null) {
+            mProtocolType = intent.getIntExtra(PROTOCOL_TYPE, 0);
+        }
     }
 
     @Override
@@ -73,6 +88,7 @@ public class ProtocolActivity extends BaseTitleActivity {
             }
         });
 
-        mWebView.loadUrl(CommonConfig.PROTOCOL_URL);
+        mWebView.loadUrl(mProtocolType == 0 ? CommonConfig.PROTOCOL_PRIVACY_URL
+                : CommonConfig.PROTOCOL_TERMS_URL);
     }
 }

@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
-import top.maxim.im.login.view.ProtocolDialog;
-
 /**
  * Description : 弹出框工具类 Created by Mango on 2018/11/11.
  */
@@ -107,18 +105,6 @@ public class DialogUtils {
         bundle.putString(CommonCustomDialog.DIALOG_CONFIRM, confirm);
         bundle.putString(CommonCustomDialog.DIALOG_CANCEL, cancel);
         dialog.setArguments(bundle);
-        dialog.setDialogListener(listener);
-        dialog.showDialog(context);
-    }
-
-    /**
-     * 带标题 自定义dialog
-     *
-     * @param context 上下文
-     * @param listener 监听
-     */
-    public void showProtocolDialog(Activity context, ProtocolDialog.OnDialogListener listener) {
-        ProtocolDialog dialog = new ProtocolDialog();
         dialog.setDialogListener(listener);
         dialog.showDialog(context);
     }

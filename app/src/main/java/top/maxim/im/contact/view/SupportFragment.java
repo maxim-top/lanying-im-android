@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXRosterItem;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
@@ -26,6 +27,7 @@ import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
 import top.maxim.im.common.view.recyclerview.RecyclerWithHFAdapter;
 import top.maxim.im.contact.bean.SupportBean;
 import top.maxim.im.message.utils.ChatUtils;
+import top.maxim.im.message.view.ChatSingleActivity;
 import top.maxim.im.net.HttpResponseCallback;
 
 /**
@@ -66,7 +68,7 @@ public class SupportFragment extends BaseTitleFragment {
         mAdapter.setOnItemClickListener((parent, view, position, id) -> {
             SupportBean bean = mAdapter.getItem(position);
             if (bean != null) {
-                RosterDetailActivity.openRosterDetail(getActivity(), bean.getUser_id());
+                ChatSingleActivity.startChatActivity(getActivity(), BMXMessage.MessageType.Single, bean.getUser_id());
             }
         });
     }

@@ -32,14 +32,11 @@ public class UserManager extends BaseManager {
     /**
      * 注册
      * 
-     * @param mobile 手机号
-     * @param verifyCode 验证码
      * @param password 密码
      * @param username 用户名
      * @return BMXUserProfile
      */
-    public BMXErrorCode signUpNewUser(String mobile, String verifyCode, String password,
-            String username, BMXUserProfile profile) {
+    public BMXErrorCode signUpNewUser(String username, String password, BMXUserProfile profile) {
         return bmxClient.signUpNewUser(username, password, profile);
     }
 

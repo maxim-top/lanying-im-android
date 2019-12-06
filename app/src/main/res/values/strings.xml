@@ -77,6 +77,7 @@
     <string name="send">发送</string>
     <string name="search_hint">搜索</string>
     <string name="verify_continue">继续</string>
+    <string name="skip">跳过</string>
 
     <!--Contact-->
     <string name="contact_apply_notice">好友申请与通知</string>
@@ -114,6 +115,7 @@
     <string name="register_user_pwd_hint">密码</string>
     <string name="quick_login">快捷登录</string>
     <string name="verify_login">验证码登录</string>
+    <string name="bind_mobile">绑定手机号</string>
     <string name="register_protocol1">注册即代表同意</string>
     <string name="register_protocol2">用户服务</string>
     <string name="register_protocol3">及</string>

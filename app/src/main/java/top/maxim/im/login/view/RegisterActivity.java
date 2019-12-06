@@ -247,7 +247,9 @@ public class RegisterActivity extends BaseTitleActivity {
                 boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
                 boolean isPhoneEmpty = TextUtils.isEmpty(mInputPhone.getText().toString().trim());
                 boolean isVerifyEmpty = TextUtils.isEmpty(mInputVerify.getText().toString().trim());
-                if (!isNameEmpty && !isPwdEmpty && !isPhoneEmpty && !isVerifyEmpty) {
+                if (!isNameEmpty && !isPwdEmpty
+                // && !isPhoneEmpty && !isVerifyEmpty
+                ) {
                     mRegister.setEnabled(true);
                 } else {
                     mRegister.setEnabled(false);
@@ -299,8 +301,10 @@ public class RegisterActivity extends BaseTitleActivity {
 
     void register(final String account, final String pwd, final String phone, final String verify) {
 
-        if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd) || TextUtils.isEmpty(phone)
-                || TextUtils.isEmpty(verify)) {
+        if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd)
+//                || TextUtils.isEmpty(phone)
+//                || TextUtils.isEmpty(verify)
+        ) {
             ToastUtil.showTextViewPrompt("不能为空");
             return;
         }
@@ -308,7 +312,7 @@ public class RegisterActivity extends BaseTitleActivity {
         Observable.just(account).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signUpNewUser(phone, verify, pwd, account,
+                return UserManager.getInstance().signUpNewUser(account, pwd,
                         new BMXUserProfile());
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
@@ -332,10 +336,10 @@ public class RegisterActivity extends BaseTitleActivity {
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
                         if (TextUtils.isEmpty(mOpenId)) {
-                            LoginActivity.login(RegisterActivity.this,
+                            BindMobileActivity.openBindMobile(RegisterActivity.this,
                                     mInputName.getEditableText().toString().trim(),
-                                    mInputPwd.getEditableText().toString().trim(), false,
-                                    mChangeAppId);
+                                    mInputPwd.getEditableText().toString().trim(), mChangeAppId);
+                            finish();
                         } else {
                             LoginActivity.bindOpenId(RegisterActivity.this,
                                     mInputName.getEditableText().toString().trim(),

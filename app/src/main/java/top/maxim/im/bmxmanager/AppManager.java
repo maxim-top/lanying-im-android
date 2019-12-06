@@ -594,6 +594,182 @@ public class AppManager {
     }
 
     /**
+     * 绑定手机号
+     */
+    public void mobileBind(String token, String mobile, String captcha, HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        header.put("mobile", mobile);
+        header.put("captcha", captcha);
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "/user/mobile_bind", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (data) {
+                                    if (callback != null) {
+                                        callback.onCallResponse(result);
+                                    }
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 使用签名绑定手机号
+     */
+    public void mobileBindBySign(String token, String mobile, String sign, HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        header.put("mobile", mobile);
+        header.put("sign", sign);
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "/user/mobile_bind_with_sign", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (data) {
+                                    if (callback != null) {
+                                        callback.onCallResponse(result);
+                                    }
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 使用签名绑定手机号
+     */
+    public void checkName(String token, String userName, HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        header.put("username", userName);
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "/user/name_check", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (data) {
+                                    if (callback != null) {
+                                        callback.onCallResponse(result);
+                                    }
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
      * 绑定证书名和用户名id
      */
     public void notifierBind(String token, String deviceToken, String appId, String userId, String notifierName,

@@ -281,6 +281,7 @@ public class LoginActivity extends BaseTitleActivity {
                         SharePreferenceUtils.getInstance().putLoginStatus(true);
                         MessageDispatcher.getDispatcher().initialize();
                         MainActivity.openMain(activity);
+                        activity.finish();
                     }
                 });
     }

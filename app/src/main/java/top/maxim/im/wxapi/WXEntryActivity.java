@@ -59,7 +59,6 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                 // 同意
                 String code = ((SendAuth.Resp)baseResp).code;
                 loginWeChat(code);
-                finish();
                 return;
             case BaseResp.ErrCode.ERR_AUTH_DENIED:
                 // 拒绝
@@ -83,6 +82,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
             public void onResponse(String result) {
                 if (TextUtils.isEmpty(result)) {
                     ToastUtil.showTextViewPrompt("登陆失败");
+                    finish();
                     return;
                 }
                 String appId = WXUtils.getInstance().getAppId();
@@ -99,7 +99,6 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                     String userId = jsonObject.getString("user_id");
                     String pwd = jsonObject.getString("password");
                     LoginActivity.login(WXEntryActivity.this, userId, pwd, true, appId);
-                    finish();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -108,6 +107,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
                 ToastUtil.showTextViewPrompt("登陆失败");
+                finish();
             }
         });
     }

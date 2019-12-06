@@ -95,6 +95,11 @@
             android:name=".login.view.BindMobileActivity"
             android:screenOrientation="portrait"></activity>
 
+        <!--绑定用户-->
+        <activity
+            android:name=".login.view.BindUserActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!--注册-->
         <activity
             android:name=".login.view.RegisterActivity"
@@ -477,7 +482,9 @@
         </receiver>
 
         <!-- 华为刘海 -->
-        <meta-data android:name="android.notch_support" android:value="true"/>
+        <meta-data
+            android:name="android.notch_support"
+            android:value="true" />
 
         <!-- *************BUGLY START************** -->
 

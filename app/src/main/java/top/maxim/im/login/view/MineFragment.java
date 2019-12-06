@@ -285,7 +285,7 @@ public class MineFragment extends BaseTitleFragment {
                 .setArrowVisible(false).setOnItemClickListener(v -> unBindWeChat());
         View viewBindWeChat = mUnBindWeChat.build();
         container.addView(viewBindWeChat, 11);
-        viewBindWeChat.setVisibility(View.GONE);
+//        viewBindWeChat.setVisibility(View.GONE);
 
         // 关于我们
         mAboutUs = new ItemLineArrow.Builder(getActivity())

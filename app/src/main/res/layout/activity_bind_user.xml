@@ -3,28 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="@dimen/dimen_50"
     android:paddingBottom="@dimen/dimen_32">
 
-    <ImageView
-        android:id="@+id/iv_close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="@dimen/dimen_48"
-        android:layout_marginRight="@dimen/dimen_48"
-        android:textSize="@dimen/dimen_16"
-        android:textColor="@color/color_333333"
-        android:text="@string/skip"/>
-
     <TextView
-        android:id="@+id/tv_login_tag"
+        android:id="@+id/tv_bind_tag"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/dimen_48"
         android:layout_marginTop="@dimen/dimen_30"
-        android:text="@string/bind_mobile"
+        android:text="@string/bind_register_user"
         android:textColor="@color/color_333333"
         android:textSize="@dimen/dimen_24" />
 
@@ -32,7 +20,7 @@
         android:id="@+id/ll_et_user_phone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_login_tag"
+        android:layout_below="@id/tv_bind_tag"
         android:orientation="vertical">
 
         <EditText
@@ -45,7 +33,6 @@
             android:layout_marginTop="@dimen/dimen_20"
             android:layout_marginRight="@dimen/dimen_48"
             android:background="@null"
-            android:inputType="phone"
             android:gravity="center_vertical"
             android:hint="@string/register_user_name_hint"
             android:maxLines="1"
@@ -60,11 +47,24 @@
             android:background="@color/guide_divider" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tv_check_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ll_et_user_phone"
+        android:layout_marginLeft="@dimen/dimen_48"
+        android:layout_marginRight="@dimen/dimen_48"
+        android:layout_marginTop="@dimen/dimen_5"
+        android:textSize="@dimen/dimen_12"
+        android:textColor="@color/color_FF475A"
+        android:visibility="gone"
+        android:text="@string/exit_user"/>
+
     <LinearLayout
         android:id="@+id/ll_et_user_verify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ll_et_user_phone"
+        android:layout_below="@id/tv_check_user"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -83,7 +83,6 @@
                 android:background="@null"
                 android:gravity="center_vertical"
                 android:hint="@string/register_user_pwd_hint"
-                android:inputType="number"
                 android:maxLines="1"
                 android:textColorHint="@color/color_666666"
                 android:textSize="@dimen/dimen_14" />
@@ -127,7 +126,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="@dimen/dimen_10"
-            android:text="@string/verify_login"
+            android:text="@string/bind_exit_user"
             android:textColor="@color/color_576B95"
             android:textSize="@dimen/dimen_14" />
 

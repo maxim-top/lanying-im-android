@@ -45,9 +45,6 @@ public class BindMobileActivity extends BaseTitleActivity {
     /* 验证码倒计时 */
     private TextView mVerifyCountDown;
 
-    /* 注册 */
-    private TextView mTvContinue;
-
     /* 扫一扫 */
     private TextView mTvSkip;
 
@@ -95,7 +92,6 @@ public class BindMobileActivity extends BaseTitleActivity {
         mLogin = view.findViewById(R.id.tv_login);
         mSendVerify = view.findViewById(R.id.tv_send_verify);
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
-        mTvContinue = view.findViewById(R.id.tv_login);
         mTvSkip = view.findViewById(R.id.tv_skip);
         return view;
     }

@@ -3,7 +3,6 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.CountDownTimer;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -12,8 +11,17 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import im.floo.floolib.BMXErrorCode;
+import im.floo.floolib.BMXUserProfile;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
+import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
@@ -24,11 +32,10 @@ import top.maxim.im.net.HttpResponseCallback;
  */
 public class BindUserActivity extends BaseTitleActivity {
 
-    public static String LOGIN_NAME = "loginName";
+    public static String LOGIN_OPEN_ID = "loginOpenId";
 
-    public static String LOGIN_PWD = "loginPwd";
-
-    public static String LOGIN_APP_ID = "loginAppId";
+    /* 微信返回code */
+    private String mOpenId;
 
     /* 账号 */
     private EditText mInputName;
@@ -39,77 +46,57 @@ public class BindUserActivity extends BaseTitleActivity {
     /* 登陆 */
     private TextView mLogin;
 
-    /* 发送验证码 */
-    private TextView mSendVerify;
+    private TextView mTvBindTag;
 
-    /* 验证码倒计时 */
-    private TextView mVerifyCountDown;
+    private TextView mTvBind;
 
-    /* 注册 */
-    private TextView mTvContinue;
-
-    /* 扫一扫 */
-    private TextView mTvSkip;
+    private TextView mTvCheckName;
 
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
-    private String userName;
+    // 默认注册
+    private boolean mIsRegister = true;
 
-    private String userPwd;
-
-    private String mAppId;
-
-    private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-            mVerifyCountDown.setText(millisUntilFinished / 1000 + "s");
-        }
-
-        @Override
-        public void onFinish() {
-            mVerifyCountDown.setText("");
-        }
-    };
-
-    public static void openBindMobile(Context context, String name, String pwd, String appId) {
+    public static void openBindUser(Context context, String openId) {
         Intent intent = new Intent(context, BindUserActivity.class);
-        intent.putExtra(LOGIN_NAME, name);
-        intent.putExtra(LOGIN_PWD, pwd);
-        intent.putExtra(LOGIN_APP_ID, appId);
+        intent.putExtra(LOGIN_OPEN_ID, openId);
         context.startActivity(intent);
     }
 
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
-        return new Header.Builder(this, headerContainer).build();
+        Header.Builder builder = new Header.Builder(this, headerContainer);
+        builder.setBackIcon(R.drawable.header_back_icon, v -> finish());
+        return builder.build();
     }
 
     @Override
     protected View onCreateView() {
-        hideHeader();
-        View view = View.inflate(this, R.layout.activity_bind_mobile, null);
+        View view = View.inflate(this, R.layout.activity_bind_user, null);
         mInputName = view.findViewById(R.id.et_user_phone);
         mInputPwd = view.findViewById(R.id.et_user_verify);
         mLogin = view.findViewById(R.id.tv_login);
-        mSendVerify = view.findViewById(R.id.tv_send_verify);
-        mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
-        mTvContinue = view.findViewById(R.id.tv_login);
-        mTvSkip = view.findViewById(R.id.tv_skip);
+        mTvCheckName = view.findViewById(R.id.tv_check_user);
+        mTvBindTag = view.findViewById(R.id.tv_bind_tag);
+        mTvBind = view.findViewById(R.id.tv_verify);
         return view;
     }
 
     @Override
     protected void setViewListener() {
+        // 切换注册或绑定
+        mTvBind.setOnClickListener(v -> {
+            mIsRegister = !mIsRegister;
+            mTvBindTag.setText(mIsRegister ? R.string.bind_register_user : R.string.bind_user);
+            mTvBind.setText(mIsRegister ? R.string.bind_not_user : R.string.bind_exit_user);
+        });
         // 登陆
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
-            bindMobile(name, pwd);
+            checkName(name, pwd);
         });
-        // 跳过
-        mTvSkip.setOnClickListener(v -> login());
         mInputWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -134,45 +121,13 @@ public class BindUserActivity extends BaseTitleActivity {
         };
         mInputName.addTextChangedListener(mInputWatcher);
         mInputPwd.addTextChangedListener(mInputWatcher);
-        // 发送验证码
-        mSendVerify.setOnClickListener(v -> {
-            verifyCountDown();
-            String phone = mInputName.getEditableText().toString().trim();
-            AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<String>() {
-                @Override
-                public void onResponse(String result) {
-                    ToastUtil.showTextViewPrompt("获取验证码成功");
-                    mSendVerify.setEnabled(true);
-                    mVerifyCountDown.setText("");
-                    timer.cancel();
-                }
-
-                @Override
-                public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                    ToastUtil.showTextViewPrompt("获取验证码失败");
-                    mSendVerify.setEnabled(true);
-                    mVerifyCountDown.setText("");
-                    timer.cancel();
-                }
-            });
-        });
-    }
-
-    /**
-     * 验证码倒计时60s
-     */
-    public void verifyCountDown() {
-        mSendVerify.setEnabled(false);
-        timer.start();
     }
 
     @Override
     protected void initDataFromFront(Intent intent) {
         super.initDataFromFront(intent);
         if (intent != null) {
-            userName = intent.getStringExtra(LOGIN_NAME);
-            userPwd = intent.getStringExtra(LOGIN_PWD);
-            mAppId = intent.getStringExtra(LOGIN_APP_ID);
+            mOpenId = intent.getStringExtra(LOGIN_OPEN_ID);
         }
     }
 
@@ -181,23 +136,95 @@ public class BindUserActivity extends BaseTitleActivity {
         super.initDataForActivity();
     }
 
-    private void bindMobile(String mobile, String captcha) {
-        showLoadingDialog(true);
-        AppManager.getInstance().getTokenByName(userName, userPwd, new HttpResponseCallback<String>() {
+    /**
+     * 校验用户名
+     */
+    private void checkName(String userName, String pwd) {
+        AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean result) {
+                if (result == null || !result) {
+                    // 不可用
+                    mTvCheckName.setVisibility(View.VISIBLE);
+                    return;
+                }
+                mTvCheckName.setVisibility(View.GONE);
+                // 校验成功 如果是注册 需要先注册 否则直接绑定
+                if (mIsRegister) {
+                    register(userName, pwd);
+                } else {
+                    bindOpenId(userName, pwd, mOpenId);
+                }
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                dismissLoadingDialog();
+                ToastUtil.showTextViewPrompt(errorMsg);
+            }
+        });
+    }
+
+    /**
+     * 注册
+     * 
+     * @param userName
+     * @param pwd
+     */
+    private void register(String userName, String pwd) {
+        if (TextUtils.isEmpty(userName) || TextUtils.isEmpty(pwd)) {
+            ToastUtil.showTextViewPrompt("不能为空");
+            return;
+        }
+        Observable.just(userName).map(new Func1<String, BMXErrorCode>() {
+            @Override
+            public BMXErrorCode call(String s) {
+                return UserManager.getInstance().signUpNewUser(userName, pwd, new BMXUserProfile());
+            }
+        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
+            @Override
+            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
+                return BaseManager.bmxFinish(errorCode, errorCode);
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BMXErrorCode>() {
+                    @Override
+                    public void onCompleted() {
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt("网络异常");
+                    }
+
+                    @Override
+                    public void onNext(BMXErrorCode errorCode) {
+                        // 注册成功 需要绑定微信
+                        bindOpenId(userName, pwd, mOpenId);
+                    }
+                });
+    }
+
+    /**
+     * 绑定openId
+     */
+    public void bindOpenId(String name, String pwd, String openId) {
+        AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
-                AppManager.getInstance().mobileBind(result, mobile, captcha,
+                AppManager.getInstance().bindOpenId(result, openId,
                         new HttpResponseCallback<String>() {
                             @Override
                             public void onResponse(String result) {
                                 dismissLoadingDialog();
-                                login();
+                                openBindMobile(name, pwd);
                             }
 
                             @Override
                             public void onFailure(int errorCode, String errorMsg, Throwable t) {
                                 dismissLoadingDialog();
-                                ToastUtil.showTextViewPrompt(errorMsg);
+                                ToastUtil.showTextViewPrompt("绑定失败");
                             }
                         });
             }
@@ -210,7 +237,9 @@ public class BindUserActivity extends BaseTitleActivity {
         });
     }
 
-    private void login() {
-        LoginActivity.login(this, userName, userPwd, false, mAppId);
+    private void openBindMobile(String userName, String pwd) {
+        // 绑定成功 进入绑定手机号页面
+        BindMobileActivity.openBindMobile(BindUserActivity.this, userName, pwd, "");
+        finish();
     }
 }

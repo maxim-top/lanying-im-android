@@ -63,7 +63,7 @@ public class AppManager {
         Map<String, String> params = new HashMap<>();
         params.put("user_id", String.valueOf(id));
         params.put("password", pwd);
-        
+
         Map<String, String> header = new HashMap<>();
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         mClient.call(HttpClient.Method.POST, mBaseUrl + "token_id", params, header,
@@ -261,7 +261,6 @@ public class AppManager {
 
     /**
      * 加入群
-     *
      */
     public void groupInvite(String token, String qrInfo, HttpResponseCallback<String> callback) {
         Map<String, String> params = new HashMap<>();
@@ -507,7 +506,7 @@ public class AppManager {
             params.put("open_id", openId);
         }
         params.put("type", "2");
-        mClient.call(HttpClient.Method.GET, mBaseUrl + "bind_openid", params, header,
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "wechat/bind", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
@@ -556,9 +555,64 @@ public class AppManager {
                 });
     }
 
+    /**
+     * 解绑定openId
+     */
+    public void unBindOpenId(String token, HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "wechat/unbind", null, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (data) {
+                                    if (callback != null) {
+                                        callback.onCallResponse(result);
+                                    }
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
 
     /**
-     * 绑定openId
+     * 获取支持列表
      */
     public void getSupportStaff(String token, HttpResponseCallback<List<SupportBean>> callback) {
         Map<String, String> header = new HashMap<>();
@@ -587,23 +641,17 @@ public class AppManager {
     }
 
     /**
-     * 解绑定openId
-     */
-    public void unBindOpenId(String token, HttpResponseCallback<String> callback) {
-        bindOpenId(token, "", callback);
-    }
-
-    /**
      * 绑定手机号
      */
-    public void mobileBind(String token, String mobile, String captcha, HttpResponseCallback<String> callback) {
+    public void mobileBind(String token, String mobile, String captcha,
+            HttpResponseCallback<String> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         Map<String, String> params = new HashMap<>();
-        header.put("mobile", mobile);
-        header.put("captcha", captcha);
-        mClient.call(HttpClient.Method.POST, mBaseUrl + "/user/mobile_bind", params, header,
+        params.put("mobile", mobile);
+        params.put("captcha", captcha);
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "user/mobile_bind", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
@@ -655,15 +703,16 @@ public class AppManager {
     /**
      * 使用签名绑定手机号
      */
-    public void mobileBindBySign(String token, String mobile, String sign, HttpResponseCallback<String> callback) {
+    public void mobileBindBySign(String token, String mobile, String sign,
+            HttpResponseCallback<String> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         Map<String, String> params = new HashMap<>();
-        header.put("mobile", mobile);
-        header.put("sign", sign);
-        mClient.call(HttpClient.Method.POST, mBaseUrl + "/user/mobile_bind_with_sign", params, header,
-                new HttpCallback<String>() {
+        params.put("mobile", mobile);
+        params.put("sign", sign);
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "user/mobile_bind_with_sign", params,
+                header, new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
                         if (TextUtils.isEmpty(result)) {
@@ -714,13 +763,12 @@ public class AppManager {
     /**
      * 使用签名绑定手机号
      */
-    public void checkName(String token, String userName, HttpResponseCallback<String> callback) {
+    public void checkName(String userName, HttpResponseCallback<Boolean> callback) {
         Map<String, String> header = new HashMap<>();
-        header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         Map<String, String> params = new HashMap<>();
-        header.put("username", userName);
-        mClient.call(HttpClient.Method.GET, mBaseUrl + "/user/name_check", params, header,
+        params.put("username", userName);
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "user/name_check", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
@@ -741,11 +789,8 @@ public class AppManager {
                                 error = jsonObject.getString("message");
                             }
                             if (jsonObject.has("data")) {
-                                boolean data = jsonObject.getBoolean("data");
-                                if (data) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(result);
-                                    }
+                                if (callback != null) {
+                                    callback.onCallResponse(jsonObject.getBoolean("data"));
                                 }
                                 return;
                             }
@@ -772,8 +817,8 @@ public class AppManager {
     /**
      * 绑定证书名和用户名id
      */
-    public void notifierBind(String token, String deviceToken, String appId, String userId, String notifierName,
-            HttpResponseCallback<String> callback) {
+    public void notifierBind(String token, String deviceToken, String appId, String userId,
+            String notifierName, HttpResponseCallback<String> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("access-app_id", appId);
@@ -783,8 +828,8 @@ public class AppManager {
         params.put("user_id", userId);
         params.put("notifier_name", notifierName);
         params.put("device_token", deviceToken);
-        mClient.call(HttpClient.Method.POST, "https://butler.maximtop.com/notifier/bind", params, header,
-                new HttpCallback<String>() {
+        mClient.call(HttpClient.Method.POST, "https://butler.maximtop.com/notifier/bind", params,
+                header, new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
                         if (TextUtils.isEmpty(result)) {
@@ -844,7 +889,8 @@ public class AppManager {
         Map<String, String> params = new HashMap<>();
         params.put("uuid", UUID.randomUUID().toString());
         params.put("device_token", deviceToken);
-        mClient.call(HttpClient.Method.POST, "https://butler.maximtop.com/notifier/upload_push_info", params, header,
+        mClient.call(HttpClient.Method.POST,
+                "https://butler.maximtop.com/notifier/upload_push_info", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
@@ -895,9 +941,11 @@ public class AppManager {
 
     /**
      * 解析返回结果
+     * 
      * @param result
      */
-    private <T> void parseResult(String result, HttpResponseCallback<T> callback, Class<T> clazz, String key) {
+    private <T> void parseResult(String result, HttpResponseCallback<T> callback, Class<T> clazz,
+            String key) {
         if (TextUtils.isEmpty(result)) {
             if (callback != null) {
                 callback.onCallFailure(-1, "", new Throwable());
@@ -940,7 +988,7 @@ public class AppManager {
      * @param result
      */
     <T> void parseListResult(int successCode, String result, HttpResponseCallback<List<T>> callback,
-                             Class<T> clazz) {
+            Class<T> clazz) {
         if (TextUtils.isEmpty(result)) {
             if (callback != null) {
                 callback.onCallFailure(-1, "", new Throwable());

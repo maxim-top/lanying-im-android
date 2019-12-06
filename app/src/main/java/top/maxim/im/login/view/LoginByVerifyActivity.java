@@ -35,8 +35,6 @@ import top.maxim.im.wxapi.WXUtils;
  */
 public class LoginByVerifyActivity extends BaseTitleActivity {
 
-    public static String LOGIN_OPEN_ID = "loginOpenId";
-
     /* 账号 */
     private EditText mInputName;
 
@@ -68,9 +66,6 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
-    /* 微信返回code */
-    private String mOpenId;
-
     private TextView mTvAppId;
 
     private String mChangeAppId;
@@ -89,14 +84,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     };
 
     public static void openLogin(Context context) {
-        openLogin(context, null);
-    }
-
-    public static void openLogin(Context context, String openId) {
         Intent intent = new Intent(context, LoginByVerifyActivity.class);
-        if (!TextUtils.isEmpty(openId)) {
-            intent.putExtra(LOGIN_OPEN_ID, openId);
-        }
         context.startActivity(intent);
     }
 
@@ -130,7 +118,6 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                 .setOnClickListener(v -> RegisterActivity.openRegister(LoginByVerifyActivity.this));
         // 密码登录
         mVerifyLogin.setOnClickListener(v -> {
-            LoginActivity.openLogin(LoginByVerifyActivity.this, mOpenId);
             finish();
         });
         // 登陆
@@ -221,14 +208,6 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     }
 
     @Override
-    protected void initDataFromFront(Intent intent) {
-        super.initDataFromFront(intent);
-        if (intent != null) {
-            mOpenId = intent.getStringExtra(LOGIN_OPEN_ID);
-        }
-    }
-
-    @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
         // 判断当前是否是扫码登陆
@@ -263,13 +242,8 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                             if (jsonObject.has("user_id")) {
                                 user_id = jsonObject.getString("user_id");
                             }
-                            if (!TextUtils.isEmpty(mOpenId)) {
-                                LoginActivity.bindOpenId(LoginByVerifyActivity.this, username,
-                                        password, mOpenId);
-                            } else {
-                                LoginActivity.login(LoginByVerifyActivity.this, username, password,
-                                        false);
-                            }
+                            LoginActivity.login(LoginByVerifyActivity.this, username, password,
+                                    false, mChangeAppId);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

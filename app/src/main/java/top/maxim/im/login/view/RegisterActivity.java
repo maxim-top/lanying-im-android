@@ -88,11 +88,6 @@ public class RegisterActivity extends BaseTitleActivity {
 
     public static final String REFISTER_PWD = "registerPwd";
 
-    public static final String OPEN_ID = "openId";
-
-    /* 微信登录返回的openId */
-    private String mOpenId;
-
     private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
 
         @Override
@@ -107,14 +102,7 @@ public class RegisterActivity extends BaseTitleActivity {
     };
 
     public static void openRegister(Context context) {
-        openRegister(context, null);
-    }
-
-    public static void openRegister(Context context, String openId) {
         Intent intent = new Intent(context, RegisterActivity.class);
-        if (!TextUtils.isEmpty(openId)) {
-            intent.putExtra(OPEN_ID, openId);
-        }
         context.startActivity(intent);
     }
 
@@ -143,14 +131,6 @@ public class RegisterActivity extends BaseTitleActivity {
         view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
         view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
         return view;
-    }
-
-    @Override
-    protected void initDataFromFront(Intent intent) {
-        super.initDataFromFront(intent);
-        if (intent != null) {
-            mOpenId = intent.getStringExtra(OPEN_ID);
-        }
     }
 
     @Override
@@ -207,7 +187,6 @@ public class RegisterActivity extends BaseTitleActivity {
         mClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginActivity.openLogin(RegisterActivity.this, mOpenId);
                 finish();
             }
         });
@@ -219,7 +198,7 @@ public class RegisterActivity extends BaseTitleActivity {
             }
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER);
         });
-        // 注册成功
+        // 注册
         mRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -227,7 +206,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 String pwd = mInputPwd.getEditableText().toString().trim();
                 String phone = mInputPhone.getEditableText().toString().trim();
                 String verify = mInputVerify.getEditableText().toString().trim();
-                register(account, pwd, phone, verify);
+                checkName(account, pwd);
             }
         });
         mInputWatcher = new TextWatcher() {
@@ -299,11 +278,35 @@ public class RegisterActivity extends BaseTitleActivity {
                 }));
     }
 
-    void register(final String account, final String pwd, final String phone, final String verify) {
+    /**
+     * 校验用户名
+     */
+    private void checkName(String userName, String pwd) {
+        AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean result) {
+                if (result == null || !result) {
+                    // 不可用
+                    ToastUtil.showTextViewPrompt("账号已被注册");
+                    return;
+                }
+                // 校验成功 注册
+                register(userName, pwd);
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                dismissLoadingDialog();
+                ToastUtil.showTextViewPrompt(errorMsg);
+            }
+        });
+    }
+
+    private void register(final String account, final String pwd) {
 
         if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd)
-//                || TextUtils.isEmpty(phone)
-//                || TextUtils.isEmpty(verify)
+        // || TextUtils.isEmpty(phone)
+        // || TextUtils.isEmpty(verify)
         ) {
             ToastUtil.showTextViewPrompt("不能为空");
             return;
@@ -312,8 +315,7 @@ public class RegisterActivity extends BaseTitleActivity {
         Observable.just(account).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signUpNewUser(account, pwd,
-                        new BMXUserProfile());
+                return UserManager.getInstance().signUpNewUser(account, pwd, new BMXUserProfile());
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
@@ -335,16 +337,10 @@ public class RegisterActivity extends BaseTitleActivity {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
-                        if (TextUtils.isEmpty(mOpenId)) {
-                            BindMobileActivity.openBindMobile(RegisterActivity.this,
-                                    mInputName.getEditableText().toString().trim(),
-                                    mInputPwd.getEditableText().toString().trim(), mChangeAppId);
-                            finish();
-                        } else {
-                            LoginActivity.bindOpenId(RegisterActivity.this,
-                                    mInputName.getEditableText().toString().trim(),
-                                    mInputPwd.getEditableText().toString().trim(), mOpenId);
-                        }
+                        BindMobileActivity.openBindMobile(RegisterActivity.this,
+                                mInputName.getEditableText().toString().trim(),
+                                mInputPwd.getEditableText().toString().trim(), mChangeAppId);
+                        finish();
                     }
                 });
     }

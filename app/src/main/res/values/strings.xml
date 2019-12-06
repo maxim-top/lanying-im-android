@@ -116,6 +116,11 @@
     <string name="quick_login">快捷登录</string>
     <string name="verify_login">验证码登录</string>
     <string name="bind_mobile">绑定手机号</string>
+    <string name="bind_user">绑定已有账户</string>
+    <string name="bind_register_user">注册并绑定账户</string>
+    <string name="bind_not_user">暂无账户,点击创建</string>
+    <string name="bind_exit_user">已有账户,直接绑定</string>
+    <string name="exit_user">该用户名已存在</string>
     <string name="register_protocol1">注册即代表同意</string>
     <string name="register_protocol2">用户服务</string>
     <string name="register_protocol3">及</string>

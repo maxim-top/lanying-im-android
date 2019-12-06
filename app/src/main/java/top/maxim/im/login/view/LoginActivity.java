@@ -34,7 +34,6 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
-import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
 import top.maxim.im.sdk.utils.MessageDispatcher;
@@ -44,8 +43,6 @@ import top.maxim.im.wxapi.WXUtils;
  * Description : 登陆 Created by Mango on 2018/11/21.
  */
 public class LoginActivity extends BaseTitleActivity {
-
-    public static String LOGIN_OPEN_ID = "loginOpenId";
 
     /* 账号 */
     private EditText mInputName;
@@ -78,22 +75,12 @@ public class LoginActivity extends BaseTitleActivity {
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
-    /* 微信返回code */
-    private String mOpenId;
-
     private TextView mTvAppId;
     
     private String mChangeAppId;
 
     public static void openLogin(Context context) {
-        openLogin(context, null);
-    }
-
-    public static void openLogin(Context context, String openId) {
         Intent intent = new Intent(context, LoginActivity.class);
-        if (!TextUtils.isEmpty(openId)) {
-            intent.putExtra(LOGIN_OPEN_ID, openId);
-        }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
@@ -141,11 +128,7 @@ public class LoginActivity extends BaseTitleActivity {
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
-            if (!TextUtils.isEmpty(mOpenId)) {
-                bindOpenId(this, name, pwd, mOpenId);
-            } else {
-                login(this, name, pwd, mLoginByUserId, mChangeAppId);
-            }
+            login(this, name, pwd, mLoginByUserId, mChangeAppId);
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
@@ -212,14 +195,6 @@ public class LoginActivity extends BaseTitleActivity {
     }
 
     @Override
-    protected void initDataFromFront(Intent intent) {
-        super.initDataFromFront(intent);
-        if (intent != null) {
-            mOpenId = intent.getStringExtra(LOGIN_OPEN_ID);
-        }
-    }
-
-    @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
         // 判断当前是否是扫码登陆
@@ -229,51 +204,6 @@ public class LoginActivity extends BaseTitleActivity {
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
-    }
-
-    /**
-     * 绑定openId
-     * 
-     * @param pwd
-     */
-    public static void bindOpenId(final Activity activity, String name, final String pwd,
-            final String openId) {
-        // 首先获取token
-        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-            ((BaseTitleActivity)activity).showLoadingDialog(true);
-        }
-        AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
-            @Override
-            public void onResponse(String result) {
-                AppManager.getInstance().bindOpenId(result, openId,
-                        new HttpResponseCallback<String>() {
-                            @Override
-                            public void onResponse(String result) {
-                                if (activity instanceof BaseTitleActivity
-                                        && !activity.isFinishing()) {
-                                    ((BaseTitleActivity)activity).dismissLoadingDialog();
-                                }
-                                login(activity, name, pwd, false);
-                            }
-
-                            @Override
-                            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                                if (activity instanceof BaseTitleActivity
-                                        && !activity.isFinishing()) {
-                                    ((BaseTitleActivity)activity).dismissLoadingDialog();
-                                }
-                            }
-                        });
-            }
-
-            @Override
-            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                ToastUtil.showTextViewPrompt("绑定失败");
-                if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-                    ((BaseTitleActivity)activity).dismissLoadingDialog();
-                }
-            }
-        });
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {

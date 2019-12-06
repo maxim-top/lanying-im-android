@@ -16,11 +16,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import top.maxim.im.bmxmanager.AppManager;
-import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.login.view.BindUserActivity;
 import top.maxim.im.login.view.LoginActivity;
-import top.maxim.im.login.view.LoginByVerifyActivity;
-import top.maxim.im.login.view.RegisterActivity;
 import top.maxim.im.net.HttpResponseCallback;
 
 /**
@@ -79,8 +77,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     /**
      * 微信登录
      */
-    public void loginWeChat(String code) {
-        int source = WXUtils.getInstance().getSource();
+    private void loginWeChat(String code) {
         AppManager.getInstance().weChatLogin(code, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
@@ -92,12 +89,8 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                     JSONObject jsonObject = new JSONObject(result);
                     if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
                         String openId = jsonObject.getString("openid");
-                        // 没有userId 密码 需要跳转注册
-                        if (source == CommonConfig.SourceToWX.TYPE_LOGIN_VERIFY) {
-                            LoginByVerifyActivity.openLogin(WXEntryActivity.this, openId);
-                        } else {
-                            RegisterActivity.openRegister(WXEntryActivity.this, openId);
-                        }
+                        // 没有userId 密码 需要跳转绑定微信页面
+                        BindUserActivity.openBindUser(WXEntryActivity.this, openId);
                         finish();
                         return;
                     }

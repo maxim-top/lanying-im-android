@@ -18,6 +18,7 @@ import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.contact.view.AllContactFragment;
 import top.maxim.im.login.view.MineFragment;
 import top.maxim.im.message.view.SessionFragment;
+import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.push.PushClientMgr;
 
 /**
@@ -97,9 +98,10 @@ public class MainActivity extends BaseSwitchActivity {
                             return;
                         }
                         String action = intent.getAction();
-                        if (TextUtils.equals(action, CommonConfig.SESSION_COUNT_ACTION)) {
+                        if (mSessionTab != null && TextUtils.equals(action, CommonConfig.SESSION_COUNT_ACTION)) {
                             int count = intent.getIntExtra(CommonConfig.TAB_COUNT, 0);
                             mSessionTab.setCount(count);
+                            NotificationUtils.getInstance().setCorner(null, count);
                         }
                     }
                 });

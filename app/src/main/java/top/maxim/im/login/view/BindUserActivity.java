@@ -168,32 +168,32 @@ public class BindUserActivity extends BaseTitleActivity {
      * 校验用户名
      */
     private void checkName(String userName, String pwd) {
-        if (!mIsRegister) {
-            // 如果不是注册 直接绑定
-            bind(userName, pwd);
-            return;
-        }
         showLoadingDialog(true);
-        AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
-            @Override
-            public void onResponse(Boolean result) {
-                if (result == null || !result) {
-                    dismissLoadingDialog();
-                    // 不可用
-                    mTvCheckName.setVisibility(View.VISIBLE);
-                    return;
-                }
-                mTvCheckName.setVisibility(View.GONE);
-                // 校验成功 需要先注册
-                register(userName, pwd);
-            }
-
-            @Override
-            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt(errorMsg);
-            }
-        });
+        if (mIsRegister) {
+            register(userName, pwd);
+        } else {
+            bind(userName, pwd);
+        }
+//        AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
+//            @Override
+//            public void onResponse(Boolean result) {
+//                if (result == null || !result) {
+//                    dismissLoadingDialog();
+//                    // 不可用
+//                    mTvCheckName.setVisibility(View.VISIBLE);
+//                    return;
+//                }
+//                mTvCheckName.setVisibility(View.GONE);
+//                // 校验成功 需要先注册
+//                register(userName, pwd);
+//            }
+//
+//            @Override
+//            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+//                dismissLoadingDialog();
+//                ToastUtil.showTextViewPrompt(errorMsg);
+//            }
+//        });
     }
 
     /**
@@ -226,7 +226,8 @@ public class BindUserActivity extends BaseTitleActivity {
                     @Override
                     public void onError(Throwable e) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("网络异常");
+                        // 不可用
+                        mTvCheckName.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -273,41 +274,39 @@ public class BindUserActivity extends BaseTitleActivity {
      * 绑定微信
      */
     public void bindWeChat(String token, String name, String pwd) {
+        // 绑定和登陆没有依赖
         AppManager.getInstance().bindOpenId(token, mOpenId, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
-                dismissLoadingDialog();
-                BindMobileActivity.openBindMobile(BindUserActivity.this, name, pwd, mAppId);
-                finish();
             }
 
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                dismissLoadingDialog();
                 ToastUtil.showTextViewPrompt(errorMsg);
             }
         });
+        BindMobileActivity.openBindMobile(BindUserActivity.this, name, pwd, mAppId);
+        finish();
     }
 
     /**
      * 绑定手机号
      */
     public void bindMobile(String token, String name, String pwd) {
+        // 绑定和登陆没有依赖
         AppManager.getInstance().mobileBind(token, mMobile, mCaptcha,
                 new HttpResponseCallback<String>() {
                     @Override
                     public void onResponse(String result) {
-                        dismissLoadingDialog();
-                        LoginActivity.login(BindUserActivity.this, name, pwd, false, mAppId);
-                        finish();
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                        dismissLoadingDialog();
                         ToastUtil.showTextViewPrompt(errorMsg);
                     }
                 });
+        LoginActivity.login(BindUserActivity.this, name, pwd, false, mAppId);
+        finish();
     }
 
 }

@@ -282,24 +282,25 @@ public class RegisterActivity extends BaseTitleActivity {
      * 校验用户名
      */
     private void checkName(String userName, String pwd) {
-        AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
-            @Override
-            public void onResponse(Boolean result) {
-                if (result == null || !result) {
-                    // 不可用
-                    ToastUtil.showTextViewPrompt("账号已被注册");
-                    return;
-                }
-                // 校验成功 注册
-                register(userName, pwd);
-            }
-
-            @Override
-            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt(errorMsg);
-            }
-        });
+        register(userName, pwd);
+//        AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
+//            @Override
+//            public void onResponse(Boolean result) {
+//                if (result == null || !result) {
+//                    // 不可用
+//                    ToastUtil.showTextViewPrompt("账号已被注册");
+//                    return;
+//                }
+//                // 校验成功 注册
+//                register(userName, pwd);
+//            }
+//
+//            @Override
+//            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+//                dismissLoadingDialog();
+//                ToastUtil.showTextViewPrompt(errorMsg);
+//            }
+//        });
     }
 
     private void register(final String account, final String pwd) {

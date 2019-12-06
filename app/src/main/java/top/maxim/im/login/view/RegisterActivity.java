@@ -196,7 +196,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
-            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER);
+            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER, mChangeAppId);
         });
         // 注册
         mRegister.setOnClickListener(new View.OnClickListener() {

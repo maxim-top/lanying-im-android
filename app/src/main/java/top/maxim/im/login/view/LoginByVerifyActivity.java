@@ -132,7 +132,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
-            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN_VERIFY);
+            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN_VERIFY, mChangeAppId);
         });
         // 扫一扫
         mIvScan.setOnClickListener(v -> ScannerActivity.openScan(this));
@@ -230,18 +230,18 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                             ToastUtil.showTextViewPrompt("登录失败");
                             return;
                         }
-                        String username = "", password = "", user_id = "";
                         try {
                             JSONObject jsonObject = new JSONObject(result);
-                            if (jsonObject.has("username")) {
-                                username = jsonObject.getString("username");
+                            if (!jsonObject.has("username") || !jsonObject.has("password")) {
+                                // 没有用户名 密码 需要跳转绑定用户页面
+                                BindUserActivity.openBindUser(LoginByVerifyActivity.this, mobile,
+                                        captcha, mChangeAppId);
+                                finish();
+                                return;
                             }
-                            if (jsonObject.has("password")) {
-                                password = jsonObject.getString("password");
-                            }
-                            if (jsonObject.has("user_id")) {
-                                user_id = jsonObject.getString("user_id");
-                            }
+                            // 直接登录
+                            String username = jsonObject.getString("username");
+                            String password = jsonObject.getString("password");
                             LoginActivity.login(LoginByVerifyActivity.this, username, password,
                                     false, mChangeAppId);
                         } catch (JSONException e) {

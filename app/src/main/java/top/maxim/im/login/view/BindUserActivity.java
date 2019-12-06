@@ -34,8 +34,23 @@ public class BindUserActivity extends BaseTitleActivity {
 
     public static String LOGIN_OPEN_ID = "loginOpenId";
 
+    public static String LOGIN_MOBILE = "loginMobile";
+
+    public static String LOGIN_CAPTCHA = "loginCaptcha";
+
+    public static String LOGIN_APP_ID = "loginAppId";
+
     /* 微信返回code */
     private String mOpenId;
+
+    /* 手机号 */
+    private String mMobile;
+
+    /* 验证码 */
+    private String mCaptcha;
+
+    /* appId */
+    private String mAppId;
 
     /* 账号 */
     private EditText mInputName;
@@ -58,9 +73,18 @@ public class BindUserActivity extends BaseTitleActivity {
     // 默认注册
     private boolean mIsRegister = true;
 
-    public static void openBindUser(Context context, String openId) {
+    public static void openBindUser(Context context, String openId, String appId) {
         Intent intent = new Intent(context, BindUserActivity.class);
         intent.putExtra(LOGIN_OPEN_ID, openId);
+        intent.putExtra(LOGIN_APP_ID, appId);
+        context.startActivity(intent);
+    }
+
+    public static void openBindUser(Context context, String mobile, String captcha, String appId) {
+        Intent intent = new Intent(context, BindUserActivity.class);
+        intent.putExtra(LOGIN_MOBILE, mobile);
+        intent.putExtra(LOGIN_CAPTCHA, captcha);
+        intent.putExtra(LOGIN_APP_ID, appId);
         context.startActivity(intent);
     }
 
@@ -88,6 +112,7 @@ public class BindUserActivity extends BaseTitleActivity {
         // 切换注册或绑定
         mTvBind.setOnClickListener(v -> {
             mIsRegister = !mIsRegister;
+            mTvCheckName.setVisibility(View.GONE);
             mTvBindTag.setText(mIsRegister ? R.string.bind_register_user : R.string.bind_user);
             mTvBind.setText(mIsRegister ? R.string.bind_not_user : R.string.bind_exit_user);
         });
@@ -128,6 +153,9 @@ public class BindUserActivity extends BaseTitleActivity {
         super.initDataFromFront(intent);
         if (intent != null) {
             mOpenId = intent.getStringExtra(LOGIN_OPEN_ID);
+            mMobile = intent.getStringExtra(LOGIN_MOBILE);
+            mCaptcha = intent.getStringExtra(LOGIN_CAPTCHA);
+            mAppId = intent.getStringExtra(LOGIN_APP_ID);
         }
     }
 
@@ -140,6 +168,11 @@ public class BindUserActivity extends BaseTitleActivity {
      * 校验用户名
      */
     private void checkName(String userName, String pwd) {
+        if (!mIsRegister) {
+            // 如果不是注册 直接绑定
+            bind(userName, pwd);
+            return;
+        }
         AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
             @Override
             public void onResponse(Boolean result) {
@@ -149,12 +182,8 @@ public class BindUserActivity extends BaseTitleActivity {
                     return;
                 }
                 mTvCheckName.setVisibility(View.GONE);
-                // 校验成功 如果是注册 需要先注册 否则直接绑定
-                if (mIsRegister) {
-                    register(userName, pwd);
-                } else {
-                    bindOpenId(userName, pwd, mOpenId);
-                }
+                // 校验成功 需要先注册
+                register(userName, pwd);
             }
 
             @Override
@@ -201,32 +230,33 @@ public class BindUserActivity extends BaseTitleActivity {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         // 注册成功 需要绑定微信
-                        bindOpenId(userName, pwd, mOpenId);
+                        bind(userName, pwd);
                     }
                 });
     }
 
     /**
-     * 绑定openId
+     * 绑定
+     * 
+     * @param name
+     * @param pwd
      */
-    public void bindOpenId(String name, String pwd, String openId) {
+    private void bind(String name, String pwd) {
         AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
-                AppManager.getInstance().bindOpenId(result, openId,
-                        new HttpResponseCallback<String>() {
-                            @Override
-                            public void onResponse(String result) {
-                                dismissLoadingDialog();
-                                openBindMobile(name, pwd);
-                            }
-
-                            @Override
-                            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                                dismissLoadingDialog();
-                                ToastUtil.showTextViewPrompt("绑定失败");
-                            }
-                        });
+                if (!TextUtils.isEmpty(mOpenId)) {
+                    // 绑定微信
+                    bindWeChat(result, name, pwd);
+                    return;
+                }
+                if (!TextUtils.isEmpty(mMobile) && !TextUtils.isEmpty(mCaptcha)) {
+                    // 绑定手机
+                    bindMobile(result, name, pwd);
+                    return;
+                }
+                dismissLoadingDialog();
+                ToastUtil.showTextViewPrompt("绑定失败");
             }
 
             @Override
@@ -237,9 +267,45 @@ public class BindUserActivity extends BaseTitleActivity {
         });
     }
 
-    private void openBindMobile(String userName, String pwd) {
-        // 绑定成功 进入绑定手机号页面
-        BindMobileActivity.openBindMobile(BindUserActivity.this, userName, pwd, "");
-        finish();
+    /**
+     * 绑定微信
+     */
+    public void bindWeChat(String token, String name, String pwd) {
+        AppManager.getInstance().bindOpenId(token, mOpenId, new HttpResponseCallback<String>() {
+            @Override
+            public void onResponse(String result) {
+                dismissLoadingDialog();
+                BindMobileActivity.openBindMobile(BindUserActivity.this, name, pwd, mAppId);
+                finish();
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                dismissLoadingDialog();
+                ToastUtil.showTextViewPrompt(errorMsg);
+            }
+        });
     }
+
+    /**
+     * 绑定手机号
+     */
+    public void bindMobile(String token, String name, String pwd) {
+        AppManager.getInstance().mobileBind(token, mMobile, mCaptcha,
+                new HttpResponseCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        dismissLoadingDialog();
+                        LoginActivity.login(BindUserActivity.this, name, pwd, false, mAppId);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt(errorMsg);
+                    }
+                });
+    }
+
 }

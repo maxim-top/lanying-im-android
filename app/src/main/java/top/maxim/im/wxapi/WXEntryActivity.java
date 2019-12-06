@@ -85,19 +85,20 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                     ToastUtil.showTextViewPrompt("登陆失败");
                     return;
                 }
+                String appId = WXUtils.getInstance().getAppId();
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
                         String openId = jsonObject.getString("openid");
                         // 没有userId 密码 需要跳转绑定微信页面
-                        BindUserActivity.openBindUser(WXEntryActivity.this, openId);
+                        BindUserActivity.openBindUser(WXEntryActivity.this, openId, appId);
                         finish();
                         return;
                     }
                     // 直接登录
                     String userId = jsonObject.getString("user_id");
                     String pwd = jsonObject.getString("password");
-                    LoginActivity.login(WXEntryActivity.this, userId, pwd, true);
+                    LoginActivity.login(WXEntryActivity.this, userId, pwd, true, appId);
                     finish();
                 } catch (JSONException e) {
                     e.printStackTrace();

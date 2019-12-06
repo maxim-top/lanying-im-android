@@ -22,6 +22,8 @@ public class WXUtils {
 
     private int mSource;
 
+    private String mAppId;
+
     private WXUtils() {
         String appId = PushClientMgr.getPushAppId("WEIXIN_APPID");
         if (!TextUtils.isEmpty(appId)) {
@@ -56,11 +58,12 @@ public class WXUtils {
     /**
      * 微信登录
      */
-    public void wxLogin(int source) {
+    public void wxLogin(int source, String appId) {
         if (mApi == null) {
             return;
         }
         mSource = source;
+        mAppId = appId;
         SendAuth.Req req = new SendAuth.Req();
         req.scope = "snsapi_userinfo";
         req.state = AppContextUtils.getAppContext().getString(R.string.block_message);
@@ -73,5 +76,9 @@ public class WXUtils {
 
     public int getSource() {
         return mSource;
+    }
+
+    public String getAppId() {
+        return mAppId;
     }
 }

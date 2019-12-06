@@ -136,7 +136,7 @@ public class LoginActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
-            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN);
+            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN, mChangeAppId);
         });
         // 扫一扫
         mIvScan.setOnClickListener(v -> ScannerActivity.openScan(this));

@@ -12,6 +12,10 @@ public interface CommonConfig {
 
     String SOURCE_TO_WX = "sourceToWX";
 
+    String SESSION_COUNT_ACTION = "sessionCountAction";
+
+    String TAB_COUNT = "stabCountAction";
+
     /**
      * 进入微信来源
      */

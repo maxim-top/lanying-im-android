@@ -147,6 +147,13 @@ public class ChatManager extends BaseManager {
     }
 
     /**
+     * 获取所有会话未读数
+     **/
+    public int getAllConversationsUnreadCount() {
+        return mService.getAllConversationsUnreadCount();
+    }
+
+    /**
      * 拉取历史消息
      **/
     public BMXErrorCode retrieveHistoryMessages(BMXConversation conversation, long refMsgId,

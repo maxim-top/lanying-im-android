@@ -5,10 +5,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import java.util.List;
 
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import top.maxim.im.common.base.BaseSwitchActivity;
+import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.contact.view.AllContactFragment;
 import top.maxim.im.login.view.MineFragment;
 import top.maxim.im.message.view.SessionFragment;
@@ -36,6 +42,7 @@ public class MainActivity extends BaseSwitchActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PushClientMgr.getManager().register(this);
+        initRxBus();
     }
 
     @Override
@@ -69,5 +76,32 @@ public class MainActivity extends BaseSwitchActivity {
         if (mCurrentFragment != null) {
             mCurrentFragment.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void initRxBus() {
+        RxBus.getInstance().toObservable(Intent.class).subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<Intent>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Intent intent) {
+                        if (intent == null) {
+                            return;
+                        }
+                        String action = intent.getAction();
+                        if (TextUtils.equals(action, CommonConfig.SESSION_COUNT_ACTION)) {
+                            int count = intent.getIntExtra(CommonConfig.TAB_COUNT, 0);
+                            mSessionTab.setCount(count);
+                        }
+                    }
+                });
     }
 }

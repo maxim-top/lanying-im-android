@@ -173,10 +173,12 @@ public class BindUserActivity extends BaseTitleActivity {
             bind(userName, pwd);
             return;
         }
+        showLoadingDialog(true);
         AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
             @Override
             public void onResponse(Boolean result) {
                 if (result == null || !result) {
+                    dismissLoadingDialog();
                     // 不可用
                     mTvCheckName.setVisibility(View.VISIBLE);
                     return;

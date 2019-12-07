@@ -104,18 +104,21 @@ public class BindUserActivity extends BaseTitleActivity {
         mTvCheckName = view.findViewById(R.id.tv_check_user);
         mTvBindTag = view.findViewById(R.id.tv_bind_tag);
         mTvBind = view.findViewById(R.id.tv_verify);
+        initUI(true);
         return view;
+    }
+
+    private void initUI(boolean isRegister) {
+        mIsRegister = isRegister;
+        mTvCheckName.setVisibility(View.GONE);
+        mTvBindTag.setText(mIsRegister ? R.string.bind_register_user : R.string.bind_user);
+        mTvBind.setText(mIsRegister ? R.string.bind_exit_user : R.string.bind_not_user);
     }
 
     @Override
     protected void setViewListener() {
         // 切换注册或绑定
-        mTvBind.setOnClickListener(v -> {
-            mIsRegister = !mIsRegister;
-            mTvCheckName.setVisibility(View.GONE);
-            mTvBindTag.setText(mIsRegister ? R.string.bind_register_user : R.string.bind_user);
-            mTvBind.setText(mIsRegister ? R.string.bind_not_user : R.string.bind_exit_user);
-        });
+        mTvBind.setOnClickListener(v -> initUI(!mIsRegister));
         // 登陆
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
@@ -174,26 +177,27 @@ public class BindUserActivity extends BaseTitleActivity {
         } else {
             bind(userName, pwd);
         }
-//        AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
-//            @Override
-//            public void onResponse(Boolean result) {
-//                if (result == null || !result) {
-//                    dismissLoadingDialog();
-//                    // 不可用
-//                    mTvCheckName.setVisibility(View.VISIBLE);
-//                    return;
-//                }
-//                mTvCheckName.setVisibility(View.GONE);
-//                // 校验成功 需要先注册
-//                register(userName, pwd);
-//            }
-//
-//            @Override
-//            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-//                dismissLoadingDialog();
-//                ToastUtil.showTextViewPrompt(errorMsg);
-//            }
-//        });
+        // AppManager.getInstance().checkName(userName, new
+        // HttpResponseCallback<Boolean>() {
+        // @Override
+        // public void onResponse(Boolean result) {
+        // if (result == null || !result) {
+        // dismissLoadingDialog();
+        // // 不可用
+        // mTvCheckName.setVisibility(View.VISIBLE);
+        // return;
+        // }
+        // mTvCheckName.setVisibility(View.GONE);
+        // // 校验成功 需要先注册
+        // register(userName, pwd);
+        // }
+        //
+        // @Override
+        // public void onFailure(int errorCode, String errorMsg, Throwable t) {
+        // dismissLoadingDialog();
+        // ToastUtil.showTextViewPrompt(errorMsg);
+        // }
+        // });
     }
 
     /**
@@ -285,8 +289,10 @@ public class BindUserActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(errorMsg);
             }
         });
-        BindMobileActivity.openBindMobile(BindUserActivity.this, name, pwd, mAppId);
-        finish();
+        // 微信绑定完也直接登录
+        LoginActivity.login(BindUserActivity.this, name, pwd, false, mAppId);
+        // BindMobileActivity.openBindMobile(BindUserActivity.this, name, pwd, mAppId);
+        // finish();
     }
 
     /**
@@ -306,7 +312,6 @@ public class BindUserActivity extends BaseTitleActivity {
                     }
                 });
         LoginActivity.login(BindUserActivity.this, name, pwd, false, mAppId);
-        finish();
     }
 
 }

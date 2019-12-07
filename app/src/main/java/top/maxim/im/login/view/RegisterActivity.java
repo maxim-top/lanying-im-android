@@ -24,15 +24,18 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
@@ -87,6 +90,8 @@ public class RegisterActivity extends BaseTitleActivity {
     public static final String REFISTER_ACCOUNT = "registerAccount";
 
     public static final String REFISTER_PWD = "registerPwd";
+
+    private CompositeSubscription mSubscription;
 
     private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
 
@@ -196,6 +201,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
+            initRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER, mChangeAppId);
         });
         // 注册
@@ -352,5 +358,47 @@ public class RegisterActivity extends BaseTitleActivity {
     public void verifyCountDown() {
         mSendVerify.setEnabled(false);
         timer.start();
+    }
+
+    private void initRxBus() {
+        if (mSubscription == null) {
+            mSubscription = new CompositeSubscription();
+        }
+        Subscription wxLogin = RxBus.getInstance().toObservable(Intent.class)
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Intent>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Intent intent) {
+                        if (intent == null || !TextUtils.equals(intent.getAction(),
+                                CommonConfig.WX_LOGIN_ACTION)) {
+                            return;
+                        }
+                        if (mSubscription != null) {
+                            mSubscription.unsubscribe();
+                        }
+                        String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
+                        LoginActivity.wxChatLogin(RegisterActivity.this, openId);
+                    }
+                });
+        mSubscription.add(wxLogin);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mSubscription != null) {
+            mSubscription.unsubscribe();
+            mSubscription = null;
+        }
     }
 }

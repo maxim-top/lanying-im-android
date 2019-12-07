@@ -14,7 +14,11 @@ public interface CommonConfig {
 
     String SESSION_COUNT_ACTION = "sessionCountAction";
 
-    String TAB_COUNT = "stabCountAction";
+    String TAB_COUNT = "stabCount";
+
+    String WX_LOGIN_ACTION = "wxLoginAction";
+
+    String WX_OPEN_ID = "wxOpenId";
 
     /**
      * 进入微信来源

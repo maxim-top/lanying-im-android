@@ -12,25 +12,16 @@
 
     </top.maxim.im.common.view.ViewPagerFixed>
 
-    <RelativeLayout
-        android:id="@+id/rl_focus"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_56"
-        android:layout_gravity="top"
-        android:background="@color/c4">
-
-    </RelativeLayout>
-
     <TextView
         android:id="@+id/tv_photo_index"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_56"
         android:layout_gravity="bottom"
-        android:background="@color/c4"
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@color/c3"
+        android:visibility="gone"
         android:textSize="@dimen/dimen_17" />
 
 </FrameLayout>

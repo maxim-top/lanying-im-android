@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="bottom"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/btn_call"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/color_white"
+        android:gravity="center"
+        android:textColor="@color/color_0079F4"
+        android:textSize="@dimen/dimen_20" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_0.3"
+        android:background="@color/guide_divider" />
+
+    <TextView
+        android:id="@+id/btn_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/color_white"
+        android:gravity="center"
+        android:text="@string/cancel"
+        android:textColor="@color/color_0079F4"
+        android:textSize="@dimen/dimen_20" />
+</LinearLayout>

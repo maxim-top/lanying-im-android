@@ -86,7 +86,7 @@ public class WelcomeActivity extends BaseTitleActivity {
         super.initDataForActivity();
         NotificationUtils.getInstance().cancelAll();
         if (checkPermission()) {
-            initJump();
+            showProtocol();
         } else {
             requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
         }
@@ -104,7 +104,8 @@ public class WelcomeActivity extends BaseTitleActivity {
             autoLogin(userId, pwd);
             return;
         }
-        showProtocol();
+        LoginActivity.openLogin(WelcomeActivity.this);
+        finish();
     }
 
     /**
@@ -113,8 +114,7 @@ public class WelcomeActivity extends BaseTitleActivity {
     private void showVideo() {
         boolean isFirst = SharePreferenceUtils.getInstance().getFirst();
         if (!isFirst) {
-            LoginActivity.openLogin(this);
-            finish();
+            initJump();
             return;
         }
         SharePreferenceUtils.getInstance().putIsFirst(false);
@@ -134,8 +134,7 @@ public class WelcomeActivity extends BaseTitleActivity {
 
             @Override
             public void onError() {
-                LoginActivity.openLogin(WelcomeActivity.this);
-                finish();
+                initJump();
             }
         });
         mVideoSplash.setPrepareVideoPath(R.raw.splash_video);
@@ -151,7 +150,7 @@ public class WelcomeActivity extends BaseTitleActivity {
             switch (permission) {
                 case PermissionsConstant.READ_STORAGE:
                     // SD权限
-                    initJump();
+                    showProtocol();
                     break;
                 case PermissionsConstant.WRITE_STORAGE:
                     break;

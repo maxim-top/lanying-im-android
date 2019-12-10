@@ -128,8 +128,7 @@ public class WelcomeActivity extends BaseTitleActivity {
 
             @Override
             public void onFinish() {
-                LoginActivity.openLogin(WelcomeActivity.this);
-                finish();
+                initJump();
             }
 
             @Override

@@ -78,15 +78,19 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
 
     private CompositeSubscription mSubscription;
 
+    private boolean mCountDown;
+    
     private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
 
         @Override
         public void onTick(long millisUntilFinished) {
+            mCountDown = true;
             mVerifyCountDown.setText(millisUntilFinished / 1000 + "s");
         }
 
         @Override
         public void onFinish() {
+            mCountDown = false;
             mVerifyCountDown.setText("");
         }
     };
@@ -110,6 +114,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
         mLogin = view.findViewById(R.id.tv_login);
         mVerifyLogin = view.findViewById(R.id.tv_verify);
         mSendVerify = view.findViewById(R.id.tv_send_verify);
+        mSendVerify.setEnabled(false);
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
         mRegister = view.findViewById(R.id.tv_register);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
@@ -167,7 +172,31 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                 }
             }
         };
-        mInputName.addTextChangedListener(mInputWatcher);
+        mInputName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                boolean isNameEmpty = TextUtils.isEmpty(mInputName.getText().toString().trim());
+                boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
+                if (!isNameEmpty && !isPwdEmpty) {
+                    mLogin.setEnabled(true);
+                } else {
+                    mLogin.setEnabled(false);
+                }
+                if (!mCountDown) {
+                    mSendVerify.setEnabled(!isNameEmpty);
+                }
+            }
+        });
         mInputPwd.addTextChangedListener(mInputWatcher);
         // 修改appId
         mIvChangeAppId.setOnClickListener(v -> DialogUtils.getInstance().showEditDialog(this,
@@ -192,9 +221,9 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                 @Override
                 public void onResponse(String result) {
                     ToastUtil.showTextViewPrompt("获取验证码成功");
-                    mSendVerify.setEnabled(true);
-                    mVerifyCountDown.setText("");
-                    timer.cancel();
+//                    mSendVerify.setEnabled(true);
+//                    mVerifyCountDown.setText("");
+//                    timer.cancel();
                 }
 
                 @Override
@@ -212,6 +241,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
      * 验证码倒计时60s
      */
     public void verifyCountDown() {
+        mCountDown = true;
         mSendVerify.setEnabled(false);
         timer.start();
     }

@@ -85,9 +85,11 @@ public class ProtocolActivity extends BaseTitleActivity {
                 String js = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta)";
                 mWebView.loadUrl("javascript:" + js);
                 super.onPageFinished(view, url);
+                dismissLoadingDialog();
             }
         });
 
+        showLoadingDialog(true);
         mWebView.loadUrl(mProtocolType == 0 ? CommonConfig.PROTOCOL_PRIVACY_URL
                 : CommonConfig.PROTOCOL_TERMS_URL);
     }

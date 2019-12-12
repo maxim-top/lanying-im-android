@@ -130,6 +130,8 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
 
         private TextView mTvTab;
 
+        private TextView mTvCount;
+
         private View mSwitchView;
 
         public TabSwitchView(@DrawableRes int drawable, int resString, BaseFragment baseFragment,
@@ -143,6 +145,8 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
             mSwitchView = View.inflate(AppContextUtils.getAppContext(), R.layout.switch_tab, null);
             mIvTab = mSwitchView.findViewById(R.id.iv_switch_tab);
             mTvTab = mSwitchView.findViewById(R.id.tv_switch_tab);
+            mTvCount = mSwitchView.findViewById(R.id.tab_unread_num);
+            mTvCount.setVisibility(View.GONE);
             mTvTab.setText(getString(mResString));
             mIvTab.setImageResource(mDrawable);
             mSwitchView.setOnClickListener(this);
@@ -154,6 +158,15 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
 
         public ImageView getTabImageView() {
             return mIvTab;
+        }
+
+        public void setCount(int count) {
+            if (count <= 0) {
+                mTvCount.setVisibility(View.GONE);
+            } else {
+                mTvCount.setVisibility(View.VISIBLE);
+                mTvCount.setText(String.valueOf(count));
+            }
         }
 
         public void onClick(View paramView) {

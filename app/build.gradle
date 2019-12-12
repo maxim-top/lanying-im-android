@@ -7,7 +7,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1907071346
-        versionName "v1.1.2"
+        versionName "v1.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         manifestPlaceholders = [
@@ -85,7 +85,7 @@ dependencies {
 
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_1.0.11.20191106',ext:'aar')
+    implementation(name:'floo-android_2.0.4.20191207',ext:'aar')
 
     implementation 'com.squareup.okhttp3:okhttp:3.12.3'
 

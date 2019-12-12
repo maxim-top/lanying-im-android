@@ -54,6 +54,8 @@ public class GroupAckActivity extends BaseTitleActivity {
 
     private TextView mTvReaded, mTvUnRead;
 
+    private View mViewReaded, mViewUnRead;
+
     private ReadAckAdapter mAdapter;
 
     public static void openGroupAckActivity(Context context, List<Long> memberIdList,
@@ -101,9 +103,13 @@ public class GroupAckActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.activity_group_ack_view, null);
         mRecyclerView = view.findViewById(R.id.rcv_read_ack);
         mTvReaded = view.findViewById(R.id.tv_readed);
-        mTvReaded.setSelected(true);
         mTvUnRead = view.findViewById(R.id.tv_unRead);
+        mViewReaded = view.findViewById(R.id.tv_readed_selected);
+        mViewUnRead = view.findViewById(R.id.tv_unRead_selected);
+        mTvReaded.setSelected(true);
         mTvUnRead.setSelected(false);
+        mViewReaded.setVisibility(View.VISIBLE);
+        mViewUnRead.setVisibility(View.INVISIBLE);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter = new ReadAckAdapter(this));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
@@ -119,6 +125,8 @@ public class GroupAckActivity extends BaseTitleActivity {
             }
             mTvReaded.setSelected(true);
             mTvUnRead.setSelected(false);
+            mViewReaded.setVisibility(View.VISIBLE);
+            mViewUnRead.setVisibility(View.INVISIBLE);
             initRoster(mReadIdList, true);
         });
         mTvUnRead.setOnClickListener(v -> {
@@ -127,6 +135,8 @@ public class GroupAckActivity extends BaseTitleActivity {
             }
             mTvReaded.setSelected(false);
             mTvUnRead.setSelected(true);
+            mViewReaded.setVisibility(View.INVISIBLE);
+            mViewUnRead.setVisibility(View.VISIBLE);
             initRoster(mUnReadIdList, true);
         });
     }

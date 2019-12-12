@@ -115,6 +115,10 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
         if (TextUtils.isEmpty(extension)) {
             return;
         }
+        if (mChatId == mMyUserId) {
+            // 如果对方是自己 不显示
+            return;
+        }
         Observable.just(extension).map(new Func1<String, String>() {
             @Override
             public String call(String s) {

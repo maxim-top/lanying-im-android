@@ -14,13 +14,18 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.MainActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
@@ -28,6 +33,8 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ClickTimeUtils;
+import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
@@ -44,8 +51,6 @@ import top.maxim.im.wxapi.WXUtils;
  */
 public class LoginActivity extends BaseTitleActivity {
 
-    public static String LOGIN_OPEN_ID = "loginOpenId";
-
     /* 账号 */
     private EditText mInputName;
 
@@ -57,6 +62,8 @@ public class LoginActivity extends BaseTitleActivity {
 
     /* 注册 */
     private TextView mRegister;
+
+    private TextView mVerifyLogin;
 
     /* 切换登陆模式 */
     private TextView mSwitchLoginMode;
@@ -75,22 +82,14 @@ public class LoginActivity extends BaseTitleActivity {
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
-    /* 微信返回code */
-    private String mOpenId;
-
     private TextView mTvAppId;
-    
+
     private String mChangeAppId;
 
-    public static void openLogin(Context context) {
-        openLogin(context, null);
-    }
+    private CompositeSubscription mSubscription;
 
-    public static void openLogin(Context context, String openId) {
+    public static void openLogin(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
-        if (!TextUtils.isEmpty(openId)) {
-            intent.putExtra(LOGIN_OPEN_ID, openId);
-        }
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
@@ -108,6 +107,7 @@ public class LoginActivity extends BaseTitleActivity {
         mInputPwd = view.findViewById(R.id.et_user_pwd);
         mLogin = view.findViewById(R.id.tv_login);
         mRegister = view.findViewById(R.id.tv_register);
+        mVerifyLogin = view.findViewById(R.id.tv_verify);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
@@ -131,16 +131,13 @@ public class LoginActivity extends BaseTitleActivity {
     protected void setViewListener() {
         // 注册
         mRegister.setOnClickListener(v -> RegisterActivity.openRegister(LoginActivity.this));
+        // 验证码登录
+        mVerifyLogin.setOnClickListener(v -> LoginByVerifyActivity.openLogin(LoginActivity.this));
         // 登陆
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
-            // MainActivity.openMain(LoginActivity.this);
-            if (!TextUtils.isEmpty(mOpenId)) {
-                bindOpenId(this, name, pwd, mOpenId);
-            } else {
-                login(this, name, pwd, mLoginByUserId, mChangeAppId);
-            }
+            login(this, name, pwd, mLoginByUserId, mChangeAppId);
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
@@ -148,7 +145,8 @@ public class LoginActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
-            WXUtils.getInstance().wxLogin();
+            initRxBus();
+            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN, mChangeAppId);
         });
         // 扫一扫
         mIvScan.setOnClickListener(v -> ScannerActivity.openScan(this));
@@ -188,7 +186,7 @@ public class LoginActivity extends BaseTitleActivity {
             }
             mLoginByUserId = !mLoginByUserId;
         });
-        
+
         // 修改appId
         mIvChangeAppId.setOnClickListener(v -> DialogUtils.getInstance().showEditDialog(this,
                 "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
@@ -207,14 +205,6 @@ public class LoginActivity extends BaseTitleActivity {
     }
 
     @Override
-    protected void initDataFromFront(Intent intent) {
-        super.initDataFromFront(intent);
-        if (intent != null) {
-            mOpenId = intent.getStringExtra(LOGIN_OPEN_ID);
-        }
-    }
-
-    @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
         // 判断当前是否是扫码登陆
@@ -224,51 +214,6 @@ public class LoginActivity extends BaseTitleActivity {
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
-    }
-
-    /**
-     * 绑定openId
-     * 
-     * @param pwd
-     */
-    public static void bindOpenId(final Activity activity, String name, final String pwd,
-            final String openId) {
-        // 首先获取token
-        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-            ((BaseTitleActivity)activity).showLoadingDialog(true);
-        }
-        AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
-            @Override
-            public void onResponse(String result) {
-                AppManager.getInstance().bindOpenId(result, openId,
-                        new HttpResponseCallback<String>() {
-                            @Override
-                            public void onResponse(String result) {
-                                if (activity instanceof BaseTitleActivity
-                                        && !activity.isFinishing()) {
-                                    ((BaseTitleActivity)activity).dismissLoadingDialog();
-                                }
-                                login(activity, name, pwd, false);
-                            }
-
-                            @Override
-                            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                                if (activity instanceof BaseTitleActivity
-                                        && !activity.isFinishing()) {
-                                    ((BaseTitleActivity)activity).dismissLoadingDialog();
-                                }
-                            }
-                        });
-            }
-
-            @Override
-            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                ToastUtil.showTextViewPrompt("绑定失败");
-                if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-                    ((BaseTitleActivity)activity).dismissLoadingDialog();
-                }
-            }
-        });
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
@@ -346,7 +291,91 @@ public class LoginActivity extends BaseTitleActivity {
                         SharePreferenceUtils.getInstance().putLoginStatus(true);
                         MessageDispatcher.getDispatcher().initialize();
                         MainActivity.openMain(activity);
+                        activity.finish();
                     }
                 });
+    }
+
+    public static void wxChatLogin(final Activity activity, String openId) {
+        if (TextUtils.isEmpty(openId)) {
+            ToastUtil.showTextViewPrompt("不能为空");
+            return;
+        }
+        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+            ((BaseTitleActivity)activity).showLoadingDialog(true);
+        }
+        AppManager.getInstance().weChatLogin(openId, new HttpResponseCallback<String>() {
+            @Override
+            public void onResponse(String result) {
+                if (TextUtils.isEmpty(result)) {
+                    ToastUtil.showTextViewPrompt("登陆失败");
+                    return;
+                }
+                String appId = WXUtils.getInstance().getAppId();
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
+                        String openId = jsonObject.getString("openid");
+                        // 没有userId 密码 需要跳转绑定微信页面
+                        BindUserActivity.openBindUser(activity, openId, appId);
+                        activity.finish();
+                        return;
+                    }
+                    // 直接登录
+                    String userId = jsonObject.getString("user_id");
+                    String pwd = jsonObject.getString("password");
+                    LoginActivity.login(activity, userId, pwd, true, appId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                ToastUtil.showTextViewPrompt("登陆失败");
+            }
+        });
+    }
+
+    private void initRxBus() {
+        if (mSubscription == null) {
+            mSubscription = new CompositeSubscription();
+        }
+        Subscription wxLogin = RxBus.getInstance().toObservable(Intent.class)
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Intent>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Intent intent) {
+                        if (intent == null || !TextUtils.equals(intent.getAction(),
+                                CommonConfig.WX_LOGIN_ACTION)) {
+                            return;
+                        }
+                        if (mSubscription != null) {
+                            mSubscription.unsubscribe();
+                        }
+                        String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
+                        wxChatLogin(LoginActivity.this, openId);
+                    }
+                });
+        mSubscription.add(wxLogin);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mSubscription != null) {
+            mSubscription.unsubscribe();
+            mSubscription = null;
+        }
     }
 }

@@ -76,6 +76,8 @@
     <string name="begin_chat">开始聊天</string>
     <string name="send">发送</string>
     <string name="search_hint">搜索</string>
+    <string name="verify_continue">继续</string>
+    <string name="skip">跳过</string>
 
     <!--Contact-->
     <string name="contact_apply_notice">好友申请与通知</string>
@@ -102,14 +104,23 @@
     <string name="login">登录</string>
     <string name="login_by_pwd">密码登录</string>
     <string name="register">注册</string>
-    <string name="login_user_name_hint">请输入用户名或手机号</string>
+    <string name="login_user_name_hint">用户名/手机号</string>
+    <string name="login_user_phone_hint">手机号</string>
+    <string name="login_user_verify_hint">验证码</string>
     <string name="login_user_id_hint">请输入用户id</string>
-    <string name="login_user_pwd_hint">请输入密码</string>
+    <string name="login_user_pwd_hint">输入登录密码</string>
     <string name="register_user_phone_hint">请输入手机号</string>
-    <string name="register_user_name_hint">请输入用户名</string>
+    <string name="register_user_name_hint">用户名</string>
     <string name="register_user_verify_hint">请输入验证码</string>
-    <string name="register_user_pwd_hint">请输入密码</string>
+    <string name="register_user_pwd_hint">密码</string>
     <string name="quick_login">快捷登录</string>
+    <string name="verify_login">验证码登录</string>
+    <string name="bind_mobile">绑定手机号</string>
+    <string name="bind_user">绑定已有账户</string>
+    <string name="bind_register_user">注册并绑定账户</string>
+    <string name="bind_not_user">暂无账户,点击创建</string>
+    <string name="bind_exit_user">已有账户,直接绑定</string>
+    <string name="exit_user">该用户名已存在</string>
     <string name="register_protocol1">注册即代表同意</string>
     <string name="register_protocol2">用户服务</string>
     <string name="register_protocol3">及</string>
@@ -178,8 +189,10 @@
 
 
     <string name="about_us_desc">一键启用多云架构的即时通讯云服务</string>
-    <string name="about_us_net">官网 https://www.maximtop.com</string>
-    <string name="about_us_phone">联系商务 400-666-0162</string>
+    <string name="about_us_net_pre">官网&#8194;&#8194;</string>
+    <string name="about_us_net">https://www.maximtop.com</string>
+    <string name="about_us_phone_pre">联系商务&#8194;&#8194;</string>
+    <string name="about_us_phone">400-666-0162</string>
     <string name="about_us_company">copyright© 2019 美信拓扑</string>
 
 </resources>

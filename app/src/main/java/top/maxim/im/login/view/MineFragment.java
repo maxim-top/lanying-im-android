@@ -29,6 +29,7 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -338,6 +339,23 @@ public class MineFragment extends BaseTitleFragment {
     }
 
     @Override
+    public void onShow() {
+        super.onShow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (getActivity() == null || mScrollView == null) {
+                return;
+            }
+            Window window = getActivity().getWindow();
+            int scrollY = mScrollView.getScrollY();
+            if (ScreenUtils.getStatusBarHeight() < scrollY) {
+                window.setStatusBarColor(getResources().getColor(R.color.color_0079F4));
+            } else {
+                window.setStatusBarColor(Color.TRANSPARENT);
+            }
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         final BMXUserProfile profile = new BMXUserProfile();
@@ -418,6 +436,9 @@ public class MineFragment extends BaseTitleFragment {
         mUserEdit.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
 
         mMyQrCode.setOnClickListener(v -> MyQrCodeActivity.openMyQrcode(getActivity()));
+
+        // 三次点击 解绑微信
+        ClickTimeUtils.setClickTimes(mUserIcon, 5, () -> unBindWeChat());
     }
 
     @Override

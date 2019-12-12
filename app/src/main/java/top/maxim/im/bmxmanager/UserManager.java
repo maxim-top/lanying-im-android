@@ -32,15 +32,12 @@ public class UserManager extends BaseManager {
     /**
      * 注册
      * 
-     * @param mobile 手机号
-     * @param verifyCode 验证码
      * @param password 密码
      * @param username 用户名
      * @return BMXUserProfile
      */
-    public BMXErrorCode signUpNewUser(String mobile, String verifyCode, String password,
-            String username, BMXUserProfile profile) {
-        return mService.signUpNewUser(mobile, verifyCode, password, username, profile);
+    public BMXErrorCode signUpNewUser(String username, String password, BMXUserProfile profile) {
+        return bmxClient.signUpNewUser(username, password, profile);
     }
 
     /**
@@ -51,18 +48,7 @@ public class UserManager extends BaseManager {
      * @return
      */
     public BMXErrorCode signInByName(String name, String password) {
-        return mService.signInByName(name, password);
-    }
-
-    /**
-     * 手机号登陆
-     * 
-     * @param phone
-     * @param password
-     * @return
-     */
-    public BMXErrorCode signInByPhone(String phone, String password) {
-        return mService.signInByPhone(phone, password);
+        return bmxClient.signInByName(name, password);
     }
 
     /**
@@ -73,29 +59,29 @@ public class UserManager extends BaseManager {
      * @return
      */
     public BMXErrorCode signInById(long id, String password) {
-        return mService.signInById(id, password);
+        return bmxClient.signInById(id, password);
     }
 
     /**
      * 自动登陆 根据用户名
-     * 
+     *
      * @param name
      * @param password
      * @return
      */
     public BMXErrorCode autoSignInByName(String name, String password) {
-        return mService.fastSignInByName(name, password);
+        return bmxClient.fastSignInByName(name, password);
     }
 
     /**
      * 自动登陆 根据id
-     * 
+     *
      * @param uid
      * @param password
      * @return
      */
     public BMXErrorCode autoSignInById(long uid, String password) {
-        return mService.fastSignInById(uid, password);
+        return bmxClient.fastSignInById(uid, password);
     }
 
     /**
@@ -104,21 +90,21 @@ public class UserManager extends BaseManager {
      * @return
      */
     public BMXErrorCode signOut() {
-        return mService.signOut();
+        return bmxClient.signOut();
     }
 
     /**
      * 获取当前和服务器的连接状态
      **/
     public BMXConnectStatus connectStatus() {
-        return mService.connectStatus();
+        return bmxClient.connectStatus();
     }
 
     /**
      * 获取当前的登录状态
      **/
     public BMXSignInStatus signInStatus() {
-        return mService.signInStatus();
+        return bmxClient.signInStatus();
     }
 
     /**

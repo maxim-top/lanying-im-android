@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -42,13 +43,19 @@ import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.common.view.SplashVideoPlayView;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 
 public class WelcomeActivity extends BaseTitleActivity {
 
+    private ImageView mIvSplash;
+
+    private SplashVideoPlayView mVideoSplash;
+
     public static void openWelcome(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
@@ -60,7 +67,12 @@ public class WelcomeActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         hideHeader();
-        return View.inflate(this, R.layout.activity_welcome, null);
+        View view = View.inflate(this, R.layout.activity_welcome, null);
+        mIvSplash = view.findViewById(R.id.view_splash_img);
+        mVideoSplash = view.findViewById(R.id.view_splash_video);
+        mIvSplash.setVisibility(View.VISIBLE);
+        mVideoSplash.setVisibility(View.GONE);
+        return view;
     }
 
     @Override
@@ -74,7 +86,7 @@ public class WelcomeActivity extends BaseTitleActivity {
         super.initDataForActivity();
         NotificationUtils.getInstance().cancelAll();
         if (checkPermission()) {
-            initJump();
+            showProtocol();
         } else {
             requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
         }
@@ -92,7 +104,39 @@ public class WelcomeActivity extends BaseTitleActivity {
             autoLogin(userId, pwd);
             return;
         }
-        showProtocol();
+        LoginActivity.openLogin(WelcomeActivity.this);
+        finish();
+    }
+
+    /**
+     * 展示视频
+     */
+    private void showVideo() {
+        boolean isFirst = SharePreferenceUtils.getInstance().getFirst();
+        if (!isFirst) {
+            initJump();
+            return;
+        }
+        SharePreferenceUtils.getInstance().putIsFirst(false);
+        mIvSplash.setVisibility(View.GONE);
+        mVideoSplash.setVisibility(View.VISIBLE);
+        mVideoSplash.setPlayListener(new SplashVideoPlayView.OnPlayVideoListener() {
+
+            @Override
+            public void onStart() {
+            }
+
+            @Override
+            public void onFinish() {
+                initJump();
+            }
+
+            @Override
+            public void onError() {
+                initJump();
+            }
+        });
+        mVideoSplash.setPrepareVideoPath(R.raw.splash_video);
     }
 
     @Override
@@ -104,17 +148,10 @@ public class WelcomeActivity extends BaseTitleActivity {
         for (String permission : permissions) {
             switch (permission) {
                 case PermissionsConstant.READ_STORAGE:
-                    // 读SD权限
-                    if (hasPermission(PermissionsConstant.WRITE_STORAGE)) {
-                        // 如果有读写权限都有 则直接操作
-                        initJump();
-                    } else {
-                        requestPermissions(PermissionsConstant.WRITE_STORAGE);
-                    }
+                    // SD权限
+                    showProtocol();
                     break;
                 case PermissionsConstant.WRITE_STORAGE:
-                    // 写SD权限 如果有读写权限都有 则直接操作
-                    initJump();
                     break;
                 default:
                     break;
@@ -131,9 +168,10 @@ public class WelcomeActivity extends BaseTitleActivity {
         for (String permission : permissions) {
             switch (permission) {
                 case PermissionsConstant.READ_STORAGE:
-                case PermissionsConstant.WRITE_STORAGE:
                     // 读写SD权限拒绝
                     CommonProvider.openAppPermission(this);
+                    break;
+                case PermissionsConstant.WRITE_STORAGE:
                     break;
                 default:
                     break;
@@ -217,10 +255,9 @@ public class WelcomeActivity extends BaseTitleActivity {
      * 展示用户协议
      */
     private void showProtocol() {
-        boolean show = SharePreferenceUtils.getInstance().getPrococolDialogStatus();
+        boolean show = SharePreferenceUtils.getInstance().getProtocolDialogStatus();
         if (show) {
-            LoginActivity.openLogin(WelcomeActivity.this);
-            finish();
+            showVideo();
             return;
         }
         // 标题
@@ -276,9 +313,8 @@ public class WelcomeActivity extends BaseTitleActivity {
                 new CommonCustomDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener() {
-                        SharePreferenceUtils.getInstance().putPrococolDialogStatus(true);
-                        LoginActivity.openLogin(WelcomeActivity.this);
-                        finish();
+                        SharePreferenceUtils.getInstance().putProtocolDialogStatus(true);
+                        showVideo();
                     }
 
                     @Override

@@ -2,8 +2,10 @@
 package top.maxim.im.common.utils;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.support.annotation.RawRes;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -147,7 +149,6 @@ public class VideoPlay
                 mOnPlayListener.changeSurfaceViewSize(mVideoWidth, mVideoHeight);
             }
         }
-
         if (mOnPlayListener != null) {
             mOnPlayListener.onPrepare();
         }
@@ -188,6 +189,23 @@ public class VideoPlay
         try {
             mMediaPlayer.reset();
             mMediaPlayer.setDataSource(videoPath);
+            mMediaPlayer.prepare();
+        } catch (IllegalArgumentException | IllegalStateException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 设置视频路径
+     *
+     */
+    public void setVideoPath(@RawRes int videoRes) {
+        try {
+            mMediaPlayer.reset();
+            AssetFileDescriptor afd = AppContextUtils.getAppContext().getResources()
+                    .openRawResourceFd(videoRes); // 注意这里的区别
+            mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             mMediaPlayer.prepare();
         } catch (IllegalArgumentException | IllegalStateException | IOException e) {
             e.printStackTrace();
@@ -260,6 +278,7 @@ public class VideoPlay
     }
 
     public interface OnPlayListener {
+
         void onPlayComplete();
 
         void changeSurfaceViewSize(int width, int height);
@@ -267,5 +286,6 @@ public class VideoPlay
         void onError();
 
         void onPrepare();
+
     }
 }

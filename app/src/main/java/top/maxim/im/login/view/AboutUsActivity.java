@@ -3,6 +3,7 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -13,6 +14,7 @@ import top.maxim.im.BuildConfig;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.TelLinkPopupWindow;
 import top.maxim.im.common.view.Header;
 
 /**
@@ -23,6 +25,17 @@ public class AboutUsActivity extends BaseTitleActivity {
     private TextView mAppVersion;
 
     private TextView mFlooVersion;
+
+    private TextView mTvNet;
+
+    private TextView mTvPhone;
+
+    private String mUrl;
+
+    private String mPhone;
+
+    /* 链接 电话弹出框 */
+    private TelLinkPopupWindow mTelLinkPopupWindow;
 
     public static void startAboutUsActivity(Context context) {
         Intent intent = new Intent(context, AboutUsActivity.class);
@@ -47,7 +60,25 @@ public class AboutUsActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.activity_about_us, null);
         mAppVersion = view.findViewById(R.id.tv_app_version);
         mFlooVersion = view.findViewById(R.id.tv_floo_version);
+        mTvNet = view.findViewById(R.id.tv_about_us_net);
+        mTvPhone = view.findViewById(R.id.tv_about_us_contact);
+        mTvNet.setText(mUrl = getString(R.string.about_us_net));
+        mTvPhone.setText(mPhone = getString(R.string.about_us_phone));
         return view;
+    }
+
+    @Override
+    protected void setViewListener() {
+        // 跳转浏览器
+        mTvNet.setOnClickListener(
+                v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl))));
+        // 弹起打电话pop
+        mTvPhone.setOnClickListener(v -> {
+            if (mTelLinkPopupWindow == null) {
+                mTelLinkPopupWindow = new TelLinkPopupWindow(this);
+            }
+            mTelLinkPopupWindow.showAsDropDown(mPhone, mTvPhone);
+        });
     }
 
     @Override
@@ -57,9 +88,19 @@ public class AboutUsActivity extends BaseTitleActivity {
         mAppVersion.setText("MaxIM Version:" + versionName);
         BMXClient client = BaseManager.getBMXClient();
         String sdkVersion = "";
-        if (client != null && client.getSDKConfig() != null && !TextUtils.isEmpty(client.getSDKConfig().getSDKVersion())) {
+        if (client != null && client.getSDKConfig() != null
+                && !TextUtils.isEmpty(client.getSDKConfig().getSDKVersion())) {
             sdkVersion = client.getSDKConfig().getSDKVersion();
         }
         mFlooVersion.setText("FlooSDK Version:" + sdkVersion);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mTelLinkPopupWindow != null) {
+            mTelLinkPopupWindow.dismiss();
+            return;
+        }
+        super.onBackPressed();
     }
 }

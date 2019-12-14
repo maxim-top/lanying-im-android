@@ -40,6 +40,7 @@ import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
+import top.maxim.im.common.utils.dialog.CustomDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.BMImageLoader;
@@ -75,11 +76,15 @@ public class SettingUserActivity extends BaseTitleActivity {
     /* 显示公共信息 */
     private TextView mTvPublic;
 
+    private View mLinePublic;
+
     /* 设置私有信息 */
     private ItemLineArrow.Builder mSetPrivate;
 
     /* 显示私有信息 */
     private TextView mTvPrivate;
+
+    private View mLinePrivate;
 
     /* 设置添加好友验证 */
     private ItemLineArrow.Builder mSetAddFriendAuthMode;
@@ -171,22 +176,6 @@ public class SettingUserActivity extends BaseTitleActivity {
                 .setMarginLeft(ScreenUtils.dp2px(15));
         container.addView(itemLine3.build());
 
-//        // 手机号
-//        mSetPhone = new ItemLineArrow.Builder(this)
-//                .setStartContent(getString(R.string.setting_user_phone))
-//                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
-//                    @Override
-//                    public void onItemClick(View v) {
-//                        showSettingDialog(getString(R.string.setting_user_phone));
-//                    }
-//                });
-//        container.addView(mSetPhone.build());
-//
-//        // 分割线
-//        ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
-//                .setMarginLeft(ScreenUtils.dp2px(15));
-//        container.addView(itemLine4.build());
-
         // 公开扩展信息
         mSetPublic = new ItemLineArrow.Builder(this)
                 .setStartContent(getString(R.string.setting_user_public))
@@ -218,7 +207,8 @@ public class SettingUserActivity extends BaseTitleActivity {
         // 分割线
         ItemLine.Builder itemLine6 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine6.build());
+        container.addView(mLinePublic = itemLine6.build());
+        mLinePublic.setVisibility(View.GONE);
 
         // 私密扩展信息
         mSetPrivate = new ItemLineArrow.Builder(this)
@@ -251,7 +241,24 @@ public class SettingUserActivity extends BaseTitleActivity {
         // 分割线
         ItemLine.Builder itemLine8 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine8.build());
+        container.addView(mLinePrivate = itemLine8.build());
+        mLinePrivate.setVisibility(View.GONE);
+
+        // 手机号
+        mSetPhone = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.setting_user_phone))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                        showChangeMobile("");
+                    }
+                });
+        container.addView(mSetPhone.build());
+
+        // 分割线
+        ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(itemLine4.build());
 
         // 好友验证类型
         mSetAddFriendAuthMode = new ItemLineArrow.Builder(this)
@@ -390,14 +397,18 @@ public class SettingUserActivity extends BaseTitleActivity {
         String publicInfo = profile.publicInfo();
         if (TextUtils.isEmpty(publicInfo)) {
             mTvPublic.setVisibility(View.GONE);
+            mLinePublic.setVisibility(View.GONE);
         } else {
             mTvPublic.setVisibility(View.VISIBLE);
+            mLinePublic.setVisibility(View.VISIBLE);
             mTvPublic.setText(publicInfo);
         }
         String privateInfo = profile.privateInfo();
-        if (TextUtils.isEmpty(publicInfo)) {
+        if (TextUtils.isEmpty(privateInfo)) {
+            mTvPrivate.setVisibility(View.GONE);
             mTvPrivate.setVisibility(View.GONE);
         } else {
+            mTvPrivate.setVisibility(View.VISIBLE);
             mTvPrivate.setVisibility(View.VISIBLE);
             mTvPrivate.setText(privateInfo);
         }
@@ -772,6 +783,16 @@ public class SettingUserActivity extends BaseTitleActivity {
             return getString(R.string.add_friend_auth_reject);
         }
         return "";
+    }
+
+    /**
+     * 展示更换手机号
+     */
+    private void showChangeMobile(final String phone) {
+        View view = View.inflate(this, R.layout.dialog_change_phone, null);
+        CustomDialog dialog = new CustomDialog();
+        dialog.setCustomView(view);
+        dialog.showDialog(this);
     }
 
     /**

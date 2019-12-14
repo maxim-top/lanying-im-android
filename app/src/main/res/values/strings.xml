@@ -144,12 +144,12 @@
     <string name="other_device_tips">是否多端提示</string>
     <string name="device_list">多设备列表</string>
     <string name="about_us">关于我们</string>
-    <string name="setting_user_name">设置昵称</string>
-    <string name="setting_user_phone">设置手机号</string>
-    <string name="setting_user_public">设置公开信息</string>
+    <string name="setting_user_name">昵称</string>
+    <string name="setting_user_phone">手机号</string>
+    <string name="setting_user_public">公开信息</string>
     <string name="setting_roster_alias">设置别名</string>
     <string name="setting_roster_ext">设置扩展信息</string>
-    <string name="setting_user_private">设置私密信息</string>
+    <string name="setting_user_private">私密信息</string>
     <string name="setting_user_disturb">设置免打扰</string>
     <string name="setting_add_friend_auth_mode">好友验证类型</string>
     <string name="setting_add_friend_auth_question">好友验证问题</string>
@@ -157,6 +157,11 @@
     <string name="add_friend_auth_approval">需要同意</string>
     <string name="add_friend_auth_answer">需要回答问题</string>
     <string name="add_friend_auth_reject">拒绝所有人</string>
+
+    <string name="change_phone_tag">更换绑定手机号</string>
+    <string name="bind_phone_tag">你已绑定手机号%1s</string>
+    <string name="phone_verify_change">手机验证更换</string>
+    <string name="pwd_verify_change">密码验证更换</string>
 
     <!--群设置-->
     <string name="group_notify_all">所有人</string>

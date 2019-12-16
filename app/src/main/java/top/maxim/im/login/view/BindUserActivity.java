@@ -279,9 +279,9 @@ public class BindUserActivity extends BaseTitleActivity {
      */
     public void bindWeChat(String token, String name, String pwd) {
         // 绑定和登陆没有依赖
-        AppManager.getInstance().bindOpenId(token, mOpenId, new HttpResponseCallback<String>() {
+        AppManager.getInstance().bindOpenId(token, mOpenId, new HttpResponseCallback<Boolean>() {
             @Override
-            public void onResponse(String result) {
+            public void onResponse(Boolean result) {
             }
 
             @Override
@@ -301,9 +301,9 @@ public class BindUserActivity extends BaseTitleActivity {
     public void bindMobile(String token, String name, String pwd) {
         // 绑定和登陆没有依赖
         AppManager.getInstance().mobileBind(token, mMobile, mCaptcha,
-                new HttpResponseCallback<String>() {
+                new HttpResponseCallback<Boolean>() {
                     @Override
-                    public void onResponse(String result) {
+                    public void onResponse(Boolean result) {
                     }
 
                     @Override

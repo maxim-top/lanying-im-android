@@ -785,11 +785,11 @@ public class MineFragment extends BaseTitleFragment {
         AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
-                AppManager.getInstance().unBindOpenId(result, new HttpResponseCallback<String>() {
+                AppManager.getInstance().unBindOpenId(result, new HttpResponseCallback<Boolean>() {
                     @Override
-                    public void onResponse(String result) {
+                    public void onResponse(Boolean result) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("解除成功");
+                        ToastUtil.showTextViewPrompt(result != null && result ? "解除成功" : "解除失败");
                     }
 
                     @Override

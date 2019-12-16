@@ -163,11 +163,17 @@ public class BindMobileActivity extends BaseTitleActivity {
         mSendVerify.setOnClickListener(v -> {
             verifyCountDown();
             String phone = mInputName.getEditableText().toString().trim();
-            AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<String>() {
+            AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {
                 @Override
-                public void onResponse(String result) {
-                    ToastUtil.showTextViewPrompt("获取验证码成功");
-                    // mSendVerify.setEnabled(true);
+                public void onResponse(Boolean result) {
+                    if (result != null && result) {
+                        ToastUtil.showTextViewPrompt("获取验证码成功");
+                    } else {
+                        ToastUtil.showTextViewPrompt("获取验证码失败");
+                        mSendVerify.setEnabled(true);
+                        mVerifyCountDown.setText("");
+                        timer.cancel();
+                    }                    // mSendVerify.setEnabled(true);
                     // mVerifyCountDown.setText("");
                     // timer.cancel();
                 }
@@ -214,11 +220,13 @@ public class BindMobileActivity extends BaseTitleActivity {
                     @Override
                     public void onResponse(String result) {
                         AppManager.getInstance().mobileBind(result, mobile, captcha,
-                                new HttpResponseCallback<String>() {
+                                new HttpResponseCallback<Boolean>() {
                                     @Override
-                                    public void onResponse(String result) {
+                                    public void onResponse(Boolean result) {
                                         dismissLoadingDialog();
-                                        login();
+                                        if (result != null && result) {
+                                            login();
+                                        }
                                     }
 
                                     @Override

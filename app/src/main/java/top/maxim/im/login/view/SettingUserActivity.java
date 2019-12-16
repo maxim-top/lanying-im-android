@@ -29,6 +29,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
@@ -37,6 +38,7 @@ import top.maxim.im.common.utils.CameraUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.ScreenUtils;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
@@ -50,6 +52,7 @@ import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.utils.ChatUtils;
+import top.maxim.im.net.HttpResponseCallback;
 
 /**
  * Description : 用户设置 Created by Mango on 2018/11/21.
@@ -69,6 +72,9 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     /* 设置手机号 */
     private ItemLineArrow.Builder mSetPhone;
+
+    /* 绑定微信 */
+    private ItemLineArrow.Builder mBindWeChat;
 
     /* 设置公有信息 */
     private ItemLineArrow.Builder mSetPublic;
@@ -103,6 +109,8 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     /* 头像路径 */
     private String mIconPath;
+
+    private String mPhone;
 
     private ImageRequestConfig mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
             .showImageForEmptyUri(R.drawable.default_avatar_icon)
@@ -250,7 +258,7 @@ public class SettingUserActivity extends BaseTitleActivity {
                 .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
-                        showChangeMobile("");
+                        showChangeMobile(mPhone);
                     }
                 });
         container.addView(mSetPhone.build());
@@ -259,6 +267,21 @@ public class SettingUserActivity extends BaseTitleActivity {
         ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
         container.addView(itemLine4.build());
+
+        // 绑定微信
+        mBindWeChat = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.setting_user_wx))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                    }
+                });
+        container.addView(mBindWeChat.build());
+
+        // 分割线
+        ItemLine.Builder itemLine9 = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(itemLine9.build());
 
         // 好友验证类型
         mSetAddFriendAuthMode = new ItemLineArrow.Builder(this)
@@ -272,9 +295,9 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mSetAddFriendAuthMode.build());
 
         // 分割线
-        ItemLine.Builder itemLine9 = new ItemLine.Builder(this, container)
+        ItemLine.Builder itemLine10 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine9.build());
+        container.addView(itemLine10.build());
 
         mLlAuthQuestion = new LinearLayout(this);
         mLlAuthQuestion.setOrientation(LinearLayout.VERTICAL);
@@ -393,6 +416,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         mSetName.setEndContent(TextUtils.isEmpty(nickName) ? "" : nickName);
 
         String phone = profile.mobilePhone();
+        mPhone = phone;
         mSetPhone.setEndContent(phone);
         String publicInfo = profile.publicInfo();
         if (TextUtils.isEmpty(publicInfo)) {
@@ -416,6 +440,33 @@ public class SettingUserActivity extends BaseTitleActivity {
         BMXUserProfile.AddFriendAuthMode mode = profile.addFriendAuthMode();
         bindAddFriendAuth("", mode);
         bindAddFriendAuthQuestion(profile.authQuestion());
+        showBindWeChat();
+    }
+
+    private void showBindWeChat() {
+        String name = SharePreferenceUtils.getInstance().getUserName();
+        String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+        AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
+            @Override
+            public void onResponse(String result) {
+                AppManager.getInstance().isBind(result, new HttpResponseCallback<Boolean>() {
+                    @Override
+                    public void onResponse(Boolean result) {
+                        mBindWeChat.setEndContent(result ? "已绑定" : "未绑定");
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        mBindWeChat.setEndContent("未绑定");
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                mBindWeChat.setEndContent("未绑定");
+            }
+        });
     }
 
     private void bindAddFriendAuth(String authMode, BMXUserProfile.AddFriendAuthMode mode) {
@@ -790,6 +841,10 @@ public class SettingUserActivity extends BaseTitleActivity {
      */
     private void showChangeMobile(final String phone) {
         View view = View.inflate(this, R.layout.dialog_change_phone, null);
+        TextView tvPhone = view.findViewById(R.id.tv_bind_phone_title);
+        tvPhone.setText(String.format(getString(R.string.bind_phone_tag), phone));
+        TextView tvPhoneVerify = view.findViewById(R.id.tv_phone_verify);
+        TextView tvPwdVerify = view.findViewById(R.id.tv_pwd_verify);
         CustomDialog dialog = new CustomDialog();
         dialog.setCustomView(view);
         dialog.showDialog(this);

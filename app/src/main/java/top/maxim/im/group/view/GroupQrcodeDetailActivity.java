@@ -174,9 +174,9 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
     }
 
     public void joinGroup(String token) {
-        AppManager.getInstance().groupInvite(token, mQrInfo, new HttpResponseCallback<String>() {
+        AppManager.getInstance().groupInvite(token, mQrInfo, new HttpResponseCallback<Boolean>() {
             @Override
-            public void onResponse(String result) {
+            public void onResponse(Boolean result) {
                 dismissLoadingDialog();
                 ToastUtil.showTextViewPrompt("申请成功");
                 finish();

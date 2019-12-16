@@ -279,11 +279,13 @@ public class ScanResultActivity extends BaseTitleActivity {
                     public void onResponse(String result) {
                         AppManager.getInstance().uploadPushInfo(result, finalDeviceInfo,
                                 SharePreferenceUtils.getInstance().getAppId(),
-                                new HttpResponseCallback<String>() {
+                                new HttpResponseCallback<Boolean>() {
                                     @Override
-                                    public void onResponse(String result) {
+                                    public void onResponse(Boolean result) {
                                         dismissLoadingDialog();
-                                        ToastUtil.showTextViewPrompt("上传deviceToken成功");
+                                        ToastUtil.showTextViewPrompt(
+                                                result != null && result ? "上传deviceToken成功"
+                                                        : "上传deviceToken失败");
                                         finish();
                                     }
 

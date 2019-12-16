@@ -262,7 +262,7 @@ public class AppManager {
     /**
      * 加入群
      */
-    public void groupInvite(String token, String qrInfo, HttpResponseCallback<String> callback) {
+    public void groupInvite(String token, String qrInfo, HttpResponseCallback<Boolean> callback) {
         Map<String, String> params = new HashMap<>();
         params.put("qr_info", qrInfo);
         Map<String, String> header = new HashMap<>();
@@ -290,10 +290,8 @@ public class AppManager {
                             }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
-                                if (data) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(result);
-                                    }
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
                                 }
                                 return;
                             }
@@ -322,7 +320,7 @@ public class AppManager {
      *
      * @param mobile 手机号
      */
-    public void captchaSMS(String mobile, HttpResponseCallback<String> callback) {
+    public void captchaSMS(String mobile, HttpResponseCallback<Boolean> callback) {
         Map<String, String> params = new HashMap<>();
         params.put("mobile", mobile);
         Map<String, String> header = new HashMap<>();
@@ -349,10 +347,8 @@ public class AppManager {
                             }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
-                                if (data) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(result);
-                                    }
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
                                 }
                                 return;
                             }
@@ -497,7 +493,7 @@ public class AppManager {
     /**
      * 绑定openId
      */
-    public void bindOpenId(String token, String openId, HttpResponseCallback<String> callback) {
+    public void bindOpenId(String token, String openId, HttpResponseCallback<Boolean> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
@@ -528,10 +524,8 @@ public class AppManager {
                             }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
-                                if (data) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(result);
-                                    }
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
                                 }
                                 return;
                             }
@@ -558,7 +552,7 @@ public class AppManager {
     /**
      * 解绑定openId
      */
-    public void unBindOpenId(String token, HttpResponseCallback<String> callback) {
+    public void unBindOpenId(String token, HttpResponseCallback<Boolean> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
@@ -584,10 +578,62 @@ public class AppManager {
                             }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
-                                if (data) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(result);
-                                    }
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 解绑定openId
+     */
+    public void isBind(String token, HttpResponseCallback<Boolean> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "wechat/is_bind", null, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
                                 }
                                 return;
                             }
@@ -644,7 +690,7 @@ public class AppManager {
      * 绑定手机号
      */
     public void mobileBind(String token, String mobile, String captcha,
-            HttpResponseCallback<String> callback) {
+            HttpResponseCallback<Boolean> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
@@ -673,10 +719,8 @@ public class AppManager {
                             }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
-                                if (data) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(result);
-                                    }
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
                                 }
                                 return;
                             }
@@ -704,7 +748,7 @@ public class AppManager {
      * 使用签名绑定手机号
      */
     public void mobileBindBySign(String token, String mobile, String sign,
-            HttpResponseCallback<String> callback) {
+            HttpResponseCallback<Boolean> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
@@ -733,10 +777,8 @@ public class AppManager {
                             }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
-                                if (data) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(result);
-                                    }
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
                                 }
                                 return;
                             }
@@ -761,7 +803,189 @@ public class AppManager {
     }
 
     /**
-     * 使用签名绑定手机号
+     * 更换手机号
+     */
+    public void mobileChange(String mobile, String captcha, String sign,
+            HttpResponseCallback<Boolean> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        params.put("mobile", mobile);
+        params.put("captcha", captcha);
+        params.put("sign", sign);
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "user/mobile_change", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 更换手机号 根据旧手机获取签名
+     */
+    public void mobilePrechangeByMobile(String mobile, String captcha,
+            HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        params.put("mobile", mobile);
+        params.put("captcha", captcha);
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "user/mobile_prechange_by_mobile", params,
+                header, new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        String sign = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                String data = jsonObject.getString("data");
+                                jsonObject = new JSONObject(data);
+                                if (jsonObject.has("sign")) {
+                                    sign = jsonObject.getString("sign");
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(sign);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 更换手机号 根据旧手机获取签名
+     */
+    public void mobilePrechangeByPwd(String password, HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        params.put("password", password);
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "user/mobile_prechange_by_password", params,
+                header, new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        String sign = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                String data = jsonObject.getString("data");
+                                jsonObject = new JSONObject(data);
+                                if (jsonObject.has("sign")) {
+                                    sign = jsonObject.getString("sign");
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(sign);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 检查用户名
      */
     public void checkName(String userName, HttpResponseCallback<Boolean> callback) {
         Map<String, String> header = new HashMap<>();
@@ -818,7 +1042,7 @@ public class AppManager {
      * 绑定证书名和用户名id
      */
     public void notifierBind(String token, String deviceToken, String appId, String userId,
-            String notifierName, HttpResponseCallback<String> callback) {
+            String notifierName, HttpResponseCallback<Boolean> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("access-app_id", appId);
@@ -850,10 +1074,8 @@ public class AppManager {
                             }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
-                                if (data) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(result);
-                                    }
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
                                 }
                                 return;
                             }
@@ -881,7 +1103,7 @@ public class AppManager {
      * 绑定证书名和用户名id
      */
     public void uploadPushInfo(String token, String deviceToken, String appId,
-            HttpResponseCallback<String> callback) {
+            HttpResponseCallback<Boolean> callback) {
         Map<String, String> header = new HashMap<>();
         header.put("access-token", token);
         header.put("access-app_id", appId);
@@ -912,10 +1134,8 @@ public class AppManager {
                             }
                             if (jsonObject.has("data")) {
                                 boolean data = jsonObject.getBoolean("data");
-                                if (data) {
-                                    if (callback != null) {
-                                        callback.onCallResponse(result);
-                                    }
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
                                 }
                                 return;
                             }

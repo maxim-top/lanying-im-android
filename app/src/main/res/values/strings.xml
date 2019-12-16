@@ -146,6 +146,7 @@
     <string name="about_us">关于我们</string>
     <string name="setting_user_name">昵称</string>
     <string name="setting_user_phone">手机号</string>
+    <string name="setting_user_wx">微信</string>
     <string name="setting_user_public">公开信息</string>
     <string name="setting_roster_alias">设置别名</string>
     <string name="setting_roster_ext">设置扩展信息</string>

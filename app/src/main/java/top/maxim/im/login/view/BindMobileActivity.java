@@ -15,6 +15,8 @@ import android.widget.TextView;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
@@ -22,13 +24,7 @@ import top.maxim.im.net.HttpResponseCallback;
 /**
  * Description : 注册后绑定手机 Created by Mango on 2018/11/21.
  */
-public class RegisterBindMobileActivity extends BaseTitleActivity {
-
-    public static String LOGIN_NAME = "loginName";
-
-    public static String LOGIN_PWD = "loginPwd";
-
-    public static String LOGIN_APP_ID = "loginAppId";
+public class BindMobileActivity extends BaseTitleActivity {
 
     /* 账号 */
     private EditText mInputName;
@@ -45,17 +41,12 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
     /* 验证码倒计时 */
     private TextView mVerifyCountDown;
 
-    /* 扫一扫 */
-    private TextView mTvSkip;
-
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
     private String userName;
 
     private String userPwd;
-
-    private String mAppId;
 
     private boolean mCountDown;
 
@@ -74,30 +65,28 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
         }
     };
 
-    public static void openRegisterBindMobile(Context context, String name, String pwd, String appId) {
-        Intent intent = new Intent(context, RegisterBindMobileActivity.class);
-        intent.putExtra(LOGIN_NAME, name);
-        intent.putExtra(LOGIN_PWD, pwd);
-        intent.putExtra(LOGIN_APP_ID, appId);
+    public static void openBindMobile(Context context) {
+        Intent intent = new Intent(context, BindMobileActivity.class);
         context.startActivity(intent);
     }
 
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
-        return new Header.Builder(this, headerContainer).build();
+        Header.Builder builder = new Header.Builder(this, headerContainer);
+        builder.setBackIcon(R.drawable.header_back_icon, v -> finish());
+        builder.setTitle(R.string.bind_mobile);
+        return builder.build();
     }
 
     @Override
     protected View onCreateView() {
-        hideHeader();
-        View view = View.inflate(this, R.layout.activity_register_bind_mobile, null);
+        View view = View.inflate(this, R.layout.activity_bind_mobile, null);
         mInputName = view.findViewById(R.id.et_user_phone);
         mInputPwd = view.findViewById(R.id.et_user_verify);
         mLogin = view.findViewById(R.id.tv_login);
         mSendVerify = view.findViewById(R.id.tv_send_verify);
         mSendVerify.setEnabled(false);
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
-        mTvSkip = view.findViewById(R.id.tv_skip);
         return view;
     }
 
@@ -109,8 +98,6 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
             String pwd = mInputPwd.getText().toString().trim();
             bindMobile(name, pwd);
         });
-        // 跳过
-        mTvSkip.setOnClickListener(v -> login());
         mInputWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -173,7 +160,7 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
                         mSendVerify.setEnabled(true);
                         mVerifyCountDown.setText("");
                         timer.cancel();
-                    }                    // mSendVerify.setEnabled(true);
+                    } // mSendVerify.setEnabled(true);
                     // mVerifyCountDown.setText("");
                     // timer.cancel();
                 }
@@ -199,16 +186,6 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
     }
 
     @Override
-    protected void initDataFromFront(Intent intent) {
-        super.initDataFromFront(intent);
-        if (intent != null) {
-            userName = intent.getStringExtra(LOGIN_NAME);
-            userPwd = intent.getStringExtra(LOGIN_PWD);
-            mAppId = intent.getStringExtra(LOGIN_APP_ID);
-        }
-    }
-
-    @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
     }
@@ -225,7 +202,12 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
                                     public void onResponse(Boolean result) {
                                         dismissLoadingDialog();
                                         if (result != null && result) {
-                                            login();
+                                            Intent intent = new Intent();
+                                            intent.setAction(CommonConfig.MOBILE_BIND_ACTION);
+                                            RxBus.getInstance().send(intent);
+                                            finish();
+                                        } else {
+                                            ToastUtil.showTextViewPrompt("绑定失败");
                                         }
                                     }
 
@@ -246,7 +228,4 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
                 });
     }
 
-    private void login() {
-        LoginActivity.login(this, userName, userPwd, false, mAppId);
-    }
 }

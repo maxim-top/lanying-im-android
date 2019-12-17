@@ -20,6 +20,8 @@ public interface CommonConfig {
 
     String WX_UN_BIND_ACTION = "wxUnbindAction";
 
+    String MOBILE_BIND_ACTION = "mobilebindAction";
+
     String WX_OPEN_ID = "wxOpenId";
 
     String VERIFY_TYPE = "verifyType";

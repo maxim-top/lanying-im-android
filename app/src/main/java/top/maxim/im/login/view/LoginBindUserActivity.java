@@ -97,7 +97,7 @@ public class LoginBindUserActivity extends BaseTitleActivity {
 
     @Override
     protected View onCreateView() {
-        View view = View.inflate(this, R.layout.activity_bind_user, null);
+        View view = View.inflate(this, R.layout.activity_login_bind_user, null);
         mInputName = view.findViewById(R.id.et_user_phone);
         mInputPwd = view.findViewById(R.id.et_user_verify);
         mLogin = view.findViewById(R.id.tv_login);

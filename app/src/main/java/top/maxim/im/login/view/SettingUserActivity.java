@@ -275,7 +275,7 @@ public class SettingUserActivity extends BaseTitleActivity {
 
                     @Override
                     public void onItemEnableClick(View v) {
-
+                        BindMobileActivity.openBindMobile(SettingUserActivity.this);
                     }
                 });
         container.addView(mSetPhone.build());
@@ -376,10 +376,15 @@ public class SettingUserActivity extends BaseTitleActivity {
                         }
                         String action = intent.getAction();
                         if (TextUtils.equals(action, CommonConfig.WX_LOGIN_ACTION)) {
+                            // 绑定微信
                             String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
                             checkWeChat(openId);
                         } else if (TextUtils.equals(action, CommonConfig.WX_UN_BIND_ACTION)) {
+                            // 解绑微信
                             showBindWeChat();
+                        } else if (TextUtils.equals(action, CommonConfig.MOBILE_BIND_ACTION)) {
+                            // 绑定手机号
+                            initData(true);
                         }
                     }
                 });
@@ -511,11 +516,15 @@ public class SettingUserActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
+        initData(false);
+    }
+
+    private void initData(boolean forceRefresh) {
         final BMXUserProfile profile = new BMXUserProfile();
         Observable.just(profile).map(new Func1<BMXUserProfile, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(BMXUserProfile profile) {
-                return UserManager.getInstance().getProfile(profile, false);
+                return UserManager.getInstance().getProfile(profile, forceRefresh);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override

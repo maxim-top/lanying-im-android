@@ -926,8 +926,9 @@ public class AppManager {
     /**
      * 更换手机号 根据旧手机获取签名
      */
-    public void mobilePrechangeByPwd(String password, HttpResponseCallback<String> callback) {
+    public void mobilePrechangeByPwd(String token, String password, HttpResponseCallback<String> callback) {
         Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         Map<String, String> params = new HashMap<>();
         params.put("password", password);

@@ -105,6 +105,11 @@
             android:name=".login.view.VerifyActivity"
             android:screenOrientation="portrait"></activity>
 
+        <!--绑定手机号-->
+        <activity
+            android:name=".login.view.BindMobileActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!--注册-->
         <activity
             android:name=".login.view.RegisterActivity"

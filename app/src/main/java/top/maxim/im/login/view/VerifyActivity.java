@@ -40,8 +40,6 @@ public class VerifyActivity extends BaseTitleActivity {
 
     private String mPhone;
 
-    private String mPwd;
-
     private int mVerifyType = CommonConfig.VerifyType.TYPE_WX;
 
     public static void startVerifyPwdActivity(Context context, int type, String phone) {
@@ -107,14 +105,10 @@ public class VerifyActivity extends BaseTitleActivity {
     protected void setViewListener() {
         mTvContinue.setOnClickListener(v -> {
             String input = mEtPwd.getText().toString();
-            if (!TextUtils.equals(input, mPwd)) {
-                ToastUtil.showTextViewPrompt("密码不正确");
-                return;
-            }
             switch (mVerifyType) {
                 case CommonConfig.VerifyType.TYPE_WX:
                     // 解绑微信
-                    unBindWX();
+                    checkPwd(input);
                     break;
             }
         });
@@ -122,7 +116,6 @@ public class VerifyActivity extends BaseTitleActivity {
 
     @Override
     protected void initDataForActivity() {
-        mPwd = SharePreferenceUtils.getInstance().getUserPwd();
         String title = "", tag = "", continueTitle = "";
         switch (mVerifyType) {
             case CommonConfig.VerifyType.TYPE_WX:
@@ -153,12 +146,48 @@ public class VerifyActivity extends BaseTitleActivity {
     }
 
     /**
+     * 校验密码
+     * 
+     * @param input
+     */
+    private void checkPwd(String input) {
+        if (TextUtils.isEmpty(input)) {
+            return;
+        }
+        String name = SharePreferenceUtils.getInstance().getUserName();
+        String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+        AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
+            @Override
+            public void onResponse(String result) {
+                AppManager.getInstance().mobilePrechangeByPwd(result, input,
+                        new HttpResponseCallback<String>() {
+                            @Override
+                            public void onResponse(String result) {
+                                unBindWX();
+                            }
+
+                            @Override
+                            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                                ToastUtil.showTextViewPrompt(errorMsg);
+                            }
+                        });
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                ToastUtil.showTextViewPrompt("密码不正确");
+            }
+        });
+    }
+
+    /**
      * 解绑微信
      */
     private void unBindWX() {
         showLoadingDialog(true);
         String name = SharePreferenceUtils.getInstance().getUserName();
-        AppManager.getInstance().getTokenByName(name, mPwd, new HttpResponseCallback<String>() {
+        String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+        AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
                 AppManager.getInstance().unBindOpenId(result, new HttpResponseCallback<Boolean>() {

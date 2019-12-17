@@ -1,15 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="@dimen/dimen_30"
+    android:paddingTop="@dimen/dimen_50"
     android:paddingBottom="@dimen/dimen_32">
+
+    <TextView
+        android:id="@+id/tv_skip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="@dimen/dimen_48"
+        android:layout_marginRight="@dimen/dimen_48"
+        android:text="@string/skip"
+        android:textColor="@color/color_333333"
+        android:textSize="@dimen/dimen_16" />
+
+    <TextView
+        android:id="@+id/tv_login_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="@dimen/dimen_48"
+        android:layout_marginTop="@dimen/dimen_30"
+        android:text="@string/bind_mobile"
+        android:textColor="@color/color_333333"
+        android:textSize="@dimen/dimen_24" />
 
     <LinearLayout
         android:id="@+id/ll_et_user_phone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/tv_login_tag"
         android:orientation="vertical">
 
         <EditText
@@ -120,4 +143,4 @@
         android:textColor="@drawable/common_btn_corner_seleced_text_color"
         android:textSize="@dimen/dimen_16" />
 
-</LinearLayout>
+</RelativeLayout>

@@ -383,7 +383,7 @@ public class RegisterActivity extends BaseTitleActivity {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
-                        BindMobileActivity.openBindMobile(RegisterActivity.this,
+                        RegisterBindMobileActivity.openRegisterBindMobile(RegisterActivity.this,
                                 mInputName.getEditableText().toString().trim(),
                                 mInputPwd.getEditableText().toString().trim(), mChangeAppId);
                         finish();

@@ -317,7 +317,7 @@ public class LoginActivity extends BaseTitleActivity {
                     if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
                         String openId = jsonObject.getString("openid");
                         // 没有userId 密码 需要跳转绑定微信页面
-                        BindUserActivity.openBindUser(activity, openId, appId);
+                        LoginBindUserActivity.openLoginBindUser(activity, openId, appId);
                         activity.finish();
                         return;
                     }

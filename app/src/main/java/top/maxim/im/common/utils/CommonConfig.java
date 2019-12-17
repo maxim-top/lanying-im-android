@@ -20,6 +20,10 @@ public interface CommonConfig {
 
     String WX_OPEN_ID = "wxOpenId";
 
+    String VERIFY_TYPE = "verifyType";
+
+    String PHONE = "phone";
+
     /**
      * 进入微信来源
      */
@@ -33,6 +37,25 @@ public interface CommonConfig {
 
         // 注册
         int TYPE_REGISTER = 2;
+
+        // 绑定
+        int TYPE_BIND = 3;
+
+    }
+
+    /**
+     * 验证密码
+     */
+    interface VerifyType {
+
+        // 微信
+        int TYPE_WX = 0;
+
+        // 手机号
+        int TYPE_PHONE = 1;
+
+        // 手机号验证码
+        int TYPE_PHONE_VERIFY = 2;
 
     }
 }

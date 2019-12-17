@@ -28,9 +28,9 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
 
 /**
- * Description : 登陆 Created by Mango on 2018/11/21.
+ * Description : 微信或手机号登陆  无账号时候绑定 Created by Mango on 2018/11/21.
  */
-public class BindUserActivity extends BaseTitleActivity {
+public class LoginBindUserActivity extends BaseTitleActivity {
 
     public static String LOGIN_OPEN_ID = "loginOpenId";
 
@@ -73,15 +73,15 @@ public class BindUserActivity extends BaseTitleActivity {
     // 默认注册
     private boolean mIsRegister = true;
 
-    public static void openBindUser(Context context, String openId, String appId) {
-        Intent intent = new Intent(context, BindUserActivity.class);
+    public static void openLoginBindUser(Context context, String openId, String appId) {
+        Intent intent = new Intent(context, LoginBindUserActivity.class);
         intent.putExtra(LOGIN_OPEN_ID, openId);
         intent.putExtra(LOGIN_APP_ID, appId);
         context.startActivity(intent);
     }
 
-    public static void openBindUser(Context context, String mobile, String captcha, String appId) {
-        Intent intent = new Intent(context, BindUserActivity.class);
+    public static void openLoginBindUser(Context context, String mobile, String captcha, String appId) {
+        Intent intent = new Intent(context, LoginBindUserActivity.class);
         intent.putExtra(LOGIN_MOBILE, mobile);
         intent.putExtra(LOGIN_CAPTCHA, captcha);
         intent.putExtra(LOGIN_APP_ID, appId);
@@ -290,7 +290,7 @@ public class BindUserActivity extends BaseTitleActivity {
             }
         });
         // 微信绑定完也直接登录
-        LoginActivity.login(BindUserActivity.this, name, pwd, false, mAppId);
+        LoginActivity.login(LoginBindUserActivity.this, name, pwd, false, mAppId);
         // BindMobileActivity.openBindMobile(BindUserActivity.this, name, pwd, mAppId);
         // finish();
     }
@@ -311,7 +311,7 @@ public class BindUserActivity extends BaseTitleActivity {
                         ToastUtil.showTextViewPrompt(errorMsg);
                     }
                 });
-        LoginActivity.login(BindUserActivity.this, name, pwd, false, mAppId);
+        LoginActivity.login(LoginBindUserActivity.this, name, pwd, false, mAppId);
     }
 
 }

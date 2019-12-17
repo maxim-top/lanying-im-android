@@ -17,6 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.util.List;
 
@@ -25,9 +28,11 @@ import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.FileProgressListener;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -35,8 +40,10 @@ import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.CameraUtils;
+import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -48,11 +55,13 @@ import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.BMImageLoader;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
+import top.maxim.im.common.view.ItemEnableArrow;
 import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.wxapi.WXUtils;
 
 /**
  * Description : 用户设置 Created by Mango on 2018/11/21.
@@ -71,10 +80,10 @@ public class SettingUserActivity extends BaseTitleActivity {
     private ItemLineArrow.Builder mSetName;
 
     /* 设置手机号 */
-    private ItemLineArrow.Builder mSetPhone;
+    private ItemEnableArrow.Builder mSetPhone;
 
     /* 绑定微信 */
-    private ItemLineArrow.Builder mBindWeChat;
+    private ItemEnableArrow.Builder mBindWeChat;
 
     /* 设置公有信息 */
     private ItemLineArrow.Builder mSetPublic;
@@ -112,6 +121,8 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     private String mPhone;
 
+    private CompositeSubscription mSubscription;
+
     private ImageRequestConfig mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
             .showImageForEmptyUri(R.drawable.default_avatar_icon)
             .showImageOnFail(R.drawable.default_avatar_icon).cacheOnDisk(true)
@@ -144,6 +155,7 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     @Override
     protected View onCreateView() {
+        initRxBus();
         View view = View.inflate(this, R.layout.activity_setting_user, null);
         LinearLayout container = view.findViewById(R.id.ll_setting_container);
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
@@ -253,12 +265,17 @@ public class SettingUserActivity extends BaseTitleActivity {
         mLinePrivate.setVisibility(View.GONE);
 
         // 手机号
-        mSetPhone = new ItemLineArrow.Builder(this)
+        mSetPhone = new ItemEnableArrow.Builder(this)
                 .setStartContent(getString(R.string.setting_user_phone))
-                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                .setOnItemClickListener(new ItemEnableArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
                         showChangeMobile(mPhone);
+                    }
+
+                    @Override
+                    public void onItemEnableClick(View v) {
+
                     }
                 });
         container.addView(mSetPhone.build());
@@ -269,11 +286,21 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(itemLine4.build());
 
         // 绑定微信
-        mBindWeChat = new ItemLineArrow.Builder(this)
+        mBindWeChat = new ItemEnableArrow.Builder(this)
                 .setStartContent(getString(R.string.setting_user_wx))
-                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                .setOnItemClickListener(new ItemEnableArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
+                        // 解绑微信
+                        VerifyActivity.startVerifyPwdActivity(SettingUserActivity.this,
+                                CommonConfig.VerifyType.TYPE_WX, "");
+                    }
+
+                    @Override
+                    public void onItemEnableClick(View v) {
+                        // 绑定微信
+                        WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_BIND,
+                                SharePreferenceUtils.getInstance().getAppId());
                     }
                 });
         container.addView(mBindWeChat.build());
@@ -323,6 +350,108 @@ public class SettingUserActivity extends BaseTitleActivity {
                 }
             }
         });
+    }
+
+    private void initRxBus() {
+        if (mSubscription == null) {
+            mSubscription = new CompositeSubscription();
+        }
+        Subscription wxLogin = RxBus.getInstance().toObservable(Intent.class)
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Intent>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Intent intent) {
+                        if (intent == null || !TextUtils.equals(intent.getAction(),
+                                CommonConfig.WX_LOGIN_ACTION)) {
+                            return;
+                        }
+                        String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
+                        checkWeChat(openId);
+                    }
+                });
+        mSubscription.add(wxLogin);
+    }
+
+    /**
+     * 检查微信是否被绑定
+     * 
+     * @param openId
+     */
+    private void checkWeChat(String openId) {
+        if (TextUtils.isEmpty(openId)) {
+            return;
+        }
+        AppManager.getInstance().weChatLogin(openId, new HttpResponseCallback<String>() {
+            @Override
+            public void onResponse(String result) {
+                if (TextUtils.isEmpty(result)) {
+                    return;
+                }
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
+                        bindWeChat(jsonObject.getString("openid"));
+                        return;
+                    }
+                    // 已被绑定
+                    ToastUtil.showTextViewPrompt("此微信已经被绑定");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                ToastUtil.showTextViewPrompt("绑定失败");
+            }
+        });
+    }
+
+    /**
+     * 绑定微信
+     */
+    private void bindWeChat(String openId) {
+        if (TextUtils.isEmpty(openId)) {
+            return;
+        }
+        showLoadingDialog(true);
+        AppManager.getInstance().getTokenByName(SharePreferenceUtils.getInstance().getUserName(),
+                SharePreferenceUtils.getInstance().getUserPwd(),
+                new HttpResponseCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        AppManager.getInstance().bindOpenId(result, openId,
+                                new HttpResponseCallback<Boolean>() {
+                                    @Override
+                                    public void onResponse(Boolean result) {
+                                        dismissLoadingDialog();
+                                        showBindWeChat();
+                                    }
+
+                                    @Override
+                                    public void onFailure(int errorCode, String errorMsg,
+                                            Throwable t) {
+                                        dismissLoadingDialog();
+                                        ToastUtil.showTextViewPrompt(errorMsg);
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        dismissLoadingDialog();
+                    }
+                });
     }
 
     /**
@@ -414,10 +543,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
         mUserId.setEndContent(String.valueOf(id));
         mSetName.setEndContent(TextUtils.isEmpty(nickName) ? "" : nickName);
-
-        String phone = profile.mobilePhone();
-        mPhone = phone;
-        mSetPhone.setEndContent(phone);
+        showBindPhone(profile.mobilePhone());
         String publicInfo = profile.publicInfo();
         if (TextUtils.isEmpty(publicInfo)) {
             mTvPublic.setVisibility(View.GONE);
@@ -443,6 +569,16 @@ public class SettingUserActivity extends BaseTitleActivity {
         showBindWeChat();
     }
 
+    private void showBindPhone(String phone) {
+        mPhone = phone;
+        if (TextUtils.isEmpty(phone)) {
+            // 未绑定
+            mSetPhone.setEnableContent("去绑定");
+        } else {
+            mSetPhone.setEndContent(phone);
+        }
+    }
+
     private void showBindWeChat() {
         String name = SharePreferenceUtils.getInstance().getUserName();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();
@@ -452,12 +588,17 @@ public class SettingUserActivity extends BaseTitleActivity {
                 AppManager.getInstance().isBind(result, new HttpResponseCallback<Boolean>() {
                     @Override
                     public void onResponse(Boolean result) {
-                        mBindWeChat.setEndContent(result ? "已绑定" : "未绑定");
+                        if (result != null && result) {
+                            // 已绑定
+                            mBindWeChat.setEndContent("已绑定");
+                        } else {
+                            mBindWeChat.setEnableContent("去绑定");
+                        }
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                        mBindWeChat.setEndContent("未绑定");
+                        mBindWeChat.setEnableContent("去绑定");
                     }
                 });
             }
@@ -934,6 +1075,15 @@ public class SettingUserActivity extends BaseTitleActivity {
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mSubscription != null) {
+            mSubscription.unsubscribe();
+            mSubscription = null;
         }
     }
 }

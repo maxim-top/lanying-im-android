@@ -280,7 +280,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                             JSONObject jsonObject = new JSONObject(result);
                             if (!jsonObject.has("username") || !jsonObject.has("password")) {
                                 // 没有用户名 密码 需要跳转绑定用户页面
-                                BindUserActivity.openBindUser(LoginByVerifyActivity.this, mobile,
+                                LoginBindUserActivity.openLoginBindUser(LoginByVerifyActivity.this, mobile,
                                         captcha, mChangeAppId);
                                 finish();
                                 return;

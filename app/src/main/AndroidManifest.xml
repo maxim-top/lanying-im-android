@@ -90,14 +90,19 @@
             android:name=".login.view.LoginByVerifyActivity"
             android:screenOrientation="portrait"></activity>
 
-        <!--绑定手机号-->
+        <!--注册绑定手机号-->
         <activity
-            android:name=".login.view.BindMobileActivity"
+            android:name=".login.view.RegisterBindMobileActivity"
             android:screenOrientation="portrait"></activity>
 
-        <!--绑定用户-->
+        <!--手机号 微信登录绑定用户-->
         <activity
-            android:name=".login.view.BindUserActivity"
+            android:name=".login.view.LoginBindUserActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--验证密码-->
+        <activity
+            android:name=".login.view.VerifyActivity"
             android:screenOrientation="portrait"></activity>
 
         <!--注册-->

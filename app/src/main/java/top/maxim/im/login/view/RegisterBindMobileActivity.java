@@ -20,9 +20,9 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
 
 /**
- * Description : 登陆 Created by Mango on 2018/11/21.
+ * Description : 注册后绑定手机 Created by Mango on 2018/11/21.
  */
-public class BindMobileActivity extends BaseTitleActivity {
+public class RegisterBindMobileActivity extends BaseTitleActivity {
 
     public static String LOGIN_NAME = "loginName";
 
@@ -74,8 +74,8 @@ public class BindMobileActivity extends BaseTitleActivity {
         }
     };
 
-    public static void openBindMobile(Context context, String name, String pwd, String appId) {
-        Intent intent = new Intent(context, BindMobileActivity.class);
+    public static void openRegisterBindMobile(Context context, String name, String pwd, String appId) {
+        Intent intent = new Intent(context, RegisterBindMobileActivity.class);
         intent.putExtra(LOGIN_NAME, name);
         intent.putExtra(LOGIN_PWD, pwd);
         intent.putExtra(LOGIN_APP_ID, appId);

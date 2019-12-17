@@ -8,7 +8,6 @@
     android:scrollbars="none">
 
     <LinearLayout
-        android:id="@+id/ll_setting_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -18,8 +17,8 @@
             android:id="@+id/rl_user_info"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_50"
-            android:paddingLeft="@dimen/dimen_15"
-            android:background="@color/color_white">
+            android:background="@color/color_white"
+            android:paddingLeft="@dimen/dimen_15">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -85,7 +84,12 @@
             android:layout_marginLeft="@dimen/dimen_15"
             android:background="@color/guide_divider" />
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_setting_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
 
+    </LinearLayout>
 
 </ScrollView>

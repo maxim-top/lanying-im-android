@@ -29,7 +29,6 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.AppContextUtils;
-import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -437,8 +436,8 @@ public class MineFragment extends BaseTitleFragment {
 
         mMyQrCode.setOnClickListener(v -> MyQrCodeActivity.openMyQrcode(getActivity()));
 
-        // 三次点击 解绑微信
-        ClickTimeUtils.setClickTimes(mUserIcon, 5, () -> unBindWeChat());
+//         三次点击 解绑微信
+//        ClickTimeUtils.setClickTimes(mUserIcon, 5, () -> unBindWeChat());
     }
 
     @Override

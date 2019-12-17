@@ -371,12 +371,16 @@ public class SettingUserActivity extends BaseTitleActivity {
 
                     @Override
                     public void onNext(Intent intent) {
-                        if (intent == null || !TextUtils.equals(intent.getAction(),
-                                CommonConfig.WX_LOGIN_ACTION)) {
+                        if (intent == null) {
                             return;
                         }
-                        String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
-                        checkWeChat(openId);
+                        String action = intent.getAction();
+                        if (TextUtils.equals(action, CommonConfig.WX_LOGIN_ACTION)) {
+                            String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
+                            checkWeChat(openId);
+                        } else if (TextUtils.equals(action, CommonConfig.WX_UN_BIND_ACTION)) {
+                            showBindWeChat();
+                        }
                     }
                 });
         mSubscription.add(wxLogin);

@@ -18,6 +18,8 @@ public interface CommonConfig {
 
     String WX_LOGIN_ACTION = "wxLoginAction";
 
+    String WX_UN_BIND_ACTION = "wxUnbindAction";
+
     String WX_OPEN_ID = "wxOpenId";
 
     String VERIFY_TYPE = "verifyType";

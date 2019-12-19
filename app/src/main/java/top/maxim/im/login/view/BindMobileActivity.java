@@ -100,6 +100,7 @@ public class BindMobileActivity extends BaseTitleActivity {
         mSendVerify = view.findViewById(R.id.tv_send_verify);
         mSendVerify.setEnabled(false);
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
+        mHeader.setTitle(mIsChange ? R.string.bind_new_mobile : R.string.bind_mobile);
         return view;
     }
 
@@ -118,7 +119,11 @@ public class BindMobileActivity extends BaseTitleActivity {
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
-            bindMobile(name, pwd);
+            if (mIsChange) {
+                changeMobile(name, pwd);
+            } else {
+                bindMobile(name, pwd);
+            }
         });
         mInputWatcher = new TextWatcher() {
             @Override
@@ -169,15 +174,33 @@ public class BindMobileActivity extends BaseTitleActivity {
         });
         mInputPwd.addTextChangedListener(mInputWatcher);
         // 发送验证码
-        mSendVerify.setOnClickListener(v -> checkPhone());
-    }
-
-    private void checkPhone() {
-        if (mIsChange) {
+        mSendVerify.setOnClickListener(v -> {
+            verifyCountDown();
             String phone = mInputName.getEditableText().toString().trim();
-            return;
-        }
-        verifyCountDown();
+            AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {
+                @Override
+                public void onResponse(Boolean result) {
+                    if (result != null && result) {
+                        ToastUtil.showTextViewPrompt("获取验证码成功");
+                    } else {
+                        ToastUtil.showTextViewPrompt("获取验证码失败");
+                        mSendVerify.setEnabled(true);
+                        mVerifyCountDown.setText("");
+                        timer.cancel();
+                    } // mSendVerify.setEnabled(true);
+                    // mVerifyCountDown.setText("");
+                    // timer.cancel();
+                }
+
+                @Override
+                public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                    ToastUtil.showTextViewPrompt("获取验证码失败");
+                    mSendVerify.setEnabled(true);
+                    mVerifyCountDown.setText("");
+                    timer.cancel();
+                }
+            });
+        });
     }
 
     /**
@@ -187,30 +210,6 @@ public class BindMobileActivity extends BaseTitleActivity {
         mCountDown = true;
         mSendVerify.setEnabled(false);
         timer.start();
-        String phone = mInputName.getEditableText().toString().trim();
-        AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {
-            @Override
-            public void onResponse(Boolean result) {
-                if (result != null && result) {
-                    ToastUtil.showTextViewPrompt("获取验证码成功");
-                } else {
-                    ToastUtil.showTextViewPrompt("获取验证码失败");
-                    mSendVerify.setEnabled(true);
-                    mVerifyCountDown.setText("");
-                    timer.cancel();
-                } // mSendVerify.setEnabled(true);
-                  // mVerifyCountDown.setText("");
-                  // timer.cancel();
-            }
-
-            @Override
-            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                ToastUtil.showTextViewPrompt("获取验证码失败");
-                mSendVerify.setEnabled(true);
-                mVerifyCountDown.setText("");
-                timer.cancel();
-            }
-        });
     }
 
     @Override
@@ -238,6 +237,46 @@ public class BindMobileActivity extends BaseTitleActivity {
                                             finish();
                                         } else {
                                             ToastUtil.showTextViewPrompt("绑定失败");
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(int errorCode, String errorMsg,
+                                            Throwable t) {
+                                        dismissLoadingDialog();
+                                        ToastUtil.showTextViewPrompt(errorMsg);
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt("绑定失败");
+                    }
+                });
+    }
+
+    private void changeMobile(String mobile, String captcha) {
+        showLoadingDialog(true);
+        String userName = SharePreferenceUtils.getInstance().getUserName();
+        String userPwd = SharePreferenceUtils.getInstance().getUserPwd();
+        AppManager.getInstance().getTokenByName(userName, userPwd,
+                new HttpResponseCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        AppManager.getInstance().mobileChange(result, mobile, captcha, mSign,
+                                new HttpResponseCallback<Boolean>() {
+                                    @Override
+                                    public void onResponse(Boolean result) {
+                                        dismissLoadingDialog();
+                                        if (result != null && result) {
+                                            Intent intent = new Intent();
+                                            intent.setAction(CommonConfig.MOBILE_BIND_ACTION);
+                                            RxBus.getInstance().send(intent);
+                                            finish();
+                                        } else {
+                                            ToastUtil.showTextViewPrompt("更换失败");
                                         }
                                     }
 

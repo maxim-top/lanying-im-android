@@ -805,9 +805,10 @@ public class AppManager {
     /**
      * 更换手机号
      */
-    public void mobileChange(String mobile, String captcha, String sign,
+    public void mobileChange(String token, String mobile, String captcha, String sign,
             HttpResponseCallback<Boolean> callback) {
         Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         Map<String, String> params = new HashMap<>();
         params.put("mobile", mobile);

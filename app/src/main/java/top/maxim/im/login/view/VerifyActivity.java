@@ -225,6 +225,7 @@ public class VerifyActivity extends BaseTitleActivity {
                             case CommonConfig.VerifyType.TYPE_PHONE_CAPTCHA:
                                 // 更换手机号
                                 BindMobileActivity.openChangeMobile(VerifyActivity.this, result);
+                                finish();
                                 break;
                             default:
                                 break;

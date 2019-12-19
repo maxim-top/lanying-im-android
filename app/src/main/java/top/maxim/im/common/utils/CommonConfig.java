@@ -59,7 +59,7 @@ public interface CommonConfig {
         int TYPE_PHONE = 1;
 
         // 手机号验证码
-        int TYPE_PHONE_VERIFY = 2;
+        int TYPE_PHONE_CAPTCHA = 2;
 
     }
 }

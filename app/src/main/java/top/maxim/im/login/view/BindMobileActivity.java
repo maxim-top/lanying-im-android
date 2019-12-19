@@ -17,6 +17,7 @@ import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RxBus;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
@@ -44,11 +45,15 @@ public class BindMobileActivity extends BaseTitleActivity {
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
-    private String userName;
+    private boolean mIsChange;
 
-    private String userPwd;
+    private String mSign;
 
     private boolean mCountDown;
+
+    public static final String CHANGE_PHONE = "changePhone";
+
+    public static final String CHANGE_PHONE_SIGN = "changePhoneSign";
 
     private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
 
@@ -67,6 +72,14 @@ public class BindMobileActivity extends BaseTitleActivity {
 
     public static void openBindMobile(Context context) {
         Intent intent = new Intent(context, BindMobileActivity.class);
+        intent.putExtra(CHANGE_PHONE, false);
+        context.startActivity(intent);
+    }
+
+    public static void openChangeMobile(Context context, String sign) {
+        Intent intent = new Intent(context, BindMobileActivity.class);
+        intent.putExtra(CHANGE_PHONE, true);
+        intent.putExtra(CHANGE_PHONE_SIGN, sign);
         context.startActivity(intent);
     }
 
@@ -88,6 +101,15 @@ public class BindMobileActivity extends BaseTitleActivity {
         mSendVerify.setEnabled(false);
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
         return view;
+    }
+
+    @Override
+    protected void initDataFromFront(Intent intent) {
+        super.initDataFromFront(intent);
+        if (intent != null) {
+            mIsChange = intent.getBooleanExtra(CHANGE_PHONE, false);
+            mSign = intent.getStringExtra(CHANGE_PHONE_SIGN);
+        }
     }
 
     @Override
@@ -147,33 +169,15 @@ public class BindMobileActivity extends BaseTitleActivity {
         });
         mInputPwd.addTextChangedListener(mInputWatcher);
         // 发送验证码
-        mSendVerify.setOnClickListener(v -> {
-            verifyCountDown();
-            String phone = mInputName.getEditableText().toString().trim();
-            AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {
-                @Override
-                public void onResponse(Boolean result) {
-                    if (result != null && result) {
-                        ToastUtil.showTextViewPrompt("获取验证码成功");
-                    } else {
-                        ToastUtil.showTextViewPrompt("获取验证码失败");
-                        mSendVerify.setEnabled(true);
-                        mVerifyCountDown.setText("");
-                        timer.cancel();
-                    } // mSendVerify.setEnabled(true);
-                    // mVerifyCountDown.setText("");
-                    // timer.cancel();
-                }
+        mSendVerify.setOnClickListener(v -> checkPhone());
+    }
 
-                @Override
-                public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                    ToastUtil.showTextViewPrompt("获取验证码失败");
-                    mSendVerify.setEnabled(true);
-                    mVerifyCountDown.setText("");
-                    timer.cancel();
-                }
-            });
-        });
+    private void checkPhone() {
+        if (mIsChange) {
+            String phone = mInputName.getEditableText().toString().trim();
+            return;
+        }
+        verifyCountDown();
     }
 
     /**
@@ -183,6 +187,30 @@ public class BindMobileActivity extends BaseTitleActivity {
         mCountDown = true;
         mSendVerify.setEnabled(false);
         timer.start();
+        String phone = mInputName.getEditableText().toString().trim();
+        AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean result) {
+                if (result != null && result) {
+                    ToastUtil.showTextViewPrompt("获取验证码成功");
+                } else {
+                    ToastUtil.showTextViewPrompt("获取验证码失败");
+                    mSendVerify.setEnabled(true);
+                    mVerifyCountDown.setText("");
+                    timer.cancel();
+                } // mSendVerify.setEnabled(true);
+                  // mVerifyCountDown.setText("");
+                  // timer.cancel();
+            }
+
+            @Override
+            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                ToastUtil.showTextViewPrompt("获取验证码失败");
+                mSendVerify.setEnabled(true);
+                mVerifyCountDown.setText("");
+                timer.cancel();
+            }
+        });
     }
 
     @Override
@@ -192,6 +220,8 @@ public class BindMobileActivity extends BaseTitleActivity {
 
     private void bindMobile(String mobile, String captcha) {
         showLoadingDialog(true);
+        String userName = SharePreferenceUtils.getInstance().getUserName();
+        String userPwd = SharePreferenceUtils.getInstance().getUserPwd();
         AppManager.getInstance().getTokenByName(userName, userPwd,
                 new HttpResponseCallback<String>() {
                     @Override

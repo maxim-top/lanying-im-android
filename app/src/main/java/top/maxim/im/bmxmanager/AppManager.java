@@ -863,9 +863,10 @@ public class AppManager {
     /**
      * 更换手机号 根据旧手机获取签名
      */
-    public void mobilePrechangeByMobile(String mobile, String captcha,
+    public void mobilePrechangeByMobile(String token, String mobile, String captcha,
             HttpResponseCallback<String> callback) {
         Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
         header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
         Map<String, String> params = new HashMap<>();
         params.put("mobile", mobile);

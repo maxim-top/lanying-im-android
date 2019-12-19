@@ -1000,6 +1000,16 @@ public class SettingUserActivity extends BaseTitleActivity {
         TextView tvPhoneVerify = view.findViewById(R.id.tv_phone_verify);
         TextView tvPwdVerify = view.findViewById(R.id.tv_pwd_verify);
         CustomDialog dialog = new CustomDialog();
+        tvPhoneVerify.setOnClickListener(v -> {
+            // 旧手机号验证
+            VerifyActivity.startVerifyPwdActivity(this, CommonConfig.VerifyType.TYPE_PHONE_CAPTCHA, phone);
+            dialog.dismiss();
+        });
+        tvPwdVerify.setOnClickListener(v -> {
+            VerifyActivity.startVerifyPwdActivity(this,
+                    CommonConfig.VerifyType.TYPE_PHONE, "");
+            dialog.dismiss();
+        });
         dialog.setCustomView(view);
         dialog.showDialog(this);
     }

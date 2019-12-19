@@ -134,6 +134,7 @@
     <string name="unbind_wechat_continue">确认解绑</string>
     <string name="change_mobile">更换手机号</string>
     <string name="verify_pwd_tag">登录密码验证身份</string>
+    <string name="verify_captcha_tag">已绑定手机号验证身份</string>
 
     <!--设置-->
     <string name="user_info">个人信息</string>

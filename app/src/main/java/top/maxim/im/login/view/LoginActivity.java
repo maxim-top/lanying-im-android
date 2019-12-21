@@ -32,8 +32,10 @@ import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -255,9 +257,9 @@ public class LoginActivity extends BaseTitleActivity {
                 BMXErrorCode errorCode = UserManager.getInstance().getProfile(profile, true);
                 if (errorCode != null && errorCode.swigValue() == BMXErrorCode.NoError.swigValue()
                         && profile.userId() > 0) {
-                    SharePreferenceUtils.getInstance().putUserId(profile.userId());
-                    SharePreferenceUtils.getInstance().putUserName(profile.username());
-                    SharePreferenceUtils.getInstance().putUserPwd(pwd);
+                    CommonUtils.getInstance()
+                            .addUser(new UserBean(profile.username(), profile.userId(), pwd,
+                                    System.currentTimeMillis()));
                     AppManager.getInstance().getTokenByName(profile.username(), pwd, null);
                     if (!TextUtils.isEmpty(changeAppId)) {
                         SharePreferenceUtils.getInstance().putAppId(changeAppId);

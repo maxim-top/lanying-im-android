@@ -54,9 +54,9 @@ public class RosterChooseActivity extends BaseTitleActivity {
 
     protected RosterAdapter mAdapter;
 
-    private boolean mChoose = false;
+    protected boolean mChoose = false;
 
-    private boolean multi = true;
+    protected boolean multi = true;
 
     /* 筛选列表 */
     private List<String> mFilterList;

@@ -70,6 +70,9 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     private ShapeImageView mUserIcon;
 
+    /* 账号管理 */
+    private ItemLineArrow.Builder mAccountManger;
+
     /* Id */
     private ItemLineArrow.Builder mUserId;
 
@@ -325,6 +328,17 @@ public class SettingUserActivity extends BaseTitleActivity {
         ItemLine.Builder itemLine10 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
         container.addView(itemLine10.build());
+
+        // 账号管理
+        mAccountManger = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.setting_account_manager))
+                .setOnItemClickListener(v -> AccountListActivity.startAccountListActivity(this));
+        container.addView(mAccountManger.build());
+
+        // 分割线
+        ItemLine.Builder itemLine11 = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(itemLine11.build());
 
         mLlAuthQuestion = new LinearLayout(this);
         mLlAuthQuestion.setOrientation(LinearLayout.VERTICAL);
@@ -1002,12 +1016,12 @@ public class SettingUserActivity extends BaseTitleActivity {
         CustomDialog dialog = new CustomDialog();
         tvPhoneVerify.setOnClickListener(v -> {
             // 旧手机号验证
-            VerifyActivity.startVerifyPwdActivity(this, CommonConfig.VerifyType.TYPE_PHONE_CAPTCHA, phone);
+            VerifyActivity.startVerifyPwdActivity(this, CommonConfig.VerifyType.TYPE_PHONE_CAPTCHA,
+                    phone);
             dialog.dismiss();
         });
         tvPwdVerify.setOnClickListener(v -> {
-            VerifyActivity.startVerifyPwdActivity(this,
-                    CommonConfig.VerifyType.TYPE_PHONE, "");
+            VerifyActivity.startVerifyPwdActivity(this, CommonConfig.VerifyType.TYPE_PHONE, "");
             dialog.dismiss();
         });
         dialog.setCustomView(view);

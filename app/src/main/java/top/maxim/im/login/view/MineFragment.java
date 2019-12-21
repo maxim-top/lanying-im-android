@@ -28,7 +28,7 @@ import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleFragment;
-import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -43,8 +43,6 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.contact.view.BlockListActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.net.HttpResponseCallback;
-import top.maxim.im.push.PushClientMgr;
-import top.maxim.im.push.PushUtils;
 
 /**
  * Description : 我的 Created by Mango on 2018/11/06
@@ -761,14 +759,7 @@ public class MineFragment extends BaseTitleFragment {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
-                        SharePreferenceUtils.getInstance().putLoginStatus(false);
-                        SharePreferenceUtils.getInstance().putToken("");
-                        SharePreferenceUtils.getInstance().putAppId("");
-                        UserManager.getInstance()
-                                .changeAppId(SharePreferenceUtils.getInstance().getAppId());
-                        PushClientMgr.getManager().unRegister();
-                        PushUtils.getInstance()
-                                .unregisterActivityListener(AppContextUtils.getApplication());
+                        CommonUtils.getInstance().logout();
                         WelcomeActivity.openWelcome(getActivity());
                     }
                 });

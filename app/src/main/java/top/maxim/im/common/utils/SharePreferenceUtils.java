@@ -39,7 +39,9 @@ public class SharePreferenceUtils {
 
     private static String IS_FIRST = "isFirst";
 
-    private static String IS_SHOW_PROTOCOL_DIALOG= "isShowProtocolDialog";
+    private static String IS_SHOW_PROTOCOL_DIALOG = "isShowProtocolDialog";
+
+    private static String LOGIN_USER_DATA = "loginUserData";
 
     private static volatile SharePreferenceUtils instance;
 
@@ -222,5 +224,17 @@ public class SharePreferenceUtils {
             return saveInfo.getBoolean(IS_SHOW_PROTOCOL_DIALOG, false);
         }
         return false;
+    }
+
+    public boolean putLoginUserData(String data) {
+        saveEditor.putString(LOGIN_USER_DATA, data);
+        return saveEditor.commit();
+    }
+
+    public String getLoginUserData() {
+        if (saveInfo != null) {
+            return saveInfo.getString(LOGIN_USER_DATA, "");
+        }
+        return "";
     }
 }

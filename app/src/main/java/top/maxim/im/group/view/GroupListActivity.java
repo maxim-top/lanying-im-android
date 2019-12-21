@@ -178,8 +178,11 @@ public class GroupListActivity extends BaseTitleFragment {
                     @Override
                     public void onError(Throwable e) {
                         dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
+                        if (list.size() > 0) {
+                            // 空的错误不提示
+                            String error = e != null ? e.getMessage() : "网络错误";
+                            ToastUtil.showTextViewPrompt(error);
+                        }
                         GroupManager.getInstance().search(list, false);
                         RosterFetcher.getFetcher().putGroups(list);
                         mAdapter.replaceList(filterGroup(list));

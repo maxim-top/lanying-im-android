@@ -131,6 +131,11 @@
             android:name=".login.view.AboutUsActivity"
             android:screenOrientation="portrait" />
 
+        <!--账号管理-->
+        <activity
+            android:name=".login.view.AccountListActivity"
+            android:screenOrientation="portrait" />
+
         <!--首页-->
         <activity
             android:name=".MainActivity"

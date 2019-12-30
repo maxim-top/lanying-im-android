@@ -50,9 +50,11 @@ import top.maxim.im.message.utils.MessageConfig;
  */
 public class RosterChooseActivity extends BaseTitleActivity {
 
-    private RecyclerView mRecycler;
+    protected RecyclerView mRecycler;
 
     protected RosterAdapter mAdapter;
+
+    protected View mEmptyView;
 
     protected boolean mChoose = false;
 
@@ -127,6 +129,8 @@ public class RosterChooseActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         View view = View.inflate(this, R.layout.fragment_contact, null);
+        mEmptyView = view.findViewById(R.id.view_empty);
+        mEmptyView.setVisibility(View.GONE);
         mRecycler = view.findViewById(R.id.contact_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mRecycler.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
@@ -269,17 +273,24 @@ public class RosterChooseActivity extends BaseTitleActivity {
     }
 
     protected void bindData() {
-        List<BMXRosterItem> rosterItems = new ArrayList<>();
-        for (int i = 0; i < itemList.size(); i++) {
-            BMXRosterItem item = itemList.get(i);
-            if (item == null) {
-                continue;
+        if (itemList != null && !itemList.isEmpty()) {
+            List<BMXRosterItem> rosterItems = new ArrayList<>();
+            for (int i = 0; i < itemList.size(); i++) {
+                BMXRosterItem item = itemList.get(i);
+                if (item == null) {
+                    continue;
+                }
+                if (mFilterList == null || !mFilterList.contains(String.valueOf(item.rosterId()))) {
+                    rosterItems.add(itemList.get(i));
+                }
             }
-            if (mFilterList == null || !mFilterList.contains(String.valueOf(item.rosterId()))) {
-                rosterItems.add(itemList.get(i));
-            }
+            mAdapter.replaceList(rosterItems);
+            mRecycler.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.GONE);
+        } else {
+            mRecycler.setVisibility(View.GONE);
+            mEmptyView.setVisibility(View.VISIBLE);
         }
-        mAdapter.replaceList(rosterItems);
     }
 
     /**

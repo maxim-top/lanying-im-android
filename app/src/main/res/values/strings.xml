@@ -211,4 +211,8 @@
     <string name="about_us_phone">400-666-0162</string>
     <string name="about_us_company">copyright© 2019 美信拓扑</string>
 
+
+    <string name="common_empty">这里什么都没有～</string>
+    <string name="support_empty">如果想联系技术支持,请退出后,将APPID切换成"welovemaxim"</string>
+
 </resources>

@@ -78,22 +78,14 @@ public class GroupInviteActivity extends BaseTitleActivity {
 
     @Override
     protected View onCreateView() {
-        buildEmptyView();
         View view = View.inflate(this, R.layout.activity_group, null);
+        mEmptyView = view.findViewById(R.id.view_empty);
+        mEmptyView.setVisibility(View.GONE);
         mRecycler = view.findViewById(R.id.group_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new InviteAdapter(this);
         mRecycler.setAdapter(mAdapter);
         return view;
-    }
-
-    /**
-     * 设置headerView
-     */
-    private View buildEmptyView() {
-        mEmptyView = View.inflate(this, R.layout.view_empty, null);
-        mEmptyView.setVisibility(View.GONE);
-        return mEmptyView;
     }
 
     @Override

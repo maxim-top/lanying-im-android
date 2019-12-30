@@ -11,7 +11,6 @@ import android.widget.RelativeLayout;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXRosterItem;
@@ -162,7 +161,7 @@ public class AccountListActivity extends RosterChooseActivity {
         Observable.just("").map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signOut();
+                return UserManager.getInstance().signOut(userId);
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
@@ -198,8 +197,7 @@ public class AccountListActivity extends RosterChooseActivity {
     private void handleResult(String userName, String pwd) {
         showLoadingDialog(true);
         Observable.just("").subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread()).delay(500, TimeUnit.MICROSECONDS)
-                .subscribe(new Subscriber<String>() {
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<String>() {
                     @Override
                     public void onCompleted() {
 
@@ -207,7 +205,7 @@ public class AccountListActivity extends RosterChooseActivity {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        dismissLoadingDialog();
                     }
 
                     @Override

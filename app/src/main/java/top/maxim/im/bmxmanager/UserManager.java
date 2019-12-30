@@ -94,6 +94,15 @@ public class UserManager extends BaseManager {
     }
 
     /**
+     * 退出登录
+     *
+     * @return
+     */
+    public BMXErrorCode signOut(long userId) {
+        return bmxClient.signOut(userId);
+    }
+
+    /**
      * 获取当前和服务器的连接状态
      **/
     public BMXConnectStatus connectStatus() {

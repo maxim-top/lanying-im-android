@@ -29,6 +29,7 @@ import top.maxim.im.contact.bean.SupportBean;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.view.ChatSingleActivity;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.scan.config.ScanConfigs;
 
 /**
  * Description : 支持 Created by Mango on 2018/11/06
@@ -38,6 +39,10 @@ public class SupportFragment extends BaseTitleFragment {
     private RecyclerView mRecycler;
 
     private SupportAdapter mAdapter;
+
+    private View mEmptyView;
+
+    private TextView mTvEmpty;
 
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
@@ -49,6 +54,9 @@ public class SupportFragment extends BaseTitleFragment {
     protected View onCreateView() {
         hideHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_contact, null);
+        mEmptyView = view.findViewById(R.id.view_empty);
+        mTvEmpty = view.findViewById(R.id.tv_empty);
+        mEmptyView.setVisibility(View.GONE);
         mRecycler = view.findViewById(R.id.contact_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecycler
@@ -68,7 +76,8 @@ public class SupportFragment extends BaseTitleFragment {
         mAdapter.setOnItemClickListener((parent, view, position, id) -> {
             SupportBean bean = mAdapter.getItem(position);
             if (bean != null) {
-                ChatSingleActivity.startChatActivity(getActivity(), BMXMessage.MessageType.Single, bean.getUser_id());
+                ChatSingleActivity.startChatActivity(getActivity(), BMXMessage.MessageType.Single,
+                        bean.getUser_id());
             }
         });
     }
@@ -87,6 +96,12 @@ public class SupportFragment extends BaseTitleFragment {
     }
 
     private void initSupport() {
+        String appId = SharePreferenceUtils.getInstance().getAppId();
+        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
+            // 非默认appId
+            showEmpty(getString(R.string.support_empty));
+            return;
+        }
         AppManager.getInstance().getTokenByName(SharePreferenceUtils.getInstance().getUserName(),
                 SharePreferenceUtils.getInstance().getUserPwd(),
                 new HttpResponseCallback<String>() {
@@ -97,12 +112,19 @@ public class SupportFragment extends BaseTitleFragment {
 
                                     @Override
                                     public void onResponse(List<SupportBean> result) {
-                                        mAdapter.replaceList(result);
+                                        if (result != null && !result.isEmpty()) {
+                                            mAdapter.replaceList(result);
+                                            mRecycler.setVisibility(View.VISIBLE);
+                                            mEmptyView.setVisibility(View.GONE);
+                                        } else {
+                                            showEmpty(getString(R.string.common_empty));
+                                        }
                                     }
 
                                     @Override
                                     public void onFailure(int errorCode, String errorMsg,
                                             Throwable t) {
+                                        showEmpty(getString(R.string.common_empty));
                                     }
                                 });
                     }
@@ -112,6 +134,12 @@ public class SupportFragment extends BaseTitleFragment {
 
                     }
                 });
+    }
+
+    private void showEmpty(String text) {
+        mRecycler.setVisibility(View.GONE);
+        mEmptyView.setVisibility(View.VISIBLE);
+        mTvEmpty.setText(text);
     }
 
     @Override

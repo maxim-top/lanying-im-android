@@ -81,24 +81,13 @@ public class RosterApplyActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         View view = View.inflate(this, R.layout.activity_group, null);
-        buildEmptyView();
-        RelativeLayout rl = view.findViewById(R.id.group_container);
+        mEmptyView = view.findViewById(R.id.view_empty);
+        mEmptyView.setVisibility(View.GONE);
         mRecycler = view.findViewById(R.id.group_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mAdapter = new ApplyAdapter(this);
         mRecycler.setAdapter(mAdapter);
-        rl.addView(mEmptyView, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
         return view;
-    }
-
-    /**
-     * 设置headerView
-     */
-    private View buildEmptyView() {
-        mEmptyView = View.inflate(this, R.layout.view_empty, null);
-        mEmptyView.setVisibility(View.GONE);
-        return mEmptyView;
     }
 
     @Override

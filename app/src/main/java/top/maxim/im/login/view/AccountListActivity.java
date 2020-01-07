@@ -7,7 +7,9 @@ import android.text.TextUtils;
 import android.util.LongSparseArray;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,11 @@ import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.common.view.ShapeImageView;
+import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.contact.view.RosterChooseActivity;
+import top.maxim.im.message.utils.ChatUtils;
+import top.maxim.im.message.utils.MessageConfig;
 
 /**
  * Description : 账号列表 Created by Mango on 2018/11/06
@@ -68,6 +74,42 @@ public class AccountListActivity extends RosterChooseActivity {
     }
 
     @Override
+    protected RosterChooseActivity.RosterAdapter initAdapter() {
+        return new RosterAdapter(this) {
+            @Override
+            protected void onBindHolder(BaseViewHolder holder, int position) {
+                ShapeImageView icon = holder.findViewById(R.id.img_icon);
+                TextView tvName = holder.findViewById(R.id.txt_name);
+                CheckBox checkBox = holder.findViewById(R.id.cb_choice);
+                BMXRosterItem member = getItem(position);
+                if (member == null) {
+                    return;
+                }
+                if (mIsShowCheck) {
+                    boolean isCheck = mSelected.containsKey(member.rosterId())
+                            && mSelected.get(member.rosterId());
+                    checkBox.setChecked(isCheck);
+                    checkBox.setVisibility(member.rosterId() != MessageConfig.MEMBER_ADD
+                            && member.rosterId() != MessageConfig.MEMBER_REMOVE
+                            && member.rosterId() != mUserId ? View.VISIBLE : View.INVISIBLE);
+                } else {
+                    checkBox.setVisibility(View.GONE);
+                }
+                String name = "";
+                if (!TextUtils.isEmpty(member.alias())) {
+                    name = member.alias();
+                } else if (!TextUtils.isEmpty(member.nickname())) {
+                    name = member.nickname();
+                } else {
+                    name = member.username();
+                }
+                tvName.setText(name);
+                ChatUtils.getInstance().showRosterAvatar(member, icon, mConfig);
+            }
+        };
+    }
+
+    @Override
     protected void setViewListener() {
         mAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -79,6 +121,10 @@ public class AccountListActivity extends RosterChooseActivity {
                 long rosterId = member.rosterId();
                 if (mAdapter.getShowCheck()) {
                     // 单选
+                    if (rosterId == mUserId) {
+                        // 如果是自己不响应
+                        return;
+                    }
                     mSelected.clear();
                     mSelected.put(rosterId, true);
                     mAdapter.notifyDataSetChanged();

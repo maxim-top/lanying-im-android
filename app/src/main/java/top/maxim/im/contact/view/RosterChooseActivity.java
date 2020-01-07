@@ -134,10 +134,14 @@ public class RosterChooseActivity extends BaseTitleActivity {
         mRecycler = view.findViewById(R.id.contact_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mRecycler.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
-        mAdapter = new RosterAdapter(this);
+        mAdapter = initAdapter();
         mRecycler.setAdapter(mAdapter);
         mAdapter.setShowCheck(mChoose);
         return view;
+    }
+
+    protected RosterAdapter initAdapter() {
+        return new RosterAdapter(this);
     }
 
     /**
@@ -298,9 +302,9 @@ public class RosterChooseActivity extends BaseTitleActivity {
      */
     protected class RosterAdapter extends RecyclerWithHFAdapter<BMXRosterItem> {
 
-        private ImageRequestConfig mConfig;
+        protected ImageRequestConfig mConfig;
 
-        private boolean mIsShowCheck;
+        protected boolean mIsShowCheck;
 
         public RosterAdapter(Context context) {
             super(context);

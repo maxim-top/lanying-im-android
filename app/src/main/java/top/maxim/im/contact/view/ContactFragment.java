@@ -322,7 +322,15 @@ public class ContactFragment extends BaseTitleFragment {
                         RosterManager.getInstance().get(listOfLongLong, false);
                         List<BMXRosterItem> rosterItems = new ArrayList<>();
                         for (int i = 0; i < itemList.size(); i++) {
-                            rosterItems.add(itemList.get(i));
+                            BMXRosterItem item = itemList.get(i);
+                            // 是否是好友
+                            BMXRosterItem.RosterRelation rosterRelation = item != null
+                                    ? item.relation()
+                                    : null;
+                            boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
+                            if (friend) {
+                                rosterItems.add(item);
+                            }
                         }
                         RosterFetcher.getFetcher().putRosters(itemList);
                         mAdapter.replaceList(rosterItems);
@@ -332,7 +340,15 @@ public class ContactFragment extends BaseTitleFragment {
                     public void onNext(BMXErrorCode errorCode) {
                         List<BMXRosterItem> rosterItems = new ArrayList<>();
                         for (int i = 0; i < itemList.size(); i++) {
-                            rosterItems.add(itemList.get(i));
+                            BMXRosterItem item = itemList.get(i);
+                            // 是否是好友
+                            BMXRosterItem.RosterRelation rosterRelation = item != null
+                                    ? item.relation()
+                                    : null;
+                            boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
+                            if (friend) {
+                                rosterItems.add(item);
+                            }
                         }
                         RosterFetcher.getFetcher().putRosters(itemList);
                         mAdapter.replaceList(rosterItems);

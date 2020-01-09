@@ -60,12 +60,14 @@ public class BindMobileActivity extends BaseTitleActivity {
         @Override
         public void onTick(long millisUntilFinished) {
             mCountDown = true;
-            mVerifyCountDown.setText(millisUntilFinished / 1000 + "s");
+            mVerifyCountDown.setText(millisUntilFinished / 1000 + "s后重发");
         }
 
         @Override
         public void onFinish() {
             mCountDown = false;
+            mSendVerify.setEnabled(true);
+            mSendVerify.setVisibility(View.VISIBLE);
             mVerifyCountDown.setText("");
         }
     };
@@ -185,6 +187,7 @@ public class BindMobileActivity extends BaseTitleActivity {
                     } else {
                         ToastUtil.showTextViewPrompt("获取验证码失败");
                         mSendVerify.setEnabled(true);
+                        mSendVerify.setVisibility(View.VISIBLE);
                         mVerifyCountDown.setText("");
                         timer.cancel();
                     } // mSendVerify.setEnabled(true);
@@ -196,6 +199,7 @@ public class BindMobileActivity extends BaseTitleActivity {
                 public void onFailure(int errorCode, String errorMsg, Throwable t) {
                     ToastUtil.showTextViewPrompt("获取验证码失败");
                     mSendVerify.setEnabled(true);
+                    mSendVerify.setVisibility(View.VISIBLE);
                     mVerifyCountDown.setText("");
                     timer.cancel();
                 }
@@ -209,6 +213,7 @@ public class BindMobileActivity extends BaseTitleActivity {
     public void verifyCountDown() {
         mCountDown = true;
         mSendVerify.setEnabled(false);
+        mSendVerify.setVisibility(View.GONE);
         timer.start();
     }
 

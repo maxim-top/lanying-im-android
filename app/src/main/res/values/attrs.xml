@@ -20,6 +20,8 @@
         <!-- y轴圆角半径 -->
         <attr name="radius_y" format="float"/>
         <!-- 正多边形边数 -->
-        <attr name="sides" format="integer"/>
+        <attr name="sides" format="integer" />
+        <!-- 描边宽度 -->
+        <attr name="stroke" format="integer" />
     </declare-styleable>
 </resources>

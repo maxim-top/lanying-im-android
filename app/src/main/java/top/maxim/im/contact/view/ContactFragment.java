@@ -145,8 +145,9 @@ public class ContactFragment extends BaseTitleFragment {
         });
         ((TextView)applyView.findViewById(R.id.contact_title))
                 .setText(getString(R.string.contact_apply_notice));
-        ((ShapeImageView)applyView.findViewById(R.id.contact_avatar))
-                .setImageResource(R.drawable.icon_apply_notice);
+        ShapeImageView icon = applyView.findViewById(R.id.contact_avatar);
+        icon.setFrameStrokeWidth(0);
+        icon.setImageResource(R.drawable.icon_apply_notice);
         ll.addView(applyView);
 
 //        // 分割线

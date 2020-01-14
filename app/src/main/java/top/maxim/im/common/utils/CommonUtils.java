@@ -2,14 +2,15 @@
 package top.maxim.im.common.utils;
 
 import android.text.TextUtils;
-import android.util.LongSparseArray;
 
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.bean.UserBean;
@@ -44,16 +45,16 @@ public class CommonUtils {
             return;
         }
         // 添加登陆账号缓存
-        LongSparseArray<String> map = null;
+        Map<String, String> map = null;
         Gson gson = new Gson();
         String loginUserData = SharePreferenceUtils.getInstance().getLoginUserData();
         if (!TextUtils.isEmpty(loginUserData)) {
-            map = gson.fromJson(loginUserData, LongSparseArray.class);
+            map = gson.fromJson(loginUserData, Map.class);
         }
         if (map == null) {
-            map = new LongSparseArray<>();
+            map = new HashMap<>();
         }
-        map.put(bean.getUserId(), gson.toJson(bean));
+        map.put(String.valueOf(bean.getUserId()), gson.toJson(bean));
         SharePreferenceUtils.getInstance().putLoginUserData(gson.toJson(map));
 
         String userName = bean.getUserName();
@@ -83,7 +84,7 @@ public class CommonUtils {
         String loginUserData = SharePreferenceUtils.getInstance().getLoginUserData();
         Gson gson = new Gson();
         if (!TextUtils.isEmpty(loginUserData)) {
-            LongSparseArray<String> map = gson.fromJson(loginUserData, LongSparseArray.class);
+            Map<String, String> map = gson.fromJson(loginUserData, Map.class);
             String data = "";
             if (map != null && map.size() > 0) {
                 map.remove(id);
@@ -100,10 +101,10 @@ public class CommonUtils {
         List<UserBean> beans = new ArrayList<>();
         Gson gson = new Gson();
         if (!TextUtils.isEmpty(loginUserData)) {
-            LongSparseArray<String> map = gson.fromJson(loginUserData, LongSparseArray.class);
+            Map<String, String> map = gson.fromJson(loginUserData, Map.class);
             if (map != null && map.size() > 0) {
-                for (int i = 0; i < map.size(); i++) {
-                    String userData = map.valueAt(i);
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    String userData = entry.getValue();
                     if (!TextUtils.isEmpty(userData)) {
                         beans.add(gson.fromJson(userData, UserBean.class));
                     }

@@ -195,15 +195,17 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
 
                     @Override
                     public void onNext(BMXConversationList bmxConversationList) {
+                        List<BMXConversation> conversationList = new ArrayList<>();
                         if (bmxConversationList != null && !bmxConversationList.isEmpty()) {
-                            showEmpty(false);
-                            List<BMXConversation> conversationList = new ArrayList<>();
                             for (int i = 0; i < bmxConversationList.size(); i++) {
                                 BMXConversation conversation = bmxConversationList.get(i);
                                 if (conversation != null && conversation.conversationId() > 0) {
                                     conversationList.add(conversation);
                                 }
                             }
+                        }
+                        if (!conversationList.isEmpty()) {
+                            showEmpty(false);
                             sortSession(conversationList);
                             mAdapter.replaceList(conversationList);
                             notifySession(conversationList);

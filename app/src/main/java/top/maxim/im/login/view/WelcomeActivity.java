@@ -36,7 +36,9 @@ import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.common.provider.CommonProvider;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
@@ -205,7 +207,17 @@ public class WelcomeActivity extends BaseTitleActivity {
                     }
 
                     @Override
-                    public void onNext(BMXErrorCode errorCode) {
+                    public void onNext(BMXErrorCode bmxErrorCode) {
+                        // 登陆成功后 需要将userId存储SP 作为下次自动登陆
+                        BMXUserProfile profile = new BMXUserProfile();
+                        BMXErrorCode errorCode = UserManager.getInstance().getProfile(profile,
+                                false);
+                        if (errorCode != null
+                                && errorCode.swigValue() == BMXErrorCode.NoError.swigValue()
+                                && profile.userId() > 0) {
+                            CommonUtils.getInstance().addUser(new UserBean(profile.username(),
+                                    profile.userId(), pwd, System.currentTimeMillis()));
+                        }
                         initData();
                         SharePreferenceUtils.getInstance().putLoginStatus(true);
                         MessageDispatcher.getDispatcher().initialize();

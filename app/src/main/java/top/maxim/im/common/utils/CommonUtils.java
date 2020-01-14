@@ -87,7 +87,7 @@ public class CommonUtils {
             Map<String, String> map = gson.fromJson(loginUserData, Map.class);
             String data = "";
             if (map != null && map.size() > 0) {
-                map.remove(id);
+                map.remove(String.valueOf(id));
                 if (map.size() > 0) {
                     data = gson.toJson(map);
                 }

@@ -259,7 +259,7 @@ public class LoginActivity extends BaseTitleActivity {
                         && profile.userId() > 0) {
                     CommonUtils.getInstance()
                             .addUser(new UserBean(profile.username(), profile.userId(), pwd,
-                                    System.currentTimeMillis()));
+                                    changeAppId, System.currentTimeMillis()));
                     AppManager.getInstance().getTokenByName(profile.username(), pwd, null);
                     if (!TextUtils.isEmpty(changeAppId)) {
                         SharePreferenceUtils.getInstance().putAppId(changeAppId);

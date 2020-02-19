@@ -215,8 +215,10 @@ public class WelcomeActivity extends BaseTitleActivity {
                         if (errorCode != null
                                 && errorCode.swigValue() == BMXErrorCode.NoError.swigValue()
                                 && profile.userId() > 0) {
-                            CommonUtils.getInstance().addUser(new UserBean(profile.username(),
-                                    profile.userId(), pwd, System.currentTimeMillis()));
+                            CommonUtils.getInstance()
+                                    .addUser(new UserBean(profile.username(), profile.userId(), pwd,
+                                            SharePreferenceUtils.getInstance().getAppId(),
+                                            System.currentTimeMillis()));
                         }
                         initData();
                         SharePreferenceUtils.getInstance().putLoginStatus(true);

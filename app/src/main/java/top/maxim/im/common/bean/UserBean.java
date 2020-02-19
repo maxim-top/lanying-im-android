@@ -11,12 +11,15 @@ public class UserBean extends BaseBean {
 
     private String userPwd;
 
+    private String appId;
+
     private long timestamp;
 
-    public UserBean(String userName, long userId, String userPwd, long timestamp) {
+    public UserBean(String userName, long userId, String userPwd, String appId, long timestamp) {
         this.userName = userName;
         this.userId = userId;
         this.userPwd = userPwd;
+        this.appId = appId;
         this.timestamp = timestamp;
     }
 
@@ -42,6 +45,14 @@ public class UserBean extends BaseBean {
 
     public void setUserPwd(String userPwd) {
         this.userPwd = userPwd;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public long getTimestamp() {

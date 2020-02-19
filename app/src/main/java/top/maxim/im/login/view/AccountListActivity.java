@@ -3,6 +3,8 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.LongSparseArray;
 import android.view.View;
@@ -11,12 +13,12 @@ import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXRosterItem;
-import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -25,21 +27,30 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
+import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
-import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
-import top.maxim.im.contact.view.RosterChooseActivity;
-import top.maxim.im.message.utils.ChatUtils;
-import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
+import top.maxim.im.common.view.recyclerview.RecyclerWithHFAdapter;
 
 /**
  * Description : 账号列表 Created by Mango on 2018/11/06
  */
-public class AccountListActivity extends RosterChooseActivity {
+public class AccountListActivity extends BaseTitleActivity {
+
+    protected RecyclerView mRecycler;
+
+    protected AccountAdapter mAdapter;
+
+    protected View mEmptyView;
+
+    protected boolean mChoose = false;
+
+    protected Map<Long, Boolean> mSelected = new HashMap<>();
 
     private long mUserId;
 
@@ -69,44 +80,16 @@ public class AccountListActivity extends RosterChooseActivity {
 
     @Override
     protected View onCreateView() {
-        multi = false;
-        return super.onCreateView();
-    }
-
-    @Override
-    protected RosterChooseActivity.RosterAdapter initAdapter() {
-        return new RosterAdapter(this) {
-            @Override
-            protected void onBindHolder(BaseViewHolder holder, int position) {
-                ShapeImageView icon = holder.findViewById(R.id.img_icon);
-                TextView tvName = holder.findViewById(R.id.txt_name);
-                CheckBox checkBox = holder.findViewById(R.id.cb_choice);
-                BMXRosterItem member = getItem(position);
-                if (member == null) {
-                    return;
-                }
-                if (mIsShowCheck) {
-                    boolean isCheck = mSelected.containsKey(member.rosterId())
-                            && mSelected.get(member.rosterId());
-                    checkBox.setChecked(isCheck);
-                    checkBox.setVisibility(member.rosterId() != MessageConfig.MEMBER_ADD
-                            && member.rosterId() != MessageConfig.MEMBER_REMOVE
-                            && member.rosterId() != mUserId ? View.VISIBLE : View.INVISIBLE);
-                } else {
-                    checkBox.setVisibility(View.GONE);
-                }
-                String name = "";
-                if (!TextUtils.isEmpty(member.alias())) {
-                    name = member.alias();
-                } else if (!TextUtils.isEmpty(member.nickname())) {
-                    name = member.nickname();
-                } else {
-                    name = member.username();
-                }
-                tvName.setText(name);
-                ChatUtils.getInstance().showRosterAvatar(member, icon, mConfig);
-            }
-        };
+        View view = View.inflate(this, R.layout.fragment_contact, null);
+        mEmptyView = view.findViewById(R.id.view_empty);
+        mEmptyView.setVisibility(View.GONE);
+        mRecycler = view.findViewById(R.id.contact_recycler);
+        mRecycler.setLayoutManager(new LinearLayoutManager(this));
+        mRecycler.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
+        mAdapter = new AccountAdapter(this);
+        mRecycler.setAdapter(mAdapter);
+        mAdapter.setShowCheck(mChoose);
+        return view;
     }
 
     @Override
@@ -114,11 +97,11 @@ public class AccountListActivity extends RosterChooseActivity {
         mAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                BMXRosterItem member = mAdapter.getItem(position);
+                UserBean member = mAdapter.getItem(position);
                 if (member == null) {
                     return;
                 }
-                long rosterId = member.rosterId();
+                long rosterId = member.getUserId();
                 if (mAdapter.getShowCheck()) {
                     // 单选
                     if (rosterId == mUserId) {
@@ -137,30 +120,60 @@ public class AccountListActivity extends RosterChooseActivity {
                     long userId = -1;
                     String userName = null;
                     String pwd = null;
+                    String appId = null;
                     if (mAccounts != null && mAccounts.size() > 0) {
                         UserBean bean = mAccounts.get(rosterId);
                         if (bean != null) {
                             userId = bean.getUserId();
                             userName = bean.getUserName();
                             pwd = bean.getUserPwd();
+                            appId = bean.getAppId();
                         }
                     }
-                    changeAccount(userId, userName, pwd, false);
+                    changeAccount(userId, userName, pwd, appId, false);
                 }
             }
         });
     }
 
     @Override
-    protected BMXErrorCode initData(ListOfLongLong listOfLongLong, boolean forceRefresh) {
-        if (listOfLongLong == null) {
-            listOfLongLong = new ListOfLongLong();
-        } else {
-            listOfLongLong.clear();
-        }
+    protected void initDataForActivity() {
+        super.initDataForActivity();
+        init();
+    }
+
+    protected void init() {
+        showLoadingDialog(true);
+        Observable.just("").map(new Func1<String, List<UserBean>>() {
+            @Override
+            public List<UserBean> call(String s) {
+                return initData();
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<List<UserBean>>() {
+                    @Override
+                    public void onCompleted() {
+                        dismissLoadingDialog();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        dismissLoadingDialog();
+                        String error = e != null ? e.getMessage() : "网络错误";
+                        ToastUtil.showTextViewPrompt(error);
+                        bindData(null);
+                    }
+
+                    @Override
+                    public void onNext(List<UserBean> beans) {
+                        bindData(beans);
+                    }
+                });
+    }
+
+    protected List<UserBean> initData() {
+        List<UserBean> userBeans = new ArrayList<>();
         mUserId = SharePreferenceUtils.getInstance().getUserId();
-        // 自己添加到第一个
-        listOfLongLong.add(mUserId);
         // 获取登录过的账号
         List<UserBean> beans = CommonUtils.getInstance().getLoginUsers();
         if (beans != null && beans.size() > 0) {
@@ -168,12 +181,26 @@ public class AccountListActivity extends RosterChooseActivity {
                 if (bean != null) {
                     mAccounts.put(bean.getUserId(), bean);
                     if (bean.getUserId() != mUserId) {
-                        listOfLongLong.add(bean.getUserId());
+                        userBeans.add(bean);
+                    } else {
+                        // 自己添加到第一个
+                        userBeans.add(0, bean);
                     }
                 }
             }
         }
-        return null;
+        return userBeans;
+    }
+
+    protected void bindData(List<UserBean> beans) {
+        if (beans != null && !beans.isEmpty()) {
+            mAdapter.replaceList(beans);
+            mRecycler.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.GONE);
+        } else {
+            mRecycler.setVisibility(View.GONE);
+            mEmptyView.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -191,7 +218,7 @@ public class AccountListActivity extends RosterChooseActivity {
         }
         if (removeId == mUserId) {
             // 移除的是自己 跳转退出
-            changeAccount(mUserId, "", "", true);
+            changeAccount(mUserId, "", "", "", true);
         } else {
             // 不是自己 只需要清除数据
             CommonUtils.getInstance().removeAccount(removeId);
@@ -202,7 +229,8 @@ public class AccountListActivity extends RosterChooseActivity {
     /**
      * 切换账号 首先推出当前账号 然后再登陆
      */
-    private void changeAccount(long userId, String userName, String pwd, boolean remove) {
+    private void changeAccount(long userId, String userName, String pwd, String appId,
+            boolean remove) {
         showLoadingDialog(true);
         Observable.just("").map(new Func1<String, BMXErrorCode>() {
             @Override
@@ -235,12 +263,12 @@ public class AccountListActivity extends RosterChooseActivity {
                         if (remove) {
                             CommonUtils.getInstance().removeAccount(userId);
                         }
-                        handleResult(userName, pwd);
+                        handleResult(userName, pwd, appId);
                     }
                 });
     }
 
-    private void handleResult(String userName, String pwd) {
+    private void handleResult(String userName, String pwd, String appId) {
         showLoadingDialog(true);
         Observable.just("").subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<String>() {
@@ -258,8 +286,11 @@ public class AccountListActivity extends RosterChooseActivity {
                     public void onNext(String s) {
                         dismissLoadingDialog();
                         if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(pwd)) {
+                            // 查看切换账号的appId是否和当前一致 一致不需要切换
+                            String currentAppId = SharePreferenceUtils.getInstance().getAppId();
                             // 有数据 直接登录
-                            LoginActivity.login(AccountListActivity.this, userName, pwd, false);
+                            LoginActivity.login(AccountListActivity.this, userName, pwd, false,
+                                    TextUtils.equals(currentAppId, appId) ? "" : appId);
                         } else {
                             // 无数据进入登录页
                             WelcomeActivity.openWelcome(AccountListActivity.this);
@@ -267,4 +298,53 @@ public class AccountListActivity extends RosterChooseActivity {
                     }
                 });
     }
+
+    /**
+     * 展示群聊成员adapter
+     */
+    protected class AccountAdapter extends RecyclerWithHFAdapter<UserBean> {
+
+        protected boolean mIsShowCheck;
+
+        public AccountAdapter(Context context) {
+            super(context);
+        }
+
+        public void setShowCheck(boolean showCheck) {
+            mIsShowCheck = showCheck;
+        }
+
+        public boolean getShowCheck() {
+            return mIsShowCheck;
+        }
+
+        @Override
+        protected int onCreateViewById(int viewType) {
+            return R.layout.item_account_list;
+        }
+
+        @Override
+        protected void onBindHolder(BaseViewHolder holder, int position) {
+            TextView tvName = holder.findViewById(R.id.txt_name);
+            TextView tvUserId = holder.findViewById(R.id.txt_userId);
+            CheckBox checkBox = holder.findViewById(R.id.cb_choice);
+            UserBean bean = getItem(position);
+            if (bean == null) {
+                return;
+            }
+            if (mIsShowCheck) {
+                boolean isCheck = mSelected.containsKey(bean.getUserId())
+                        && mSelected.get(bean.getUserId());
+                checkBox.setChecked(isCheck);
+                checkBox.setVisibility(bean.getUserId() != mUserId ? View.VISIBLE : View.INVISIBLE);
+            } else {
+                checkBox.setVisibility(View.GONE);
+            }
+            String name = bean.getUserName();
+            long userId = bean.getUserId();
+            tvName.setText(TextUtils.isEmpty(name) ? "" : name);
+            tvUserId.setText(String.valueOf(userId));
+        }
+    }
+
 }

@@ -50,13 +50,15 @@ import top.maxim.im.message.utils.MessageConfig;
  */
 public class RosterChooseActivity extends BaseTitleActivity {
 
-    private RecyclerView mRecycler;
+    protected RecyclerView mRecycler;
 
     protected RosterAdapter mAdapter;
 
-    private boolean mChoose = false;
+    protected View mEmptyView;
 
-    private boolean multi = true;
+    protected boolean mChoose = false;
+
+    protected boolean multi = true;
 
     /* 筛选列表 */
     private List<String> mFilterList;
@@ -127,13 +129,19 @@ public class RosterChooseActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         View view = View.inflate(this, R.layout.fragment_contact, null);
+        mEmptyView = view.findViewById(R.id.view_empty);
+        mEmptyView.setVisibility(View.GONE);
         mRecycler = view.findViewById(R.id.contact_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mRecycler.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
-        mAdapter = new RosterAdapter(this);
+        mAdapter = initAdapter();
         mRecycler.setAdapter(mAdapter);
         mAdapter.setShowCheck(mChoose);
         return view;
+    }
+
+    protected RosterAdapter initAdapter() {
+        return new RosterAdapter(this);
     }
 
     /**
@@ -269,17 +277,24 @@ public class RosterChooseActivity extends BaseTitleActivity {
     }
 
     protected void bindData() {
-        List<BMXRosterItem> rosterItems = new ArrayList<>();
-        for (int i = 0; i < itemList.size(); i++) {
-            BMXRosterItem item = itemList.get(i);
-            if (item == null) {
-                continue;
+        if (itemList != null && !itemList.isEmpty()) {
+            List<BMXRosterItem> rosterItems = new ArrayList<>();
+            for (int i = 0; i < itemList.size(); i++) {
+                BMXRosterItem item = itemList.get(i);
+                if (item == null) {
+                    continue;
+                }
+                if (mFilterList == null || !mFilterList.contains(String.valueOf(item.rosterId()))) {
+                    rosterItems.add(itemList.get(i));
+                }
             }
-            if (mFilterList == null || !mFilterList.contains(String.valueOf(item.rosterId()))) {
-                rosterItems.add(itemList.get(i));
-            }
+            mAdapter.replaceList(rosterItems);
+            mRecycler.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.GONE);
+        } else {
+            mRecycler.setVisibility(View.GONE);
+            mEmptyView.setVisibility(View.VISIBLE);
         }
-        mAdapter.replaceList(rosterItems);
     }
 
     /**
@@ -287,9 +302,9 @@ public class RosterChooseActivity extends BaseTitleActivity {
      */
     protected class RosterAdapter extends RecyclerWithHFAdapter<BMXRosterItem> {
 
-        private ImageRequestConfig mConfig;
+        protected ImageRequestConfig mConfig;
 
-        private boolean mIsShowCheck;
+        protected boolean mIsShowCheck;
 
         public RosterAdapter(Context context) {
             super(context);

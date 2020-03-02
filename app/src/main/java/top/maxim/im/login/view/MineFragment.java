@@ -28,7 +28,7 @@ import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleFragment;
-import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -43,8 +43,6 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.contact.view.BlockListActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.net.HttpResponseCallback;
-import top.maxim.im.push.PushClientMgr;
-import top.maxim.im.push.PushUtils;
 
 /**
  * Description : 我的 Created by Mango on 2018/11/06
@@ -114,6 +112,12 @@ public class MineFragment extends BaseTitleFragment {
 
     /* 关于我们 */
     private ItemLineArrow.Builder mAboutUs;
+
+    /* 用户服务 */
+    private ItemLineArrow.Builder mProtocolTerms;
+
+    /* 隐私政策 */
+    private ItemLineArrow.Builder mProtocolPrivacy;
 
     /* app版本号 */
     private TextView mAppVersion;
@@ -283,9 +287,21 @@ public class MineFragment extends BaseTitleFragment {
 
         // 关于我们
         mAboutUs = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.about_us)).setArrowVisible(false)
+                .setStartContent(getString(R.string.about_us))
                 .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
         container.addView(mAboutUs.build(), 12);
+
+        // 用户服务
+        mProtocolTerms = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.register_protocol2))
+                .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 1));
+        container.addView(mProtocolTerms.build(), 13);
+
+        // 隐私政策
+        mProtocolPrivacy = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.register_protocol4))
+                .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 0));
+        container.addView(mProtocolPrivacy.build(), 14);
         return view;
     }
 
@@ -316,6 +332,23 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 }
             });
+        }
+    }
+
+    @Override
+    public void onShow() {
+        super.onShow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (getActivity() == null || mScrollView == null) {
+                return;
+            }
+            Window window = getActivity().getWindow();
+            int scrollY = mScrollView.getScrollY();
+            if (ScreenUtils.getStatusBarHeight() < scrollY) {
+                window.setStatusBarColor(getResources().getColor(R.color.color_0079F4));
+            } else {
+                window.setStatusBarColor(Color.TRANSPARENT);
+            }
         }
     }
 
@@ -400,6 +433,9 @@ public class MineFragment extends BaseTitleFragment {
         mUserEdit.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
 
         mMyQrCode.setOnClickListener(v -> MyQrCodeActivity.openMyQrcode(getActivity()));
+
+//         三次点击 解绑微信
+//        ClickTimeUtils.setClickTimes(mUserIcon, 5, () -> unBindWeChat());
     }
 
     @Override
@@ -723,14 +759,7 @@ public class MineFragment extends BaseTitleFragment {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
-                        SharePreferenceUtils.getInstance().putLoginStatus(false);
-                        SharePreferenceUtils.getInstance().putToken("");
-                        SharePreferenceUtils.getInstance().putAppId("");
-                        UserManager.getInstance()
-                                .changeAppId(SharePreferenceUtils.getInstance().getAppId());
-                        PushClientMgr.getManager().unRegister();
-                        PushUtils.getInstance()
-                                .unregisterActivityListener(AppContextUtils.getApplication());
+                        CommonUtils.getInstance().logout();
                         WelcomeActivity.openWelcome(getActivity());
                     }
                 });
@@ -746,11 +775,11 @@ public class MineFragment extends BaseTitleFragment {
         AppManager.getInstance().getTokenByName(name, pwd, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
-                AppManager.getInstance().unBindOpenId(result, new HttpResponseCallback<String>() {
+                AppManager.getInstance().unBindOpenId(result, new HttpResponseCallback<Boolean>() {
                     @Override
-                    public void onResponse(String result) {
+                    public void onResponse(Boolean result) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("解除成功");
+                        ToastUtil.showTextViewPrompt(result != null && result ? "解除成功" : "解除失败");
                     }
 
                     @Override

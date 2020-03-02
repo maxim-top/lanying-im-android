@@ -59,6 +59,8 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
     /* 群聊成员adapter */
     protected ChatGroupMemberAdapter mAdapter;
 
+    protected View mEmptyView;
+
     protected long mGroupId;
 
     private boolean mChoose = false;
@@ -117,6 +119,8 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         View view = View.inflate(this, R.layout.chat_group_list_member_view, null);
+        mEmptyView = view.findViewById(R.id.view_empty);
+        mEmptyView.setVisibility(View.GONE);
         mGvGroupMember = view.findViewById(R.id.gv_chat_group_member);
         mGvGroupMember.setLayoutManager(new LinearLayoutManager(this));
         mGvGroupMember.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
@@ -256,9 +260,9 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
         BMXGroupMemberList memberListTmp = new BMXGroupMemberList();
         BMXErrorCode errorCode =  GroupManager.getInstance().getMembers(mGroup, memberListTmp, forceRefresh);
         long myId = SharePreferenceUtils.getInstance().getUserId();
-        for (int i=0; i< memberListTmp.size(); i++){
+        for (int i = 0; i < memberListTmp.size(); i++) {
             long memberId = memberListTmp.get(i).getMUid();
-            if (myId != memberId){
+            if (myId != memberId) {
                 memberList.add(memberListTmp.get(i));
             }
         }
@@ -266,13 +270,18 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
     }
 
     protected void bindData(BMXGroupMemberList memberList) {
-        List<BMXGroup.Member> members = new ArrayList<>();
         if (memberList != null && !memberList.isEmpty()) {
+            List<BMXGroup.Member> members = new ArrayList<>();
             for (int i = 0; i < memberList.size(); i++) {
                 members.add(memberList.get(i));
             }
+            mAdapter.replaceList(members);
+            mGvGroupMember.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.GONE);
+        } else {
+            mGvGroupMember.setVisibility(View.GONE);
+            mEmptyView.setVisibility(View.VISIBLE);
         }
-        mAdapter.replaceList(members);
     }
 
     @Override

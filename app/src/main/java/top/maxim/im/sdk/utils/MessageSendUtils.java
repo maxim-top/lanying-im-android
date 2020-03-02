@@ -3,10 +3,6 @@ package top.maxim.im.sdk.utils;
 
 import android.text.TextUtils;
 
-import com.google.gson.Gson;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import im.floo.floolib.BMXFileAttachment;
@@ -14,8 +10,10 @@ import im.floo.floolib.BMXImageAttachment;
 import im.floo.floolib.BMXLocationAttachment;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageAttachment;
+import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXVideoAttachment;
 import im.floo.floolib.BMXVoiceAttachment;
+import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -24,7 +22,6 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.bean.MessageBean;
 import top.maxim.im.message.utils.ChatUtils;
-import top.maxim.im.sdk.bean.MentionBean;
 
 /**
  * Description : 消息发送 Created by Mango on 2018/11/11.
@@ -76,21 +73,21 @@ public final class MessageSendUtils {
         }
         // 文本功能添加@对象
         if (atMap != null && !atMap.isEmpty()) {
-            MentionBean mentionBean = new MentionBean();
-            mentionBean.setSenderNickname(senderName);
-            mentionBean.setPushMessage(ChatUtils.getInstance().getMessageDesc(msg));
+            BMXMessageConfig config = msg.config();
+            config.setSenderNickname(senderName);
+            config.setPushMessage(ChatUtils.getInstance().getMessageDesc(msg));
             // @对象的存储信息 包括全部成员或者部分成员
             if (atMap.containsKey("-1")) {
                 // @全部
                 String atTitle = atMap.get("-1");
                 if (!TextUtils.isEmpty(atTitle) && text.contains(atTitle)) {
                     // 如果包含全部直接走全部 还需要判断文本消息是否包含完成的@名称 如果没有就不触发@
-                    mentionBean.setMentionAll(true);
+                    config.setMentionAll(true);
                 }
             } else {
                 // @部分成员 需要遍历添加@信息
-                List<Long> atIds = new ArrayList<>();
-                mentionBean.setMentionAll(false);
+                ListOfLongLong atIds = new ListOfLongLong();
+                config.setMentionAll(false);
                 for (Map.Entry<String, String> entry : atMap.entrySet()) {
                     // 发送文字包含@对象的名称时再加入 防止输入框@对象名称被修改
                     if (entry.getValue() != null && !TextUtils.isEmpty(entry.getValue())
@@ -99,9 +96,8 @@ public final class MessageSendUtils {
                         atIds.add(Long.valueOf(entry.getKey()));
                     }
                 }
-                mentionBean.setMentionList(atIds);
+                config.setGroupMemberList(atIds);
             }
-            msg.setConfig(new Gson().toJson(mentionBean));
         }
         return handlerMessage(msg);
     }
@@ -233,7 +229,7 @@ public final class MessageSendUtils {
             message = BMXMessage.createMessage(from, to, type, to, locationAttachment);
         }
         if (message != null && type == BMXMessage.MessageType.Group) {
-            message.setEnableGroupAck(true);
+//            message.setEnableGroupAck(true);
         }
         Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
             @Override
@@ -266,7 +262,7 @@ public final class MessageSendUtils {
             return null;
         }
         if (msg.type() == BMXMessage.MessageType.Group) {
-            msg.setEnableGroupAck(true);
+//            msg.setEnableGroupAck(true);
         }
         Observable.just(msg).map(new Func1<BMXMessage, BMXMessage>() {
             @Override

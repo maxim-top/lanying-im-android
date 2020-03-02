@@ -37,6 +37,12 @@ public class SharePreferenceUtils {
 
     private static String APP_ID = "app_id";
 
+    private static String IS_FIRST = "isFirst";
+
+    private static String IS_SHOW_PROTOCOL_DIALOG = "isShowProtocolDialog";
+
+    private static String LOGIN_USER_DATA = "loginUserData";
+
     private static volatile SharePreferenceUtils instance;
 
     private static SharedPreferences.Editor saveEditor;
@@ -194,5 +200,41 @@ public class SharePreferenceUtils {
             return saveInfo.getInt(currentInputMethod, 0);
         }
         return 0;
+    }
+
+    public boolean putIsFirst(boolean first) {
+        saveEditor.putBoolean(IS_FIRST, first);
+        return saveEditor.commit();
+    }
+
+    public boolean getFirst() {
+        if (saveInfo != null) {
+            return saveInfo.getBoolean(IS_FIRST, true);
+        }
+        return false;
+    }
+
+    public boolean putProtocolDialogStatus(boolean status) {
+        saveEditor.putBoolean(IS_SHOW_PROTOCOL_DIALOG, status);
+        return saveEditor.commit();
+    }
+
+    public boolean getProtocolDialogStatus() {
+        if (saveInfo != null) {
+            return saveInfo.getBoolean(IS_SHOW_PROTOCOL_DIALOG, false);
+        }
+        return false;
+    }
+
+    public boolean putLoginUserData(String data) {
+        saveEditor.putString(LOGIN_USER_DATA, data);
+        return saveEditor.commit();
+    }
+
+    public String getLoginUserData() {
+        if (saveInfo != null) {
+            return saveInfo.getString(LOGIN_USER_DATA, "");
+        }
+        return "";
     }
 }

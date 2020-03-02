@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -145,10 +146,10 @@ public class DefaultOkhttpClient implements HttpClient {
     }
 
     private byte[] getBody(Map<String, String> params) {
-        if (params != null && params.size() > 0) {
-            return byteParameters(params);
+        if (params == null) {
+            params = new HashMap<>();
         }
-        return null;
+        return byteParameters(params);
     }
 
     private String getUrl(String url, Map<String, String> params) {

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@drawable/loading_bg"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dimen_10"
+        android:paddingRight="@dimen/dimen_10">
+
+        <TextView
+            android:id="@+id/tv_change_phone_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/change_phone_tag"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen_18"></TextView>
+
+        <TextView
+            android:id="@+id/tv_bind_phone_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dimen_30"
+            android:text="@string/bind_phone_tag"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen_14"></TextView>
+
+        <TextView
+            android:id="@+id/tv_phone_verify"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_36"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dimen_20"
+            android:background="@drawable/phone_verify_bg"
+            android:gravity="center"
+            android:text="@string/phone_verify_change"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/dimen_14"></TextView>
+
+        <TextView
+            android:id="@+id/tv_pwd_verify"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_36"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dimen_10"
+            android:background="@drawable/pwd_verify_bg"
+            android:gravity="center"
+            android:text="@string/pwd_verify_change"
+            android:textColor="@color/color_00A1E9"
+            android:textSize="@dimen/dimen_14"></TextView>
+    </LinearLayout>
+</RelativeLayout>

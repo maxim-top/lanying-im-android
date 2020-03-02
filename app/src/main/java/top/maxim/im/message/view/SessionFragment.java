@@ -37,6 +37,7 @@ import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleFragment;
+import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
@@ -156,6 +157,29 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
     }
 
     private void loadSession() {
+        // 获取所有未读数
+        Observable.just("").map(s -> ChatManager.getInstance().getAllConversationsUnreadCount())
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Integer count) {
+                        Intent intent = new Intent();
+                        intent.setAction(CommonConfig.SESSION_COUNT_ACTION);
+                        intent.putExtra(CommonConfig.TAB_COUNT, count == null ? 0 : count);
+                        RxBus.getInstance().send(intent);
+                    }
+                });
+        // 获取所有会话
         Observable.just("").map(s -> ChatManager.getInstance().getAllConversations())
                 .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BMXConversationList>() {
@@ -171,12 +195,17 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
 
                     @Override
                     public void onNext(BMXConversationList bmxConversationList) {
+                        List<BMXConversation> conversationList = new ArrayList<>();
                         if (bmxConversationList != null && !bmxConversationList.isEmpty()) {
-                            showEmpty(false);
-                            List<BMXConversation> conversationList = new ArrayList<>();
                             for (int i = 0; i < bmxConversationList.size(); i++) {
-                                conversationList.add(bmxConversationList.get(i));
+                                BMXConversation conversation = bmxConversationList.get(i);
+                                if (conversation != null && conversation.conversationId() > 0) {
+                                    conversationList.add(conversation);
+                                }
                             }
+                        }
+                        if (!conversationList.isEmpty()) {
+                            showEmpty(false);
                             sortSession(conversationList);
                             mAdapter.replaceList(conversationList);
                             notifySession(conversationList);

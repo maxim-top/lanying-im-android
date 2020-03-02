@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/dimen_20"
+    android:paddingTop="@dimen/dimen_15"
+    android:paddingRight="@dimen/dimen_20"
+    android:paddingBottom="@dimen/dimen_15">
+
+    <CheckBox
+        android:id="@+id/cb_choice"
+        android:layout_width="@dimen/dimen_23"
+        android:layout_height="@dimen/dimen_23"
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginRight="@dimen/dimen_20"
+        android:background="@drawable/checkbox_style"
+        android:button="@null"
+        android:clickable="false"
+        android:enabled="false"
+        android:focusable="false"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/txt_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:textColor="@color/color_333333"
+            android:textSize="@dimen/dimen_14" />
+
+        <TextView
+            android:id="@+id/txt_userId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:textColor="@color/color_333333"
+            android:layout_marginTop="@dimen/dimen_5"
+            android:textSize="@dimen/dimen_12" />
+
+    </LinearLayout>
+
+</LinearLayout>

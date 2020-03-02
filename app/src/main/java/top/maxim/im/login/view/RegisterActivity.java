@@ -24,20 +24,25 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
 import rx.Observable;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.wxapi.WXUtils;
 
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
@@ -79,37 +84,36 @@ public class RegisterActivity extends BaseTitleActivity {
 
     private TextView mTvRegisterProtocol;
 
+    /* 微信登录 */
+    private ImageView mWXLogin;
+
     public static final String REFISTER_ACCOUNT = "registerAccount";
 
     public static final String REFISTER_PWD = "registerPwd";
 
-    public static final String OPEN_ID = "openId";
+    private CompositeSubscription mSubscription;
 
-    /* 微信登录返回的openId */
-    private String mOpenId;
+    private boolean mCountDown;
 
     private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
 
         @Override
         public void onTick(long millisUntilFinished) {
-            mVerifyCountDown.setText(millisUntilFinished / 1000 + "s");
+            mCountDown = true;
+            mVerifyCountDown.setText(millisUntilFinished / 1000 + "s后重发");
         }
 
         @Override
         public void onFinish() {
+            mCountDown = false;
+            mSendVerify.setEnabled(true);
+            mSendVerify.setVisibility(View.VISIBLE);
             mVerifyCountDown.setText("");
         }
     };
 
     public static void openRegister(Context context) {
-        openRegister(context, null);
-    }
-
-    public static void openRegister(Context context, String openId) {
         Intent intent = new Intent(context, RegisterActivity.class);
-        if (!TextUtils.isEmpty(openId)) {
-            intent.putExtra(OPEN_ID, openId);
-        }
         context.startActivity(intent);
     }
 
@@ -127,22 +131,18 @@ public class RegisterActivity extends BaseTitleActivity {
         mInputPwd = view.findViewById(R.id.et_user_pwd);
         mInputPhone = view.findViewById(R.id.et_user_phone);
         mSendVerify = view.findViewById(R.id.tv_send_verify);
+        mSendVerify.setEnabled(false);
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
         mInputVerify = view.findViewById(R.id.et_user_verify);
         mRegister = view.findViewById(R.id.tv_register);
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
+        mWXLogin = view.findViewById(R.id.iv_wx_login);
         buildProtocol();
+        view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
+        view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
         return view;
-    }
-
-    @Override
-    protected void initDataFromFront(Intent intent) {
-        super.initDataFromFront(intent);
-        if (intent != null) {
-            mOpenId = intent.getStringExtra(OPEN_ID);
-        }
     }
 
     @Override
@@ -155,24 +155,41 @@ public class RegisterActivity extends BaseTitleActivity {
         mTvRegisterProtocol.setMovementMethod(LinkMovementMethod.getInstance());
         SpannableStringBuilder builder = new SpannableStringBuilder();
         builder.append(getResources().getString(R.string.register_protocol1));
-        ClickableSpan span = new ClickableSpan() {
+        // 用户服务
+        SpannableString spannableString = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol2) + "》");
+        spannableString.setSpan(new ClickableSpan() {
 
             @Override
             public void updateDrawState(@NonNull TextPaint ds) {
-                ds.setColor(getResources().getColor(R.color.color_0079F4));
+                ds.setColor(getResources().getColor(R.color.color_4A90E2));
                 ds.setUnderlineText(false);
             }
 
             @Override
             public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtol(RegisterActivity.this);
+                ProtocolActivity.openProtocol(RegisterActivity.this, 1);
             }
-        };
-        SpannableString spannableString = new SpannableString(
-                "《" + getResources().getString(R.string.register_protocol2) + "》");
-        spannableString.setSpan(span, 0, spannableString.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString);
+        // 隐私政策
+        builder.append(getResources().getString(R.string.register_protocol3));
+        SpannableString spannableString1 = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol4) + "》");
+        spannableString1.setSpan(new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_4A90E2));
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(RegisterActivity.this, 0);
+            }
+        }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString1);
         mTvRegisterProtocol.setText(builder);
     }
 
@@ -182,11 +199,19 @@ public class RegisterActivity extends BaseTitleActivity {
         mClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LoginActivity.openLogin(RegisterActivity.this, mOpenId);
                 finish();
             }
         });
-        // 注册成功
+        // 微信登录
+        mWXLogin.setOnClickListener(v -> {
+            if (!WXUtils.getInstance().wxSupported()) {
+                ToastUtil.showTextViewPrompt("请安装微信");
+                return;
+            }
+            initRxBus();
+            WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER, mChangeAppId);
+        });
+        // 注册
         mRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -194,7 +219,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 String pwd = mInputPwd.getEditableText().toString().trim();
                 String phone = mInputPhone.getEditableText().toString().trim();
                 String verify = mInputVerify.getEditableText().toString().trim();
-                register(account, pwd, phone, verify);
+                checkName(account, pwd);
             }
         });
         mInputWatcher = new TextWatcher() {
@@ -214,14 +239,44 @@ public class RegisterActivity extends BaseTitleActivity {
                 boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
                 boolean isPhoneEmpty = TextUtils.isEmpty(mInputPhone.getText().toString().trim());
                 boolean isVerifyEmpty = TextUtils.isEmpty(mInputVerify.getText().toString().trim());
-                if (!isNameEmpty && !isPwdEmpty && !isPhoneEmpty && !isVerifyEmpty) {
+                if (!isNameEmpty && !isPwdEmpty
+                // && !isPhoneEmpty && !isVerifyEmpty
+                ) {
                     mRegister.setEnabled(true);
                 } else {
                     mRegister.setEnabled(false);
                 }
             }
         };
-        mInputName.addTextChangedListener(mInputWatcher);
+        mInputName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                boolean isNameEmpty = TextUtils.isEmpty(mInputName.getText().toString().trim());
+                boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
+                boolean isPhoneEmpty = TextUtils.isEmpty(mInputPhone.getText().toString().trim());
+                boolean isVerifyEmpty = TextUtils.isEmpty(mInputVerify.getText().toString().trim());
+                if (!isNameEmpty && !isPwdEmpty
+                    // && !isPhoneEmpty && !isVerifyEmpty
+                ) {
+                    mRegister.setEnabled(true);
+                } else {
+                    mRegister.setEnabled(false);
+                }
+                if (!mCountDown) {
+                    mSendVerify.setEnabled(!isNameEmpty);
+                }
+            }
+        });
         mInputPwd.addTextChangedListener(mInputWatcher);
         mInputPhone.addTextChangedListener(mInputWatcher);
         mInputVerify.addTextChangedListener(mInputWatcher);
@@ -229,19 +284,27 @@ public class RegisterActivity extends BaseTitleActivity {
         mSendVerify.setOnClickListener(v -> {
             verifyCountDown();
             String phone = mInputPhone.getEditableText().toString().trim();
-            AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<String>() {
+            AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {
                 @Override
-                public void onResponse(String result) {
-                    ToastUtil.showTextViewPrompt("获取验证码成功");
-                    mSendVerify.setEnabled(true);
-                    mVerifyCountDown.setText("");
-                    timer.cancel();
+                public void onResponse(Boolean result) {
+                    if (result != null && result) {
+                        ToastUtil.showTextViewPrompt("获取验证码成功");
+                    } else {
+                        ToastUtil.showTextViewPrompt("获取验证码失败");
+                        mSendVerify.setEnabled(true);
+                        mSendVerify.setVisibility(View.VISIBLE);
+                        mVerifyCountDown.setText("");
+                        timer.cancel();
+                    }//                    mSendVerify.setEnabled(true);
+//                    mVerifyCountDown.setText("");
+//                    timer.cancel();
                 }
 
                 @Override
                 public void onFailure(int errorCode, String errorMsg, Throwable t) {
                     ToastUtil.showTextViewPrompt("获取验证码失败");
                     mSendVerify.setEnabled(true);
+                    mSendVerify.setVisibility(View.VISIBLE);
                     mVerifyCountDown.setText("");
                     timer.cancel();
                 }
@@ -264,10 +327,37 @@ public class RegisterActivity extends BaseTitleActivity {
                 }));
     }
 
-    void register(final String account, final String pwd, final String phone, final String verify) {
+    /**
+     * 校验用户名
+     */
+    private void checkName(String userName, String pwd) {
+        register(userName, pwd);
+//        AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
+//            @Override
+//            public void onResponse(Boolean result) {
+//                if (result == null || !result) {
+//                    // 不可用
+//                    ToastUtil.showTextViewPrompt("账号已被注册");
+//                    return;
+//                }
+//                // 校验成功 注册
+//                register(userName, pwd);
+//            }
+//
+//            @Override
+//            public void onFailure(int errorCode, String errorMsg, Throwable t) {
+//                dismissLoadingDialog();
+//                ToastUtil.showTextViewPrompt(errorMsg);
+//            }
+//        });
+    }
 
-        if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd) || TextUtils.isEmpty(phone)
-                || TextUtils.isEmpty(verify)) {
+    private void register(final String account, final String pwd) {
+
+        if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd)
+        // || TextUtils.isEmpty(phone)
+        // || TextUtils.isEmpty(verify)
+        ) {
             ToastUtil.showTextViewPrompt("不能为空");
             return;
         }
@@ -275,8 +365,7 @@ public class RegisterActivity extends BaseTitleActivity {
         Observable.just(account).map(new Func1<String, BMXErrorCode>() {
             @Override
             public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signUpNewUser(phone, verify, pwd, account,
-                        new BMXUserProfile());
+                return UserManager.getInstance().signUpNewUser(account, pwd, new BMXUserProfile());
             }
         }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
             @Override
@@ -298,16 +387,10 @@ public class RegisterActivity extends BaseTitleActivity {
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
                         dismissLoadingDialog();
-                        if (TextUtils.isEmpty(mOpenId)) {
-                            LoginActivity.login(RegisterActivity.this,
-                                    mInputName.getEditableText().toString().trim(),
-                                    mInputPwd.getEditableText().toString().trim(), false,
-                                    mChangeAppId);
-                        } else {
-                            LoginActivity.bindOpenId(RegisterActivity.this,
-                                    mInputName.getEditableText().toString().trim(),
-                                    mInputPwd.getEditableText().toString().trim(), mOpenId);
-                        }
+                        RegisterBindMobileActivity.openRegisterBindMobile(RegisterActivity.this,
+                                mInputName.getEditableText().toString().trim(),
+                                mInputPwd.getEditableText().toString().trim(), mChangeAppId);
+                        finish();
                     }
                 });
     }
@@ -316,7 +399,51 @@ public class RegisterActivity extends BaseTitleActivity {
      * 验证码倒计时60s
      */
     public void verifyCountDown() {
+        mCountDown = true;
         mSendVerify.setEnabled(false);
+        mSendVerify.setVisibility(View.GONE);
         timer.start();
+    }
+
+    private void initRxBus() {
+        if (mSubscription == null) {
+            mSubscription = new CompositeSubscription();
+        }
+        Subscription wxLogin = RxBus.getInstance().toObservable(Intent.class)
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Intent>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Intent intent) {
+                        if (intent == null || !TextUtils.equals(intent.getAction(),
+                                CommonConfig.WX_LOGIN_ACTION)) {
+                            return;
+                        }
+                        if (mSubscription != null) {
+                            mSubscription.unsubscribe();
+                        }
+                        String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
+                        LoginActivity.wxChatLogin(RegisterActivity.this, openId);
+                    }
+                });
+        mSubscription.add(wxLogin);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mSubscription != null) {
+            mSubscription.unsubscribe();
+            mSubscription = null;
+        }
     }
 }

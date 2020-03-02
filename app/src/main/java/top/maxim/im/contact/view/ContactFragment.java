@@ -145,8 +145,9 @@ public class ContactFragment extends BaseTitleFragment {
         });
         ((TextView)applyView.findViewById(R.id.contact_title))
                 .setText(getString(R.string.contact_apply_notice));
-        ((ShapeImageView)applyView.findViewById(R.id.contact_avatar))
-                .setImageResource(R.drawable.icon_apply_notice);
+        ShapeImageView icon = applyView.findViewById(R.id.contact_avatar);
+        icon.setFrameStrokeWidth(0);
+        icon.setImageResource(R.drawable.icon_apply_notice);
         ll.addView(applyView);
 
 //        // 分割线
@@ -314,12 +315,23 @@ public class ContactFragment extends BaseTitleFragment {
 
                     @Override
                     public void onError(Throwable e) {
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
+                        if (listOfLongLong.size() > 0) {
+                            // 空的错误不提示
+                            String error = e != null ? e.getMessage() : "网络错误";
+                            ToastUtil.showTextViewPrompt(error);
+                        }
                         RosterManager.getInstance().get(listOfLongLong, false);
                         List<BMXRosterItem> rosterItems = new ArrayList<>();
                         for (int i = 0; i < itemList.size(); i++) {
-                            rosterItems.add(itemList.get(i));
+                            BMXRosterItem item = itemList.get(i);
+                            // 是否是好友
+                            BMXRosterItem.RosterRelation rosterRelation = item != null
+                                    ? item.relation()
+                                    : null;
+                            boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
+                            if (friend) {
+                                rosterItems.add(item);
+                            }
                         }
                         RosterFetcher.getFetcher().putRosters(itemList);
                         mAdapter.replaceList(rosterItems);
@@ -329,7 +341,15 @@ public class ContactFragment extends BaseTitleFragment {
                     public void onNext(BMXErrorCode errorCode) {
                         List<BMXRosterItem> rosterItems = new ArrayList<>();
                         for (int i = 0; i < itemList.size(); i++) {
-                            rosterItems.add(itemList.get(i));
+                            BMXRosterItem item = itemList.get(i);
+                            // 是否是好友
+                            BMXRosterItem.RosterRelation rosterRelation = item != null
+                                    ? item.relation()
+                                    : null;
+                            boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
+                            if (friend) {
+                                rosterItems.add(item);
+                            }
                         }
                         RosterFetcher.getFetcher().putRosters(itemList);
                         mAdapter.replaceList(rosterItems);

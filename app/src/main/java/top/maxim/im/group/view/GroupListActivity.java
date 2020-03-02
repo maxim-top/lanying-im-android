@@ -150,8 +150,9 @@ public class GroupListActivity extends BaseTitleFragment {
         });
         ((TextView)inviteView.findViewById(R.id.contact_title))
                 .setText(getString(R.string.group_invite));
-        ((ShapeImageView)inviteView.findViewById(R.id.contact_avatar))
-                .setImageResource(R.drawable.icon_group);
+        ShapeImageView icon = inviteView.findViewById(R.id.contact_avatar);
+        icon.setFrameStrokeWidth(0);
+        icon.setImageResource(R.drawable.icon_group);
         ll.addView(inviteView);
         mAdapter.addHeaderView(headerView);
     }
@@ -178,8 +179,11 @@ public class GroupListActivity extends BaseTitleFragment {
                     @Override
                     public void onError(Throwable e) {
                         dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
+                        if (list.size() > 0) {
+                            // 空的错误不提示
+                            String error = e != null ? e.getMessage() : "网络错误";
+                            ToastUtil.showTextViewPrompt(error);
+                        }
                         GroupManager.getInstance().search(list, false);
                         RosterFetcher.getFetcher().putGroups(list);
                         mAdapter.replaceList(filterGroup(list));

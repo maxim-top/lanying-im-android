@@ -85,6 +85,31 @@
             android:name=".login.view.LoginActivity"
             android:screenOrientation="portrait"></activity>
 
+        <!--登陆-->
+        <activity
+            android:name=".login.view.LoginByVerifyActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--注册绑定手机号-->
+        <activity
+            android:name=".login.view.RegisterBindMobileActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--手机号 微信登录绑定用户-->
+        <activity
+            android:name=".login.view.LoginBindUserActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--验证密码-->
+        <activity
+            android:name=".login.view.VerifyActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--绑定手机号-->
+        <activity
+            android:name=".login.view.BindMobileActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!--注册-->
         <activity
             android:name=".login.view.RegisterActivity"
@@ -104,6 +129,11 @@
         <!--关于我们-->
         <activity
             android:name=".login.view.AboutUsActivity"
+            android:screenOrientation="portrait" />
+
+        <!--账号管理-->
+        <activity
+            android:name=".login.view.AccountListActivity"
             android:screenOrientation="portrait" />
 
         <!--首页-->
@@ -467,7 +497,9 @@
         </receiver>
 
         <!-- 华为刘海 -->
-        <meta-data android:name="android.notch_support" android:value="true"/>
+        <meta-data
+            android:name="android.notch_support"
+            android:value="true" />
 
         <!-- *************BUGLY START************** -->
 

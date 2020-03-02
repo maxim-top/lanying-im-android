@@ -7,7 +7,6 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -48,9 +47,9 @@ public class ShapeImageView extends AppCompatImageView {
 
     private boolean mReBuildShader = true;
 
-    private int mBorderColor = Color.BLUE;
+    private int mBorderColor;
 
-    private int mBorderWidth;
+    private int mBorderWidth = 0;
 
     private int mShapeType = Shape.CIRCLE;// defaut
 
@@ -88,9 +87,10 @@ public class ShapeImageView extends AppCompatImageView {
             mRx = a.getFloat(R.styleable.ShapeImageView_radius_x, mRx);
             mRy = a.getFloat(R.styleable.ShapeImageView_radius_y, mRy);
             mPolygonSides = a.getInt(R.styleable.ShapeImageView_sides, mPolygonSides);
+            mBorderWidth = a.getInt(R.styleable.ShapeImageView_stroke, mBorderWidth);
             a.recycle();
         }
-
+        mBorderColor = context.getResources().getColor(R.color.guide_divider);
         mShaderPaint.setFilterBitmap(false);
     }
 

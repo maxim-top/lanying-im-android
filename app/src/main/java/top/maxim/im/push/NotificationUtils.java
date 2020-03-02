@@ -15,7 +15,15 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.sdk.utils.MsgConstants;
 
@@ -102,7 +110,7 @@ public class NotificationUtils {
         builder.setContentIntent(pIntent);
         Notification notification = builder.build();
         manager.notify(notifyId, notification);
-        setHuaWeiCorner(count);
+        getAllCount(notification);
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -157,7 +165,32 @@ public class NotificationUtils {
      */
     public void cancelAll() {
         manager.cancelAll();
-        setHuaWeiCorner(0);
+    }
+
+    private void getAllCount(Notification notification) {
+        Observable.just("").map(s -> ChatManager.getInstance().getAllConversationsUnreadCount())
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Integer count) {
+                        setCorner(notification, count);
+                    }
+                });
+    }
+    
+    public void setCorner(Notification notification, int count) {
+        setHuaWeiCorner(count);
+        setXiaomiCount(notification, count);
     }
 
     /**
@@ -165,7 +198,7 @@ public class NotificationUtils {
      *
      * @param count
      */
-    public void setHuaWeiCorner(int count) {
+    private void setHuaWeiCorner(int count) {
         if (android.os.Build.BRAND.toLowerCase().contains("huawei")
                 || android.os.Build.BRAND.toLowerCase().contains("honor")) {
             try {
@@ -182,6 +215,25 @@ public class NotificationUtils {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void setXiaomiCount(Notification notification, int count) {
+        try {
+            if (notification != null) {
+                Field field = notification.getClass().getDeclaredField("extraNotification");
+                Object extraNotification = field.get(notification);
+                Method method = extraNotification.getClass().getDeclaredMethod("setMessageCount",
+                        int.class);
+                method.invoke(extraNotification, count);
+            }
+            // 设置小米 vivo 三星 角标
+            Intent intent = new Intent("launcher.action.CHANGE_APPLICATION_NOTIFICATION_NUM");
+            intent.putExtra("packageName", AppContextUtils.getAppContext().getPackageName());
+            intent.putExtra("notificationNum", count);
+            AppContextUtils.getAppContext().sendBroadcast(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

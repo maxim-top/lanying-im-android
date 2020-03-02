@@ -172,9 +172,9 @@ public final class PushClientMgr {
                     public void onResponse(String result) {
                         AppManager.getInstance().notifierBind(result, deviceToken, appId,
                                 currentUserId, BaseManager.getPushId(),
-                                new HttpResponseCallback<String>() {
+                                new HttpResponseCallback<Boolean>() {
                                     @Override
-                                    public void onResponse(String result) {
+                                    public void onResponse(Boolean result) {
 
                                     }
 

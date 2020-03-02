@@ -108,5 +108,4 @@ public class DialogUtils {
         dialog.setDialogListener(listener);
         dialog.showDialog(context);
     }
-
 }

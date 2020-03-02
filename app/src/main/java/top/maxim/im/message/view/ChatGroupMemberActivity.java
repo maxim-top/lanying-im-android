@@ -440,12 +440,14 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
             } else {
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(memberId);
                 String name = "";
-                if (!TextUtils.isEmpty(rosterItem.alias())) {
-                    name = rosterItem.alias();
-                } else if (!TextUtils.isEmpty(rosterItem.nickname())) {
-                    name = rosterItem.nickname();
-                } else {
-                    name = rosterItem.username();
+                if (rosterItem != null) {
+                    if (!TextUtils.isEmpty(rosterItem.alias())) {
+                        name = rosterItem.alias();
+                    } else if (!TextUtils.isEmpty(rosterItem.nickname())) {
+                        name = rosterItem.nickname();
+                    } else {
+                        name = rosterItem.username();
+                    }
                 }
                 tvName.setText(TextUtils.isEmpty(name) ? "" : name);
 

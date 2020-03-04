@@ -12,10 +12,20 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXRosterItem;
+import im.floo.floolib.BMXRosterItemList;
+import im.floo.floolib.ListOfLongLong;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
+import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -112,13 +122,7 @@ public class SupportFragment extends BaseTitleFragment {
 
                                     @Override
                                     public void onResponse(List<SupportBean> result) {
-                                        if (result != null && !result.isEmpty()) {
-                                            mAdapter.replaceList(result);
-                                            mRecycler.setVisibility(View.VISIBLE);
-                                            mEmptyView.setVisibility(View.GONE);
-                                        } else {
-                                            showEmpty(getString(R.string.common_empty));
-                                        }
+                                        refreshRoster(result);
                                     }
 
                                     @Override
@@ -136,6 +140,50 @@ public class SupportFragment extends BaseTitleFragment {
                 });
     }
 
+    private void refreshRoster(List<SupportBean> result) {
+        if (result == null || result.isEmpty()) {
+            showEmpty(getString(R.string.common_empty));
+            return;
+        }
+        final ListOfLongLong listOfLongLong = new ListOfLongLong();
+        final BMXRosterItemList itemList = new BMXRosterItemList();
+        Observable.just("").map(new Func1<String, BMXErrorCode>() {
+            @Override
+            public BMXErrorCode call(String s) {
+                for (SupportBean bean : result) {
+                    listOfLongLong.add(bean.getUser_id());
+                }
+                return RosterManager.getInstance().search(listOfLongLong, itemList, true);
+            }
+        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
+            @Override
+            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
+                return BaseManager.bmxFinish(errorCode, errorCode);
+            }
+        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BMXErrorCode>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mAdapter.replaceList(result);
+                        mRecycler.setVisibility(View.VISIBLE);
+                        mEmptyView.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onNext(BMXErrorCode bmxErrorCode) {
+                        RosterFetcher.getFetcher().putRosters(itemList);
+                        mAdapter.replaceList(result);
+                        mRecycler.setVisibility(View.VISIBLE);
+                        mEmptyView.setVisibility(View.GONE);
+                    }
+                });
+    }
+    
     private void showEmpty(String text) {
         mRecycler.setVisibility(View.GONE);
         mEmptyView.setVisibility(View.VISIBLE);
@@ -189,6 +237,8 @@ public class SupportFragment extends BaseTitleFragment {
 
             BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(bean.getUser_id());
             ChatUtils.getInstance().showRosterAvatar(rosterItem, avatar, mConfig);
+            // 支持列表需要强制更新头像
+            ChatUtils.getInstance().downloadUserAvatar(rosterItem, avatar, mConfig);
         }
     }
 }

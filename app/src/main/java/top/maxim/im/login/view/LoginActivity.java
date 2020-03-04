@@ -260,7 +260,6 @@ public class LoginActivity extends BaseTitleActivity {
                     CommonUtils.getInstance()
                             .addUser(new UserBean(profile.username(), profile.userId(), pwd,
                                     changeAppId, System.currentTimeMillis()));
-                    AppManager.getInstance().getTokenByName(profile.username(), pwd, null);
                     if (!TextUtils.isEmpty(changeAppId)) {
                         SharePreferenceUtils.getInstance().putAppId(changeAppId);
                         UserManager.getInstance().changeAppId(changeAppId);

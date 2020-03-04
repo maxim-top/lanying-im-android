@@ -135,6 +135,17 @@ public class AppManager {
             }
             return;
         }
+       getTokenByNameFromServer(name, pwd, callback);
+    }
+
+    /**
+     * 根据userName获取token
+     *
+     * @param name
+     * @param pwd
+     * @param callback
+     */
+    public void getTokenByNameFromServer(String name, String pwd, HttpResponseCallback<String> callback) {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
         params.put("password", pwd);

@@ -36,7 +36,6 @@ import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
-import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.ShapeImageView;
@@ -72,6 +71,9 @@ public class MineFragment extends BaseTitleFragment {
 
     /* 我的二维码 */
     private ImageView mMyQrCode;
+
+    /* 账号管理 */
+    private ItemLineArrow.Builder mAccountManger;
 
     /* 接受新消息通知 */
     private ItemLineSwitch.Builder mSettingPush;
@@ -165,7 +167,6 @@ public class MineFragment extends BaseTitleFragment {
         // 接受push
         mSettingPush = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.receive_push_notice))
-                .setMarginTop(ScreenUtils.dp2px(10))
                 .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
                     @Override
                     public void onItemSwitch(View v, boolean curCheck) {
@@ -174,10 +175,10 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(mSettingPush.build(), 0);
 
-        // 分割线
-        ItemLine.Builder itemLine1 = new ItemLine.Builder(getActivity(), container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine1.build(), 1);
+//        // 分割线
+//        ItemLine.Builder itemLine1 = new ItemLine.Builder(getActivity(), container)
+//                .setMarginLeft(ScreenUtils.dp2px(15));
+//        container.addView(itemLine1.build(), 1);
 
         // 声音
         mPushSound = new ItemLineSwitch.Builder(getActivity())
@@ -302,6 +303,18 @@ public class MineFragment extends BaseTitleFragment {
                 .setStartContent(getString(R.string.register_protocol4))
                 .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 0));
         container.addView(mProtocolPrivacy.build(), 14);
+
+        // 账号管理
+        mAccountManger = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.setting_account_manager))
+                .setMarginTop(ScreenUtils.dp2px(10))
+                .setOnItemClickListener(v -> AccountListActivity.startAccountListActivity(getActivity()));
+        container.addView(mAccountManger.build(), 0);
+
+//        // 分割线
+//        ItemLine.Builder itemLine0 = new ItemLine.Builder(getActivity(), container)
+//                .setMarginLeft(ScreenUtils.dp2px(15));
+//        container.addView(itemLine0.build(), 1);
         return view;
     }
 

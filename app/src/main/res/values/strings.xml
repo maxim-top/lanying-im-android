@@ -161,7 +161,7 @@
     <string name="setting_roster_ext">设置扩展信息</string>
     <string name="setting_user_private">私密信息</string>
     <string name="setting_user_disturb">设置免打扰</string>
-    <string name="setting_account_manager">账号管理</string>
+    <string name="setting_account_manager">切换账号</string>
     <string name="setting_add_friend_auth_mode">好友验证类型</string>
     <string name="setting_add_friend_auth_question">好友验证问题</string>
     <string name="add_friend_auth_open">公开</string>

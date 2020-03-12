@@ -42,24 +42,7 @@ public class BaseManager {
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
         conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
-
-        BMXSDKConfig.HostConfig hostConfig;
-        if (index == 1) {
-            hostConfig = new BMXSDKConfig.HostConfig("c1-sync.kube.maxim.top", 443,
-                    "https://c1-api.kube.maxim.top");
-        } else if (index == 2) {
-            hostConfig = new BMXSDKConfig.HostConfig("s1-sync.kube.maxim.top", 443,
-                    "https://s1-api.kube.maxim.top");
-        } else if (index == 3) {
-            hostConfig = new BMXSDKConfig.HostConfig("s2-sync.kube.maxim.top", 80,
-                    "https://s2-api.kube.maxim.top");
-        } else if (index == 4) {
-            hostConfig = new BMXSDKConfig.HostConfig("47.93.11.47", 1729, "http://47.93.11.47");
-        } else {
-            hostConfig = new BMXSDKConfig.HostConfig("sync.maximtop.com", 443,
-                    "https://api.maximtop.com");
-        }
-        // conf.setHostConfig(hostConfig);
+        
         bmxClient = BMXClient.create(conf);
     }
 

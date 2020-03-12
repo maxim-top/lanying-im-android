@@ -10,6 +10,7 @@ import android.util.LongSparseArray;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -242,6 +243,15 @@ public class AccountListActivity extends BaseTitleActivity {
             public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
                 return BaseManager.bmxFinish(errorCode, errorCode);
             }
+        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
+            @Override
+            public BMXErrorCode call(BMXErrorCode bmxErrorCode) {
+                CommonUtils.getInstance().logout();
+                if (remove) {
+                    CommonUtils.getInstance().removeAccount(userId);
+                }
+                return bmxErrorCode;
+            }
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BMXErrorCode>() {
                     @Override
@@ -258,45 +268,23 @@ public class AccountListActivity extends BaseTitleActivity {
 
                     @Override
                     public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        CommonUtils.getInstance().logout();
-                        if (remove) {
-                            CommonUtils.getInstance().removeAccount(userId);
-                        }
                         handleResult(userName, pwd, appId);
                     }
                 });
     }
 
     private void handleResult(String userName, String pwd, String appId) {
-        showLoadingDialog(true);
-        Observable.just("").subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<String>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onNext(String s) {
-                        dismissLoadingDialog();
-                        if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(pwd)) {
-                            // 查看切换账号的appId是否和当前一致 一致不需要切换
-                            String currentAppId = SharePreferenceUtils.getInstance().getAppId();
-                            // 有数据 直接登录
-                            LoginActivity.login(AccountListActivity.this, userName, pwd, false,
-                                    TextUtils.equals(currentAppId, appId) ? "" : appId);
-                        } else {
-                            // 无数据进入登录页
-                            WelcomeActivity.openWelcome(AccountListActivity.this);
-                        }
-                    }
-                });
+        if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(pwd)) {
+            // 查看切换账号的appId是否和当前一致 一致不需要切换
+            String currentAppId = SharePreferenceUtils.getInstance().getAppId();
+            // 有数据 直接登录
+            LoginActivity.login(AccountListActivity.this, userName, pwd, false,
+                    TextUtils.equals(currentAppId, appId) ? "" : appId);
+        } else {
+            dismissLoadingDialog();
+            // 无数据进入登录页
+            WelcomeActivity.openWelcome(AccountListActivity.this);
+        }
     }
 
     /**
@@ -328,10 +316,12 @@ public class AccountListActivity extends BaseTitleActivity {
             TextView tvName = holder.findViewById(R.id.txt_name);
             TextView tvUserId = holder.findViewById(R.id.txt_userId);
             CheckBox checkBox = holder.findViewById(R.id.cb_choice);
+            ImageView selecIcon = holder.findViewById(R.id.iv_seleced_skin);
             UserBean bean = getItem(position);
             if (bean == null) {
                 return;
             }
+            selecIcon.setVisibility(bean.getUserId() == mUserId ? View.VISIBLE : View.GONE);
             if (mIsShowCheck) {
                 boolean isCheck = mSelected.containsKey(bean.getUserId())
                         && mSelected.get(bean.getUserId());

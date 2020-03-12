@@ -363,7 +363,7 @@ public class ChatUtils {
     /**
      * 下载头像
      */
-    private void downloadUserAvatar(final BMXRosterItem item, final ShapeImageView imageView,
+    public void downloadUserAvatar(final BMXRosterItem item, final ShapeImageView imageView,
             final ImageRequestConfig config) {
         if (item == null || imageView == null) {
             return;
@@ -395,9 +395,9 @@ public class ChatUtils {
                                 avatarUrl = "file://" + item.avatarPath();
                             }
                             String finalAvatarUrl = avatarUrl;
-                            TaskDispatcher.postMainDelayed(() -> {
+                            TaskDispatcher.postMain(() -> {
                                 BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
-                            }, 500);
+                            });
                         }
                         Log.i(TAG, "onProgressChange roster:" + s.rosterId() + "-" + percent);
                         return 0;

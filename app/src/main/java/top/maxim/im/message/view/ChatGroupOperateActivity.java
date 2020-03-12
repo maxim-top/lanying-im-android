@@ -169,6 +169,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     private boolean mIsOwner;
 
     private List<String> memberIdList;
+    
+    // 最大展示数目
+    private final int MAX_SHOW_MEMBER = 10;
 
     public static void startGroupOperateActivity(Context context, long groupId) {
         Intent intent = new Intent(context, ChatGroupOperateActivity.class);
@@ -673,8 +676,12 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
             public BMXErrorCode call(BMXErrorCode errorCode) {
                 if (!memberList.isEmpty()) {
                     ListOfLongLong listOfLongLong = new ListOfLongLong();
-                    for (int i = 0; i < memberList.size(); i++) {
-                        listOfLongLong.add(memberList.get(i).getMUid());
+                    long size = memberList.size();
+                    int showSize = mIsOwner ? MAX_SHOW_MEMBER - 2 : MAX_SHOW_MEMBER;
+                    for (int i = 0; i < size; i++) {
+                        if (i < showSize) {
+                            listOfLongLong.add(memberList.get(i).getMUid());
+                        }
                     }
                     BMXRosterItemList itemList = new BMXRosterItemList();
                     BMXErrorCode errorCode1 = RosterManager.getInstance().search(listOfLongLong,
@@ -704,10 +711,14 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                             memberIdList = new ArrayList<>();
                         }
                         memberIdList.clear();
-                        for (int i = 0; i < memberList.size(); i++) {
+                        long size = memberList.size();
+                        int showSize = mIsOwner ? MAX_SHOW_MEMBER - 2 : MAX_SHOW_MEMBER;
+                        for (int i = 0; i < size; i++) {
                             BMXGroup.Member member = memberList.get(i);
                             if (member != null) {
-                                members.add(member);
+                                if (i < showSize) {
+                                    members.add(member);
+                                }
                                 memberIdList.add(String.valueOf(member.getMUid()));
                             }
                         }

@@ -244,7 +244,7 @@ public class WelcomeActivity extends BaseTitleActivity {
             ChatManager.getInstance().getAllConversations();
             String name = SharePreferenceUtils.getInstance().getUserName();
             String pwd = SharePreferenceUtils.getInstance().getUserPwd();
-            AppManager.getInstance().getTokenByName(name, pwd, null);
+            AppManager.getInstance().getTokenByNameFromServer(name, pwd, null);
             return "";
         }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<String>() {

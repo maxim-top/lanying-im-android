@@ -287,6 +287,10 @@ public class RosterDetailActivity extends BaseTitleActivity {
         String name = mRosterItem.username();
         String nickName = mRosterItem.nickname();
         ChatUtils.getInstance().showRosterAvatar(mRosterItem, mUserIcon, mConfig);
+        if (!friend) {
+            // 非好友 需要强制更新头像
+            ChatUtils.getInstance().downloadUserAvatar(mRosterItem, mUserIcon, mConfig);
+        }
         long userId = mRosterItem.rosterId();
         mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
         mNickName.setText(TextUtils.isEmpty(nickName) ? "" : "昵称:" + nickName);

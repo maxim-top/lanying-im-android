@@ -70,9 +70,6 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     private ShapeImageView mUserIcon;
 
-    /* 账号管理 */
-    private ItemLineArrow.Builder mAccountManger;
-
     /* Id */
     private ItemLineArrow.Builder mUserId;
 
@@ -323,17 +320,6 @@ public class SettingUserActivity extends BaseTitleActivity {
                     }
                 });
         container.addView(mSetAddFriendAuthMode.build());
-
-        // 分割线
-        ItemLine.Builder itemLine10 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine10.build());
-
-        // 账号管理
-        mAccountManger = new ItemLineArrow.Builder(this)
-                .setStartContent(getString(R.string.setting_account_manager))
-                .setOnItemClickListener(v -> AccountListActivity.startAccountListActivity(this));
-        container.addView(mAccountManger.build());
 
         // 分割线
         ItemLine.Builder itemLine11 = new ItemLine.Builder(this, container)

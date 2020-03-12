@@ -73,7 +73,7 @@ public final class MessageSendUtils {
         }
         // 文本功能添加@对象
         if (atMap != null && !atMap.isEmpty()) {
-            BMXMessageConfig config = msg.config();
+            BMXMessageConfig config = BMXMessageConfig.createMessageConfig(false);
             config.setSenderNickname(senderName);
             config.setPushMessage(ChatUtils.getInstance().getMessageDesc(msg));
             // @对象的存储信息 包括全部成员或者部分成员

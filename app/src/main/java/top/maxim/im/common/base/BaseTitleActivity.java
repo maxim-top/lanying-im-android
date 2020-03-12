@@ -169,7 +169,7 @@ public abstract class BaseTitleActivity extends BaseActivity {
         if (mLoadingDialog == null) {
             mLoadingDialog = new LoadingDialog(this);
         } else if (mLoadingDialog.isShowing()) {
-            mLoadingDialog.dismiss();
+            return;
         }
         mLoadingDialog.setCancelable(cancelable);
         mLoadingDialog.show();

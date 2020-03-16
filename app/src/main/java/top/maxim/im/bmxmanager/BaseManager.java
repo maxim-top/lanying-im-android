@@ -68,6 +68,11 @@ public class BaseManager {
                 return metaAppId.substring(2);
             }
             return "";
+        } else if (PushClientMgr.isOppo(context)) {
+            String metaAppKey = PushClientMgr.getPushAppId("OPPO_APP_KEY");
+            if (!TextUtils.isEmpty(metaAppKey)) {
+                return metaAppKey.substring(2);
+            }
         }
         return "";
     }

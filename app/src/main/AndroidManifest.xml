@@ -59,6 +59,10 @@
     <uses-permission android:name="${applicationId}.permission.C2D_MESSAGE" />
     <!-- 魅族 push permission end  魅族 push permission end 魅族 push permission end 魅族 push permission end 魅族 push permission end 魅族 push permission end-->
 
+    <!-- oppo push permission -->
+    <uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE" />
+    <uses-permission android:name="com.heytap.mcs.permission.RECIEVE_MCS_MESSAGE" />
+
     <application
         android:name=".common.base.MaxIMApplication"
         android:allowBackup="true"
@@ -381,6 +385,17 @@
             android:name="MEIZU_APP_KEY"
             android:value="a_${MEIZU_APP_KEY}" />
 
+        <!-- oppo push  配置-->
+        <meta-data
+            android:name="OPPO_APPID"
+            android:value="a_${OPPO_APPID}" />
+        <meta-data
+            android:name="OPPO_APP_KEY"
+            android:value="a_${OPPO_APP_KEY}" />
+        <meta-data
+            android:name="OPPO_APP_SECRET"
+            android:value="a_${OPPO_APP_SECRET}" />
+
         <!-- 微信 -->
         <meta-data
             android:name="WEIXIN_APPID"
@@ -407,6 +422,8 @@
                 android:name="hwc-theme"
                 android:value="androidhwext:style/Theme.Emui.Translucent" />
         </activity>
+
+        <activity android:name=".filebrowser.FileBrowserActivity" />
 
         <receiver
             android:name=".push.huawei.HuaWeiPushReceiver"
@@ -495,6 +512,23 @@
                 <category android:name="${applicationId}" />
             </intent-filter>
         </receiver>
+
+        <!-- oppoSDK配置开始  oppoSDK配置开始 oppoSDK配置开始 oppoSDK配置开始 oppoSDK配置开始 oppoSDK配置开始 魅族SDK配置开始 oppoSDK配置开始 oppoSDK配置开始 -->
+        <service
+            android:name="com.heytap.mcssdk.PushService"
+            android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
+            <intent-filter>
+                <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.heytap.mcssdk.AppPushService"
+            android:permission="com.heytap.mcs.permission.SEND_MCS_MESSAGE">
+            <intent-filter>
+                <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE" />
+            </intent-filter>
+        </service>
 
         <!-- 华为刘海 -->
         <meta-data

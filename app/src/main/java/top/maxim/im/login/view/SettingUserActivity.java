@@ -40,6 +40,7 @@ import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.CameraUtils;
+import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
@@ -59,6 +60,7 @@ import top.maxim.im.common.view.ItemEnableArrow;
 import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ShapeImageView;
+import top.maxim.im.filebrowser.FileBrowserActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.wxapi.WXUtils;
@@ -349,6 +351,11 @@ public class SettingUserActivity extends BaseTitleActivity {
                             PermissionsConstant.WRITE_STORAGE);
                 }
             }
+        });
+        // 10次点击 进入应用data目录
+        ClickTimeUtils.setClickTimes(mHeader.getTitleText(), 5, () -> {
+            ToastUtil.showTextViewPrompt("点击5次");
+            startActivity(new Intent(this, FileBrowserActivity.class));
         });
     }
 

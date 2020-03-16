@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.heytap.mcssdk.PushManager;
 import com.huawei.hms.api.ConnectionResult;
 import com.huawei.hms.api.HuaweiApiAvailability;
 import com.meizu.cloud.pushsdk.util.MzSystemUtils;
@@ -29,6 +30,7 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.push.huawei.HWPushManager;
 import top.maxim.im.push.meizu.MZPushManager;
+import top.maxim.im.push.oppo.OppoPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
 
 /**
@@ -48,6 +50,8 @@ public final class PushClientMgr {
     public static final int MI_TYPE = 2;
 
     public static final int MZ_TYPE = 3;
+    
+    public static final int OPPO_TYPE = 4;
 
     private static PushClientMgr sPushMgr = new PushClientMgr();
 
@@ -69,6 +73,9 @@ public final class PushClientMgr {
             } else if (isMeizu(application.getApplicationContext())) {
                 sManager = new MZPushManager(application.getApplicationContext());
                 sDevType = MZ_TYPE;
+            } else if (isOppo(application.getApplicationContext())) {
+                sManager = new OppoPushManager(application.getApplicationContext());
+                sDevType = OPPO_TYPE;
             }
             isInited = true;
             return true;
@@ -95,6 +102,13 @@ public final class PushClientMgr {
      */
     public static boolean isMeizu(Context context) {
         return RomUtil.isFlyme() && MzSystemUtils.isBrandMeizu(context);
+    }
+
+    /**
+     * 判断oppo
+     */
+    public static boolean isOppo(Context context) {
+        return RomUtil.isOppo() && PushManager.isSupportPush(context);
     }
 
     public static PushClientMgr getManager() {

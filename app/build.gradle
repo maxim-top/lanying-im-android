@@ -7,9 +7,6 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1907071346
-        versionName "v2.1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "100565061",
                 "XIAOMI_APPID"   : "2882303761517923338",
@@ -17,13 +14,19 @@ android {
                 "MEIZU_APPID"    : "117965",
                 "MEIZU_APP_KEY"  : "ba1881e1356d4c9ea622772c64873c41",
 
-                "WEIXIN_APPID"   : "wxf0f8e197ecfb0925",
+                "OPPO_APPID"     : "30006831",
+                "OPPO_APP_KEY"   : "5060fd43f996444ab0e5e5c8dba57ffd",
+                "OPPO_APP_SECRET" : "17046a6edd9f4be1a87c3badb2e9b755",
 
+                "WEIXIN_APPID"   : "wxf0f8e197ecfb0925",
                 "BUGLY_APPID"    : "ae2c13667e"
         ]
+        versionName "v2.1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
         ndk {
             // 设置支持的SO库架构
-            abiFilters 'armeabi' ,'armeabi-v7a'//, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+            abiFilters 'armeabi' ,'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
         }
         multiDexEnabled true
     }
@@ -85,7 +88,7 @@ dependencies {
 
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_2.1.4.20200313',ext:'aar')
+    implementation(name:'floo-android_2.1.5.20200314',ext:'aar')
 
     implementation 'com.squareup.okhttp3:okhttp:3.12.3'
 

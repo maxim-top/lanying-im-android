@@ -217,7 +217,9 @@ public class VideoPlay
      */
     public void pause() {
         try {
-            mMediaPlayer.pause();
+            if (mMediaPlayer != null) {
+                mMediaPlayer.pause();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

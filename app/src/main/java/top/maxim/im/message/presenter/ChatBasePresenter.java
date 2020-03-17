@@ -263,6 +263,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }
 
         @Override
+        public void onReceiveCommandMessages(BMXMessageList list) {
+        }
+
+        @Override
         public void onReceiveReadAcks(BMXMessageList list) {
             // 收到已读回执
             if (list != null && !list.isEmpty()) {

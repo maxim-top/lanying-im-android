@@ -191,6 +191,20 @@ public final class MessageSendUtils {
     }
 
     /**
+     * 发送command消息
+     *
+     * @param type 消息类型
+     * @param from from
+     * @param to to
+     * @param content 内容
+     * @return BMXMessage
+     */
+    public void sendCommadMessage(BMXMessage.MessageType type, long from, long to,
+            String content) {
+        handlerMessage(BMXMessage.createCommandMessage(from, to, type, to, content));
+    }
+
+    /**
      * 发送消息
      * 
      * @return BMXMessage

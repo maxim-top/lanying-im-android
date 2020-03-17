@@ -13,6 +13,7 @@ import com.heytap.mcssdk.PushManager;
 import com.huawei.hms.api.ConnectionResult;
 import com.huawei.hms.api.HuaweiApiAvailability;
 import com.meizu.cloud.pushsdk.util.MzSystemUtils;
+import com.vivo.push.PushClient;
 import com.xiaomi.mipush.sdk.MiPushClient;
 
 import im.floo.floolib.BMXErrorCode;
@@ -31,6 +32,7 @@ import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.push.huawei.HWPushManager;
 import top.maxim.im.push.meizu.MZPushManager;
 import top.maxim.im.push.oppo.OppoPushManager;
+import top.maxim.im.push.vivo.VivoPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
 
 /**
@@ -52,6 +54,8 @@ public final class PushClientMgr {
     public static final int MZ_TYPE = 3;
     
     public static final int OPPO_TYPE = 4;
+    
+    public static final int VIVO_TYPE = 5;
 
     private static PushClientMgr sPushMgr = new PushClientMgr();
 
@@ -76,6 +80,9 @@ public final class PushClientMgr {
             } else if (isOppo(application.getApplicationContext())) {
                 sManager = new OppoPushManager(application.getApplicationContext());
                 sDevType = OPPO_TYPE;
+            } else if (isVivo(application.getApplicationContext())) {
+                sManager = new VivoPushManager(application.getApplicationContext());
+                sDevType = VIVO_TYPE;
             }
             isInited = true;
             return true;
@@ -109,6 +116,20 @@ public final class PushClientMgr {
      */
     public static boolean isOppo(Context context) {
         return RomUtil.isOppo() && PushManager.isSupportPush(context);
+    }
+
+    /**
+     * 判断oppo
+     */
+    public static boolean isVivo(Context context) {
+        if (!isInited) {
+            PushClient.getInstance(context).initialize();
+        }
+        try {
+            return RomUtil.isVivo() && PushClient.getInstance(context).isSupport();
+        } catch (Exception e) {
+        }
+        return false;
     }
 
     public static PushClientMgr getManager() {

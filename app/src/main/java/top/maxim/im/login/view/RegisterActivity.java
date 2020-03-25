@@ -20,13 +20,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXUserProfile;
-import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
@@ -362,37 +358,17 @@ public class RegisterActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(account).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signUpNewUser(account, pwd, new BMXUserProfile());
+        UserManager.getInstance().signUpNewUser(account, pwd, (bmxErrorCode, bmxUserProfile) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                RegisterBindMobileActivity.openRegisterBindMobile(RegisterActivity.this,
+                        mInputName.getEditableText().toString().trim(),
+                        mInputPwd.getEditableText().toString().trim(), mChangeAppId);
+                finish();
+            } else {
+                ToastUtil.showTextViewPrompt("网络异常");
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("网络异常");
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        RegisterBindMobileActivity.openRegisterBindMobile(RegisterActivity.this,
-                                mInputName.getEditableText().toString().trim(),
-                                mInputPwd.getEditableText().toString().trim(), mChangeAppId);
-                        finish();
-                    }
-                });
+        });
     }
 
     /**

@@ -1,11 +1,11 @@
 
 package top.maxim.im.bmxmanager;
 
-import im.floo.floolib.BMXChatService;
+import im.floo.BMXCallBack;
+import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXConversation;
 import im.floo.floolib.BMXConversationList;
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXMessageListList;
@@ -20,14 +20,14 @@ public class ChatManager extends BaseManager {
 
     private static final ChatManager sInstance = new ChatManager();
 
-    private BMXChatService mService;
+    private im.floo.manager.ChatManager mService;
 
     public static ChatManager getInstance() {
         return sInstance;
     }
 
     private ChatManager() {
-        mService = bmxClient.getChatService();
+        mService = im.floo.manager.ChatManager.getInstance();
     }
 
     /**
@@ -54,8 +54,8 @@ public class ChatManager extends BaseManager {
     /**
      * 转发消息列表
      */
-    public BMXErrorCode forwardMessage(BMXMessageList list, BMXConversation to, BMXMessage newMsg) {
-        return mService.forwardMessage(list, to, newMsg);
+    public void forwardMessage(BMXMessageList list, BMXConversation to, BMXMessage newMsg, BMXCallBack callBack) {
+        mService.forwardMessage(list, to, newMsg, callBack);
     }
 
     /**
@@ -113,15 +113,15 @@ public class ChatManager extends BaseManager {
     /**
      * 插入消息
      **/
-    public BMXErrorCode insertMessages(BMXMessageList list) {
-        return mService.insertMessages(list);
+    public void insertMessages(BMXMessageList list, BMXCallBack callBack) {
+        mService.insertMessages(list, callBack);
     }
 
     /**
      * 读取一条消息
      **/
-    public BMXMessage getMessage(long msgId) {
-        return mService.getMessage(msgId);
+    public void getMessage(long msgId, BMXDataCallBack<BMXMessage> callBack) {
+        mService.getMessage(msgId, callBack);
     }
 
     /**
@@ -134,46 +134,45 @@ public class ChatManager extends BaseManager {
     /**
      * 打开一个会话
      **/
-    public BMXConversation openConversation(long conversationId, BMXConversation.Type type,
-            boolean createIfNotExist) {
-        return mService.openConversation(conversationId, type, createIfNotExist);
+    public void openConversation(long conversationId, BMXConversation.Type type,
+            boolean createIfNotExist, BMXDataCallBack<BMXConversation> callBack) {
+        mService.openConversation(conversationId, type, createIfNotExist, callBack);
     }
 
     /**
      * 获取所有会话
      **/
-    public BMXConversationList getAllConversations() {
-        return mService.getAllConversations();
+    public void getAllConversations(BMXDataCallBack<BMXConversationList> callBack) {
+        mService.getAllConversations(callBack);
     }
 
     /**
      * 获取所有会话未读数
      **/
-    public int getAllConversationsUnreadCount() {
-        return mService.getAllConversationsUnreadCount();
+    public void getAllConversationsUnreadCount(BMXDataCallBack<Integer> callBack) {
+        mService.getAllConversationsUnreadCount(callBack);
     }
 
     /**
      * 拉取历史消息
      **/
-    public BMXErrorCode retrieveHistoryMessages(BMXConversation conversation, long refMsgId,
-            long size, BMXMessageList result) {
-        return mService.retrieveHistoryMessages(conversation, refMsgId, size, result);
+    public void retrieveHistoryMessages(BMXConversation conversation, long refMsgId, long size, BMXDataCallBack<BMXMessageList> callBack) {
+        mService.retrieveHistoryMessages(conversation, refMsgId, size, callBack);
     }
 
-    public BMXErrorCode searchMessages(String keywords, long refTime, long size,
-            BMXMessageListList result, BMXConversation.Direction arg4) {
-        return mService.searchMessages(keywords, refTime, size, result, arg4);
+    public void searchMessages(String keywords, long refTime, long size,
+            BMXConversation.Direction arg4, BMXDataCallBack<BMXMessageListList> callBack) {
+        mService.searchMessages(keywords, refTime, size, arg4, callBack);
     }
 
-    public BMXErrorCode searchMessages(String keywords, long refTime, long size,
-            BMXMessageListList result) {
-        return mService.searchMessages(keywords, refTime, size, result);
+    public void searchMessages(String keywords, long refTime, long size,
+            BMXDataCallBack<BMXMessageListList> callBack) {
+        mService.searchMessages(keywords, refTime, size, callBack);
     }
 
-    public BMXErrorCode getGroupAckMessageUserIdList(BMXMessage msg,
-            ListOfLongLong groupMemberIdList) {
-        return mService.getGroupAckMessageUserIdList(msg, groupMemberIdList);
+    public void getGroupAckMessageUserIdList(BMXMessage msg,
+            BMXDataCallBack<ListOfLongLong> callBack) {
+        mService.getGroupAckMessageUserIdList(msg, callBack);
     }
 
     /**

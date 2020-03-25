@@ -19,18 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import im.floo.floolib.BMXConversation;
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
-import im.floo.floolib.BMXMessageListList;
 import im.floo.floolib.BMXRosterItem;
-import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
@@ -165,57 +157,27 @@ public class MessageSearchActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        final BMXMessageListList list = new BMXMessageListList();
-        Observable.just(search).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return ChatManager.getInstance().searchMessages(s, 0, DEFAULT_PAGE, list);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).map(new Func1<BMXErrorCode, List<BMXMessage>>() {
-            @Override
-            public List<BMXMessage> call(BMXErrorCode errorCode) {
-                if (!list.isEmpty()) {
-                    List<BMXMessage> messages = new ArrayList<>();
-                    for (int i = 0; i < list.size(); i++) {
-                        BMXMessageList bmxMessageList = list.get(i);
-                        if (bmxMessageList != null && !bmxMessageList.isEmpty()) {
-                            for (int m = 0; m < bmxMessageList.size(); m++) {
-                                messages.add(bmxMessageList.get(m));
-                            }
+        ChatManager.getInstance().searchMessages(search, 0, DEFAULT_PAGE, (bmxErrorCode, list) -> {
+            dismissLoadingDialog();
+            List<BMXMessage> messages = new ArrayList<>();
+            if (BaseManager.bmxFinish(bmxErrorCode) && list != null) {
+                for (int i = 0; i < list.size(); i++) {
+                    BMXMessageList bmxMessageList = list.get(i);
+                    if (bmxMessageList != null && !bmxMessageList.isEmpty()) {
+                        for (int m = 0; m < bmxMessageList.size(); m++) {
+                            messages.add(bmxMessageList.get(m));
                         }
                     }
-                    return messages;
                 }
-                return null;
+                isUpLoad(messages);
+                if (messages.isEmpty()) {
+                    mAdapter.removeAll();
+                } else {
+                    mAdapter.replaceList(messages);
+                    notifyMessage(messages);
+                }
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<BMXMessage>>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onNext(List<BMXMessage> messages) {
-                        isUpLoad(messages);
-                        if (messages == null || messages.isEmpty()) {
-                            mAdapter.removeAll();
-                        } else {
-                            mAdapter.replaceList(messages);
-                            notifyMessage(messages);
-                        }
-                    }
-                });
+        });
     }
 
     /**
@@ -228,54 +190,24 @@ public class MessageSearchActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        final BMXMessageListList list = new BMXMessageListList();
-        Observable.just(search).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return ChatManager.getInstance().searchMessages(s, refTime, DEFAULT_PAGE, list,
-                        BMXConversation.Direction.Down);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).map(new Func1<BMXErrorCode, List<BMXMessage>>() {
-            @Override
-            public List<BMXMessage> call(BMXErrorCode errorCode) {
-                if (!list.isEmpty()) {
+        ChatManager.getInstance().searchMessages(search, refTime, DEFAULT_PAGE,
+                BMXConversation.Direction.Down, (bmxErrorCode, list) -> {
+                    dismissLoadingDialog();
                     List<BMXMessage> messages = new ArrayList<>();
-                    for (int i = 0; i < list.size(); i++) {
-                        BMXMessageList bmxMessageList = list.get(i);
-                        if (bmxMessageList != null && !bmxMessageList.isEmpty()) {
-                            for (int m = 0; m < bmxMessageList.size(); m++) {
-                                messages.add(bmxMessageList.get(m));
+                    if (BaseManager.bmxFinish(bmxErrorCode) && list != null) {
+                        for (int i = 0; i < list.size(); i++) {
+                            BMXMessageList bmxMessageList = list.get(i);
+                            if (bmxMessageList != null && !bmxMessageList.isEmpty()) {
+                                for (int m = 0; m < bmxMessageList.size(); m++) {
+                                    messages.add(bmxMessageList.get(m));
+                                }
                             }
                         }
                     }
-                    return messages;
-                }
-                return null;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<List<BMXMessage>>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onNext(List<BMXMessage> messages) {
-                        isUpLoad(messages);
-                        if (messages != null && !messages.isEmpty()) {
-                            mAdapter.addListAtEnd(messages);
-                            notifyMessage(messages);
-                        }
+                    isUpLoad(messages);
+                    if (!messages.isEmpty()) {
+                        mAdapter.addListAtEnd(messages);
+                        notifyMessage(messages);
                     }
                 });
     }
@@ -296,39 +228,14 @@ public class MessageSearchActivity extends BaseTitleActivity {
             rosterIds.add(message.fromId());
         }
         if (!rosterIds.isEmpty()) {
-            Observable.just(rosterIds).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-                @Override
-                public BMXErrorCode call(ListOfLongLong listOfLongLong) {
-                    BMXRosterItemList itemList = new BMXRosterItemList();
-                    BMXErrorCode errorCode = RosterManager.getInstance().search(listOfLongLong,
-                            itemList, true);
-                    RosterFetcher.getFetcher().putRosters(itemList);
-                    return errorCode;
+            RosterManager.getInstance().search(rosterIds, true, (bmxErrorCode, itemList) -> {
+                RosterFetcher.getFetcher().putRosters(itemList);
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    if (mAdapter != null) {
+                        mAdapter.notifyDataSetChanged();
+                    }
                 }
-            }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-                @Override
-                public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                    return BaseManager.bmxFinish(errorCode, errorCode);
-                }
-            }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<BMXErrorCode>() {
-                        @Override
-                        public void onCompleted() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onNext(BMXErrorCode errorCode) {
-                            if (mAdapter != null) {
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        }
-                    });
+            });
         }
     }
 

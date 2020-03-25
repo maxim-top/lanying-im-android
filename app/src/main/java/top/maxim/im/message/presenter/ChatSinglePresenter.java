@@ -5,7 +5,6 @@ import android.text.TextUtils;
 
 import org.json.JSONObject;
 
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXRosterItem;
 import rx.Observable;
@@ -13,7 +12,6 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatSingleContract;
@@ -56,45 +54,23 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
                 mView.setHeadTitle(name);
             }
         }
-        mRoster = new BMXRosterItem();
-        Observable.just(chatId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long aLong) {
-                return RosterManager.getInstance().search(aLong, true, mRoster);
+        RosterManager.getInstance().search(chatId, true, (bmxErrorCode, bmxRosterItem) -> {
+            if (bmxRosterItem != null) {
+                mRoster = bmxRosterItem;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+            RosterFetcher.getFetcher().putRoster(mRoster);
+            String name = "";
+            if (mRoster != null && !TextUtils.isEmpty(mRoster.alias())) {
+                name = mRoster.alias();
+            } else if (mRoster != null && !TextUtils.isEmpty(mRoster.nickname())) {
+                name = mRoster.nickname();
+            } else if (mRoster != null) {
+                name = mRoster.username();
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mRoster = null;
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        RosterFetcher.getFetcher().putRoster(mRoster);
-                        String name = "";
-                        if (mRoster != null && !TextUtils.isEmpty(mRoster.alias())) {
-                            name = mRoster.alias();
-                        } else if (mRoster != null && !TextUtils.isEmpty(mRoster.nickname())) {
-                            name = mRoster.nickname();
-                        } else if (mRoster != null) {
-                            name = mRoster.username();
-                        }
-                        if (mView != null) {
-                            mView.setHeadTitle(name);
-                        }
-                    }
-                });
+            if (mView != null) {
+                mView.setHeadTitle(name);
+            }
+        });
     }
 
     @Override

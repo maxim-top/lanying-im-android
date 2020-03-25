@@ -11,12 +11,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXUserProfile;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
@@ -82,33 +76,17 @@ public class MyQrCodeActivity extends BaseTitleActivity {
 
     private void initUser() {
         initQrCode();
-        final BMXUserProfile profile = new BMXUserProfile();
-        Observable.just(profile)
-                .map(userProfile -> UserManager.getInstance().getProfile(userProfile, false))
-                .flatMap(errorCode -> BaseManager.bmxFinish(errorCode, errorCode))
-                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        String name = profile.username();
-                        String nickName = profile.nickname();
-                        ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
-                        long userId = profile.userId();
-                        mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
-                        mNickName.setText(TextUtils.isEmpty(nickName) ? "" : "昵称:" + nickName);
-                        mUserId.setText(userId <= 0 ? "" : "BMXID:" + userId);
-                    }
-                });
+        UserManager.getInstance().getProfile(false, (bmxErrorCode, profile) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode) && profile != null) {
+                String name = profile.username();
+                String nickName = profile.nickname();
+                ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
+                long userId = profile.userId();
+                mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
+                mNickName.setText(TextUtils.isEmpty(nickName) ? "" : "昵称:" + nickName);
+                mUserId.setText(userId <= 0 ? "" : "BMXID:" + userId);
+            }
+        });
     }
 
     /**

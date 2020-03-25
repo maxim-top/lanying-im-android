@@ -15,15 +15,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
-import im.floo.floolib.BMXGroupList;
 import im.floo.floolib.BMXMessage;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -115,46 +108,18 @@ public class ForwardMsgGroupActivity extends BaseTitleActivity {
     }
 
     private void getAllGroup() {
-        final BMXGroupList list = new BMXGroupList();
-        Observable.just(list).map(new Func1<BMXGroupList, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXGroupList bmxGroupList) {
-                return GroupManager.getInstance().search(bmxGroupList, false);
+        GroupManager.getInstance().search(false, (bmxErrorCode, list) -> {
+            dismissLoadingDialog();
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                ToastUtil.showTextViewPrompt(error);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+            List<BMXGroup> groupList = new ArrayList<>();
+            for (int i = 0; i < list.size(); i++) {
+                groupList.add(list.get(i));
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                        GroupManager.getInstance().search(list, false);
-                        List<BMXGroup> groupList = new ArrayList<>();
-                        for (int i = 0; i < list.size(); i++) {
-                            groupList.add(list.get(i));
-                        }
-                        mAdapter.replaceList(groupList);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        List<BMXGroup> groupList = new ArrayList<>();
-                        for (int i = 0; i < list.size(); i++) {
-                            groupList.add(list.get(i));
-                        }
-                        mAdapter.replaceList(groupList);
-                    }
-                });
+            mAdapter.replaceList(groupList);
+        });
     }
 
     private void forwardMessage(long groupId) {

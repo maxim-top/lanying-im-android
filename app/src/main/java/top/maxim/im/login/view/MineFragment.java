@@ -17,11 +17,6 @@ import com.gavin.view.flexible.FlexibleLayout;
 
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.BuildConfig;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
@@ -368,34 +363,11 @@ public class MineFragment extends BaseTitleFragment {
     @Override
     public void onResume() {
         super.onResume();
-        final BMXUserProfile profile = new BMXUserProfile();
-        Observable.just(profile).map(new Func1<BMXUserProfile, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXUserProfile profile) {
-                return UserManager.getInstance().getProfile(profile, false);
+        UserManager.getInstance().getProfile(false, (bmxErrorCode, bmxUserProfile) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode) && bmxUserProfile != null) {
+                initUser(bmxUserProfile);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        initUser(profile);
-                    }
-                });
+        });
     }
 
     private void initUser(BMXUserProfile profile) {
@@ -464,41 +436,22 @@ public class MineFragment extends BaseTitleFragment {
      */
     private void setPushEnable(final boolean enable) {
         showLoadingDialog(true);
-        Observable.just(enable).map(new Func1<Boolean, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Boolean aBoolean) {
-                return UserManager.getInstance().setEnablePush(enable);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
+        UserManager.getInstance().setEnablePush(enable, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                if (enable) {
+                    mPushSoundView.setVisibility(View.VISIBLE);
+                    mPushVibrateView.setVisibility(View.VISIBLE);
+                } else {
+                    mPushSoundView.setVisibility(View.GONE);
+                    mPushVibrateView.setVisibility(View.GONE);
 
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                        mSettingPush.setCheckStatus(!enable);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        if (enable) {
-                            mPushSoundView.setVisibility(View.VISIBLE);
-                            mPushVibrateView.setVisibility(View.VISIBLE);
-                        } else {
-                            mPushSoundView.setVisibility(View.GONE);
-                            mPushVibrateView.setVisibility(View.GONE);
-                        }
-                    }
-                });
+                }
+            } else {
+                toastError(bmxErrorCode);
+                mPushDetail.setCheckStatus(!enable);
+            }
+        });
     }
 
     /**
@@ -508,34 +461,13 @@ public class MineFragment extends BaseTitleFragment {
      */
     private void setPushDetailEnable(final boolean enable) {
         showLoadingDialog(true);
-        Observable.just(enable).map(new Func1<Boolean, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Boolean aBoolean) {
-                return UserManager.getInstance().setEnablePushDetaile(enable);
+        UserManager.getInstance().setEnablePushDetaile(enable, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                toastError(bmxErrorCode);
+                mSettingPush.setCheckStatus(!enable);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                        mPushDetail.setCheckStatus(!enable);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                    }
-                });
+        });
     }
 
     /**
@@ -545,34 +477,13 @@ public class MineFragment extends BaseTitleFragment {
      */
     private void setPushSoundEnable(final boolean enable) {
         showLoadingDialog(true);
-        Observable.just(enable).map(new Func1<Boolean, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Boolean aBoolean) {
-                return UserManager.getInstance().setNotificationSound(enable);
+        UserManager.getInstance().setNotificationSound(enable, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                toastError(bmxErrorCode);
+                mPushSound.setCheckStatus(!enable);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                        mPushSound.setCheckStatus(!enable);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                    }
-                });
+        });
     }
 
     /**
@@ -582,34 +493,13 @@ public class MineFragment extends BaseTitleFragment {
      */
     private void setPushVibrateEnable(final boolean enable) {
         showLoadingDialog(true);
-        Observable.just(enable).map(new Func1<Boolean, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Boolean aBoolean) {
-                return UserManager.getInstance().setNotificationVibrate(enable);
+        UserManager.getInstance().setNotificationVibrate(enable, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                toastError(bmxErrorCode);
+                mPushVibrate.setCheckStatus(!enable);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                        mPushVibrate.setCheckStatus(!enable);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                    }
-                });
+        });
     }
 
     /**
@@ -619,34 +509,13 @@ public class MineFragment extends BaseTitleFragment {
      */
     private void setAutoDownloadAttachmentEnable(final boolean enable) {
         showLoadingDialog(true);
-        Observable.just(enable).map(new Func1<Boolean, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Boolean aBoolean) {
-                return UserManager.getInstance().setAutoDownloadAttachment(enable);
+        UserManager.getInstance().setAutoDownloadAttachment(enable, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                toastError(bmxErrorCode);
+                autoDownloadAttachment.setCheckStatus(!enable);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                        autoDownloadAttachment.setCheckStatus(!enable);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                    }
-                });
+        });
     }
 
     /**
@@ -656,34 +525,13 @@ public class MineFragment extends BaseTitleFragment {
      */
     private void setAutoAcceptGroupInviteEnable(final boolean enable) {
         showLoadingDialog(true);
-        Observable.just(enable).map(new Func1<Boolean, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Boolean aBoolean) {
-                return UserManager.getInstance().setAutoAcceptGroupInvite(enable);
+        UserManager.getInstance().setAutoAcceptGroupInvite(enable, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                toastError(bmxErrorCode);
+                autoAcceptGroupInvite.setCheckStatus(!enable);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                        autoAcceptGroupInvite.setCheckStatus(!enable);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                    }
-                });
+        });
     }
 
     /**
@@ -696,34 +544,14 @@ public class MineFragment extends BaseTitleFragment {
         // return;
         // }
         showLoadingDialog(true);
-        Observable.just(name).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().setPushNickname(name);
+        UserManager.getInstance().setPushNickname(name, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                mPushName.setEndContent(name);
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        mPushName.setEndContent(name);
-                    }
-                });
+        });
     }
 
     /**
@@ -747,35 +575,15 @@ public class MineFragment extends BaseTitleFragment {
 
     void logout() {
         showLoadingDialog(true);
-        Observable.just("").map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signOut();
+        UserManager.getInstance().signOut((bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                CommonUtils.getInstance().logout();
+                WelcomeActivity.openWelcome(getActivity());
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        CommonUtils.getInstance().logout();
-                        WelcomeActivity.openWelcome(getActivity());
-                    }
-                });
+        }));
     }
 
     /**
@@ -814,6 +622,11 @@ public class MineFragment extends BaseTitleFragment {
 
     private void toastError(Throwable e) {
         String error = e != null ? e.getMessage() : "网络异常";
+        ToastUtil.showTextViewPrompt(error);
+    }
+
+    private void toastError(BMXErrorCode e) {
+        String error = e != null ? e.name() : "网络异常";
         ToastUtil.showTextViewPrompt(error);
     }
 }

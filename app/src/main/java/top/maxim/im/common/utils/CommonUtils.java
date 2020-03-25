@@ -72,7 +72,7 @@ public class CommonUtils {
         SharePreferenceUtils.getInstance().putUserPwd("");
         SharePreferenceUtils.getInstance().putToken("");
         SharePreferenceUtils.getInstance().putAppId("");
-        UserManager.getInstance().changeAppId(SharePreferenceUtils.getInstance().getAppId());
+        UserManager.getInstance().changeAppId(SharePreferenceUtils.getInstance().getAppId(), null);
         PushClientMgr.getManager().unRegister();
         PushUtils.getInstance().unregisterActivityListener(AppContextUtils.getApplication());
     }

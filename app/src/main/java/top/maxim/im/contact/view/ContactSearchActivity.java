@@ -18,13 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import im.floo.floolib.BMXErrorCode;
+import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXRosterItem;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -127,44 +122,23 @@ public class ContactSearchActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        final BMXRosterItem item = new BMXRosterItem();
-        Observable.just(search).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                if (mSearchByUserId) {
-                    if (Pattern.matches("[0-9]+", s)) {
-                        // 纯数字
-                        return RosterManager.getInstance().search(Long.valueOf(s), true, item);
-                    }
-                }
-                return RosterManager.getInstance().search(s, true, item);
+        BMXDataCallBack<BMXRosterItem> callBack = (bmxErrorCode, item) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                List<BMXRosterItem> mSearchs = new ArrayList<>();
+                mSearchs.add(item);
+                mAdapter.replaceList(mSearchs);
+            } else {
+                mAdapter.removeAll();
+                ToastUtil.showTextViewPrompt("未搜索到用户");
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        mAdapter.removeAll();
-                        ToastUtil.showTextViewPrompt("未搜索到用户");
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        List<BMXRosterItem> mSearchs = new ArrayList<>();
-                        mSearchs.add(item);
-                        mAdapter.replaceList(mSearchs);
-                    }
-                });
+        };
+        if (mSearchByUserId && Pattern.matches("[0-9]+", search)) {
+            // 纯数字
+            RosterManager.getInstance().search(Long.valueOf(search), true, callBack);
+        } else {
+            RosterManager.getInstance().search(search, true, callBack);
+        }
     }
 
     class SearchAdapter extends BaseRecyclerAdapter<BMXRosterItem> {
@@ -235,35 +209,15 @@ public class ContactSearchActivity extends BaseTitleActivity {
                 return;
             }
             showLoadingDialog(true);
-            Observable.just(rosterId).map(new Func1<Long, BMXErrorCode>() {
-                @Override
-                public BMXErrorCode call(Long s) {
-                    return RosterManager.getInstance().apply(s, reason);
+            RosterManager.getInstance().apply(rosterId, reason, bmxErrorCode -> {
+                dismissLoadingDialog();
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    ToastUtil.showTextViewPrompt("添加成功");
+                    finish();
+                } else {
+                    ToastUtil.showTextViewPrompt("添加失败");
                 }
-            }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-                @Override
-                public Observable<BMXErrorCode> call(BMXErrorCode bmxErrorCode) {
-                    return BaseManager.bmxFinish(bmxErrorCode, bmxErrorCode);
-                }
-            }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<BMXErrorCode>() {
-                        @Override
-                        public void onCompleted() {
-                            dismissLoadingDialog();
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            dismissLoadingDialog();
-                            ToastUtil.showTextViewPrompt("添加失败");
-                        }
-
-                        @Override
-                        public void onNext(BMXErrorCode errorCode) {
-                            ToastUtil.showTextViewPrompt("添加成功");
-                            finish();
-                        }
-                    });
+            });
         }
     }
 }

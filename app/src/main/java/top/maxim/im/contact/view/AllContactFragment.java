@@ -25,16 +25,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupService;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -380,41 +373,20 @@ public class AllContactFragment extends BaseTitleFragment {
         BMXGroupService.CreateGroupOptions options = new BMXGroupService.CreateGroupOptions(name,
                 desc, publicCheckStatus);
         options.setMMembers(members);
-        final BMXGroup group = new BMXGroup();
         showLoadingDialog(true);
-        Observable.just(options).map(new Func1<BMXGroupService.CreateGroupOptions, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXGroupService.CreateGroupOptions createGroupOptions) {
-                return GroupManager.getInstance().create(createGroupOptions, group);
+        GroupManager.getInstance().create(options, (bmxErrorCode, group) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                if (mGroupFragment != null) {
+                    mGroupFragment.onShow();
+                }
+                ChatBaseActivity.startChatActivity(getActivity(), BMXMessage.MessageType.Group,
+                        group.groupId());
+            } else {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "创建失败";
+                ToastUtil.showTextViewPrompt(error);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "创建失败";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        if (mGroupFragment != null) {
-                            mGroupFragment.onShow();
-                        }
-                        ChatBaseActivity.startChatActivity(getActivity(),
-                                BMXMessage.MessageType.Group, group.groupId());
-                    }
-                });
+        });
     }
 
     final class MyViewPagerAdapter extends FragmentPagerAdapter {

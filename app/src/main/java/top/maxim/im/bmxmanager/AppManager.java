@@ -1198,7 +1198,7 @@ public class AppManager {
                 error = jsonObject.getString("message");
             }
             if (jsonObject.has(key)) {
-                t = (T)jsonObject.get(key);
+                t = mGson.fromJson(jsonObject.getString(key), clazz);
             }
         } catch (JSONException e) {
             e.printStackTrace();

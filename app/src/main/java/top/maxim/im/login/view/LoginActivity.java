@@ -17,13 +17,10 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXUserProfile;
-import rx.Observable;
+import im.floo.BMXCallBack;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.MainActivity;
@@ -38,6 +35,7 @@ import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
@@ -232,69 +230,53 @@ public class LoginActivity extends BaseTitleActivity {
         if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
             ((BaseTitleActivity)activity).showLoadingDialog(true);
         }
-        Observable.just(name).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                if (isLoginById) {
-                    return UserManager.getInstance().signInById(Long.valueOf(s), pwd);
-                }
-                // if (Pattern.matches("0?(13|14|15|17|18|19)[0-9]{9}", s)) {
-                // // 手机号
-                // return UserManager.getInstance().signInByPhone(s, pwd);
-                // }
-                return UserManager.getInstance().signInByName(s, pwd);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode bmxErrorCode) {
+
+        BMXCallBack callBack = (bmxErrorCode) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
                 // 登陆成功后 需要将userId存储SP 作为下次自动登陆
-                BMXUserProfile profile = new BMXUserProfile();
-                BMXErrorCode errorCode = UserManager.getInstance().getProfile(profile, true);
-                if (errorCode != null && errorCode.swigValue() == BMXErrorCode.NoError.swigValue()
-                        && profile.userId() > 0) {
-                    CommonUtils.getInstance()
-                            .addUser(new UserBean(profile.username(), profile.userId(), pwd,
-                                    changeAppId, System.currentTimeMillis()));
-                    if (!TextUtils.isEmpty(changeAppId)) {
-                        SharePreferenceUtils.getInstance().putAppId(changeAppId);
-                        UserManager.getInstance().changeAppId(changeAppId);
-                    }
-                    // 登陆成功消息预加载
-                    WelcomeActivity.initData();
-                }
-                return bmxErrorCode;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-                            ((BaseTitleActivity)activity).dismissLoadingDialog();
+                UserManager.getInstance().getProfile(true, (bmxErrorCode1, profile) -> {
+                    TaskDispatcher.exec(() -> {
+                        if (BaseManager.bmxFinish(bmxErrorCode1) && profile != null
+                                && profile.userId() > 0) {
+                            CommonUtils.getInstance()
+                                    .addUser(new UserBean(profile.username(), profile.userId(), pwd,
+                                            changeAppId, System.currentTimeMillis()));
+                            if (!TextUtils.isEmpty(changeAppId)) {
+                                SharePreferenceUtils.getInstance().putAppId(changeAppId);
+                                UserManager.getInstance().changeAppId(changeAppId, null);
+                            }
+                            // 登陆成功消息预加载
+                            WelcomeActivity.initData();
                         }
-                        String error = e != null ? e.getMessage() : "网络异常";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-                            ((BaseTitleActivity)activity).dismissLoadingDialog();
-                        }
-                        SharePreferenceUtils.getInstance().putLoginStatus(true);
-                        MessageDispatcher.getDispatcher().initialize();
-                        MainActivity.openMain(activity);
-                        activity.finish();
-                    }
+                        TaskDispatcher.postMain(() -> {
+                            if (activity instanceof BaseTitleActivity
+                                    && !activity.isFinishing()) {
+                                ((BaseTitleActivity)activity).dismissLoadingDialog();
+                            }
+                            SharePreferenceUtils.getInstance().putLoginStatus(true);
+                            MessageDispatcher.getDispatcher().initialize();
+                            MainActivity.openMain(activity);
+                            activity.finish();
+                        });
+                    });
                 });
+                return;
+            }
+            // 失败
+            if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+                ((BaseTitleActivity)activity).dismissLoadingDialog();
+            }
+            String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
+            ToastUtil.showTextViewPrompt(error);
+        };
+        if (isLoginById) {
+            UserManager.getInstance().signInById(Long.valueOf(name), pwd, callBack);
+        }
+        // if (Pattern.matches("0?(13|14|15|17|18|19)[0-9]{9}", s)) {
+        // // 手机号
+        // return UserManager.getInstance().signInByPhone(s, pwd);
+        // }
+        UserManager.getInstance().signInByName(name, pwd, callBack);
     }
 
     public static void wxChatLogin(final Activity activity, String openId) {

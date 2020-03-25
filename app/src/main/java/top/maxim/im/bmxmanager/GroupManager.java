@@ -1,7 +1,8 @@
 
 package top.maxim.im.bmxmanager;
 
-import im.floo.floolib.BMXErrorCode;
+import im.floo.BMXCallBack;
+import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupAnnouncementList;
 import im.floo.floolib.BMXGroupBannedMemberList;
@@ -25,336 +26,338 @@ public class GroupManager extends BaseManager {
 
     private static final GroupManager sInstance = new GroupManager();
 
-    private BMXGroupService mService;
+    private im.floo.manager.GroupManager mService;
 
     public static GroupManager getInstance() {
         return sInstance;
     }
 
     private GroupManager() {
-        mService = bmxClient.getGroupService();
+        mService = im.floo.manager.GroupManager.getInstance();
     }
 
     /**
      * 获取群组列表，如果设置了forceRefresh则从服务器拉取
      **/
-    public BMXErrorCode search(BMXGroupList list, boolean forceRefresh) {
-        return mService.search(list, forceRefresh);
+    public void search(boolean forceRefresh, BMXDataCallBack<BMXGroupList> callBack) {
+        mService.search(forceRefresh, callBack);
     }
 
     /**
      * 获取群信息
      **/
-    public BMXErrorCode search(ListOfLongLong groupIdList, BMXGroupList list,
-            boolean forceRefresh) {
-        return mService.search(groupIdList, list, forceRefresh);
+    public void search(ListOfLongLong groupIdList,
+            boolean forceRefresh, BMXDataCallBack<BMXGroupList> callBack) {
+        mService.search(groupIdList, forceRefresh, callBack);
     }
 
     /**
      * 获取群信息
      **/
-    public BMXErrorCode search(long groupId, BMXGroup group, boolean forceUpdate) {
-        return mService.search(groupId, group, forceUpdate);
+    public void search(long groupId, boolean forceUpdate, BMXDataCallBack<BMXGroup> callBack) {
+        mService.search(groupId, forceUpdate, callBack);
     }
 
     /**
      * 群聊邀请
      */
-    public BMXErrorCode getInvitationList(GroupInvitaionPage result, String cursor, int pageSize) {
-        return mService.getInvitationList(result, cursor, pageSize);
+    public void getInvitationList(String cursor, int pageSize, BMXDataCallBack<GroupInvitaionPage> callBack) {
+        mService.getInvitationList(cursor, pageSize, callBack);
     }
 
     /**
      * 入群通知
      */
-    public BMXErrorCode getApplicationList(BMXGroupList list, GroupApplicationPage result,
-            String cursor, int pageSize) {
-        return mService.getApplicationList(list, result, cursor, pageSize);
+    public void getApplicationList(GroupApplicationPage result,
+            String cursor, int pageSize, BMXDataCallBack<BMXGroupList> callBack) {
+        mService.getApplicationList(result, cursor, pageSize, callBack);
     }
 
     /**
      * 创建群
      **/
-    public BMXErrorCode create(BMXGroupService.CreateGroupOptions options, BMXGroup group) {
-        return mService.create(options, group);
+    public void create(BMXGroupService.CreateGroupOptions options, BMXDataCallBack<BMXGroup> callBack) {
+        mService.create(options, callBack);
     }
 
     /**
      * 销毁群
      **/
-    public BMXErrorCode destroy(BMXGroup group) {
-        return mService.destroy(group);
+    public void destroy(BMXGroup group, BMXCallBack callBack) {
+        mService.destroy(group, callBack);
     }
 
     /**
      * 加入一个群，根据群设置可能需要管理员批准
      **/
-    public BMXErrorCode join(BMXGroup group, String message) {
-        return mService.join(group, message);
+    public void join(BMXGroup group, String message, BMXCallBack callBack) {
+        mService.join(group, message, callBack);
     }
 
     /**
      * 退出群
      **/
-    public BMXErrorCode leave(BMXGroup group) {
-        return mService.leave(group);
+    public void leave(BMXGroup group, BMXCallBack callBack) {
+        mService.leave(group, callBack);
     }
 
     /**
      * 获取群详情，从服务端拉取最新信息
      **/
-    public BMXErrorCode getInfo(BMXGroup group) {
-        return mService.getInfo(group);
+    public void getInfo(BMXGroup group, BMXDataCallBack<BMXGroup> callBack) {
+        mService.getInfo(group, callBack);
     }
 
     /**
      * 获取群成员列表，如果设置了forceRefresh则从服务器拉取
      **/
-    public BMXErrorCode getMembers(BMXGroup group, BMXGroupMemberList list, boolean forceRefresh) {
-        return mService.getMembers(group, list, forceRefresh);
+    public void getMembers(BMXGroup group, boolean forceRefresh, BMXDataCallBack<BMXGroupMemberList> callBack) {
+        mService.getMembers(group, forceRefresh, callBack);
     }
 
     /**
      * 添加群成员
      **/
-    public BMXErrorCode addMembers(BMXGroup group, ListOfLongLong listOfLongLong, String message) {
-        return mService.addMembers(group, listOfLongLong, message);
+    public void addMembers(BMXGroup group, ListOfLongLong listOfLongLong, String message, BMXCallBack callBack) {
+        mService.addMembers(group, listOfLongLong, message, callBack);
     }
 
     /**
      * 删除群成员
      **/
-    public BMXErrorCode removeMembers(BMXGroup group, ListOfLongLong listOfLongLong,
-            String reason) {
-        return mService.removeMembers(group, listOfLongLong, reason);
+    public void removeMembers(BMXGroup group, ListOfLongLong listOfLongLong, String reason,
+            BMXCallBack callBack) {
+        mService.removeMembers(group, listOfLongLong, reason, callBack);
     }
 
     /**
      * 添加管理员
      **/
-    public BMXErrorCode addAdmins(BMXGroup group, ListOfLongLong listOfLongLong, String message) {
-        return mService.addAdmins(group, listOfLongLong, message);
+    public void addAdmins(BMXGroup group, ListOfLongLong listOfLongLong, String message,
+            BMXCallBack callBack) {
+        mService.addAdmins(group, listOfLongLong, message, callBack);
     }
 
     /**
      * 删除管理员
      **/
-    public BMXErrorCode removeAdmins(BMXGroup group, ListOfLongLong listOfLongLong, String reason) {
-        return mService.removeAdmins(group, listOfLongLong, reason);
+    public void removeAdmins(BMXGroup group, ListOfLongLong listOfLongLong, String reason,
+            BMXCallBack callBack) {
+        mService.removeAdmins(group, listOfLongLong, reason, callBack);
     }
 
     /**
      * 获取Admins列表，如果设置了forceRefresh则从服务器拉取
      **/
-    public BMXErrorCode getAdmins(BMXGroup group, BMXGroupMemberList list, boolean forceRefresh) {
-        return mService.getAdmins(group, list, forceRefresh);
+    public void getAdmins(BMXGroup group, boolean forceRefresh, BMXDataCallBack<BMXGroupMemberList> callBack) {
+        mService.getAdmins(group, forceRefresh, callBack);
     }
 
     /**
      * 添加黑名单
      **/
-    public BMXErrorCode blockMembers(BMXGroup group, ListOfLongLong listOfLongLong) {
-        return mService.blockMembers(group, listOfLongLong);
+    public void blockMembers(BMXGroup group, ListOfLongLong listOfLongLong, BMXCallBack callBack) {
+        mService.blockMembers(group, listOfLongLong, callBack);
     }
 
     /**
      * 从黑名单删除
      **/
-    public BMXErrorCode unblockMembers(BMXGroup group, ListOfLongLong listOfLongLong) {
-        return mService.unblockMembers(group, listOfLongLong);
+    public void unblockMembers(BMXGroup group, ListOfLongLong listOfLongLong, BMXCallBack callBack) {
+        mService.unblockMembers(group, listOfLongLong, callBack);
     }
 
     /**
      * 获取黑名单
      **/
-    public BMXErrorCode getBlockList(BMXGroup group, BMXGroupMemberList list,
-            boolean forceRefresh) {
-        return mService.getBlockList(group, list, forceRefresh);
+    public void getBlockList(BMXGroup group, boolean forceRefresh,
+            BMXDataCallBack<BMXGroupMemberList> callBack) {
+        mService.getBlockList(group, forceRefresh, callBack);
     }
 
     /**
      * 禁言
      **/
-    public BMXErrorCode banMembers(BMXGroup group, ListOfLongLong listOfLongLong, long duration,
-            String reason) {
-        return mService.banMembers(group, listOfLongLong, duration, reason);
+    public void banMembers(BMXGroup group, ListOfLongLong listOfLongLong, long duration,
+            String reason, BMXCallBack callBack) {
+        mService.banMembers(group, listOfLongLong, duration, reason, callBack);
     }
 
     /**
      * 解除禁言
      **/
-    public BMXErrorCode unbanMembers(BMXGroup group, ListOfLongLong listOfLongLong) {
-        return mService.unbanMembers(group, listOfLongLong);
+    public void unbanMembers(BMXGroup group, ListOfLongLong listOfLongLong, BMXCallBack callBack) {
+        mService.unbanMembers(group, listOfLongLong, callBack);
     }
 
     /**
      * 获取禁言列表
      **/
-    public BMXErrorCode getBannedMembers(BMXGroup group, BMXGroupBannedMemberList list) {
-        return mService.getBannedMembers(group, list);
+    public void getBannedMembers(BMXGroup group, BMXDataCallBack<BMXGroupBannedMemberList> callBack) {
+        mService.getBannedMembers(group, callBack);
     }
 
     /**
      * 屏蔽群消息开关
      **/
-    public BMXErrorCode muteMessage(BMXGroup group, BMXGroup.MsgMuteMode mode) {
-        return mService.muteMessage(group, mode);
+    public void muteMessage(BMXGroup group, BMXGroup.MsgMuteMode mode, BMXCallBack callBack) {
+        mService.muteMessage(group, mode, callBack);
     }
 
     /**
      * 接受入群申请
      **/
-    public BMXErrorCode acceptApplication(BMXGroup group, long applicantId) {
-        return mService.acceptApplication(group, applicantId);
+    public void acceptApplication(BMXGroup group, long applicantId, BMXCallBack callBack) {
+        mService.acceptApplication(group, applicantId, callBack);
     }
 
     /**
      * 拒绝入群申请
      **/
-    public BMXErrorCode declineApplication(BMXGroup group, long applicantId, String reason) {
-        return mService.declineApplication(group, applicantId, reason);
+    public void declineApplication(BMXGroup group, long applicantId, String reason, BMXCallBack callBack) {
+        mService.declineApplication(group, applicantId, reason, callBack);
     }
 
     /**
      * 接受入群邀请
      **/
-    public BMXErrorCode acceptInvitation(BMXGroup group, long inviter) {
-        return mService.acceptInvitation(group, inviter);
+    public void acceptInvitation(BMXGroup group, long inviter, BMXCallBack callBack) {
+        mService.acceptInvitation(group, inviter, callBack);
     }
 
     /**
      * 拒绝入群邀请
      **/
-    public BMXErrorCode declineInvitation(BMXGroup group, long inviter) {
-        return mService.declineInvitation(group, inviter);
+    public void declineInvitation(BMXGroup group, long inviter, BMXCallBack callBack) {
+        mService.declineInvitation(group, inviter, callBack);
     }
 
     /**
      * 转移群主
      **/
-    public BMXErrorCode transferOwner(BMXGroup group, long newOwnerId) {
-        return mService.transferOwner(group, newOwnerId);
+    public void transferOwner(BMXGroup group, long newOwnerId, BMXCallBack callBack) {
+        mService.transferOwner(group, newOwnerId, callBack);
     }
 
     /**
      * 添加群共享文件
      **/
-    public BMXErrorCode uploadSharedFile(BMXGroup group, String filePath, String displayName,
-            String extensionName, FileProgressListener listener) {
-        return mService.uploadSharedFile(group, filePath, displayName, extensionName, listener);
+    public void uploadSharedFile(BMXGroup group, String filePath, String displayName,
+            String extensionName, FileProgressListener listener, BMXCallBack callBack) {
+        mService.uploadSharedFile(group, filePath, displayName, extensionName, listener, callBack);
     }
 
     /**
      * 移除群共享文件
      **/
-    public BMXErrorCode removeSharedFile(BMXGroup group, BMXGroup.SharedFile sharedFile) {
-        return mService.removeSharedFile(group, sharedFile);
+    public void removeSharedFile(BMXGroup group, BMXGroup.SharedFile sharedFile, BMXCallBack callBack) {
+        mService.removeSharedFile(group, sharedFile, callBack);
     }
 
     /**
      * 下载群共享文件
      **/
-    public BMXErrorCode downloadSharedFile(BMXGroup group, BMXGroup.SharedFile sharedFile,
-            FileProgressListener listener) {
-        return mService.downloadSharedFile(group, sharedFile, listener);
+    public void downloadSharedFile(BMXGroup group, BMXGroup.SharedFile sharedFile,
+            FileProgressListener listener, BMXCallBack callBack) {
+        mService.downloadSharedFile(group, sharedFile, listener, callBack);
     }
 
     /**
      * 获取群共享文件列表
      **/
-    public BMXErrorCode getSharedFilesList(BMXGroup group, BMXGroupSharedFileList list,
-            boolean forceRefresh) {
-        return mService.getSharedFilesList(group, list, forceRefresh);
+    public void getSharedFilesList(BMXGroup group, boolean forceRefresh,
+            BMXDataCallBack<BMXGroupSharedFileList> callBack) {
+        mService.getSharedFilesList(group, forceRefresh, callBack);
     }
 
     /**
      * 修改群文件名称
      */
-    public BMXErrorCode changeSharedFileName(BMXGroup group, BMXGroup.SharedFile sharedFile,
-            String name) {
-        return mService.changeSharedFileName(group, sharedFile, name);
+    public void changeSharedFileName(BMXGroup group, BMXGroup.SharedFile sharedFile, String name,
+            BMXCallBack callBack) {
+        mService.changeSharedFileName(group, sharedFile, name, callBack);
     }
 
-    public BMXErrorCode getLatestAnnouncement(BMXGroup group, BMXGroup.Announcement announcement,
-            boolean forceRefresh) {
-        return mService.getLatestAnnouncement(group, announcement, forceRefresh);
+    public void getLatestAnnouncement(BMXGroup group, boolean forceRefresh,
+            BMXDataCallBack<BMXGroup.Announcement> callBack) {
+        mService.getLatestAnnouncement(group, forceRefresh, callBack);
     }
 
-    public BMXErrorCode getAnnouncementList(BMXGroup group, BMXGroupAnnouncementList list,
-            boolean forceRefresh) {
-        return mService.getAnnouncementList(group, list, forceRefresh);
+    public void getAnnouncementList(BMXGroup group, boolean forceRefresh,
+            BMXDataCallBack<BMXGroupAnnouncementList> callBack) {
+        mService.getAnnouncementList(group, forceRefresh, callBack);
     }
 
-    public BMXErrorCode editAnnouncement(BMXGroup group, String title, String content) {
-        return mService.editAnnouncement(group, title, content);
+    public void editAnnouncement(BMXGroup group, String title, String content, BMXCallBack callBack) {
+        mService.editAnnouncement(group, title, content, callBack);
     }
 
-    public BMXErrorCode deleteAnnouncement(BMXGroup group, long announcementId) {
-        return mService.deleteAnnouncement(group, announcementId);
+    public void deleteAnnouncement(BMXGroup group, long announcementId, BMXCallBack callBack) {
+        mService.deleteAnnouncement(group, announcementId, callBack);
     }
 
     /**
      * 设置群名称
      **/
-    public BMXErrorCode setName(BMXGroup group, String name) {
-        return mService.setName(group, name);
+    public void setName(BMXGroup group, String name, BMXCallBack callBack) {
+        mService.setName(group, name, callBack);
     }
 
     /**
      * 设置群描述信息
      **/
-    public BMXErrorCode setDescription(BMXGroup group, String description) {
-        return mService.setDescription(group, description);
+    public void setDescription(BMXGroup group, String description,BMXCallBack callBack) {
+        mService.setDescription(group, description, callBack);
     }
 
     /**
      * 设置群扩展信息
      **/
-    public BMXErrorCode setExtension(BMXGroup group, String extension) {
-        return mService.setExtension(group, extension);
+    public void setExtension(BMXGroup group, String extension, BMXCallBack callBack) {
+        mService.setExtension(group, extension, callBack);
     }
 
     /**
      * 设置在群里的昵称
      **/
-    public BMXErrorCode setMyNickname(BMXGroup group, String nickname) {
-        return mService.setMyNickname(group, nickname);
+    public void setMyNickname(BMXGroup group, String nickname, BMXCallBack callBack) {
+        mService.setMyNickname(group, nickname, callBack);
     }
 
     /**
      * 设置群消息通知模式
      **/
-    public BMXErrorCode setMsgPushMode(BMXGroup group, BMXGroup.MsgPushMode mode) {
-        return mService.setMsgPushMode(group, mode);
+    public void setMsgPushMode(BMXGroup group, BMXGroup.MsgPushMode mode, BMXCallBack callBack) {
+        mService.setMsgPushMode(group, mode, callBack);
     }
 
     /**
      * 设置入群审批模式
      **/
-    public BMXErrorCode setJoinAuthMode(BMXGroup group, BMXGroup.JoinAuthMode mode) {
-        return mService.setJoinAuthMode(group, mode);
+    public void setJoinAuthMode(BMXGroup group, BMXGroup.JoinAuthMode mode, BMXCallBack callBack) {
+        mService.setJoinAuthMode(group, mode, callBack);
     }
 
     /**
      * 设置邀请模式
      **/
-    public BMXErrorCode setInviteMode(BMXGroup group, BMXGroup.InviteMode mode) {
-        return mService.setInviteMode(group, mode);
+    public void setInviteMode(BMXGroup group, BMXGroup.InviteMode mode, BMXCallBack callBack) {
+        mService.setInviteMode(group, mode, callBack);
     }
 
     /**
      * 设置群头像
      **/
-    public BMXErrorCode setAvatar(BMXGroup group, String avatarPath,
-            FileProgressListener listener) {
-        return mService.setAvatar(group, avatarPath, listener);
+    public void setAvatar(BMXGroup group, String avatarPath,
+            FileProgressListener listener, BMXCallBack callBack) {
+        mService.setAvatar(group, avatarPath, listener, callBack);
     }
 
     /**
      * 下载群头像
      */
-    public BMXErrorCode downloadAvatar(BMXGroup group, FileProgressListener listener) {
-        return mService.downloadAvatar(group, false, listener);
+    public void downloadAvatar(BMXGroup group, FileProgressListener listener, BMXCallBack callBack) {
+        mService.downloadAvatar(group, listener, callBack);
     }
 
     /**
@@ -382,7 +385,7 @@ public class GroupManager extends BaseManager {
     /**
      * 设置群已读开关
      */
-    public BMXErrorCode setEnableReadAck(BMXGroup group, boolean enable) {
-        return mService.setEnableReadAck(group, enable);
+    public void setEnableReadAck(BMXGroup group, boolean enable, BMXCallBack callBack) {
+        mService.setEnableReadAck(group, enable, callBack);
     }
 }

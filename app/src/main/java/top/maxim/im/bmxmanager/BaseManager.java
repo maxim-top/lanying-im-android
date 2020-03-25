@@ -23,8 +23,6 @@ public class BaseManager {
         System.loadLibrary("floo");
     }
 
-    protected static BMXClient bmxClient;
-
     /**
      * 配置环境
      */
@@ -42,8 +40,7 @@ public class BaseManager {
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
         conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
-        
-        bmxClient = BMXClient.create(conf);
+        im.floo.manager.BaseManager.initClient(conf);
     }
 
     public static String getPushId() {
@@ -90,7 +87,14 @@ public class BaseManager {
         return Observable.just(t);
     }
 
+    public static boolean bmxFinish(BMXErrorCode error) {
+        if (error == null || error.swigValue() != BMXErrorCode.NoError.swigValue()) {
+            return false;
+        }
+        return true;
+    }
+
     public static BMXClient getBMXClient() {
-        return bmxClient;
+        return im.floo.manager.BaseManager.getClient();
     }
 }

@@ -18,13 +18,7 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupMemberList;
 import im.floo.floolib.BMXRosterItem;
-import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -140,84 +134,39 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
 
     private void initGroupInfo() {
         showLoadingDialog(true);
-        Observable.just(mGroupId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long aLong) {
-                return GroupManager.getInstance().search(mGroupId, mGroup, false);
+        GroupManager.getInstance().search(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                if (bmxGroup != null) {
+                    mGroup = bmxGroup;
+                }
+                mIsOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
+                initGroupMembers();
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e == null ? "网络错误" : e.getMessage();
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        mIsOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
-                        initGroupMembers();
-                    }
-                });
+        });
     }
 
     private void initGroupMembers() {
-        final BMXGroupMemberList memberList = new BMXGroupMemberList();
-        Observable.just(mGroup).map(new Func1<BMXGroup, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXGroup group) {
-                return GroupManager.getInstance().getMembers(mGroup, memberList, true);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode errorCode) {
-                if (!memberList.isEmpty()) {
-                    ListOfLongLong listOfLongLong = new ListOfLongLong();
-                    for (int i = 0; i < memberList.size(); i++) {
-                        listOfLongLong.add(memberList.get(i).getMUid());
-                    }
-                    BMXRosterItemList itemList = new BMXRosterItemList();
-                    BMXErrorCode errorCode1 = RosterManager.getInstance().search(listOfLongLong,
-                            itemList, true);
-                    RosterFetcher.getFetcher().putRosters(itemList);
-                    return errorCode1;
+        GroupManager.getInstance().getMembers(mGroup, true, (bmxErrorCode, memberList) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                ListOfLongLong listOfLongLong = new ListOfLongLong();
+                for (int i = 0; i < memberList.size(); i++) {
+                    listOfLongLong.add(memberList.get(i).getMUid());
                 }
-                return errorCode;
+                RosterManager.getInstance().search(listOfLongLong, true,
+                        (bmxErrorCode1, itemList) -> {
+                            RosterFetcher.getFetcher().putRosters(itemList);
+                            if (!BaseManager.bmxFinish(bmxErrorCode1)) {
+                                toastError(bmxErrorCode1);
+                            }
+                            bindData(memberList);
+                        });
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                        bindData(memberList);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        bindData(memberList);
-                    }
-                });
+        });
     }
 
     protected void bindData(BMXGroupMemberList memberList) {
@@ -286,35 +235,14 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(listOfLongLong).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(ListOfLongLong s) {
-                return GroupManager.getInstance().addMembers(mGroup, s, message);
+        GroupManager.getInstance().addMembers(mGroup, listOfLongLong, message, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                initGroupMembers();
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        initGroupMembers();
-                    }
-                });
+        });
     }
 
     /**
@@ -322,40 +250,24 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
      *
      * @param listOfLongLong 成员
      */
-    private void removeMembers(ListOfLongLong listOfLongLong, final String reason) {
+    private void removeMembers(ListOfLongLong listOfLongLong, String reason) {
         if (listOfLongLong == null || listOfLongLong.isEmpty()) {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(listOfLongLong).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(ListOfLongLong s) {
-                return GroupManager.getInstance().removeMembers(mGroup, s, reason);
+        GroupManager.getInstance().removeMembers(mGroup, listOfLongLong, reason, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                initGroupMembers();
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
+        });
+    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        initGroupMembers();
-                    }
-                });
+    private void toastError(BMXErrorCode e) {
+        String error = e != null ? e.name() : "网络异常";
+        ToastUtil.showTextViewPrompt(error);
     }
 
     @Override

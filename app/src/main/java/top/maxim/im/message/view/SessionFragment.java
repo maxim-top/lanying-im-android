@@ -19,12 +19,9 @@ import java.util.List;
 
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXConversation;
-import im.floo.floolib.BMXConversationList;
 import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXGroupList;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
-import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
 import rx.Subscriber;
@@ -158,62 +155,34 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
 
     private void loadSession() {
         // 获取所有未读数
-        Observable.just("").map(s -> ChatManager.getInstance().getAllConversationsUnreadCount())
-                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Integer>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(Integer count) {
-                        Intent intent = new Intent();
-                        intent.setAction(CommonConfig.SESSION_COUNT_ACTION);
-                        intent.putExtra(CommonConfig.TAB_COUNT, count == null ? 0 : count);
-                        RxBus.getInstance().send(intent);
-                    }
-                });
+        ChatManager.getInstance().getAllConversationsUnreadCount((bmxErrorCode, count) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                Intent intent = new Intent();
+                intent.setAction(CommonConfig.SESSION_COUNT_ACTION);
+                intent.putExtra(CommonConfig.TAB_COUNT, count == null ? 0 : count);
+                RxBus.getInstance().send(intent);
+            }
+        });
         // 获取所有会话
-        Observable.just("").map(s -> ChatManager.getInstance().getAllConversations())
-                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXConversationList>() {
-                    @Override
-                    public void onCompleted() {
-
+        ChatManager.getInstance().getAllConversations((bmxErrorCode, bmxConversationList) -> {
+            List<BMXConversation> conversationList = new ArrayList<>();
+            if (bmxConversationList != null && !bmxConversationList.isEmpty()) {
+                for (int i = 0; i < bmxConversationList.size(); i++) {
+                    BMXConversation conversation = bmxConversationList.get(i);
+                    if (conversation != null && conversation.conversationId() > 0) {
+                        conversationList.add(conversation);
                     }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXConversationList bmxConversationList) {
-                        List<BMXConversation> conversationList = new ArrayList<>();
-                        if (bmxConversationList != null && !bmxConversationList.isEmpty()) {
-                            for (int i = 0; i < bmxConversationList.size(); i++) {
-                                BMXConversation conversation = bmxConversationList.get(i);
-                                if (conversation != null && conversation.conversationId() > 0) {
-                                    conversationList.add(conversation);
-                                }
-                            }
-                        }
-                        if (!conversationList.isEmpty()) {
-                            showEmpty(false);
-                            sortSession(conversationList);
-                            mAdapter.replaceList(conversationList);
-                            notifySession(conversationList);
-                        } else {
-                            showEmpty(true);
-                        }
-                    }
-                });
+                }
+            }
+            if (!conversationList.isEmpty()) {
+                showEmpty(false);
+                sortSession(conversationList);
+                mAdapter.replaceList(conversationList);
+                notifySession(conversationList);
+            } else {
+                showEmpty(true);
+            }
+        });
     }
 
     private void showEmpty(boolean empty) {
@@ -278,78 +247,24 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
             }
         }
         if (!rosterIds.isEmpty()) {
-            Observable.just(rosterIds).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-                @Override
-                public BMXErrorCode call(ListOfLongLong listOfLongLong) {
-                    BMXRosterItemList itemList = new BMXRosterItemList();
-                    BMXErrorCode errorCode = RosterManager.getInstance().search(listOfLongLong,
-                            itemList, true);
-                    if (errorCode == BMXErrorCode.NoError) {
-                        RosterFetcher.getFetcher().putRosters(itemList);
+            RosterManager.getInstance().search(rosterIds, true, (bmxErrorCode, itemList) -> {
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    RosterFetcher.getFetcher().putRosters(itemList);
+                    if (mAdapter != null) {
+                        mAdapter.notifyDataSetChanged();
                     }
-                    return errorCode;
                 }
-            }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-                @Override
-                public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                    return BaseManager.bmxFinish(errorCode, errorCode);
-                }
-            }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<BMXErrorCode>() {
-                        @Override
-                        public void onCompleted() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onNext(BMXErrorCode errorCode) {
-                            if (mAdapter != null) {
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        }
-                    });
+            });
         }
         if (!groupIds.isEmpty()) {
-            Observable.just(groupIds).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-                @Override
-                public BMXErrorCode call(ListOfLongLong listOfLongLong) {
-                    BMXGroupList list = new BMXGroupList();
-                    BMXErrorCode errorCode = GroupManager.getInstance().search(listOfLongLong, list,
-                            false);
-                    if (errorCode == BMXErrorCode.NoError) {
-                        RosterFetcher.getFetcher().putGroups(list);
+            GroupManager.getInstance().search(groupIds, true, (bmxErrorCode, itemList) -> {
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    RosterFetcher.getFetcher().putGroups(itemList);
+                    if (mAdapter != null) {
+                        mAdapter.notifyDataSetChanged();
                     }
-                    return errorCode;
                 }
-            }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-                @Override
-                public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                    return BaseManager.bmxFinish(errorCode, errorCode);
-                }
-            }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<BMXErrorCode>() {
-                        @Override
-                        public void onCompleted() {
-
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-
-                        }
-
-                        @Override
-                        public void onNext(BMXErrorCode errorCode) {
-                            if (mAdapter != null) {
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        }
-                    });
+            });
         }
     }
 
@@ -485,37 +400,18 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
-                Observable.just(conversation).map(new Func1<BMXConversation, BMXErrorCode>() {
-                    @Override
-                    public BMXErrorCode call(BMXConversation conversation) {
-                        if (conversation == null) {
-                            return null;
+                if (conversation != null) {
+                    conversation.removeAllMessages(bmxErrorCode -> {
+                        if (BaseManager.bmxFinish(bmxErrorCode)) {
+                            ToastUtil.showTextViewPrompt("清除成功");
+                            loadSession();
+                        } else {
+                            ToastUtil.showTextViewPrompt("清除失败");
                         }
-                        return conversation.removeAllMessages();
-                    }
-                }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-                    @Override
-                    public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                        return BaseManager.bmxFinish(errorCode, errorCode);
-                    }
-                }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Subscriber<BMXErrorCode>() {
-                            @Override
-                            public void onCompleted() {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                ToastUtil.showTextViewPrompt("清除失败");
-                            }
-
-                            @Override
-                            public void onNext(BMXErrorCode errorCode) {
-                                ToastUtil.showTextViewPrompt("清除成功");
-                                loadSession();
-                            }
-                        });
+                    });
+                } else {
+                    ToastUtil.showTextViewPrompt("清除失败");
+                }
             }
         });
         // TODO 清除聊天记录功能暂时不加 C++暂时没有对外提供

@@ -144,7 +144,7 @@ public class ForwardMsgRosterActivity extends BaseTitleActivity {
         
         RosterManager.getInstance().get(false, (bmxErrorCode, list) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                RosterManager.getInstance().search(list, true, (bmxErrorCode1, itemList) -> {
+                RosterManager.getInstance().getRosterList(list, true, (bmxErrorCode1, itemList) -> {
                     if (!BaseManager.bmxFinish(bmxErrorCode1)) {
                         String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";
                         ToastUtil.showTextViewPrompt(error);

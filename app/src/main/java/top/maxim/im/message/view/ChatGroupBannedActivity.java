@@ -162,7 +162,7 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
 
     private void initGroupInfo() {
         showLoadingDialog(true);
-        GroupManager.getInstance().search(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
             dismissLoadingDialog();
             if (bmxGroup != null) {
                 mGroup = bmxGroup;
@@ -181,18 +181,15 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
         }
         showLoadingDialog(true);
         GroupManager.getInstance().getBannedMembers(mGroup, (bmxErrorCode, memberList) -> {
+            dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 ListOfLongLong listOfLongLong = new ListOfLongLong();
                 for (int i = 0; i < memberList.size(); i++) {
                     listOfLongLong.add(memberList.get(i).getMUid());
                 }
-                RosterManager.getInstance().search(listOfLongLong, true,
+                RosterManager.getInstance().getRosterList(listOfLongLong, true,
                         (bmxErrorCode1, itemList) -> {
                             RosterFetcher.getFetcher().putRosters(itemList);
-                            if (!BaseManager.bmxFinish(bmxErrorCode1)) {
-                                toastError(bmxErrorCode1);
-                                dismissLoadingDialog();
-                            }
                             List<BMXGroup.BannedMember> members = new ArrayList<>();
                             if (memberList != null && !memberList.isEmpty()) {
                                 for (int i = 0; i < memberList.size(); i++) {
@@ -206,7 +203,6 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
                         });
             } else {
                 toastError(bmxErrorCode);
-                dismissLoadingDialog();
             }
         });
     }

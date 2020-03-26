@@ -102,7 +102,7 @@ public class GroupInviteActivity extends BaseTitleActivity {
                             for (int i = 0; i < list.size(); i++) {
                                 listOfLongLong.add(list.get(i).getMGroupId());
                             }
-                            GroupManager.getInstance().search(listOfLongLong, true,
+                            GroupManager.getInstance().getGroupList(listOfLongLong, true,
                                     (bmxErrorCode1, itemList) -> {
                                         RosterFetcher.getFetcher().putGroups(itemList);
                                         BMXGroupInvitationList invitationList = page.result();

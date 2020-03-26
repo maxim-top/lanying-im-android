@@ -213,9 +213,7 @@ public class WelcomeActivity extends BaseTitleActivity {
             // roster列表信息
             RosterManager.getInstance().get(true, null);
             // 群列表信息
-            GroupManager.getInstance().search(true, (bmxErrorCode, bmxGroupList) -> {
-
-            });
+            GroupManager.getInstance().getGroupList(true, null);
             // 消息列表信息
             ChatManager.getInstance().getAllConversations(null);
             String name = SharePreferenceUtils.getInstance().getUserName();

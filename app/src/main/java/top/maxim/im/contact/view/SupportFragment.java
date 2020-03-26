@@ -144,7 +144,7 @@ public class SupportFragment extends BaseTitleFragment {
             for (SupportBean bean : result) {
                 listOfLongLong.add(bean.getUser_id());
             }
-            RosterManager.getInstance().search(listOfLongLong, true, (bmxErrorCode, itemList) -> {
+            RosterManager.getInstance().getRosterList(listOfLongLong, true, (bmxErrorCode, itemList) -> {
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
                     RosterFetcher.getFetcher().putRosters(itemList);
                 }

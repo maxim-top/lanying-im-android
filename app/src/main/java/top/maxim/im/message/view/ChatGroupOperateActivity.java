@@ -209,7 +209,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     private void initGroupInfo(final boolean syncMember) {
         showLoadingDialog(true);
-        GroupManager.getInstance().search(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (bmxGroup != null) {
@@ -649,7 +649,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                             listOfLongLong.add(memberList.get(i).getMUid());
                         }
                     }
-                    RosterManager.getInstance().search(listOfLongLong, true,
+                    RosterManager.getInstance().getRosterList(listOfLongLong, true,
                             (bmxErrorCode1, itemList) -> {
                                 RosterFetcher.getFetcher().putRosters(itemList);
                                 if (BaseManager.bmxFinish(bmxErrorCode1)) {
@@ -755,6 +755,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         }
         showLoadingDialog(true);
         BMXCallBack callBack = bmxErrorCode -> {
+            dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (TextUtils.equals(title, getString(R.string.group_rename))) {
                     // 修改群名称

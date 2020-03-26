@@ -214,6 +214,9 @@ public class LoginActivity extends BaseTitleActivity {
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
+        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
+            mChangeAppId = appId;
+        }
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
@@ -241,10 +244,6 @@ public class LoginActivity extends BaseTitleActivity {
                             CommonUtils.getInstance()
                                     .addUser(new UserBean(profile.username(), profile.userId(), pwd,
                                             changeAppId, System.currentTimeMillis()));
-                            if (!TextUtils.isEmpty(changeAppId)) {
-                                SharePreferenceUtils.getInstance().putAppId(changeAppId);
-                                UserManager.getInstance().changeAppId(changeAppId, null);
-                            }
                             // 登陆成功消息预加载
                             WelcomeActivity.initData();
                         }
@@ -269,14 +268,19 @@ public class LoginActivity extends BaseTitleActivity {
             String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
             ToastUtil.showTextViewPrompt(error);
         };
+        if (!TextUtils.isEmpty(changeAppId)) {
+            SharePreferenceUtils.getInstance().putAppId(changeAppId);
+            UserManager.getInstance().changeAppId(changeAppId);
+        }
         if (isLoginById) {
             UserManager.getInstance().signInById(Long.valueOf(name), pwd, callBack);
+        } else {
+            // if (Pattern.matches("0?(13|14|15|17|18|19)[0-9]{9}", s)) {
+            // // 手机号
+            // return UserManager.getInstance().signInByPhone(s, pwd);
+            // }
+            UserManager.getInstance().signInByName(name, pwd, callBack);
         }
-        // if (Pattern.matches("0?(13|14|15|17|18|19)[0-9]{9}", s)) {
-        // // 手机号
-        // return UserManager.getInstance().signInByPhone(s, pwd);
-        // }
-        UserManager.getInstance().signInByName(name, pwd, callBack);
     }
 
     public static void wxChatLogin(final Activity activity, String openId) {
@@ -290,6 +294,10 @@ public class LoginActivity extends BaseTitleActivity {
         AppManager.getInstance().weChatLogin(openId, new HttpResponseCallback<String>() {
             @Override
             public void onResponse(String result) {
+                if (activity instanceof BaseTitleActivity
+                        && !activity.isFinishing()) {
+                    ((BaseTitleActivity)activity).dismissLoadingDialog();
+                }
                 if (TextUtils.isEmpty(result)) {
                     ToastUtil.showTextViewPrompt("登陆失败");
                     return;
@@ -315,6 +323,10 @@ public class LoginActivity extends BaseTitleActivity {
 
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                if (activity instanceof BaseTitleActivity
+                        && !activity.isFinishing()) {
+                    ((BaseTitleActivity)activity).dismissLoadingDialog();
+                }
                 ToastUtil.showTextViewPrompt("登陆失败");
             }
         });

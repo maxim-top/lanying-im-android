@@ -15,14 +15,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
+import im.floo.floolib.BMXGroupApplicationList;
 import im.floo.floolib.BMXGroupList;
 import im.floo.floolib.BMXRosterItem;
-import im.floo.floolib.GroupApplicationPage;
+import im.floo.floolib.ListOfLongLong;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
+import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ScreenUtils;
@@ -96,7 +101,7 @@ public class GroupApplyActivity extends BaseTitleActivity {
 
     @Override
     protected void initDataForActivity() {
-        GroupManager.getInstance().search(mGroupId, true, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupList(mGroupId, true, (bmxErrorCode, bmxGroup) -> {
             if (bmxGroup != null) {
                 mGroup = bmxGroup;
             }
@@ -109,82 +114,36 @@ public class GroupApplyActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        final GroupApplicationPage page = new GroupApplicationPage();
-        final BMXGroupList list = new BMXGroupList();
-        list.add(mGroup);
-//        Observable.just(cursor).map(new Func1<String, BMXErrorCode>() {
-//            @Override
-//            public BMXErrorCode call(String s) {
-//                return GroupManager.getInstance().getApplicationList(list, page, s,
-//                        DEFAULT_PAGE_SIZE);
-//            }
-//        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-//            @Override
-//            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-//                return BaseManager.bmxFinish(errorCode, errorCode);
-//            }
-//        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-//            @Override
-//            public BMXErrorCode call(BMXErrorCode errorCode) {
-//                if (page.result() != null && !page.result().isEmpty()) {
-//                    ListOfLongLong listOfLongLong = new ListOfLongLong();
-//                    BMXGroupApplicationList list = page.result();
-//                    for (int i = 0; i < list.size(); i++) {
-//                        listOfLongLong.add(list.get(i).getMApplicationId());
-//                    }
-//                    BMXRosterItemList itemList = new BMXRosterItemList();
-//                    BMXErrorCode errorCode1 = RosterManager.getInstance().search(listOfLongLong,
-//                            itemList, true);
-//                    RosterFetcher.getFetcher().putRosters(itemList);
-//                    return errorCode1;
-//                }
-//                return errorCode;
-//            }
-//        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-//            @Override
-//            public BMXErrorCode call(BMXErrorCode errorCode) {
-//                if (page.result() != null && !page.result().isEmpty()) {
-//                    ListOfLongLong listOfLongLong = new ListOfLongLong();
-//                    BMXGroupApplicationList list = page.result();
-//                    for (int i = 0; i < list.size(); i++) {
-//                        listOfLongLong.add(list.get(i).getMGroupId());
-//                    }
-//                    BMXGroupList itemList = new BMXGroupList();
-//                    BMXErrorCode errorCode1 = GroupManager.getInstance().search(listOfLongLong,
-//                            itemList, true);
-//                    if (errorCode1 == BMXErrorCode.NoError) {
-//                        RosterFetcher.getFetcher().putGroups(itemList);
-//                    }
-//                    return errorCode1;
-//                }
-//                return errorCode;
-//            }
-//        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Subscriber<BMXErrorCode>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        dismissLoadingDialog();
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        dismissLoadingDialog();
-//                        String error = e == null ? "网络错误" : e.getMessage();
-//                        ToastUtil.showTextViewPrompt(error);
-//                    }
-//
-//                    @Override
-//                    public void onNext(BMXErrorCode errorCode) {
-//                        BMXGroupApplicationList list = page.result();
-//                        if (list != null && !list.isEmpty()) {
-//                            List<BMXGroup.Application> applications = new ArrayList<>();
-//                            for (int i = 0; i < list.size(); i++) {
-//                                applications.add(list.get(i));
-//                            }
-//                            mAdapter.replaceList(applications);
-//                        }
-//                    }
-//                });
+        final BMXGroupList groupList = new BMXGroupList();
+        groupList.add(mGroup);
+
+        GroupManager.getInstance().getApplicationList(groupList, cursor, DEFAULT_PAGE_SIZE,
+                (bmxErrorCode, page) -> {
+                    dismissLoadingDialog();
+                    if (BaseManager.bmxFinish(bmxErrorCode)) {
+                        if (page != null && page.result() != null && !page.result().isEmpty()) {
+                            ListOfLongLong listOfLongLong = new ListOfLongLong();
+                            BMXGroupApplicationList applicationList = page.result();
+                            for (int i = 0; i < applicationList.size(); i++) {
+                                listOfLongLong.add(applicationList.get(i).getMApplicationId());
+                            }
+                            RosterManager.getInstance().getRosterList(listOfLongLong, true,
+                                    (bmxErrorCode1, itemList) -> {
+                                        RosterFetcher.getFetcher().putRosters(itemList);
+                                        BMXGroupApplicationList list = page.result();
+                                        if (list != null && !list.isEmpty()) {
+                                            List<BMXGroup.Application> applications = new ArrayList<>();
+                                            for (int i = 0; i < list.size(); i++) {
+                                                applications.add(list.get(i));
+                                            }
+                                            mAdapter.replaceList(applications);
+                                        }
+                                    });
+                        }
+                    } else {
+                        toastError(bmxErrorCode);
+                    }
+                });
     }
 
     class ApplyAdapter extends BaseRecyclerAdapter<BMXGroup.Application> {

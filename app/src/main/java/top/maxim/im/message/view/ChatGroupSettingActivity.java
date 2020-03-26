@@ -312,7 +312,7 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
 
     private void initGroupInfo() {
         showLoadingDialog(true);
-        GroupManager.getInstance().search(mGroupId, true, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupList(mGroupId, true, (bmxErrorCode, bmxGroup) -> {
             dismissLoadingDialog();
             if (bmxGroup != null) {
                 mGroup = bmxGroup;

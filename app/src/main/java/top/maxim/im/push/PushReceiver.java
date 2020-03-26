@@ -63,7 +63,7 @@ public class PushReceiver extends BroadcastReceiver {
                     BMXMessage.MessageType type = bean.getType();
                     if (type == BMXMessage.MessageType.Single) {
                         // 查询单聊免打扰
-                        RosterManager.getInstance().search(bean.getChatId(), false,
+                        RosterManager.getInstance().getRosterList(bean.getChatId(), false,
                                 (bmxErrorCode1, rosterItem) -> {
                                     if (rosterItem == null || rosterItem.isMuteNotification()) {
                                         return;
@@ -78,7 +78,7 @@ public class PushReceiver extends BroadcastReceiver {
                                             isPushDetail);
                                 });
                     } else if (type == BMXMessage.MessageType.Group) {
-                        GroupManager.getInstance().search(bean.getChatId(), false,
+                        GroupManager.getInstance().getGroupList(bean.getChatId(), false,
                                 (bmxErrorCode1, groupItem) -> {
                                     if (groupItem == null
                                             || groupItem.msgMuteMode() != null && groupItem

@@ -228,7 +228,7 @@ public class MessageSearchActivity extends BaseTitleActivity {
             rosterIds.add(message.fromId());
         }
         if (!rosterIds.isEmpty()) {
-            RosterManager.getInstance().search(rosterIds, true, (bmxErrorCode, itemList) -> {
+            RosterManager.getInstance().getRosterList(rosterIds, true, (bmxErrorCode, itemList) -> {
                 RosterFetcher.getFetcher().putRosters(itemList);
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
                     if (mAdapter != null) {

@@ -209,7 +209,7 @@ public class ScanResultActivity extends BaseTitleActivity {
         }
         if (!TextUtils.isEmpty(appId)) {
             SharePreferenceUtils.getInstance().putAppId(appId);
-            UserManager.getInstance().changeAppId(appId, null);
+            UserManager.getInstance().changeAppId(appId);
         }
         LoginActivity.openLogin(this);
         finish();
@@ -234,7 +234,7 @@ public class ScanResultActivity extends BaseTitleActivity {
         }
         if (!TextUtils.isEmpty(appId)) {
             SharePreferenceUtils.getInstance().putAppId(appId);
-            UserManager.getInstance().changeAppId(appId, null);
+            UserManager.getInstance().changeAppId(appId);
         }
         LoginActivity.openLogin(this);
         finish();

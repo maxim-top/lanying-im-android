@@ -165,7 +165,7 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
 
     private void initGroupInfo() {
         showLoadingDialog(true);
-        GroupManager.getInstance().search(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
             dismissLoadingDialog();
             if (bmxGroup != null) {
                 mGroup = bmxGroup;
@@ -183,18 +183,16 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
         }
         showLoadingDialog(true);
         initData(true, (bmxErrorCode, list) -> {
+            dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (!list.isEmpty()) {
                     ListOfLongLong listOfLongLong = new ListOfLongLong();
                     for (int i = 0; i < list.size(); i++) {
                         listOfLongLong.add(list.get(i).getMUid());
                     }
-                    RosterManager.getInstance().search(listOfLongLong, true,
+                    RosterManager.getInstance().getRosterList(listOfLongLong, true,
                             (bmxErrorCode1, itemList) -> {
                                 RosterFetcher.getFetcher().putRosters(itemList);
-                                if (!BaseManager.bmxFinish(bmxErrorCode1)) {
-                                    toastError(bmxErrorCode1);
-                                }
                                 bindData(list);
                             });
                 } else {
@@ -206,7 +204,6 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
                     bindData(list1);
                 });
             }
-            dismissLoadingDialog();
         });
     }
 

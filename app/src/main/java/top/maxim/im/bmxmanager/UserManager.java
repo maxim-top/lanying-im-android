@@ -255,7 +255,7 @@ public class UserManager extends BaseManager {
      * 切换appId
      * @param appId appId
      */
-    public void changeAppId(String appId, BMXCallBack callBack) {
-        mService.changeAppId(appId, callBack);
+    public void changeAppId(String appId) {
+        mService.changeAppId(appId, null);
     }
 }

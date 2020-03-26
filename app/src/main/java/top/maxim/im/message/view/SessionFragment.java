@@ -247,7 +247,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
             }
         }
         if (!rosterIds.isEmpty()) {
-            RosterManager.getInstance().search(rosterIds, true, (bmxErrorCode, itemList) -> {
+            RosterManager.getInstance().getRosterList(rosterIds, true, (bmxErrorCode, itemList) -> {
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
                     RosterFetcher.getFetcher().putRosters(itemList);
                     if (mAdapter != null) {
@@ -257,7 +257,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
             });
         }
         if (!groupIds.isEmpty()) {
-            GroupManager.getInstance().search(groupIds, true, (bmxErrorCode, itemList) -> {
+            GroupManager.getInstance().getGroupList(groupIds, true, (bmxErrorCode, itemList) -> {
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
                     RosterFetcher.getFetcher().putGroups(itemList);
                     if (mAdapter != null) {

@@ -39,23 +39,23 @@ public class GroupManager extends BaseManager {
     /**
      * 获取群组列表，如果设置了forceRefresh则从服务器拉取
      **/
-    public void search(boolean forceRefresh, BMXDataCallBack<BMXGroupList> callBack) {
-        mService.search(forceRefresh, callBack);
+    public void getGroupList(boolean forceRefresh, BMXDataCallBack<BMXGroupList> callBack) {
+        mService.getGroupList(forceRefresh, callBack);
     }
 
     /**
      * 获取群信息
      **/
-    public void search(ListOfLongLong groupIdList,
-            boolean forceRefresh, BMXDataCallBack<BMXGroupList> callBack) {
-        mService.search(groupIdList, forceRefresh, callBack);
+    public void getGroupList(ListOfLongLong groupIdList,
+                             boolean forceRefresh, BMXDataCallBack<BMXGroupList> callBack) {
+        mService.getGroupList(groupIdList, forceRefresh, callBack);
     }
 
     /**
      * 获取群信息
      **/
-    public void search(long groupId, boolean forceUpdate, BMXDataCallBack<BMXGroup> callBack) {
-        mService.search(groupId, forceUpdate, callBack);
+    public void getGroupList(long groupId, boolean forceUpdate, BMXDataCallBack<BMXGroup> callBack) {
+        mService.getGroupList(groupId, forceUpdate, callBack);
     }
 
     /**
@@ -68,9 +68,9 @@ public class GroupManager extends BaseManager {
     /**
      * 入群通知
      */
-    public void getApplicationList(GroupApplicationPage result,
-            String cursor, int pageSize, BMXDataCallBack<BMXGroupList> callBack) {
-        mService.getApplicationList(result, cursor, pageSize, callBack);
+    public void getApplicationList(BMXGroupList list, String cursor, int pageSize,
+            BMXDataCallBack<GroupApplicationPage> callBack) {
+        mService.getApplicationList(list, cursor, pageSize, callBack);
     }
 
     /**

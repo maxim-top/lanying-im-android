@@ -134,7 +134,7 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
 
     private void initGroupInfo() {
         showLoadingDialog(true);
-        GroupManager.getInstance().search(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (bmxGroup != null) {
@@ -155,7 +155,7 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
                 for (int i = 0; i < memberList.size(); i++) {
                     listOfLongLong.add(memberList.get(i).getMUid());
                 }
-                RosterManager.getInstance().search(listOfLongLong, true,
+                RosterManager.getInstance().getRosterList(listOfLongLong, true,
                         (bmxErrorCode1, itemList) -> {
                             RosterFetcher.getFetcher().putRosters(itemList);
                             if (!BaseManager.bmxFinish(bmxErrorCode1)) {

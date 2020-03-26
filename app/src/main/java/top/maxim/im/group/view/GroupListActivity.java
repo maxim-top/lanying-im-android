@@ -111,8 +111,8 @@ public class GroupListActivity extends BaseTitleFragment {
      */
     private void buildContactHeaderView() {
         View headerView = View.inflate(getActivity(), R.layout.item_contact_header, null);
-//        FrameLayout search = headerView.findViewById(R.id.fl_contact_header_search);
-//        search.setOnClickListener(new View.OnClickListener() {
+//        FrameLayout getGroupList = headerView.findViewById(R.id.fl_contact_header_search);
+//        getGroupList.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                GroupSearchActivity.openGroupSearch(getActivity());
@@ -152,7 +152,7 @@ public class GroupListActivity extends BaseTitleFragment {
     }
 
     private void getAllGroup() {
-        GroupManager.getInstance().search(false, (bmxErrorCode, list) -> {
+        GroupManager.getInstance().getGroupList(false, (bmxErrorCode, list) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 RosterFetcher.getFetcher().putGroups(list);
@@ -163,7 +163,7 @@ public class GroupListActivity extends BaseTitleFragment {
                     String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
                     ToastUtil.showTextViewPrompt(error);
                 }
-                GroupManager.getInstance().search(false, (bmxErrorCode1, bmxGroupList) -> {
+                GroupManager.getInstance().getGroupList(false, (bmxErrorCode1, bmxGroupList) -> {
                     RosterFetcher.getFetcher().putGroups(bmxGroupList);
                     mAdapter.replaceList(filterGroup(bmxGroupList));
                 });

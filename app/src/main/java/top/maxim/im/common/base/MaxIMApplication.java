@@ -19,6 +19,7 @@ import top.maxim.im.common.utils.BuglyTask;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
 
@@ -34,6 +35,12 @@ public class MaxIMApplication extends Application {
     private static final int MAX_IMG_H_FOR_MEMORY_CACHE = 240;
 
     private static final int MEMORY_CACHE_SIZE_MAX = 10 * 1024 * 1024;
+
+    private Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
+        public void uncaughtException(Thread thread, Throwable ex) {
+            restartApp();
+        }
+    };
     
     @Override
     protected void attachBaseContext(Context base) {
@@ -46,6 +53,12 @@ public class MaxIMApplication extends Application {
         super.onCreate();
         initUtils();
         initBMXSDK();
+        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+    }
+
+    public void restartApp() {
+        WelcomeActivity.openWelcome(getApplicationContext());
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     /**

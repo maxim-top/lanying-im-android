@@ -89,7 +89,7 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
     private void initGroup() {
         initQrCode();
         mTvGroupId.setText(mGroupId <= 0 ? "" : "群Id:" + mGroupId);
-        GroupManager.getInstance().search(mGroupId, false, (bmxErrorCode, group) -> {
+        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, group) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 String name = group.name();
                 ChatUtils.getInstance().showGroupAvatar(group, mGroupIcon, mConfig);

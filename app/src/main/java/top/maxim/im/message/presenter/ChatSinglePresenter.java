@@ -54,7 +54,7 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
                 mView.setHeadTitle(name);
             }
         }
-        RosterManager.getInstance().search(chatId, true, (bmxErrorCode, bmxRosterItem) -> {
+        RosterManager.getInstance().getRosterList(chatId, true, (bmxErrorCode, bmxRosterItem) -> {
             if (bmxRosterItem != null) {
                 mRoster = bmxRosterItem;
             }

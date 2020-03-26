@@ -135,9 +135,9 @@ public class ContactSearchActivity extends BaseTitleActivity {
         };
         if (mSearchByUserId && Pattern.matches("[0-9]+", search)) {
             // 纯数字
-            RosterManager.getInstance().search(Long.valueOf(search), true, callBack);
+            RosterManager.getInstance().getRosterList(Long.valueOf(search), true, callBack);
         } else {
-            RosterManager.getInstance().search(search, true, callBack);
+            RosterManager.getInstance().getRosterList(search, true, callBack);
         }
     }
 

@@ -56,7 +56,7 @@ public class RosterFetcher {
         if (item != null) {
             return item;
         }
-        RosterManager.getInstance().search(rosterId, true, (bmxErrorCode, bmxRosterItem) -> {
+        RosterManager.getInstance().getRosterList(rosterId, true, (bmxErrorCode, bmxRosterItem) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 putRoster(bmxRosterItem);
             }
@@ -85,7 +85,7 @@ public class RosterFetcher {
         if (item != null) {
             return item;
         }
-        GroupManager.getInstance().search(groupId, true, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupList(groupId, true, (bmxErrorCode, bmxGroup) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 putGroup(bmxGroup);
             }

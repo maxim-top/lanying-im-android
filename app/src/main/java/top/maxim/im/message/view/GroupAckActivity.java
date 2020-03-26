@@ -146,7 +146,7 @@ public class GroupAckActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        RosterManager.getInstance().search(list, forceRefresh, (bmxErrorCode, itemList) -> {
+        RosterManager.getInstance().getRosterList(list, forceRefresh, (bmxErrorCode, itemList) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 List<BMXRosterItem> rosterItems = new ArrayList<>();

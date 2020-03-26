@@ -218,7 +218,7 @@ public class RosterChooseActivity extends BaseTitleActivity {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (!list.isEmpty()) {
-                    RosterManager.getInstance().search(list, true, (bmxErrorCode1, itemList) -> {
+                    RosterManager.getInstance().getRosterList(list, true, (bmxErrorCode1, itemList) -> {
                         RosterFetcher.getFetcher().putRosters(itemList);
                         if (BaseManager.bmxFinish(bmxErrorCode1)) {
                             bindData(itemList);

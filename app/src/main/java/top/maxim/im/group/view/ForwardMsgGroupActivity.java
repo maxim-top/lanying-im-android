@@ -108,7 +108,7 @@ public class ForwardMsgGroupActivity extends BaseTitleActivity {
     }
 
     private void getAllGroup() {
-        GroupManager.getInstance().search(false, (bmxErrorCode, list) -> {
+        GroupManager.getInstance().getGroupList(false, (bmxErrorCode, list) -> {
             dismissLoadingDialog();
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
                 String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";

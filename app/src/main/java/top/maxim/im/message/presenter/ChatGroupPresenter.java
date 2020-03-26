@@ -62,7 +62,7 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
         if (chatId <= 0) {
             return;
         }
-        GroupManager.getInstance().search(chatId, true, (bmxErrorCode, group) -> {
+        GroupManager.getInstance().getGroupList(chatId, true, (bmxErrorCode, group) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 RosterFetcher.getFetcher().putGroup(group);
                 if (mView != null) {

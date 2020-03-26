@@ -121,8 +121,8 @@ public class ContactFragment extends BaseTitleFragment {
      */
     private void buildContactHeaderView() {
         View headerView = View.inflate(getActivity(), R.layout.item_contact_header, null);
-//        FrameLayout search = headerView.findViewById(R.id.fl_contact_header_search);
-//        search.setOnClickListener(new View.OnClickListener() {
+//        FrameLayout getGroupList = headerView.findViewById(R.id.fl_contact_header_search);
+//        getGroupList.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                ContactSearchActivity.openRosterSearch(getActivity());
@@ -276,7 +276,7 @@ public class ContactFragment extends BaseTitleFragment {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 // 成功
                 if (list != null && !list.isEmpty()) {
-                    RosterManager.getInstance().search(list, true, callBack);
+                    RosterManager.getInstance().getRosterList(list, true, callBack);
                 }
                 return;
             }
@@ -284,7 +284,7 @@ public class ContactFragment extends BaseTitleFragment {
             RosterManager.getInstance().get(false, (bmxErrorCode1, list1) -> {
                 if (BaseManager.bmxFinish(bmxErrorCode1)) {
                     if (list1 != null && !list1.isEmpty()) {
-                        RosterManager.getInstance().search(list1, true, callBack);
+                        RosterManager.getInstance().getRosterList(list1, true, callBack);
                     }
                 } else {
                     String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";

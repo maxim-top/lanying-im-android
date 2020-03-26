@@ -103,7 +103,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
                             for (int i = 0; i < list.size(); i++) {
                                 listOfLongLong.add(list.get(i).getMRosterId());
                             }
-                            RosterManager.getInstance().search(listOfLongLong, true,
+                            RosterManager.getInstance().getRosterList(listOfLongLong, true,
                                     (bmxErrorCode1, itemList) -> {
                                         RosterFetcher.getFetcher().putRosters(itemList);
                                         if (BaseManager.bmxFinish(bmxErrorCode1)) {

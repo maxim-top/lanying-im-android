@@ -39,22 +39,22 @@ public class RosterManager extends BaseManager {
     /**
      * 搜索用户
      **/
-    public void search(long rosterId, boolean forceRefresh, BMXDataCallBack<BMXRosterItem> callBack) {
+    public void getRosterList(long rosterId, boolean forceRefresh, BMXDataCallBack<BMXRosterItem> callBack) {
         mService.search(rosterId, forceRefresh, callBack);
     }
 
     /**
      * 搜索用户
      **/
-    public void search(String name, boolean forceRefresh, BMXDataCallBack<BMXRosterItem> callBack) {
+    public void getRosterList(String name, boolean forceRefresh, BMXDataCallBack<BMXRosterItem> callBack) {
         mService.search(name, forceRefresh, callBack);
     }
 
     /**
      * 搜索用户
      **/
-    public void search(ListOfLongLong rosterIdList, boolean forceRefresh,
-            BMXDataCallBack<BMXRosterItemList> callBack) {
+    public void getRosterList(ListOfLongLong rosterIdList, boolean forceRefresh,
+                              BMXDataCallBack<BMXRosterItemList> callBack) {
         mService.search(rosterIdList, forceRefresh, callBack);
     }
 

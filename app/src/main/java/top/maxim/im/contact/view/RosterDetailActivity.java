@@ -227,14 +227,14 @@ public class RosterDetailActivity extends BaseTitleActivity {
 
     private void initRoster() {
         showLoadingDialog(true);
-        RosterManager.getInstance().search(mRosterId, true, (bmxErrorCode, bmxRosterItem) -> {
+        RosterManager.getInstance().getRosterList(mRosterId, true, (bmxErrorCode, bmxRosterItem) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 mRosterItem = bmxRosterItem;
                 RosterFetcher.getFetcher().putRoster(bmxRosterItem);
                 bindRoster();
             } else {
-                RosterManager.getInstance().search(mRosterId, false,
+                RosterManager.getInstance().getRosterList(mRosterId, false,
                         (bmxErrorCode1, bmxRosterItem1) -> {
                             if (bmxRosterItem1 != null) {
                                 mRosterItem = bmxRosterItem1;

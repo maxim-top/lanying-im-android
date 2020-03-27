@@ -256,6 +256,6 @@ public class UserManager extends BaseManager {
      * @param appId appId
      */
     public void changeAppId(String appId) {
-        mService.changeAppId(appId, null);
+        mService.changeAppId(appId);
     }
 }

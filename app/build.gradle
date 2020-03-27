@@ -91,7 +91,7 @@ dependencies {
 
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_2.1.9.20200325',ext:'aar')
+    implementation(name:'floo-android_2.1.10.20200327',ext:'aar')
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
 

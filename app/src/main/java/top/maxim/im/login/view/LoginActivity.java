@@ -267,6 +267,8 @@ public class LoginActivity extends BaseTitleActivity {
             }
             String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
             ToastUtil.showTextViewPrompt(error);
+            // 登陆失败后需要重置数据
+            CommonUtils.getInstance().logout();
         };
         if (!TextUtils.isEmpty(changeAppId)) {
             SharePreferenceUtils.getInstance().putAppId(changeAppId);

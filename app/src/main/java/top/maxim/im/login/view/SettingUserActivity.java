@@ -160,7 +160,11 @@ public class SettingUserActivity extends BaseTitleActivity {
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
 
         // Id
-        mUserId = new ItemLineArrow.Builder(this).setStartContent("ID");
+        mUserId = new ItemLineArrow.Builder(this).setStartContent("ID")
+                .setOnItemClickListener(v -> {
+                    // 跳转查看日志
+                    LogViewActivity.openLogView(this);
+                });
         container.addView(mUserId.build());
 
         // 分割线

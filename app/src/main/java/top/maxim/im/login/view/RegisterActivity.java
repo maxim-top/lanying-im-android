@@ -138,6 +138,7 @@ public class RegisterActivity extends BaseTitleActivity {
         buildProtocol();
         view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
         view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
+        initRxBus();
         return view;
     }
 
@@ -204,7 +205,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
-            initRxBus();
+            initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER, mChangeAppId);
         });
         // 注册
@@ -312,8 +313,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        mChangeAppId = content;
-                        mTvAppId.setText("APPID:" + content);
+                        LoginActivity.changeAppId(RegisterActivity.this, content);
                     }
 
                     @Override
@@ -381,7 +381,7 @@ public class RegisterActivity extends BaseTitleActivity {
         timer.start();
     }
 
-    private void initRxBus() {
+    private void initWXRxBus() {
         if (mSubscription == null) {
             mSubscription = new CompositeSubscription();
         }
@@ -412,6 +412,37 @@ public class RegisterActivity extends BaseTitleActivity {
                     }
                 });
         mSubscription.add(wxLogin);
+    }
+
+    private void initRxBus() {
+        if (mSubscription == null) {
+            mSubscription = new CompositeSubscription();
+        }
+        // 切换appId
+        Subscription changeAppId = RxBus.getInstance().toObservable(Intent.class)
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Intent>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Intent intent) {
+                        if (intent == null || !TextUtils.equals(intent.getAction(),
+                                CommonConfig.CHANGE_APP_ID_ACTION)) {
+                            return;
+                        }
+                        mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
+                        mTvAppId.setText("APPID:" + mChangeAppId);
+                    }
+                });
+        mSubscription.add(changeAppId);
     }
 
     @Override

@@ -37,6 +37,7 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
 import top.maxim.im.common.view.recyclerview.RecyclerWithHFAdapter;
+import top.maxim.im.scan.config.ScanConfigs;
 
 /**
  * Description : 账号列表 Created by Mango on 2018/11/06
@@ -257,6 +258,10 @@ public class AccountListActivity extends BaseTitleActivity {
     private void handleResult(String userName, String pwd, String appId) {
         if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(pwd)) {
             // 查看切换账号的appId是否和当前一致 一致不需要切换
+            if (TextUtils.isEmpty(appId)) {
+                // 兼容之前版本 如果为空 则为默认appId
+                appId = ScanConfigs.CODE_APP_ID;
+            }
             String currentAppId = SharePreferenceUtils.getInstance().getAppId();
             // 有数据 直接登录
             LoginActivity.login(AccountListActivity.this, userName, pwd, false,

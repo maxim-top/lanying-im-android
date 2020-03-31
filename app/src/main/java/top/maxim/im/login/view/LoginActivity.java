@@ -124,6 +124,7 @@ public class LoginActivity extends BaseTitleActivity {
             SharePreferenceUtils.getInstance().putCustomDns(newIndex);
             ToastUtil.showTextViewPrompt("切换新的环境配置:" + newIndex);
         });
+        initRxBus();
         return view;
     }
 
@@ -145,7 +146,7 @@ public class LoginActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
-            initRxBus();
+            initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN, mChangeAppId);
         });
         // 扫一扫
@@ -193,8 +194,7 @@ public class LoginActivity extends BaseTitleActivity {
                 new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        mChangeAppId = content;
-                        mTvAppId.setText("APPID:" + content);
+                        changeAppId(LoginActivity.this, content);
                     }
 
                     @Override
@@ -214,9 +214,6 @@ public class LoginActivity extends BaseTitleActivity {
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
-        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
-            mChangeAppId = appId;
-        }
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
@@ -267,13 +264,24 @@ public class LoginActivity extends BaseTitleActivity {
             }
             String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
             ToastUtil.showTextViewPrompt(error);
-            // 登陆失败后需要重置数据
-            CommonUtils.getInstance().logout();
         };
+        
         if (!TextUtils.isEmpty(changeAppId)) {
-            SharePreferenceUtils.getInstance().putAppId(changeAppId);
-            UserManager.getInstance().changeAppId(changeAppId);
+            UserManager.getInstance().changeAppId(changeAppId, bmxErrorCode -> {
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    SharePreferenceUtils.getInstance().putAppId(changeAppId);
+                    realLogin(isLoginById, name, pwd, callBack);
+                } else {
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
+                    ToastUtil.showTextViewPrompt(error);
+                }
+            });
+        } else {
+            realLogin(isLoginById, name, pwd, callBack);
         }
+    }
+    
+    private static void realLogin(boolean isLoginById, String name, String pwd, BMXCallBack callBack) {
         if (isLoginById) {
             UserManager.getInstance().signInById(Long.valueOf(name), pwd, callBack);
         } else {
@@ -334,7 +342,49 @@ public class LoginActivity extends BaseTitleActivity {
         });
     }
 
-    private void initRxBus() {
+    /**
+     * 切换appId
+     */
+    public static void changeAppId(final Activity activity, String appId) {
+        // 为空 置为默认的appId
+        appId = TextUtils.isEmpty(appId) ? ScanConfigs.CODE_APP_ID : appId;
+        String oldAppId = SharePreferenceUtils.getInstance().getAppId();
+        if (TextUtils.equals(oldAppId, appId)) {
+            // 相同不处理
+            Intent intent = new Intent();
+            intent.setAction(CommonConfig.CHANGE_APP_ID_ACTION);
+            intent.putExtra(CommonConfig.CHANGE_APP_ID, appId);
+            RxBus.getInstance().send(intent);
+            return;
+        }
+        // TODO 在登陆时候再切换appId
+        Intent intent = new Intent();
+        intent.setAction(CommonConfig.CHANGE_APP_ID_ACTION);
+        intent.putExtra(CommonConfig.CHANGE_APP_ID, appId);
+        RxBus.getInstance().send(intent);
+//        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+//            ((BaseTitleActivity)activity).showLoadingDialog(true);
+//        }
+//        String finalAppId = appId;
+//        UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {
+//            if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+//                ((BaseTitleActivity)activity).dismissLoadingDialog();
+//            }
+//            if (BaseManager.bmxFinish(bmxErrorCode)) {
+//                SharePreferenceUtils.getInstance().putAppId(finalAppId);
+//                ToastUtil.showTextViewPrompt("切换appId成功");
+//                Intent intent = new Intent();
+//                intent.setAction(CommonConfig.CHANGE_APP_ID_ACTION);
+//                intent.putExtra(CommonConfig.CHANGE_APP_ID, finalAppId);
+//                RxBus.getInstance().send(intent);
+//            } else {
+//                String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
+//                ToastUtil.showTextViewPrompt(error);
+//            }
+//        });
+    }
+
+    private void initWXRxBus() {
         if (mSubscription == null) {
             mSubscription = new CompositeSubscription();
         }
@@ -365,6 +415,37 @@ public class LoginActivity extends BaseTitleActivity {
                     }
                 });
         mSubscription.add(wxLogin);
+    }
+
+    private void initRxBus() {
+        if (mSubscription == null) {
+            mSubscription = new CompositeSubscription();
+        }
+        // 切换appId
+        Subscription changeAppId = RxBus.getInstance().toObservable(Intent.class)
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Intent>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Intent intent) {
+                        if (intent == null || !TextUtils.equals(intent.getAction(),
+                                CommonConfig.CHANGE_APP_ID_ACTION)) {
+                            return;
+                        }
+                        mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
+                        mTvAppId.setText("APPID:" + mChangeAppId);
+                    }
+                });
+        mSubscription.add(changeAppId);
     }
 
     @Override

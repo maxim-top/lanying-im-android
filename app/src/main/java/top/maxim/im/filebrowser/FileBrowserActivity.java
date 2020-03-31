@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import top.maxim.im.R;
+import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.FileConfig;
 
 /**
@@ -98,14 +99,14 @@ public class FileBrowserActivity extends ListActivity {
         if (file.isDirectory()) {
             getFileDir(file.getPath());
         } else {
-            CopySdcardFile(file.getPath(), priDir + "/" + getFileName(file.getPath()));
+            copySdcardFile(file.getPath(), priDir + "/" + getFileName(file.getPath()));
             //Toast.makeText(this, file.getPath(), Toast.LENGTH_SHORT).show();
         }
     }
 
     //文件拷贝
     //要复制的目录下的所有非子目录(文件夹)文件拷贝
-    private void CopySdcardFile(String fromFile, String toFile) {
+    public static void copySdcardFile(String fromFile, String toFile) {
         InputStream fosfrom = null;
         OutputStream fosto = null;
         try {
@@ -117,7 +118,8 @@ public class FileBrowserActivity extends ListActivity {
                 fosto.write(bt, 0, c);
             }
 
-            Toast.makeText(this, "文件已拷贝至" + toFile, Toast.LENGTH_SHORT).show();
+            Toast.makeText(AppContextUtils.getAppContext(), "文件已拷贝至" + toFile, Toast.LENGTH_SHORT)
+                    .show();
 
         } catch (Exception ex) {
         }

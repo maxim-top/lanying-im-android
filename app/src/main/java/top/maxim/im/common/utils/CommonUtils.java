@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
@@ -71,8 +70,6 @@ public class CommonUtils {
         SharePreferenceUtils.getInstance().putUserName("");
         SharePreferenceUtils.getInstance().putUserPwd("");
         SharePreferenceUtils.getInstance().putToken("");
-        SharePreferenceUtils.getInstance().putAppId("");
-        UserManager.getInstance().changeAppId(SharePreferenceUtils.getInstance().getAppId());
         PushClientMgr.getManager().unRegister();
         PushUtils.getInstance().unregisterActivityListener(AppContextUtils.getApplication());
     }

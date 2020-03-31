@@ -33,6 +33,7 @@ import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -40,8 +41,6 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
-import top.maxim.im.push.PushClientMgr;
-import top.maxim.im.push.PushUtils;
 
 /**
  * Description : 消息分发 Created by mango on 2018/12/20.
@@ -214,10 +213,7 @@ public class MessageDispatcher {
 
                             @Override
                             public void onNext(String s) {
-                                SharePreferenceUtils.getInstance().putLoginStatus(false);
-                                PushClientMgr.getManager().unRegister();
-                                PushUtils.getInstance().unregisterActivityListener(
-                                        AppContextUtils.getApplication());
+                                CommonUtils.getInstance().logout();
                                 WelcomeActivity.openWelcome(AppContextUtils.getAppContext());
                             }
                         });

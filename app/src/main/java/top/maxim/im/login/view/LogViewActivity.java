@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -21,9 +24,13 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.FileConfig;
+import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CustomDialog;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.filebrowser.FileBrowserActivity;
 
 /**
  * Description : 日志查看 Created by Mango on 2018/11/21.
@@ -33,6 +40,9 @@ public class LogViewActivity extends BaseTitleActivity {
     private static final String LOG_NAME = "floo.log";
     
     private TextView mTvLog;
+    
+    /* 日志路径 */
+    private String mLogPath;
 
     public static void openLogView(Context context) {
         Intent intent = new Intent(context, LogViewActivity.class);
@@ -43,6 +53,9 @@ public class LogViewActivity extends BaseTitleActivity {
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
         builder.setTitle(R.string.log_info);
+        builder.setRightIcon(R.drawable.icon_more, v -> {
+            showSaveLog();
+        });
         builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,7 +69,6 @@ public class LogViewActivity extends BaseTitleActivity {
     protected View onCreateView() {
         View view = View.inflate(this, R.layout.activity_log_view, null);
         mTvLog = view.findViewById(R.id.tv_log);
-        mTvLog.setTextIsSelectable(true);
         return view;
     }
 
@@ -110,14 +122,14 @@ public class LogViewActivity extends BaseTitleActivity {
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             return "";
         }
-        String filePath = getLogPath() + filename;
-        if (!new File(filePath).exists()) {
+        mLogPath = getLogPath() + filename;
+        if (!new File(mLogPath).exists()) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
         // 打开文件输入流
         try {
-            FileInputStream input = new FileInputStream(filePath);
+            FileInputStream input = new FileInputStream(mLogPath);
             byte[] temp = new byte[1024];
 
             int len = 0;
@@ -133,4 +145,35 @@ public class LogViewActivity extends BaseTitleActivity {
         }
         return sb.toString();
     }
+
+    private void showSaveLog() {
+        final CustomDialog dialog = new CustomDialog();
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        // 保存
+        TextView save = new TextView(this);
+        save.setPadding(ScreenUtils.dp2px(15), 0, ScreenUtils.dp2px(15), 0);
+        save.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        save.setTextColor(getResources().getColor(R.color.color_black));
+        save.setBackgroundColor((getResources().getColor(R.color.color_white)));
+        save.setText("保存日志");
+        save.setOnClickListener(v -> {
+            //保存的路径
+            String appId = SharePreferenceUtils.getInstance().getAppId();
+            File savePath = new File(FileConfig.DIR_APP_CRASH_LOG + "/" + appId);
+            if (!savePath.exists()) {
+                savePath.mkdirs();
+            }
+            FileBrowserActivity.copySdcardFile(mLogPath, savePath + "/" + LOG_NAME);
+            dialog.dismiss();
+        });
+        ll.addView(save, params);
+
+        dialog.setCustomView(ll);
+        dialog.showDialog(this);
+    }
+
 }

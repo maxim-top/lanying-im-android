@@ -42,6 +42,7 @@ import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.SplashVideoPlayView;
 import top.maxim.im.push.NotificationUtils;
+import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 
 public class WelcomeActivity extends BaseTitleActivity {
@@ -101,8 +102,25 @@ public class WelcomeActivity extends BaseTitleActivity {
             autoLogin(userId, pwd);
             return;
         }
-        LoginActivity.openLogin(WelcomeActivity.this);
-        finish();
+        //没有登录 需要切换到默认appId 再进入登录页面
+        String oldAppId = SharePreferenceUtils.getInstance().getAppId();
+        if (TextUtils.equals(oldAppId, ScanConfigs.CODE_APP_ID)) {
+            // 已经是默认的 直接进入
+            LoginActivity.openLogin(WelcomeActivity.this);
+            finish();
+        } else {
+            // 还原为默认的appId
+            UserManager.getInstance().changeAppId(ScanConfigs.CODE_APP_ID, bmxErrorCode -> {
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    SharePreferenceUtils.getInstance().putAppId("");
+                    LoginActivity.openLogin(WelcomeActivity.this);
+                    finish();
+                } else {
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
+                    ToastUtil.showTextViewPrompt(error);
+                }
+            });
+        }
     }
 
     /**

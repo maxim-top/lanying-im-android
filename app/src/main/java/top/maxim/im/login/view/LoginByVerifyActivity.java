@@ -265,6 +265,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
         String scanUserName = ScanConfigs.CODE_USER_NAME;
         if (!TextUtils.isEmpty(scanUserName)) {
             mInputName.setText(scanUserName);
+            ScanConfigs.CODE_USER_NAME = "";
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);

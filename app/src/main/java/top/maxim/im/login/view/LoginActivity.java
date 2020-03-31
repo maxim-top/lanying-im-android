@@ -211,9 +211,13 @@ public class LoginActivity extends BaseTitleActivity {
         String scanUserName = ScanConfigs.CODE_USER_NAME;
         if (!TextUtils.isEmpty(scanUserName)) {
             mInputName.setText(scanUserName);
+            ScanConfigs.CODE_USER_NAME = "";
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
+        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
+            mChangeAppId = appId;
+        }
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
@@ -266,7 +270,9 @@ public class LoginActivity extends BaseTitleActivity {
             ToastUtil.showTextViewPrompt(error);
         };
         
-        if (!TextUtils.isEmpty(changeAppId)) {
+        boolean isChange = !TextUtils.isEmpty(changeAppId)
+                && !TextUtils.equals(changeAppId, SharePreferenceUtils.getInstance().getAppId());
+        if (isChange) {
             UserManager.getInstance().changeAppId(changeAppId, bmxErrorCode -> {
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
                     SharePreferenceUtils.getInstance().putAppId(changeAppId);

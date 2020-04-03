@@ -14,7 +14,6 @@ import org.json.JSONObject;
 
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
-import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -209,19 +208,22 @@ public class ScanResultActivity extends BaseTitleActivity {
             e.printStackTrace();
         }
         if (!TextUtils.isEmpty(appId)) {
-            isUploadToken = true;
-            showLoadingDialog(true);
-            String finalAppId = appId;
+//            isUploadToken = true;
+//            showLoadingDialog(true);
+//            String finalAppId = appId;
+            SharePreferenceUtils.getInstance().putAppId(appId);
             UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {
                 dismissLoadingDialog();
-                if (BaseManager.bmxFinish(bmxErrorCode)) {
-                    SharePreferenceUtils.getInstance().putAppId(finalAppId);
-                } else {
-                    ToastUtil.showTextViewPrompt("切换AppId失败");
-                }
-                LoginActivity.openLogin(this);
-                finish();
+//                if (BaseManager.bmxFinish(bmxErrorCode)) {
+//                    SharePreferenceUtils.getInstance().putAppId(finalAppId);
+//                } else {
+//                    ToastUtil.showTextViewPrompt("切换AppId失败");
+//                }
+//                LoginActivity.openLogin(this);
+//                finish();
             });
+            LoginActivity.openLogin(this);
+            finish();
         } else {
             LoginActivity.openLogin(this);
             finish();
@@ -246,19 +248,22 @@ public class ScanResultActivity extends BaseTitleActivity {
             e.printStackTrace();
         }
         if (!TextUtils.isEmpty(appId)) {
-            isUploadToken = true;
-            showLoadingDialog(true);
-            String finalAppId = appId;
+//            isUploadToken = true;
+//            showLoadingDialog(true);
+//            String finalAppId = appId;
+            SharePreferenceUtils.getInstance().putAppId(appId);
             UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {
-                dismissLoadingDialog();
-                if (BaseManager.bmxFinish(bmxErrorCode)) {
-                    SharePreferenceUtils.getInstance().putAppId(finalAppId);
-                } else {
-                    ToastUtil.showTextViewPrompt("切换AppId失败");
-                }
-                LoginActivity.openLogin(this);
-                finish();
+//                dismissLoadingDialog();
+//                if (BaseManager.bmxFinish(bmxErrorCode)) {
+//                    SharePreferenceUtils.getInstance().putAppId(finalAppId);
+//                } else {
+//                    ToastUtil.showTextViewPrompt("切换AppId失败");
+//                }
+//                LoginActivity.openLogin(this);
+//                finish();
             });
+            LoginActivity.openLogin(this);
+            finish();
         } else {
             LoginActivity.openLogin(this);
             finish();

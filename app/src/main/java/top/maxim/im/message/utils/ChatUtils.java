@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXFileAttachment;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXImageAttachment;
@@ -26,11 +25,6 @@ import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.BMXVoiceAttachment;
 import im.floo.floolib.FileProgressListener;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -297,67 +291,44 @@ public class ChatUtils {
         if (profile == null || imageView == null) {
             return;
         }
-        Observable.just("").map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().downloadAvatar(profile, new FileProgressListener(){
-                    @Override
-                    public int onProgressChange(String percent) {
-                                if (Integer.valueOf(percent) >= 100) {
-                                    String avatarUrl = "";
-                                    if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
-                                            && new File(profile.avatarThumbnailPath()).exists()
-                                            && new File(profile.avatarThumbnailPath()).isFile()) {
-                                        avatarUrl = "file://" + profile.avatarThumbnailPath();
-                                    } else
-                                        if (!TextUtils.isEmpty(profile.avatarPath())
-                                            && new File(profile.avatarPath()).exists()
-                                            && new File(profile.avatarPath()).isFile()) {
-                                        avatarUrl = "file://" + profile.avatarPath();
-                                    }
-                                    String finalAvatarUrl = avatarUrl;
-                                    TaskDispatcher.postMainDelayed(() -> {
-                                        BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
-                                    }, 500);
-                                }
-                        Log.i(TAG, "onProgressChange profile:"+ profile.userId() + "-" + percent);
-                        return 0;
-                    }
-                });
+        UserManager.getInstance().downloadAvatar(profile, s -> {
+            if (Integer.valueOf(s) >= 100) {
+                String avatarUrl = "";
+                if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
+                        && new File(profile.avatarThumbnailPath()).exists()
+                        && new File(profile.avatarThumbnailPath()).isFile()) {
+                    avatarUrl = "file://" + profile.avatarThumbnailPath();
+                } else if (!TextUtils.isEmpty(profile.avatarPath())
+                        && new File(profile.avatarPath()).exists()
+                        && new File(profile.avatarPath()).isFile()) {
+                    avatarUrl = "file://" + profile.avatarPath();
+                }
+                String finalAvatarUrl = avatarUrl;
+                TaskDispatcher.postMainDelayed(() -> {
+                    BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
+                }, 500);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+            Log.i(TAG, "onProgressChange profile:" + profile.userId() + "-" + s);
+            return 0;
+        }, bmxErrorCode -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                // String avatarUrl = "";
+                // // if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
+                // // && new File(profile.avatarThumbnailPath()).exists()
+                // // && new File(profile.avatarThumbnailPath()).isFile()) {
+                // // avatarUrl = + profile.avatarThumbnailPath();
+                // // } else
+                // if (!TextUtils.isEmpty(profile.avatarPath())
+                // && new File(profile.avatarPath()).exists()
+                // && new File(profile.avatarPath()).isFile()) {
+                // avatarUrl = + profile.avatarPath();
+                // }
+                // RosterFetcher.getFetcher().putProfile(profile);
+                // BMImageLoader.getInstance().display(imageView, avatarUrl, config);
+            } else {
+                // BMImageLoader.getInstance().display(imageView, "", config);
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // BMImageLoader.getInstance().display(imageView, "", config);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        // String avatarUrl = "";
-                        // // if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
-                        // // && new File(profile.avatarThumbnailPath()).exists()
-                        // // && new File(profile.avatarThumbnailPath()).isFile()) {
-                        // // avatarUrl = + profile.avatarThumbnailPath();
-                        // // } else
-                        // if (!TextUtils.isEmpty(profile.avatarPath())
-                        // && new File(profile.avatarPath()).exists()
-                        // && new File(profile.avatarPath()).isFile()) {
-                        // avatarUrl = + profile.avatarPath();
-                        // }
-                        // RosterFetcher.getFetcher().putProfile(profile);
-                        // BMImageLoader.getInstance().display(imageView, avatarUrl, config);
-                    }
-                });
+        });
     }
 
     /**
@@ -370,82 +341,65 @@ public class ChatUtils {
         }
         final int hashCode = imageView.hashCode();
         mViewCache.put(hashCode, item.rosterId());
-        Observable.just(item).map(new Func1<BMXRosterItem, BMXErrorCode>() {
+        RosterManager.getInstance().downloadAvatar(item, new FileProgressListener() {
             @Override
-            public BMXErrorCode call(BMXRosterItem s) {
-                return RosterManager.getInstance().downloadAvatar(s, new FileProgressListener() {
-                    @Override
-                    public int onProgressChange(String percent) {
-                        if (Integer.valueOf(percent) >= 100) {
-                            // 成功
-                            if (!mViewCache.containsKey(hashCode)
-                                    || mViewCache.get(hashCode) != item.rosterId()) {
-                                return 0;
-                            }
-                            mViewCache.remove(hashCode);
-                            String avatarUrl = "";
-                            if (!TextUtils.isEmpty(item.avatarThumbnailPath())
-                                    && new File(item.avatarThumbnailPath()).exists()
-                                    && new File(item.avatarThumbnailPath()).isFile()) {
-                                avatarUrl = "file://" + item.avatarThumbnailPath();
-                            } else
-                                if (!TextUtils.isEmpty(item.avatarPath())
-                                    && new File(item.avatarPath()).exists()
-                                    && new File(item.avatarPath()).isFile()) {
-                                avatarUrl = "file://" + item.avatarPath();
-                            }
-                            String finalAvatarUrl = avatarUrl;
-                            TaskDispatcher.postMain(() -> {
-                                BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
-                            });
-                        }
-                        Log.i(TAG, "onProgressChange roster:" + s.rosterId() + "-" + percent);
+            public int onProgressChange(String percent) {
+                if (Integer.valueOf(percent) >= 100) {
+                    // 成功
+                    if (!mViewCache.containsKey(hashCode)
+                            || mViewCache.get(hashCode) != item.rosterId()) {
                         return 0;
                     }
-                });
+                    mViewCache.remove(hashCode);
+                    String avatarUrl = "";
+                    if (!TextUtils.isEmpty(item.avatarThumbnailPath())
+                            && new File(item.avatarThumbnailPath()).exists()
+                            && new File(item.avatarThumbnailPath()).isFile()) {
+                        avatarUrl = "file://" + item.avatarThumbnailPath();
+                    } else
+                    if (!TextUtils.isEmpty(item.avatarPath())
+                            && new File(item.avatarPath()).exists()
+                            && new File(item.avatarPath()).isFile()) {
+                        avatarUrl = "file://" + item.avatarPath();
+                    }
+                    String finalAvatarUrl = avatarUrl;
+                    TaskDispatcher.postMain(() -> {
+                        BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
+                    });
+                }
+                Log.i(TAG, "onProgressChange roster:" + item.rosterId() + "-" + percent);
+                return 0;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+        }, bmxErrorCode -> {
+            if(BaseManager.bmxFinish(bmxErrorCode)){
+                //成功
+                // String avatarUrl = "";
+                // // if (!TextUtils.isEmpty(item.avatarThumbnailPath())
+                // // && new File(item.avatarThumbnailPath()).exists()
+                // // && new File(item.avatarThumbnailPath()).isFile()) {
+                // // avatarUrl = + item.avatarThumbnailPath();
+                // // } else
+                // if (!TextUtils.isEmpty(item.avatarPath())
+                // && new File(item.avatarPath()).exists()
+                // && new File(item.avatarPath()).isFile()) {
+                // avatarUrl = + item.avatarPath();
+                // }
+                // RosterFetcher.getFetcher().putRoster(item);
+                // if (!mViewCache.containsKey(hashCode)
+                // || mViewCache.get(hashCode) != item.rosterId()) {
+                // return;
+                // }
+                // mViewCache.remove(hashCode);
+                // BMImageLoader.getInstance().display(imageView, avatarUrl, config);
+//                return;
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // if (mViewCache.containsKey(hashCode)
-                        // && mViewCache.get(hashCode) == item.rosterId()) {
-                        // mViewCache.remove(hashCode);
-                        // }
-                        // BMImageLoader.getInstance().display(imageView, "", config);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        // String avatarUrl = "";
-                        // // if (!TextUtils.isEmpty(item.avatarThumbnailPath())
-                        // // && new File(item.avatarThumbnailPath()).exists()
-                        // // && new File(item.avatarThumbnailPath()).isFile()) {
-                        // // avatarUrl = + item.avatarThumbnailPath();
-                        // // } else
-                        // if (!TextUtils.isEmpty(item.avatarPath())
-                        // && new File(item.avatarPath()).exists()
-                        // && new File(item.avatarPath()).isFile()) {
-                        // avatarUrl = + item.avatarPath();
-                        // }
-                        // RosterFetcher.getFetcher().putRoster(item);
-                        // if (!mViewCache.containsKey(hashCode)
-                        // || mViewCache.get(hashCode) != item.rosterId()) {
-                        // return;
-                        // }
-                        // mViewCache.remove(hashCode);
-                        // BMImageLoader.getInstance().display(imageView, avatarUrl, config);
-                    }
-                });
+            //失败
+            // if (mViewCache.containsKey(hashCode)
+            // && mViewCache.get(hashCode) == item.rosterId()) {
+            // mViewCache.remove(hashCode);
+            // }
+            // BMImageLoader.getInstance().display(imageView, "", config);
+        });
     }
 
     /**
@@ -458,80 +412,61 @@ public class ChatUtils {
         }
         final int hashCode = imageView.hashCode();
         mViewCache.put(hashCode, item.groupId());
-        Observable.just(item).map(new Func1<BMXGroup, BMXErrorCode>() {
+        GroupManager.getInstance().downloadAvatar(item, new FileProgressListener() {
             @Override
-            public BMXErrorCode call(BMXGroup s) {
-                return GroupManager.getInstance().downloadAvatar(s, new FileProgressListener() {
-                    @Override
-                    public int onProgressChange(String percent) {
-                        if (Integer.valueOf(percent) >= 100) {
-                            String avatarUrl = "";
-                            if (!TextUtils.isEmpty(item.avatarThumbnailPath())
-                                    && new File(item.avatarThumbnailPath()).exists()
-                                    && new File(item.avatarThumbnailPath()).isFile()) {
-                                avatarUrl = "file://" + item.avatarThumbnailPath();
-                            } else if (!TextUtils.isEmpty(item.avatarPath())
-                                    && new File(item.avatarPath()).exists()
-                                    && new File(item.avatarPath()).isFile()) {
-                                avatarUrl = "file://" + item.avatarPath();
-                            }
-                            if (!mViewCache.containsKey(hashCode)
-                                    || mViewCache.get(hashCode) != item.groupId()) {
-                                return 0;
-                            }
-                            mViewCache.remove(hashCode);
-                            String finalAvatarUrl = avatarUrl;
-                            TaskDispatcher.postMainDelayed(() -> {
-                                BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
-                            }, 500);
-                        }
-                        Log.i(TAG, "onProgressChange group:"+ s.groupId() + "-" + percent);
+            public int onProgressChange(String percent) {
+                if (Integer.valueOf(percent) >= 100) {
+                    String avatarUrl = "";
+                    if (!TextUtils.isEmpty(item.avatarThumbnailPath())
+                            && new File(item.avatarThumbnailPath()).exists()
+                            && new File(item.avatarThumbnailPath()).isFile()) {
+                        avatarUrl = "file://" + item.avatarThumbnailPath();
+                    } else if (!TextUtils.isEmpty(item.avatarPath())
+                            && new File(item.avatarPath()).exists()
+                            && new File(item.avatarPath()).isFile()) {
+                        avatarUrl = "file://" + item.avatarPath();
+                    }
+                    if (!mViewCache.containsKey(hashCode)
+                            || mViewCache.get(hashCode) != item.groupId()) {
                         return 0;
                     }
-                });
+                    mViewCache.remove(hashCode);
+                    String finalAvatarUrl = avatarUrl;
+                    TaskDispatcher.postMainDelayed(() -> {
+                        BMImageLoader.getInstance().display(imageView, finalAvatarUrl, config);
+                    }, 500);
+                }
+                Log.i(TAG, "onProgressChange group:" + item.groupId() + "-" + percent);
+                return 0;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+        }, bmxErrorCode -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                // String avatarUrl = "";
+                // // if (!TextUtils.isEmpty(item.avatarThumbnailPath())
+                // // && new File(item.avatarThumbnailPath()).exists()
+                // // && new File(item.avatarThumbnailPath()).isFile()) {
+                // // avatarUrl = + item.avatarThumbnailPath();
+                // // } else
+                // if (!TextUtils.isEmpty(item.avatarPath())
+                // && new File(item.avatarPath()).exists()
+                // && new File(item.avatarPath()).isFile()) {
+                // avatarUrl = + item.avatarPath();
+                // }
+                // RosterFetcher.getFetcher().putGroup(item);
+                // if (!mViewCache.containsKey(hashCode)
+                // || mViewCache.get(hashCode) != item.groupId()) {
+                // return;
+                // }
+                // mViewCache.remove(hashCode);
+                // BMImageLoader.getInstance().display(imageView, avatarUrl, config);
+            } else {
+                // if (mViewCache.containsKey(hashCode)
+                // && mViewCache.get(hashCode) == item.groupId()) {
+                // mViewCache.remove(hashCode);
+                // }
+                // BMImageLoader.getInstance().display(imageView, "", config);
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        // if (mViewCache.containsKey(hashCode)
-                        // && mViewCache.get(hashCode) == item.groupId()) {
-                        // mViewCache.remove(hashCode);
-                        // }
-                        // BMImageLoader.getInstance().display(imageView, "", config);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        // String avatarUrl = "";
-                        // // if (!TextUtils.isEmpty(item.avatarThumbnailPath())
-                        // // && new File(item.avatarThumbnailPath()).exists()
-                        // // && new File(item.avatarThumbnailPath()).isFile()) {
-                        // // avatarUrl = + item.avatarThumbnailPath();
-                        // // } else
-                        // if (!TextUtils.isEmpty(item.avatarPath())
-                        // && new File(item.avatarPath()).exists()
-                        // && new File(item.avatarPath()).isFile()) {
-                        // avatarUrl = + item.avatarPath();
-                        // }
-                        // RosterFetcher.getFetcher().putGroup(item);
-                        // if (!mViewCache.containsKey(hashCode)
-                        // || mViewCache.get(hashCode) != item.groupId()) {
-                        // return;
-                        // }
-                        // mViewCache.remove(hashCode);
-                        // BMImageLoader.getInstance().display(imageView, avatarUrl, config);
-                    }
-                });
+        });
     }
 
     public MessageBean buildMessage(BMXMessage mBmxMessage, BMXMessage.MessageType type,

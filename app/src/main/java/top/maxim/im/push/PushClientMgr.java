@@ -9,17 +9,13 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.heytap.mcssdk.PushManager;
 import com.huawei.hms.api.ConnectionResult;
 import com.huawei.hms.api.HuaweiApiAvailability;
 import com.meizu.cloud.pushsdk.util.MzSystemUtils;
+import com.vivo.push.PushClient;
 import com.xiaomi.mipush.sdk.MiPushClient;
 
-import im.floo.floolib.BMXErrorCode;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
@@ -29,6 +25,7 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.push.huawei.HWPushManager;
 import top.maxim.im.push.meizu.MZPushManager;
+import top.maxim.im.push.oppo.OppoPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
 
 /**
@@ -36,8 +33,7 @@ import top.maxim.im.push.xiaomi.MIPushManager;
  */
 public final class PushClientMgr {
 
-    private static IPushManager sManager = new IPushManager() {
-    };
+    private static IPushManager sManager;
 
     private static boolean isInited = false;
 
@@ -48,6 +44,10 @@ public final class PushClientMgr {
     public static final int MI_TYPE = 2;
 
     public static final int MZ_TYPE = 3;
+    
+    public static final int OPPO_TYPE = 4;
+    
+    public static final int VIVO_TYPE = 5;
 
     private static PushClientMgr sPushMgr = new PushClientMgr();
 
@@ -69,6 +69,16 @@ public final class PushClientMgr {
             } else if (isMeizu(application.getApplicationContext())) {
                 sManager = new MZPushManager(application.getApplicationContext());
                 sDevType = MZ_TYPE;
+            } else if (isOppo(application.getApplicationContext())) {
+                sManager = new OppoPushManager(application.getApplicationContext());
+                sDevType = OPPO_TYPE;
+            }
+//            else if (isVivo(application.getApplicationContext())) {
+//                sManager = new VivoPushManager(application.getApplicationContext());
+//                sDevType = VIVO_TYPE;
+//            }
+            else {
+                sManager = new EmptyPushManager(application.getApplicationContext());
             }
             isInited = true;
             return true;
@@ -97,6 +107,27 @@ public final class PushClientMgr {
         return RomUtil.isFlyme() && MzSystemUtils.isBrandMeizu(context);
     }
 
+    /**
+     * 判断oppo
+     */
+    public static boolean isOppo(Context context) {
+        return RomUtil.isOppo() && PushManager.isSupportPush(context);
+    }
+
+    /**
+     * 判断oppo
+     */
+    public static boolean isVivo(Context context) {
+        if (!isInited) {
+            PushClient.getInstance(context).initialize();
+        }
+        try {
+            return RomUtil.isVivo() && PushClient.getInstance(context).isSupport();
+        } catch (Exception e) {
+        }
+        return false;
+    }
+
     public static PushClientMgr getManager() {
         if (!isInited) {
             throw new IllegalStateException(
@@ -123,33 +154,11 @@ public final class PushClientMgr {
         if (TextUtils.isEmpty(token)) {
             return;
         }
-        Observable.just(token).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().bindDevice(s);
+        UserManager.getInstance().bindDevice(token, bmxErrorCode -> {
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                Log.e("bindDevice failed", bmxErrorCode.name());
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("bindDevice failed", e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-
-                    }
-                });
+        });
         notifierBind(token);
     }
 
@@ -198,11 +207,15 @@ public final class PushClientMgr {
     }
 
     public void register(Activity activity) {
-        sManager.register(activity);
+        if (sManager != null) {
+            sManager.register(activity);
+        }
     }
 
     public void unRegister() {
-        sManager.unRegister();
+        if (sManager != null) {
+            sManager.unRegister();
+        }
         // 底层实现解绑 上层不再调用
         // String token = SharePreferenceUtils.getInstance().getToken();
         // if (!TextUtils.isEmpty(token)) {

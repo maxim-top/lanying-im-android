@@ -10,16 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
-import im.floo.floolib.BMXGroupMemberList;
 import im.floo.floolib.BMXMessage;
-import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -39,8 +31,6 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     private ChatGroupContract.Model mModel;
 
     private final int AT_REQUEST = 2000;
-
-    private BMXGroup mGroup = new BMXGroup();
 
     /* 文本@的对象列表 以feedId作为唯一标志 */
     private Map<String, String> mAtMap;
@@ -72,80 +62,41 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
         if (chatId <= 0) {
             return;
         }
-        Observable.just(mGroup).map(new Func1<BMXGroup, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXGroup group) {
-                return GroupManager.getInstance().search(chatId, mGroup, true);
+        GroupManager.getInstance().getGroupList(chatId, true, (bmxErrorCode, group) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                RosterFetcher.getFetcher().putGroup(group);
+                if (mView != null) {
+                    if (group != null) {
+                        mView.setHeadTitle(group.name());
+                        mShowAckRead = group.enableReadAck();
+                    }
+                    mView.showReadAck(mShowAckRead);
+                }
+                syncGroupMember(group);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mGroup = null;
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        RosterFetcher.getFetcher().putGroup(mGroup);
-                        if (mView != null) {
-                            mView.setHeadTitle(mGroup.name());
-                            mShowAckRead = mGroup.enableReadAck();
-                            mView.showReadAck(mShowAckRead);
-                        }
-                        syncGroupMember();
-                    }
-                });
+        });
     }
 
     /**
      * 同步群成员
      */
-    private void syncGroupMember() {
-        BMXGroupMemberList memberList = new BMXGroupMemberList();
-        Observable.just(mGroup).map(new Func1<BMXGroup, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXGroup group) {
-                return GroupManager.getInstance().getMembers(mGroup, memberList, true);
+    private void syncGroupMember(BMXGroup group) {
+        if (group == null) {
+            return;
+        }
+        GroupManager.getInstance().getMembers(group, true, (bmxErrorCode, memberList) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                if (mMemberIdList == null) {
+                    mMemberIdList = new ArrayList<>();
+                }
+                mMemberIdList.clear();
+                if (memberList != null && !memberList.isEmpty()) {
+                    for (int i = 0; i < memberList.size(); i++) {
+                        mMemberIdList.add(memberList.get(i).getMUid());
+                    }
+                }
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        if (mMemberIdList == null) {
-                            mMemberIdList = new ArrayList<>();
-                        }
-                        if (memberList != null && !memberList.isEmpty()) {
-                            for (int i = 0; i < memberList.size(); i++) {
-                                mMemberIdList.add(memberList.get(i).getMUid());
-                            }
-                        }
-                    }
-                });
+        });
     }
 
     /**
@@ -233,41 +184,18 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
         if (bean == null || mMemberIdList == null || mMemberIdList.isEmpty()) {
             return;
         }
-        ListOfLongLong list = new ListOfLongLong();
-        Observable.just(bean).map(new Func1<BMXMessage, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXMessage msg) {
-                return ChatManager.getInstance().getGroupAckMessageUserIdList(msg, list);
+        ChatManager.getInstance().getGroupAckMessageUserIdList(bean, (bmxErrorCode, list) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                List<Long> readList = new ArrayList<>();
+                if (list != null && !list.isEmpty()) {
+                    for (int i = 0; i < list.size(); i++) {
+                        readList.add(list.get(i));
+                    }
+                }
+                GroupAckActivity.openGroupAckActivity(mView.getContext(), mMemberIdList, readList);
+            } else {
+                ToastUtil.showTextViewPrompt("获取已读列表失败");
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        ToastUtil.showTextViewPrompt("获取已读列表失败");
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        List<Long> readList = new ArrayList<>();
-                        if (list != null && !list.isEmpty()) {
-                            for (int i = 0; i < list.size(); i++) {
-                                readList.add(list.get(i));
-                            }
-                        }
-                        GroupAckActivity.openGroupAckActivity(mView.getContext(), mMemberIdList,
-                                readList);
-
-                    }
-                });
+        });
     }
 }

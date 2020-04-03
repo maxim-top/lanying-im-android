@@ -30,15 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupSharedFileList;
 import im.floo.floolib.FileProgressListener;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -70,8 +66,6 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
     private boolean isEdit = false;
 
     protected BMXGroup mGroup = new BMXGroup();
-
-    protected BMXGroupSharedFileList shareList = new BMXGroupSharedFileList();
 
     protected Map<BMXGroup.SharedFile, Boolean> mSelected = new HashMap<>();
 
@@ -189,41 +183,23 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
         // 文件不存在 下载
         mDownload.put(file, true);
         mAdapter.notifyDataSetChanged();
-        Observable.just(file).map(new Func1<BMXGroup.SharedFile, BMXErrorCode>() {
+        GroupManager.getInstance().downloadSharedFile(mGroup, file, new FileProgressListener() {
             @Override
-            public BMXErrorCode call(BMXGroup.SharedFile file) {
-                return GroupManager.getInstance().downloadSharedFile(mGroup, file, new FileProgressListener(){
-                    @Override
-                    public int onProgressChange(String percent) {
-                        Log.i("ChatGroupShareActivity", "onProgressChange:"+ mGroup.groupId() + "-" + percent);
-                        return 0;
-                    }
-                });
+            public int onProgressChange(String percent) {
+                Log.i("ChatGroupShareActivity",
+                        "onProgressChange:" + mGroup.groupId() + "-" + percent);
+                return 0;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+        }, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                mDownload.remove(file);
+                mAdapter.notifyDataSetChanged();
+            } else {
+                mDownload.remove(file);
+                mAdapter.notifyDataSetChanged();
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mDownload.remove(file);
-                        mAdapter.notifyDataSetChanged();
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        mDownload.remove(file);
-                        mAdapter.notifyDataSetChanged();
-                    }
-                });
+        });
     }
 
     /**
@@ -266,14 +242,18 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
         super.initDataFromFront(intent);
         if (intent != null) {
             mGroupId = intent.getLongExtra(MessageConfig.CHAT_ID, 0);
-            GroupManager.getInstance().search(mGroupId, mGroup, false);
         }
     }
 
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        init();
+        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
+            if (bmxGroup != null) {
+                mGroup = bmxGroup;
+            }
+            init();
+        });
     }
 
     protected void init() {
@@ -281,44 +261,25 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(mGroup).map(new Func1<BMXGroup, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXGroup group) {
-                return initData(true);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                        initData(false);
-                        bindData();
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        bindData();
-                    }
+        initData(true, (bmxErrorCode, bmxGroupSharedFileList) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                bindData(bmxGroupSharedFileList);
+            } else {
+                toastError(bmxErrorCode);
+                initData(false, (bmxErrorCode1, bmxGroupSharedFileList1) -> {
+                    bindData(bmxGroupSharedFileList1);
                 });
+            }
+        });
     }
 
-    protected BMXErrorCode initData(boolean forceRefresh) {
-        return GroupManager.getInstance().getSharedFilesList(mGroup, shareList, forceRefresh);
+    protected void initData(boolean forceRefresh,
+            BMXDataCallBack<BMXGroupSharedFileList> callBack) {
+        GroupManager.getInstance().getSharedFilesList(mGroup, forceRefresh, callBack);
     }
 
-    protected void bindData() {
+    protected void bindData(BMXGroupSharedFileList shareList) {
         List<BMXGroup.SharedFile> files = new ArrayList<>();
         for (int i = 0; i < shareList.size(); i++) {
             files.add(shareList.get(i));
@@ -338,76 +299,35 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(file).map(new Func1<BMXGroup.SharedFile, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXGroup.SharedFile file1) {
-                return GroupManager.getInstance().removeSharedFile(mGroup, file1);
+        GroupManager.getInstance().removeSharedFile(mGroup, file, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                init();
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        init();
-                    }
-                });
+        });
     }
 
-    private void addShare(String filePath, final String displayName, final String extensionName) {
+    private void addShare(String filePath, String displayName, String extensionName) {
         if (TextUtils.isEmpty(filePath) || !new File(filePath).exists()) {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(filePath).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return GroupManager.getInstance().uploadSharedFile(mGroup, s, displayName,
-                        extensionName, new FileProgressListener(){
-                            @Override
-                            public int onProgressChange(String percent) {
-                                Log.i("ChatGroupShareActivity", "onProgressChange:"+ mGroup.groupId() + "-" + percent);
-                                return 0;
-                            }
-                        });
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
+        GroupManager.getInstance().uploadSharedFile(mGroup, filePath, displayName, extensionName,
+                new FileProgressListener() {
                     @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
+                    public int onProgressChange(String percent) {
+                        Log.i("ChatGroupShareActivity",
+                                "onProgressChange:" + mGroup.groupId() + "-" + percent);
+                        return 0;
                     }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
+                }, bmxErrorCode -> {
+                    dismissLoadingDialog();
+                    if (BaseManager.bmxFinish(bmxErrorCode)) {
                         init();
+                    } else {
+                        toastError(bmxErrorCode);
                     }
                 });
     }
@@ -536,4 +456,8 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
         }
     }
 
+    private void toastError(BMXErrorCode e) {
+        String error = e != null ? e.name() : "网络异常";
+        ToastUtil.showTextViewPrompt(error);
+    }
 }

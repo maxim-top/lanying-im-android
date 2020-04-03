@@ -10,9 +10,9 @@ import android.text.TextUtils;
 import im.floo.floolib.BMXConversation;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXMessage;
-import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXUserProfile;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -39,56 +39,71 @@ public class PushReceiver extends BroadcastReceiver {
         // 是否显示消息内容
         String action = intent.getAction();
         // 获取自己的profile
-        BMXUserProfile profile = new BMXUserProfile();
-        UserManager.getInstance().getProfile(profile, false);
-        // 获取设置的push开关
-        BMXUserProfile.MessageSetting setting = profile.messageSetting();
-        boolean isPush = setting != null && setting.getMPushEnabled();
-        boolean isPushDetail = setting != null && setting.getMPushDetail();
-        boolean isPushSound = setting != null && setting.getMNotificationSound();
-        boolean isPushVibrate = setting != null && setting.getMNotificationVibrate();
-        if (!isPush) {
-            // 不push
+        UserManager.getInstance().getProfile(false, (bmxErrorCode, profile) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode) && profile != null) {
+                // 获取设置的push开关
+                BMXUserProfile.MessageSetting setting = profile.messageSetting();
+                boolean isPush = setting != null && setting.getMPushEnabled();
+                boolean isPushDetail = setting != null && setting.getMPushDetail();
+                boolean isPushSound = setting != null && setting.getMNotificationSound();
+                boolean isPushVibrate = setting != null && setting.getMNotificationVibrate();
+                if (!isPush) {
+                    // 不push
+                    return;
+                }
+                if (TextUtils.equals(action,
+                        String.format(context.getString(R.string.im_push_msg_action),
+                                context.getPackageName()))) {
+                    MessageBean bean = (MessageBean)intent
+                            .getSerializableExtra(MessageConfig.CHAT_MSG);
+                    // 如果是我发送不通知
+                    if (bean == null || !bean.isReceiveMsg()) {
+                        return;
+                    }
+                    BMXMessage.MessageType type = bean.getType();
+                    if (type == BMXMessage.MessageType.Single) {
+                        // 查询单聊免打扰
+                        RosterManager.getInstance().getRosterList(bean.getChatId(), false,
+                                (bmxErrorCode1, rosterItem) -> {
+                                    if (rosterItem == null || rosterItem.isMuteNotification()) {
+                                        return;
+                                    }
+                                    String name = "";
+                                    if (!TextUtils.isEmpty(rosterItem.alias())) {
+                                        name = rosterItem.alias();
+                                    } else {
+                                        name = rosterItem.username();
+                                    }
+                                    handleNotify(context, name, bean, isPushSound, isPushVibrate,
+                                            isPushDetail);
+                                });
+                    } else if (type == BMXMessage.MessageType.Group) {
+                        GroupManager.getInstance().getGroupList(bean.getChatId(), false,
+                                (bmxErrorCode1, groupItem) -> {
+                                    if (groupItem == null
+                                            || groupItem.msgMuteMode() != null && groupItem
+                                                    .msgMuteMode() == BMXGroup.MsgMuteMode.MuteChat) {
+                                        return;
+                                    }
+                                    String name = groupItem.name();
+                                    handleNotify(context, name, bean, isPushSound, isPushVibrate,
+                                            isPushDetail);
+                                });
+                    }
+                }
+            }
+        });
+    }
+    
+    private void handleNotify(Context context, String name, MessageBean bean, boolean isPushSound,
+            boolean isPushVibrate, boolean isPushDetail) {
+        if (handleSoundAndShake(context, bean, isPushSound, isPushVibrate)) {
             return;
         }
-        if (TextUtils.equals(action, String.format(context.getString(R.string.im_push_msg_action),
-                context.getPackageName()))) {
-            MessageBean bean = (MessageBean)intent.getSerializableExtra(MessageConfig.CHAT_MSG);
-            // 如果是我发送不通知
-            if (bean == null || !bean.isReceiveMsg()) {
-                return;
-            }
-            String name = "";
-            BMXMessage.MessageType type = bean.getType();
-            if (type == BMXMessage.MessageType.Single) {
-                // 查询单聊免打扰
-                BMXRosterItem rosterItem = new BMXRosterItem();
-                RosterManager.getInstance().search(bean.getChatId(), false, rosterItem);
-                if (rosterItem.isMuteNotification()) {
-                    return;
-                }
-                if (!TextUtils.isEmpty(rosterItem.alias())) {
-                    name = rosterItem.alias();
-                } else {
-                    name = rosterItem.username();
-                }
-            } else if (type == BMXMessage.MessageType.Group) {
-                BMXGroup groupItem = new BMXGroup();
-                GroupManager.getInstance().search(bean.getChatId(), groupItem, false);
-                if (groupItem.msgMuteMode() != null
-                        && groupItem.msgMuteMode() == BMXGroup.MsgMuteMode.MuteChat) {
-                    return;
-                }
-                name = groupItem.name();
-            }
-            if (handleSoundAndShake(context, bean, isPushSound, isPushVibrate)) {
-                return;
-            }
-            if (isPushDetail) {
-                showChatNotification(name, bean);
-            } else {
-                hideDetailContentMsgNotification(context, bean);
-            }
+        if (isPushDetail) {
+            showChatNotification(name, bean);
+        } else {
+            hideDetailContentMsgNotification(context, bean);
         }
     }
 
@@ -130,30 +145,34 @@ public class PushReceiver extends BroadcastReceiver {
         BMXConversation.Type type = null;
         if (bean.getType() == BMXMessage.MessageType.Single) {
             type = BMXConversation.Type.Single;
-        } else if (bean.getType() == BMXMessage.MessageType.Group) {
+        } else {
             type = BMXConversation.Type.Group;
         }
-        BMXConversation conversation = type == null ? null
-                : ChatManager.getInstance().openConversation(bean.getChatId(), type, false);
-        int count = conversation != null ? conversation.unreadNumber() : 0;
-        StringBuilder content = new StringBuilder();
-        if (count > 1) {
-            content.append("[").append(count).append("条]");
-        }
-        if (!TextUtils.isEmpty(title)) {
-            content.append(title).append(":");
-        }
-        content.append(ChatUtils.getInstance().getMessageDesc(bean));
-        Intent intent = new Intent();
-        if (bean.getType() == BMXMessage.MessageType.Single) {
-            intent.setClass(AppContextUtils.getAppContext(), ChatSingleActivity.class);
-        } else {
-            intent.setClass(AppContextUtils.getAppContext(), ChatGroupActivity.class);
-        }
-        intent.putExtra(MessageConfig.CHAT_ID, bean.getChatId());
-        // 跳到通知
-        NotificationUtils.getInstance().showNotify(MsgConstants.ChannelImportance.PRIVATE, title,
-                content.toString(), intent, String.valueOf(bean.getChatId()).hashCode(), count);
+        ChatManager.getInstance().openConversation(bean.getChatId(), type, false,
+                (bmxErrorCode, conversation) -> {
+                    int count = BaseManager.bmxFinish(bmxErrorCode) && conversation != null
+                            ? conversation.unreadNumber()
+                            : 0;
+                    StringBuilder content = new StringBuilder();
+                    if (count > 1) {
+                        content.append("[").append(count).append("条]");
+                    }
+                    if (!TextUtils.isEmpty(title)) {
+                        content.append(title).append(":");
+                    }
+                    content.append(ChatUtils.getInstance().getMessageDesc(bean));
+                    Intent intent = new Intent();
+                    if (bean.getType() == BMXMessage.MessageType.Single) {
+                        intent.setClass(AppContextUtils.getAppContext(), ChatSingleActivity.class);
+                    } else {
+                        intent.setClass(AppContextUtils.getAppContext(), ChatGroupActivity.class);
+                    }
+                    intent.putExtra(MessageConfig.CHAT_ID, bean.getChatId());
+                    // 跳到通知
+                    NotificationUtils.getInstance().showNotify(
+                            MsgConstants.ChannelImportance.PRIVATE, title, content.toString(),
+                            intent, String.valueOf(bean.getChatId()).hashCode(), count);
+                });
     }
 
     /**
@@ -177,24 +196,30 @@ public class PushReceiver extends BroadcastReceiver {
         BMXConversation.Type type = null;
         if (bean.getType() == BMXMessage.MessageType.Single) {
             type = BMXConversation.Type.Single;
-        } else if (bean.getType() == BMXMessage.MessageType.Group) {
+        } else {
             type = BMXConversation.Type.Group;
         }
-        BMXConversation conversation = type == null ? null
-                : ChatManager.getInstance().openConversation(bean.getChatId(), type, false);
-        int count = conversation != null ? conversation.unreadNumber() : 0;
-        String content = context.getString(R.string.push_receiver_rec_msg_count,
-                String.valueOf(count <= 0 ? 1 : count));
+        String finalTitle = title;
+        ChatManager.getInstance().openConversation(bean.getChatId(), type, false,
+                (bmxErrorCode, conversation) -> {
+                    int count = BaseManager.bmxFinish(bmxErrorCode) && conversation != null
+                            ? conversation.unreadNumber()
+                            : 0;
+                    String content = context.getString(R.string.push_receiver_rec_msg_count,
+                            String.valueOf(count <= 0 ? 1 : count));
 
-        Intent intent = new Intent();
-        if (bean.getType() == BMXMessage.MessageType.Single) {
-            intent.setClass(AppContextUtils.getAppContext(), ChatSingleActivity.class);
-        } else {
-            intent.setClass(AppContextUtils.getAppContext(), ChatGroupActivity.class);
-        }
-        intent.putExtra(MessageConfig.CHAT_ID, bean.getChatId());
-        // 跳到通知
-        NotificationUtils.getInstance().showNotify(MsgConstants.ChannelImportance.PRIVATE, title,
-                content, intent, String.valueOf(bean.getChatId()).hashCode(), count);
+                    Intent intent = new Intent();
+                    if (bean.getType() == BMXMessage.MessageType.Single) {
+                        intent.setClass(AppContextUtils.getAppContext(), ChatSingleActivity.class);
+                    } else {
+                        intent.setClass(AppContextUtils.getAppContext(), ChatGroupActivity.class);
+                    }
+                    intent.putExtra(MessageConfig.CHAT_ID, bean.getChatId());
+                    // 跳到通知
+                    NotificationUtils.getInstance().showNotify(
+                            MsgConstants.ChannelImportance.PRIVATE, finalTitle, content, intent,
+                            String.valueOf(bean.getChatId()).hashCode(), count);
+                });
+        
     }
 }

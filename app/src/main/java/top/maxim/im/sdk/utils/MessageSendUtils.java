@@ -14,11 +14,6 @@ import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXVideoAttachment;
 import im.floo.floolib.BMXVoiceAttachment;
 import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.bean.MessageBean;
 import top.maxim.im.message.utils.ChatUtils;
@@ -191,6 +186,20 @@ public final class MessageSendUtils {
     }
 
     /**
+     * 发送command消息
+     *
+     * @param type 消息类型
+     * @param from from
+     * @param to to
+     * @param content 内容
+     * @return BMXMessage
+     */
+    public void sendCommandMessage(BMXMessage.MessageType type, long from, long to,
+            String content) {
+        handlerMessage(BMXMessage.createCommandMessage(from, to, type, to, content));
+    }
+
+    /**
      * 发送消息
      * 
      * @return BMXMessage
@@ -231,29 +240,7 @@ public final class MessageSendUtils {
         if (message != null && type == BMXMessage.MessageType.Group) {
 //            message.setEnableGroupAck(true);
         }
-        Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
-            @Override
-            public BMXMessage call(BMXMessage msg) {
-                ChatManager.getInstance().forwardMessage(msg);
-                return msg;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXMessage>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXMessage message) {
-
-                    }
-                });
+        ChatManager.getInstance().forwardMessage(message);
         return message;
     }
 
@@ -264,29 +251,7 @@ public final class MessageSendUtils {
         if (msg.type() == BMXMessage.MessageType.Group) {
 //            msg.setEnableGroupAck(true);
         }
-        Observable.just(msg).map(new Func1<BMXMessage, BMXMessage>() {
-            @Override
-            public BMXMessage call(BMXMessage message) {
-                ChatManager.getInstance().sendMessage(message);
-                return message;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXMessage>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXMessage message) {
-
-                    }
-                });
+        ChatManager.getInstance().sendMessage(msg);
         return msg;
     }
 }

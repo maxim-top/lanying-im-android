@@ -12,14 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import im.floo.floolib.BMXErrorCode;
+import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXRosterItem;
+import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -117,12 +113,12 @@ public class BlockListActivity extends RosterChooseActivity {
     }
 
     @Override
-    protected BMXErrorCode initData(ListOfLongLong listOfLongLong, boolean forceRefresh) {
-        return RosterManager.getInstance().getBlockList(listOfLongLong, forceRefresh);
+    protected void initData(boolean forceRefresh, BMXDataCallBack<ListOfLongLong> callBack) {
+        RosterManager.getInstance().getBlockList(forceRefresh, callBack);
     }
 
     @Override
-    protected void bindData() {
+    protected void bindData(BMXRosterItemList itemList) {
         if (itemList != null && !itemList.isEmpty()) {
             List<BMXRosterItem> members = new ArrayList<>();
             for (int i = 0; i < itemList.size(); i++) {
@@ -142,34 +138,15 @@ public class BlockListActivity extends RosterChooseActivity {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(rosterId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long l) {
-                return RosterManager.getInstance().block(l);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<BMXErrorCode>() {
-            @Override
-            public void onCompleted() {
-                dismissLoadingDialog();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                dismissLoadingDialog();
-                String error = e != null ? e.getMessage() : "网络错误";
-                ToastUtil.showTextViewPrompt(error);
-            }
-
-            @Override
-            public void onNext(BMXErrorCode errorCode) {
+        RosterManager.getInstance().block(rosterId, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
                 mSelected.clear();
                 mAdapter.notifyDataSetChanged();
                 init();
+            } else {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                ToastUtil.showTextViewPrompt(error);
             }
         });
     }
@@ -179,32 +156,13 @@ public class BlockListActivity extends RosterChooseActivity {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(rosterId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long l) {
-                return RosterManager.getInstance().unblock(rosterId);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<BMXErrorCode>() {
-            @Override
-            public void onCompleted() {
-                dismissLoadingDialog();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                dismissLoadingDialog();
-                String error = e != null ? e.getMessage() : "网络错误";
-                ToastUtil.showTextViewPrompt(error);
-            }
-
-            @Override
-            public void onNext(BMXErrorCode errorCode) {
+        RosterManager.getInstance().unblock(rosterId, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
                 init();
+            } else {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                ToastUtil.showTextViewPrompt(error);
             }
         });
     }

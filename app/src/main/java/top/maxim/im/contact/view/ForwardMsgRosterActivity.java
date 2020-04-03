@@ -14,16 +14,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXRosterItem;
-import im.floo.floolib.BMXRosterItemList;
-import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -149,55 +141,26 @@ public class ForwardMsgRosterActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        final ListOfLongLong listOfLongLong = new ListOfLongLong();
-        final BMXRosterItemList itemList = new BMXRosterItemList();
-        Observable.just(listOfLongLong).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(ListOfLongLong longs) {
-                return RosterManager.getInstance().get(longs, false);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode errorCode) {
-                return RosterManager.getInstance().search(listOfLongLong, itemList, true);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        String error = e != null ? e.getMessage() : "网络错误";
+        
+        RosterManager.getInstance().get(false, (bmxErrorCode, list) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                RosterManager.getInstance().getRosterList(list, true, (bmxErrorCode1, itemList) -> {
+                    if (!BaseManager.bmxFinish(bmxErrorCode1)) {
+                        String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";
                         ToastUtil.showTextViewPrompt(error);
-                        RosterManager.getInstance().get(listOfLongLong, false);
-                        List<BMXRosterItem> rosterItems = new ArrayList<>();
-                        for (int i = 0; i < itemList.size(); i++) {
-                            rosterItems.add(itemList.get(i));
-                        }
-                        mAdapter.replaceList(rosterItems);
                     }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        List<BMXRosterItem> rosterItems = new ArrayList<>();
-                        for (int i = 0; i < itemList.size(); i++) {
-                            rosterItems.add(itemList.get(i));
-                        }
-                        mAdapter.replaceList(rosterItems);
+                    List<BMXRosterItem> rosterItems = new ArrayList<>();
+                    for (int i = 0; i < itemList.size(); i++) {
+                        rosterItems.add(itemList.get(i));
                     }
+                    mAdapter.replaceList(rosterItems);
                 });
+            } else {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                ToastUtil.showTextViewPrompt(error);
+                mAdapter.replaceList(null);
+            }
+        });
     }
 
     @Override

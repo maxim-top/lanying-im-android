@@ -23,14 +23,11 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.List;
 
-import im.floo.floolib.BMXErrorCode;
+import im.floo.BMXCallBack;
 import im.floo.floolib.BMXUserProfile;
-import im.floo.floolib.FileProgressListener;
-import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
@@ -40,6 +37,7 @@ import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.CameraUtils;
+import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
@@ -59,6 +57,7 @@ import top.maxim.im.common.view.ItemEnableArrow;
 import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ShapeImageView;
+import top.maxim.im.filebrowser.FileBrowserActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.wxapi.WXUtils;
@@ -161,7 +160,11 @@ public class SettingUserActivity extends BaseTitleActivity {
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
 
         // Id
-        mUserId = new ItemLineArrow.Builder(this).setStartContent("ID");
+        mUserId = new ItemLineArrow.Builder(this).setStartContent("ID")
+                .setOnItemClickListener(v -> {
+                    // 跳转查看日志
+                    LogViewActivity.openLogView(this);
+                });
         container.addView(mUserId.build());
 
         // 分割线
@@ -350,6 +353,11 @@ public class SettingUserActivity extends BaseTitleActivity {
                 }
             }
         });
+        // 10次点击 进入应用data目录
+        ClickTimeUtils.setClickTimes(mHeader.getTitleText(), 5, () -> {
+            ToastUtil.showTextViewPrompt("点击5次");
+            startActivity(new Intent(this, FileBrowserActivity.class));
+        });
     }
 
     private void initRxBus() {
@@ -520,34 +528,11 @@ public class SettingUserActivity extends BaseTitleActivity {
     }
 
     private void initData(boolean forceRefresh) {
-        final BMXUserProfile profile = new BMXUserProfile();
-        Observable.just(profile).map(new Func1<BMXUserProfile, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXUserProfile profile) {
-                return UserManager.getInstance().getProfile(profile, forceRefresh);
+        UserManager.getInstance().getProfile(forceRefresh, (bmxErrorCode, bmxUserProfile) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode) && bmxUserProfile != null) {
+                initUser(bmxUserProfile);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        initUser(profile);
-                    }
-                });
+        });
     }
 
     private void initUser(BMXUserProfile profile) {
@@ -844,35 +829,15 @@ public class SettingUserActivity extends BaseTitleActivity {
         final BMXUserProfile.AuthQuestion authQuestion = new BMXUserProfile.AuthQuestion();
         authQuestion.setMQuestion(question);
         authQuestion.setMAnswer(answer);
-        Observable.just(authQuestion).map(new Func1<BMXUserProfile.AuthQuestion, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXUserProfile.AuthQuestion s) {
-                return UserManager.getInstance().setAuthQuestion(s);
+        UserManager.getInstance().setAuthQuestion(authQuestion, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                bindAddFriendAuthQuestion(authQuestion);
+            } else {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
+                ToastUtil.showTextViewPrompt(error);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络异常";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        bindAddFriendAuthQuestion(authQuestion);
-                    }
-                });
+        });
     }
 
     /**
@@ -887,88 +852,54 @@ public class SettingUserActivity extends BaseTitleActivity {
             }
         }
         showLoadingDialog(true);
-        Observable.just(info).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                if (TextUtils.equals(title, getString(R.string.setting_user_name))) {
-                    // 设置昵称
-                    return UserManager.getInstance().setNickname(s);
-                } else if (TextUtils.equals(title, getString(R.string.setting_user_phone))) {
-                    // 设置手机号
-                    return UserManager.getInstance().setMobilePhone(s);
-                } else if (TextUtils.equals(title, getString(R.string.setting_user_public))) {
-                    // 设置公有信息
-                    return UserManager.getInstance().setPublicInfo(s);
-                } else if (TextUtils.equals(title, getString(R.string.setting_user_private))) {
-                    // 设置私密信息
-                    return UserManager.getInstance().setPrivateInfo(s);
-                } else if (TextUtils.equals(title,
-                        getString(R.string.setting_add_friend_auth_mode))) {
-                    // 设置好友验证类型
-                    BMXUserProfile.AddFriendAuthMode mode = null;
-                    if (TextUtils.equals(info, getString(R.string.add_friend_auth_open))) {
-                        mode = BMXUserProfile.AddFriendAuthMode.Open;
-                    } else if (TextUtils.equals(info,
-                            getString(R.string.add_friend_auth_approval))) {
-                        mode = BMXUserProfile.AddFriendAuthMode.NeedApproval;
-                    } else if (TextUtils.equals(info, getString(R.string.add_friend_auth_answer))) {
-                        mode = BMXUserProfile.AddFriendAuthMode.AnswerQuestion;
-                    } else if (TextUtils.equals(info, getString(R.string.add_friend_auth_reject))) {
-                        mode = BMXUserProfile.AddFriendAuthMode.RejectAll;
-                    }
-                    if (mode != null) {
-                        return UserManager.getInstance().setAddFriendAuthMode(mode);
-                    }
-                }
-                return null;
+        BMXCallBack callBack = bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
+                ToastUtil.showTextViewPrompt(error);
+                return;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+            if (TextUtils.equals(title, getString(R.string.setting_user_name))) {
+                // 设置昵称
+                mSetName.setEndContent(TextUtils.isEmpty(info) ? "" : info);
+            } else if (TextUtils.equals(title, getString(R.string.setting_user_public))) {
+                // 设置公有信息
+                mTvPublic.setVisibility(TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                mTvPublic.setText(TextUtils.isEmpty(info) ? "" : info);
+            } else if (TextUtils.equals(title, getString(R.string.setting_user_private))) {
+                // 设置私密信息
+                mTvPrivate.setVisibility(TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                mTvPrivate.setText(TextUtils.isEmpty(info) ? "" : info);
+            } else if (TextUtils.equals(title, getString(R.string.setting_add_friend_auth_mode))) {
+                // 设置好友验证类型
+                bindAddFriendAuth(info, null);
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络异常";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        if (TextUtils.equals(title, getString(R.string.setting_user_name))) {
-                            // 设置昵称
-                            mSetName.setEndContent(TextUtils.isEmpty(info) ? "" : info);
-                        } else if (TextUtils.equals(title,
-                                getString(R.string.setting_user_phone))) {
-                            // 设置手机号
-                            mSetPhone.setEndContent(info);
-                        } else if (TextUtils.equals(title,
-                                getString(R.string.setting_user_public))) {
-                            // 设置公有信息
-                            mTvPublic.setVisibility(
-                                    TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
-                            mTvPublic.setText(TextUtils.isEmpty(info) ? "" : info);
-                        } else if (TextUtils.equals(title,
-                                getString(R.string.setting_user_private))) {
-                            // 设置私密信息
-                            mTvPrivate.setVisibility(
-                                    TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
-                            mTvPrivate.setText(TextUtils.isEmpty(info) ? "" : info);
-                        } else if (TextUtils.equals(title,
-                                getString(R.string.setting_add_friend_auth_mode))) {
-                            // 设置好友验证类型
-                            bindAddFriendAuth(info, null);
-                        }
-                    }
-                });
+        };
+        if (TextUtils.equals(title, getString(R.string.setting_user_name))) {
+            // 设置昵称
+            UserManager.getInstance().setNickname(info, callBack);
+        } else if (TextUtils.equals(title, getString(R.string.setting_user_public))) {
+            // 设置公有信息
+            UserManager.getInstance().setPublicInfo(info, callBack);
+        } else if (TextUtils.equals(title, getString(R.string.setting_user_private))) {
+            // 设置私密信息
+            UserManager.getInstance().setPrivateInfo(info, callBack);
+        } else if (TextUtils.equals(title, getString(R.string.setting_add_friend_auth_mode))) {
+            // 设置好友验证类型
+            BMXUserProfile.AddFriendAuthMode mode = null;
+            if (TextUtils.equals(info, getString(R.string.add_friend_auth_open))) {
+                mode = BMXUserProfile.AddFriendAuthMode.Open;
+            } else if (TextUtils.equals(info, getString(R.string.add_friend_auth_approval))) {
+                mode = BMXUserProfile.AddFriendAuthMode.NeedApproval;
+            } else if (TextUtils.equals(info, getString(R.string.add_friend_auth_answer))) {
+                mode = BMXUserProfile.AddFriendAuthMode.AnswerQuestion;
+            } else if (TextUtils.equals(info, getString(R.string.add_friend_auth_reject))) {
+                mode = BMXUserProfile.AddFriendAuthMode.RejectAll;
+            }
+            if (mode != null) {
+                UserManager.getInstance().setAddFriendAuthMode(mode, callBack);
+            }
+        }
     }
 
     private String getAddFriendAuthContent(BMXUserProfile.AddFriendAuthMode mode) {
@@ -1025,42 +956,17 @@ public class SettingUserActivity extends BaseTitleActivity {
         }
         BMImageLoader.getInstance().display(mUserIcon, "file://" + path, mConfig);
         showLoadingDialog(true);
-        Observable.just(path).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().uploadAvatar(s, new FileProgressListener() {
-                    @Override
-                    public int onProgressChange(String percent) {
-                        Log.i("uploadUserAvatar", "onProgressChange:" + path + "-" + percent);
-                        return 0;
-                    }
-                });
+        UserManager.getInstance().uploadAvatar(path, s -> {
+            Log.i("uploadUserAvatar", "onProgressChange:" + path + "-" + s);
+            return 0;
+        }, bmxErrorCode -> {
+            dismissLoadingDialog();
+            mIconPath = "";
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
+                ToastUtil.showTextViewPrompt(error);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络异常";
-                        ToastUtil.showTextViewPrompt(error);
-                        mIconPath = "";
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        mIconPath = "";
-                    }
-                });
+        });
     }
 
     @Override

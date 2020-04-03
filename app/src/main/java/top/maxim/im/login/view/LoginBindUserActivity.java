@@ -11,13 +11,6 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXUserProfile;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -211,35 +204,16 @@ public class LoginBindUserActivity extends BaseTitleActivity {
             ToastUtil.showTextViewPrompt("不能为空");
             return;
         }
-        Observable.just(userName).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signUpNewUser(userName, pwd, new BMXUserProfile());
+        UserManager.getInstance().signUpNewUser(userName, pwd, (bmxErrorCode, bmxUserProfile) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                // 注册成功 需要绑定微信
+                bind(userName, pwd);
+            } else {
+                dismissLoadingDialog();
+                // 不可用
+                mTvCheckName.setVisibility(View.VISIBLE);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        // 不可用
-                        mTvCheckName.setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        // 注册成功 需要绑定微信
-                        bind(userName, pwd);
-                    }
-                });
+        });
     }
 
     /**

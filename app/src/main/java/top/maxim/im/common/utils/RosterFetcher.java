@@ -3,18 +3,13 @@ package top.maxim.im.common.utils;
 
 import android.util.LruCache;
 
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupList;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.BMXUserProfile;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 
@@ -61,34 +56,11 @@ public class RosterFetcher {
         if (item != null) {
             return item;
         }
-        final BMXRosterItem finalItem = new BMXRosterItem();
-        Observable.just(finalItem).map(new Func1<BMXRosterItem, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXRosterItem item) {
-                return RosterManager.getInstance().search(rosterId, true, item);
+        RosterManager.getInstance().getRosterList(rosterId, true, (bmxErrorCode, bmxRosterItem) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                putRoster(bmxRosterItem);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        putRoster(finalItem);
-                    }
-                });
+        });
         return null;
     }
 
@@ -106,7 +78,19 @@ public class RosterFetcher {
     }
 
     public BMXGroup getGroup(long groupId) {
-        return mGroupCache.get(groupId);
+        if (groupId <= 0) {
+            return null;
+        }
+        BMXGroup item = mGroupCache.get(groupId);
+        if (item != null) {
+            return item;
+        }
+        GroupManager.getInstance().getGroupList(groupId, true, (bmxErrorCode, bmxGroup) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                putGroup(bmxGroup);
+            }
+        });
+        return null;
     }
 
     public BMXUserProfile getProfile() {
@@ -114,34 +98,11 @@ public class RosterFetcher {
         if (profile != null) {
             return profile;
         }
-        final BMXUserProfile finalProfile = new BMXUserProfile();
-        Observable.just("").map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().getProfile(finalProfile, false);
+        UserManager.getInstance().getProfile(false, (bmxErrorCode, bmxUserProfile) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode) && bmxUserProfile != null) {
+                putProfile(bmxUserProfile);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        putProfile(finalProfile);
-                    }
-                });
+        });
         return null;
     }
 

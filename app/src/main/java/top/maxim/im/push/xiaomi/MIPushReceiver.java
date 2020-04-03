@@ -12,6 +12,7 @@ import com.xiaomi.mipush.sdk.PushMessageReceiver;
 
 import java.util.List;
 
+import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.push.PushClientMgr;
 
 /**
@@ -61,6 +62,7 @@ public class MIPushReceiver extends PushMessageReceiver {
         } else if (!TextUtils.isEmpty(message.getUserAccount())) {
             mUserAccount = message.getUserAccount();
         }
+        WelcomeActivity.openWelcome(context);
     }
 
     @Override

@@ -12,16 +12,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXRosterItem;
-import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -29,6 +22,7 @@ import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
@@ -145,43 +139,20 @@ public class SupportFragment extends BaseTitleFragment {
             showEmpty(getString(R.string.common_empty));
             return;
         }
-        final ListOfLongLong listOfLongLong = new ListOfLongLong();
-        final BMXRosterItemList itemList = new BMXRosterItemList();
-        Observable.just("").map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                for (SupportBean bean : result) {
-                    listOfLongLong.add(bean.getUser_id());
+        TaskDispatcher.exec(() -> {
+            final ListOfLongLong listOfLongLong = new ListOfLongLong();
+            for (SupportBean bean : result) {
+                listOfLongLong.add(bean.getUser_id());
+            }
+            RosterManager.getInstance().getRosterList(listOfLongLong, true, (bmxErrorCode, itemList) -> {
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    RosterFetcher.getFetcher().putRosters(itemList);
                 }
-                return RosterManager.getInstance().search(listOfLongLong, itemList, true);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        mAdapter.replaceList(result);
-                        mRecycler.setVisibility(View.VISIBLE);
-                        mEmptyView.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode bmxErrorCode) {
-                        RosterFetcher.getFetcher().putRosters(itemList);
-                        mAdapter.replaceList(result);
-                        mRecycler.setVisibility(View.VISIBLE);
-                        mEmptyView.setVisibility(View.GONE);
-                    }
-                });
+                mAdapter.replaceList(result);
+                mRecycler.setVisibility(View.VISIBLE);
+                mEmptyView.setVisibility(View.GONE);
+            });
+        });
     }
     
     private void showEmpty(String text) {

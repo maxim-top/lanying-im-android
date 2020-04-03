@@ -18,14 +18,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXGroupList;
-import im.floo.floolib.BMXUserProfile;
-import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.MainActivity;
 import top.maxim.im.R;
@@ -47,6 +42,7 @@ import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.SplashVideoPlayView;
 import top.maxim.im.push.NotificationUtils;
+import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 
 public class WelcomeActivity extends BaseTitleActivity {
@@ -106,8 +102,25 @@ public class WelcomeActivity extends BaseTitleActivity {
             autoLogin(userId, pwd);
             return;
         }
-        LoginActivity.openLogin(WelcomeActivity.this);
-        finish();
+        //没有登录 需要切换到默认appId 再进入登录页面
+        String oldAppId = SharePreferenceUtils.getInstance().getAppId();
+        if (TextUtils.equals(oldAppId, ScanConfigs.CODE_APP_ID)) {
+            // 已经是默认的 直接进入
+            LoginActivity.openLogin(WelcomeActivity.this);
+            finish();
+        } else {
+            // 还原为默认的appId
+            UserManager.getInstance().changeAppId(ScanConfigs.CODE_APP_ID, bmxErrorCode -> {
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    SharePreferenceUtils.getInstance().putAppId("");
+                    LoginActivity.openLogin(WelcomeActivity.this);
+                    finish();
+                } else {
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
+                    ToastUtil.showTextViewPrompt(error);
+                }
+            });
+        }
     }
 
     /**
@@ -185,48 +198,27 @@ public class WelcomeActivity extends BaseTitleActivity {
      * 自动登陆
      */
     private void autoLogin(long userId, final String pwd) {
-        Observable.just(userId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long s) {
-                return UserManager.getInstance().signInById(s, pwd);
+        UserManager.getInstance().signInById(userId, pwd, bmxErrorCode -> {
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                ToastUtil.showTextViewPrompt("网络异常");
+                return;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        ToastUtil.showTextViewPrompt("网络异常");
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode bmxErrorCode) {
-                        // 登陆成功后 需要将userId存储SP 作为下次自动登陆
-                        BMXUserProfile profile = new BMXUserProfile();
-                        BMXErrorCode errorCode = UserManager.getInstance().getProfile(profile,
-                                false);
-                        if (errorCode != null
-                                && errorCode.swigValue() == BMXErrorCode.NoError.swigValue()
-                                && profile.userId() > 0) {
-                            CommonUtils.getInstance()
-                                    .addUser(new UserBean(profile.username(), profile.userId(), pwd,
-                                            SharePreferenceUtils.getInstance().getAppId(),
-                                            System.currentTimeMillis()));
-                        }
-                        initData();
-                        SharePreferenceUtils.getInstance().putLoginStatus(true);
-                        MessageDispatcher.getDispatcher().initialize();
-                        MainActivity.openMain(WelcomeActivity.this);
-                        finish();
-                    }
-                });
+            // 登陆成功后 需要将userId存储SP 作为下次自动登陆
+            UserManager.getInstance().getProfile(false, (bmxErrorCode1, profile) -> {
+                if (BaseManager.bmxFinish(bmxErrorCode1) && profile != null
+                        && profile.userId() > 0) {
+                    CommonUtils.getInstance()
+                            .addUser(new UserBean(profile.username(), profile.userId(), pwd,
+                                    SharePreferenceUtils.getInstance().getAppId(),
+                                    System.currentTimeMillis()));
+                }
+            });
+            initData();
+            SharePreferenceUtils.getInstance().putLoginStatus(true);
+            MessageDispatcher.getDispatcher().initialize();
+            MainActivity.openMain(WelcomeActivity.this);
+            finish();
+        });
     }
 
     /**
@@ -235,13 +227,13 @@ public class WelcomeActivity extends BaseTitleActivity {
     public static void initData() {
         Observable.just("").map(s -> {
             // 自己的profile
-            UserManager.getInstance().getProfile(new BMXUserProfile(), true);
+            UserManager.getInstance().getProfile(true, null);
             // roster列表信息
-            RosterManager.getInstance().get(new ListOfLongLong(), true);
+            RosterManager.getInstance().get(true, null);
             // 群列表信息
-            GroupManager.getInstance().search(new BMXGroupList(), true);
+            GroupManager.getInstance().getGroupList(true, null);
             // 消息列表信息
-            ChatManager.getInstance().getAllConversations();
+            ChatManager.getInstance().getAllConversations(null);
             String name = SharePreferenceUtils.getInstance().getUserName();
             String pwd = SharePreferenceUtils.getInstance().getUserPwd();
             AppManager.getInstance().getTokenByNameFromServer(name, pwd, null);

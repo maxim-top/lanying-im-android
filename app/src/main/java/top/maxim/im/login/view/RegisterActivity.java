@@ -20,13 +20,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXUserProfile;
-import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
@@ -142,6 +138,7 @@ public class RegisterActivity extends BaseTitleActivity {
         buildProtocol();
         view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
         view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
+        initRxBus();
         return view;
     }
 
@@ -208,7 +205,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt("请安装微信");
                 return;
             }
-            initRxBus();
+            initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER, mChangeAppId);
         });
         // 注册
@@ -316,8 +313,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        mChangeAppId = content;
-                        mTvAppId.setText("APPID:" + content);
+                        LoginActivity.changeAppId(RegisterActivity.this, content);
                     }
 
                     @Override
@@ -362,37 +358,17 @@ public class RegisterActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(account).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signUpNewUser(account, pwd, new BMXUserProfile());
+        UserManager.getInstance().signUpNewUser(account, pwd, (bmxErrorCode, bmxUserProfile) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                RegisterBindMobileActivity.openRegisterBindMobile(RegisterActivity.this,
+                        mInputName.getEditableText().toString().trim(),
+                        mInputPwd.getEditableText().toString().trim(), mChangeAppId);
+                finish();
+            } else {
+                ToastUtil.showTextViewPrompt("网络异常");
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("网络异常");
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        RegisterBindMobileActivity.openRegisterBindMobile(RegisterActivity.this,
-                                mInputName.getEditableText().toString().trim(),
-                                mInputPwd.getEditableText().toString().trim(), mChangeAppId);
-                        finish();
-                    }
-                });
+        });
     }
 
     /**
@@ -405,7 +381,7 @@ public class RegisterActivity extends BaseTitleActivity {
         timer.start();
     }
 
-    private void initRxBus() {
+    private void initWXRxBus() {
         if (mSubscription == null) {
             mSubscription = new CompositeSubscription();
         }
@@ -436,6 +412,37 @@ public class RegisterActivity extends BaseTitleActivity {
                     }
                 });
         mSubscription.add(wxLogin);
+    }
+
+    private void initRxBus() {
+        if (mSubscription == null) {
+            mSubscription = new CompositeSubscription();
+        }
+        // 切换appId
+        Subscription changeAppId = RxBus.getInstance().toObservable(Intent.class)
+                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<Intent>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Intent intent) {
+                        if (intent == null || !TextUtils.equals(intent.getAction(),
+                                CommonConfig.CHANGE_APP_ID_ACTION)) {
+                            return;
+                        }
+                        mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
+                        mTvAppId.setText("APPID:" + mChangeAppId);
+                    }
+                });
+        mSubscription.add(changeAppId);
     }
 
     @Override

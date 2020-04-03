@@ -25,15 +25,8 @@ import java.util.Map;
 
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
-import im.floo.floolib.BMXGroupBannedMemberList;
 import im.floo.floolib.BMXRosterItem;
-import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -169,35 +162,17 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
 
     private void initGroupInfo() {
         showLoadingDialog(true);
-        Observable.just(mGroupId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long aLong) {
-                return GroupManager.getInstance().search(mGroupId, mGroup, false);
+        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
+            dismissLoadingDialog();
+            if (bmxGroup != null) {
+                mGroup = bmxGroup;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                init();
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e == null ? "网络错误" : e.getMessage();
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        init();
-                    }
-                });
+        });
     }
 
     private void init() {
@@ -205,61 +180,31 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        final BMXGroupBannedMemberList memberList = new BMXGroupBannedMemberList();
-        Observable.just(mGroup).map(new Func1<BMXGroup, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXGroup group) {
-                return GroupManager.getInstance().getBannedMembers(mGroup, memberList);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode errorCode) {
-                if (!memberList.isEmpty()) {
-                    ListOfLongLong listOfLongLong = new ListOfLongLong();
-                    for (int i = 0; i < memberList.size(); i++) {
-                        listOfLongLong.add(memberList.get(i).getMUid());
-                    }
-                    BMXRosterItemList itemList = new BMXRosterItemList();
-                    BMXErrorCode errorCode1 = RosterManager.getInstance().search(listOfLongLong,
-                            itemList, true);
-                    RosterFetcher.getFetcher().putRosters(itemList);
-                    return errorCode1;
+        GroupManager.getInstance().getBannedMembers(mGroup, (bmxErrorCode, memberList) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                ListOfLongLong listOfLongLong = new ListOfLongLong();
+                for (int i = 0; i < memberList.size(); i++) {
+                    listOfLongLong.add(memberList.get(i).getMUid());
                 }
-                return errorCode;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        List<BMXGroup.BannedMember> members = new ArrayList<>();
-                        if (memberList != null && !memberList.isEmpty()) {
-                            for (int i = 0; i < memberList.size(); i++) {
-                                members.add(memberList.get(i));
+                RosterManager.getInstance().getRosterList(listOfLongLong, true,
+                        (bmxErrorCode1, itemList) -> {
+                            RosterFetcher.getFetcher().putRosters(itemList);
+                            List<BMXGroup.BannedMember> members = new ArrayList<>();
+                            if (memberList != null && !memberList.isEmpty()) {
+                                for (int i = 0; i < memberList.size(); i++) {
+                                    members.add(memberList.get(i));
+                                }
                             }
-                        }
-                        BMXGroup.BannedMember add = new BMXGroup.BannedMember();
-                        add.setMUid(MessageConfig.MEMBER_ADD);
-                        members.add(add);
-                        mAdapter.replaceList(members);
-                    }
-                });
+                            BMXGroup.BannedMember add = new BMXGroup.BannedMember();
+                            add.setMUid(MessageConfig.MEMBER_ADD);
+                            members.add(add);
+                            mAdapter.replaceList(members);
+                        });
+            } else {
+                toastError(bmxErrorCode);
+            }
+        });
     }
 
     private void removeBan() {
@@ -273,71 +218,29 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(black).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(ListOfLongLong listOfLongLong) {
-                return GroupManager.getInstance().unbanMembers(mGroup, black);
+        GroupManager.getInstance().unbanMembers(mGroup, black, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                init();
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        init();
-                    }
-                });
+        });
     }
 
-    private void addBan(final ListOfLongLong mute, final String reason, final long time) {
+    private void addBan(ListOfLongLong mute, String reason, long time) {
         if (mute == null || mute.isEmpty()) {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(mute).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(ListOfLongLong listOfLongLong) {
-                return GroupManager.getInstance().banMembers(mGroup, mute, time, reason);
+        GroupManager.getInstance().banMembers(mGroup, mute, time, reason, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                init();
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        init();
-                    }
-                });
+        });
     }
 
     private void showAddBan(final ListOfLongLong mute) {
@@ -413,6 +316,11 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
                 });
     }
 
+    private void toastError(BMXErrorCode e) {
+        String error = e != null ? e.name() : "网络异常";
+        ToastUtil.showTextViewPrompt(error);
+    }
+    
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

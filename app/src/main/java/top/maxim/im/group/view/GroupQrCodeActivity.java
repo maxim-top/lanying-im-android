@@ -11,12 +11,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXGroup;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -95,28 +89,13 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
     private void initGroup() {
         initQrCode();
         mTvGroupId.setText(mGroupId <= 0 ? "" : "群Id:" + mGroupId);
-        final BMXGroup group = new BMXGroup();
-        Observable.just(mGroupId).map(id -> GroupManager.getInstance().search(id, group, false))
-                .flatMap(errorCode -> BaseManager.bmxFinish(errorCode, errorCode))
-                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        String name = group.name();
-                        ChatUtils.getInstance().showGroupAvatar(group, mGroupIcon, mConfig);
-                        mGroupName.setText(TextUtils.isEmpty(name) ? "" : name);
-                    }
-                });
+        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, group) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                String name = group.name();
+                ChatUtils.getInstance().showGroupAvatar(group, mGroupIcon, mConfig);
+                mGroupName.setText(TextUtils.isEmpty(name) ? "" : name);
+            }
+        });
     }
 
     /**

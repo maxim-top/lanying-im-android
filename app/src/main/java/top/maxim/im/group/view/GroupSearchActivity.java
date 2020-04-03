@@ -18,13 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -105,43 +99,25 @@ public class GroupSearchActivity extends BaseTitleActivity {
         if (TextUtils.isEmpty(search)) {
             return;
         }
-        showLoadingDialog(true);
-        final BMXGroup item = new BMXGroup();
-        Observable.just(search).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                if (Pattern.matches("[0-9]+", s)) {
-                    // 纯数字
-                    return GroupManager.getInstance().search(Long.valueOf(s), item, true);
-                }
-                return null;
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
+        if (Pattern.matches("[0-9]+", search)) {
+            showLoadingDialog(true);
+            // 纯数字
+            GroupManager.getInstance().getGroupList(Long.valueOf(search), true,
+                    (bmxErrorCode, bmxGroup) -> {
                         dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        mAdapter.removeAll();
-                        ToastUtil.showTextViewPrompt("未搜索到群组");
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        List<BMXGroup> groups = new ArrayList<>();
-                        groups.add(item);
-                        mAdapter.replaceList(groups);
-                    }
-                });
+                        if (BaseManager.bmxFinish(bmxErrorCode)) {
+                            List<BMXGroup> groups = new ArrayList<>();
+                            groups.add(bmxGroup);
+                            mAdapter.replaceList(groups);
+                        } else {
+                            mAdapter.removeAll();
+                            ToastUtil.showTextViewPrompt("未搜索到群组");
+                        }
+                    });
+        } else {
+            mAdapter.removeAll();
+            ToastUtil.showTextViewPrompt("未搜索到群组");
+        }
     }
 
     class SearchAdapter extends BaseRecyclerAdapter<BMXGroup> {
@@ -207,36 +183,16 @@ public class GroupSearchActivity extends BaseTitleActivity {
                 return;
             }
             showLoadingDialog(true);
-            Observable.just(reason).map(new Func1<String, BMXErrorCode>() {
-                @Override
-                public BMXErrorCode call(String s) {
-                    return GroupManager.getInstance().join(group, s);
+            GroupManager.getInstance().join(group, reason, bmxErrorCode -> {
+                dismissLoadingDialog();
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    ToastUtil.showTextViewPrompt("加入成功");
+                    finish();
+                } else {
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "加入失败";
+                    ToastUtil.showTextViewPrompt(error);
                 }
-            }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-                @Override
-                public Observable<BMXErrorCode> call(BMXErrorCode bmxErrorCode) {
-                    return BaseManager.bmxFinish(bmxErrorCode, bmxErrorCode);
-                }
-            }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<BMXErrorCode>() {
-                        @Override
-                        public void onCompleted() {
-                            dismissLoadingDialog();
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            dismissLoadingDialog();
-                            String error = e != null ? e.getMessage() : "加入失败";
-                            ToastUtil.showTextViewPrompt(error);
-                        }
-
-                        @Override
-                        public void onNext(BMXErrorCode errorCode) {
-                            ToastUtil.showTextViewPrompt("加入成功");
-                            finish();
-                        }
-                    });
+            });
         }
     }
 }

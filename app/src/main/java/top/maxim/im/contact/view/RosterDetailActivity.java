@@ -13,14 +13,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import im.floo.floolib.BMXErrorCode;
+import im.floo.BMXCallBack;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXRosterItem;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -232,37 +227,22 @@ public class RosterDetailActivity extends BaseTitleActivity {
 
     private void initRoster() {
         showLoadingDialog(true);
-        Observable.just(mRosterId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long aLong) {
-                return RosterManager.getInstance().search(mRosterId, true, mRosterItem);
+        RosterManager.getInstance().getRosterList(mRosterId, true, (bmxErrorCode, bmxRosterItem) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                mRosterItem = bmxRosterItem;
+                RosterFetcher.getFetcher().putRoster(bmxRosterItem);
+                bindRoster();
+            } else {
+                RosterManager.getInstance().getRosterList(mRosterId, false,
+                        (bmxErrorCode1, bmxRosterItem1) -> {
+                            if (bmxRosterItem1 != null) {
+                                mRosterItem = bmxRosterItem1;
+                            }
+                            bindRoster();
+                        });
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        RosterManager.getInstance().search(mRosterId, false, mRosterItem);
-                        bindRoster();
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        bindRoster();
-                        RosterFetcher.getFetcher().putRoster(mRosterItem);
-                    }
-                });
+        });
     }
 
     private void bindRoster() {
@@ -344,48 +324,26 @@ public class RosterDetailActivity extends BaseTitleActivity {
      */
     private void setRosterInfo(final String info, final String title) {
         showLoadingDialog(true);
-        Observable.just(info).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
+        BMXCallBack callBack = bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (TextUtils.equals(title, getString(R.string.setting_roster_alias))) {
-                    return RosterManager.getInstance().setItemAlias(mRosterItem, info);
+                    mSetAlias.setEndContent(info);
+                } else if (TextUtils.equals(title, getString(R.string.setting_roster_ext))) {
+                    mTvExt.setVisibility(TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                    mTvExt.setText(TextUtils.isEmpty(info) ? "" : info);
                 }
-                if (TextUtils.equals(title, getString(R.string.setting_roster_ext))) {
-                    return RosterManager.getInstance().setItemExtension(mRosterItem, info);
-                }
-                return null;
+                return;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
+            String error = bmxErrorCode == null ? "" : bmxErrorCode.name();
+            ToastUtil.showTextViewPrompt(error);
 
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e == null ? "" : e.getMessage();
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        if (TextUtils.equals(title, getString(R.string.setting_roster_alias))) {
-                            mSetAlias.setEndContent(info);
-                        } else if (TextUtils.equals(title,
-                                getString(R.string.setting_roster_ext))) {
-                            mTvExt.setVisibility(
-                                    TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
-                            mTvExt.setText(TextUtils.isEmpty(info) ? "" : info);
-                        }
-                    }
-                });
+        };
+        if (TextUtils.equals(title, getString(R.string.setting_roster_alias))) {
+            RosterManager.getInstance().setItemAlias(mRosterItem, info, callBack);
+        } else if (TextUtils.equals(title, getString(R.string.setting_roster_ext))) {
+            RosterManager.getInstance().setItemExtension(mRosterItem, info, callBack);
+        }
     }
 
     /**
@@ -395,36 +353,16 @@ public class RosterDetailActivity extends BaseTitleActivity {
      */
     private void setMuteEnable(final boolean enable) {
         showLoadingDialog(true);
-        Observable.just(enable).map(new Func1<Boolean, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Boolean aBoolean) {
-                return RosterManager.getInstance().setItemMuteNotification(mRosterItem, enable);
+        RosterManager.getInstance().setItemMuteNotification(mRosterItem, enable, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                RosterFetcher.getFetcher().putRoster(mRosterItem);
+            } else {
+                String error = bmxErrorCode == null ? "" : bmxErrorCode.name();
+                ToastUtil.showTextViewPrompt(error);
+                mSetDistrub.setCheckStatus(!enable);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e == null ? "" : e.getMessage();
-                        ToastUtil.showTextViewPrompt(error);
-                        mSetDistrub.setCheckStatus(!enable);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        RosterFetcher.getFetcher().putRoster(mRosterItem);
-                    }
-                });
+        });
     }
 
     /**
@@ -450,35 +388,15 @@ public class RosterDetailActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(rosterId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long s) {
-                return RosterManager.getInstance().apply(s, reason);
+        RosterManager.getInstance().apply(rosterId, reason, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                ToastUtil.showTextViewPrompt("添加成功");
+                initRoster();
+            } else {
+                ToastUtil.showTextViewPrompt("添加失败");
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode bmxErrorCode) {
-                return BaseManager.bmxFinish(bmxErrorCode, bmxErrorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("添加失败");
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        ToastUtil.showTextViewPrompt("添加成功");
-                        initRoster();
-                    }
-                });
+        });
     }
 
 }

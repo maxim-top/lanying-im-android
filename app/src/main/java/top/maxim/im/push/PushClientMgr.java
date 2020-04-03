@@ -16,12 +16,6 @@ import com.meizu.cloud.pushsdk.util.MzSystemUtils;
 import com.vivo.push.PushClient;
 import com.xiaomi.mipush.sdk.MiPushClient;
 
-import im.floo.floolib.BMXErrorCode;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
@@ -32,7 +26,6 @@ import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.push.huawei.HWPushManager;
 import top.maxim.im.push.meizu.MZPushManager;
 import top.maxim.im.push.oppo.OppoPushManager;
-import top.maxim.im.push.vivo.VivoPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
 
 /**
@@ -40,8 +33,7 @@ import top.maxim.im.push.xiaomi.MIPushManager;
  */
 public final class PushClientMgr {
 
-    private static IPushManager sManager = new IPushManager() {
-    };
+    private static IPushManager sManager;
 
     private static boolean isInited = false;
 
@@ -80,9 +72,13 @@ public final class PushClientMgr {
             } else if (isOppo(application.getApplicationContext())) {
                 sManager = new OppoPushManager(application.getApplicationContext());
                 sDevType = OPPO_TYPE;
-            } else if (isVivo(application.getApplicationContext())) {
-                sManager = new VivoPushManager(application.getApplicationContext());
-                sDevType = VIVO_TYPE;
+            }
+//            else if (isVivo(application.getApplicationContext())) {
+//                sManager = new VivoPushManager(application.getApplicationContext());
+//                sDevType = VIVO_TYPE;
+//            }
+            else {
+                sManager = new EmptyPushManager(application.getApplicationContext());
             }
             isInited = true;
             return true;
@@ -158,33 +154,11 @@ public final class PushClientMgr {
         if (TextUtils.isEmpty(token)) {
             return;
         }
-        Observable.just(token).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().bindDevice(s);
+        UserManager.getInstance().bindDevice(token, bmxErrorCode -> {
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                Log.e("bindDevice failed", bmxErrorCode.name());
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("bindDevice failed", e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-
-                    }
-                });
+        });
         notifierBind(token);
     }
 
@@ -233,11 +207,15 @@ public final class PushClientMgr {
     }
 
     public void register(Activity activity) {
-        sManager.register(activity);
+        if (sManager != null) {
+            sManager.register(activity);
+        }
     }
 
     public void unRegister() {
-        sManager.unRegister();
+        if (sManager != null) {
+            sManager.unRegister();
+        }
         // 底层实现解绑 上层不再调用
         // String token = SharePreferenceUtils.getInstance().getToken();
         // if (!TextUtils.isEmpty(token)) {

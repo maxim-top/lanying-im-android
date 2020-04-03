@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import im.floo.floolib.BMXErrorCode;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -32,11 +31,13 @@ import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
 import top.maxim.im.common.view.recyclerview.RecyclerWithHFAdapter;
+import top.maxim.im.scan.config.ScanConfigs;
 
 /**
  * Description : 账号列表 Created by Mango on 2018/11/06
@@ -233,49 +234,34 @@ public class AccountListActivity extends BaseTitleActivity {
     private void changeAccount(long userId, String userName, String pwd, String appId,
             boolean remove) {
         showLoadingDialog(true);
-        Observable.just("").map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().signOut(userId);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode bmxErrorCode) {
-                CommonUtils.getInstance().logout();
-                if (remove) {
-                    CommonUtils.getInstance().removeAccount(userId);
-                }
-                return bmxErrorCode;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
+        UserManager.getInstance().signOut(userId, bmxErrorCode -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                TaskDispatcher.exec(() -> {
+                    CommonUtils.getInstance().logout();
+                    if (remove) {
+                        CommonUtils.getInstance().removeAccount(userId);
                     }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e == null || TextUtils.isEmpty(e.getMessage()) ? "网络错误"
-                                : e.getMessage();
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
+                    TaskDispatcher.postMain(() -> {
                         handleResult(userName, pwd, appId);
-                    }
+                    });
                 });
+                return;
+            }
+            // 失败
+            dismissLoadingDialog();
+            String error = bmxErrorCode == null || TextUtils.isEmpty(bmxErrorCode.name()) ? "网络错误"
+                    : bmxErrorCode.name();
+            ToastUtil.showTextViewPrompt(error);
+        });
     }
 
     private void handleResult(String userName, String pwd, String appId) {
         if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(pwd)) {
             // 查看切换账号的appId是否和当前一致 一致不需要切换
+            if (TextUtils.isEmpty(appId)) {
+                // 兼容之前版本 如果为空 则为默认appId
+                appId = ScanConfigs.CODE_APP_ID;
+            }
             String currentAppId = SharePreferenceUtils.getInstance().getAppId();
             // 有数据 直接登录
             LoginActivity.login(AccountListActivity.this, userName, pwd, false,

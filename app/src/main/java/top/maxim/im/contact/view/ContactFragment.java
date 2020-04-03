@@ -14,16 +14,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import im.floo.floolib.BMXErrorCode;
+import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.BMXRosterServiceListener;
-import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
@@ -127,8 +121,8 @@ public class ContactFragment extends BaseTitleFragment {
      */
     private void buildContactHeaderView() {
         View headerView = View.inflate(getActivity(), R.layout.item_contact_header, null);
-//        FrameLayout search = headerView.findViewById(R.id.fl_contact_header_search);
-//        search.setOnClickListener(new View.OnClickListener() {
+//        FrameLayout getGroupList = headerView.findViewById(R.id.fl_contact_header_search);
+//        getGroupList.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                ContactSearchActivity.openRosterSearch(getActivity());
@@ -230,34 +224,13 @@ public class ContactFragment extends BaseTitleFragment {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(item).map(new Func1<BMXRosterItem, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXRosterItem rosterItem) {
-                return RosterManager.getInstance().remove(rosterItem.rosterId());
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
+        RosterManager.getInstance().remove(item.rosterId(), bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
                 ChatManager.getInstance().deleteConversation(item.rosterId(), true);
-                return BaseManager.bmxFinish(errorCode, errorCode);
+                mAdapter.remove(position);
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        mAdapter.remove(position);
-                    }
-                });
+        });
     }
 
     @Override
@@ -279,82 +252,46 @@ public class ContactFragment extends BaseTitleFragment {
     }
 
     private void initRoster(boolean forceRefresh) {
-        final ListOfLongLong listOfLongLong = new ListOfLongLong();
-        final BMXRosterItemList itemList = new BMXRosterItemList();
-        Observable.just(listOfLongLong).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(ListOfLongLong longs) {
-                return RosterManager.getInstance().get(longs, forceRefresh);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode errorCode) {
-                if (!listOfLongLong.isEmpty()) {
-                    BMXErrorCode errorCode1 = RosterManager.getInstance().search(listOfLongLong,
-                            itemList, true);
-                    RosterFetcher.getFetcher().putRosters(itemList);
-                    return errorCode1;
+        RosterManager.getInstance().get(forceRefresh, (bmxErrorCode, list) -> {
+            BMXDataCallBack<BMXRosterItemList> callBack = (bmxErrorCode1, itemList) -> {
+                RosterFetcher.getFetcher().putRosters(itemList);
+                if (!BaseManager.bmxFinish(bmxErrorCode1)) {
+                    String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";
+                    ToastUtil.showTextViewPrompt(error);
                 }
-                return errorCode;
+                List<BMXRosterItem> rosterItems = new ArrayList<>();
+                for (int i = 0; i < itemList.size(); i++) {
+                    BMXRosterItem item = itemList.get(i);
+                    // 是否是好友
+                    BMXRosterItem.RosterRelation rosterRelation = item != null ? item.relation()
+                            : null;
+                    boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
+                    if (friend) {
+                        rosterItems.add(item);
+                    }
+                }
+                RosterFetcher.getFetcher().putRosters(itemList);
+                mAdapter.replaceList(rosterItems);
+            };
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                // 成功
+                if (list != null && !list.isEmpty()) {
+                    RosterManager.getInstance().getRosterList(list, true, callBack);
+                }
+                return;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
+            // 失败获取本地
+            RosterManager.getInstance().get(false, (bmxErrorCode1, list1) -> {
+                if (BaseManager.bmxFinish(bmxErrorCode1)) {
+                    if (list1 != null && !list1.isEmpty()) {
+                        RosterManager.getInstance().getRosterList(list1, true, callBack);
                     }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (listOfLongLong.size() > 0) {
-                            // 空的错误不提示
-                            String error = e != null ? e.getMessage() : "网络错误";
-                            ToastUtil.showTextViewPrompt(error);
-                        }
-                        RosterManager.getInstance().get(listOfLongLong, false);
-                        List<BMXRosterItem> rosterItems = new ArrayList<>();
-                        for (int i = 0; i < itemList.size(); i++) {
-                            BMXRosterItem item = itemList.get(i);
-                            // 是否是好友
-                            BMXRosterItem.RosterRelation rosterRelation = item != null
-                                    ? item.relation()
-                                    : null;
-                            boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
-                            if (friend) {
-                                rosterItems.add(item);
-                            }
-                        }
-                        RosterFetcher.getFetcher().putRosters(itemList);
-                        mAdapter.replaceList(rosterItems);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        List<BMXRosterItem> rosterItems = new ArrayList<>();
-                        for (int i = 0; i < itemList.size(); i++) {
-                            BMXRosterItem item = itemList.get(i);
-                            // 是否是好友
-                            BMXRosterItem.RosterRelation rosterRelation = item != null
-                                    ? item.relation()
-                                    : null;
-                            boolean friend = rosterRelation == BMXRosterItem.RosterRelation.Friend;
-                            if (friend) {
-                                rosterItems.add(item);
-                            }
-                        }
-                        RosterFetcher.getFetcher().putRosters(itemList);
-                        mAdapter.replaceList(rosterItems);
-                    }
-                });
+                } else {
+                    String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";
+                    ToastUtil.showTextViewPrompt(error);
+                }
+            });
+        });
     }
 
     @Override

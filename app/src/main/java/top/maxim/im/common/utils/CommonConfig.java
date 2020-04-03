@@ -27,6 +27,10 @@ public interface CommonConfig {
     String VERIFY_TYPE = "verifyType";
 
     String PHONE = "phone";
+    
+    String CHANGE_APP_ID_ACTION = "changeAppIdAction";
+
+    String CHANGE_APP_ID = "changeAppId";
 
     /**
      * 进入微信来源

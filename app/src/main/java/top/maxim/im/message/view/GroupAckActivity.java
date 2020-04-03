@@ -15,15 +15,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXRosterItem;
-import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -153,44 +146,17 @@ public class GroupAckActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        final BMXRosterItemList itemList = new BMXRosterItemList();
-        Observable.just(list).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(ListOfLongLong longs) {
-                return RosterManager.getInstance().search(longs, itemList, forceRefresh);
+        RosterManager.getInstance().getRosterList(list, forceRefresh, (bmxErrorCode, itemList) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                List<BMXRosterItem> rosterItems = new ArrayList<>();
+                for (int i = 0; i < itemList.size(); i++) {
+                    rosterItems.add(itemList.get(i));
+                }
+                RosterFetcher.getFetcher().putRosters(itemList);
+                mAdapter.replaceList(rosterItems);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        List<BMXRosterItem> rosterItems = new ArrayList<>();
-                        for (int i = 0; i < itemList.size(); i++) {
-                            rosterItems.add(itemList.get(i));
-                        }
-                        RosterFetcher.getFetcher().putRosters(itemList);
-                        mAdapter.replaceList(rosterItems);
-                    }
-                });
+        });
     }
 
     /**

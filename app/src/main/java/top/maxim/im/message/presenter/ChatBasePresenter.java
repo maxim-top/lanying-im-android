@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXConversation;
 import im.floo.floolib.BMXErrorCode;
@@ -44,7 +45,6 @@ import im.floo.floolib.BMXImageAttachment;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageAttachment;
 import im.floo.floolib.BMXMessageList;
-import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.BMXVideoAttachment;
 import im.floo.floolib.BMXVoiceAttachment;
 import rx.Observable;
@@ -321,46 +321,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (mConversation == null) {
             return;
         }
-        final BMXMessageList messageList = new BMXMessageList();
-        Observable.just(mConversation).map(new Func1<BMXConversation, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXConversation bmxConversation) {
-                return ChatManager.getInstance().retrieveHistoryMessages(bmxConversation, msgId,
-                        MessageConfig.DEFAULT_PAGE_SIZE, messageList);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode errorCode) {
-                if (errorCode != null
-                        && errorCode.swigValue() == BMXErrorCode.NoError.swigValue()) {
-                    return errorCode;
-                }
-                // 历史消息没有拉到 从DB获取
-                return mConversation.loadMessages(msgId, MessageConfig.DEFAULT_PAGE_SIZE,
-                        messageList);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        if (e != null && !TextUtils.isEmpty(e.getMessage())) {
-                            TaskDispatcher
-                                    .postMain(() -> ToastUtil.showTextViewPrompt(e.getMessage()));
-                        }
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
+        //拉取历史消息
+        ChatManager.getInstance().retrieveHistoryMessages(mConversation, msgId,
+                MessageConfig.DEFAULT_PAGE_SIZE, (bmxErrorCode, messageList) -> {
+                    if (BaseManager.bmxFinish(bmxErrorCode)) {
                         if (!messageList.isEmpty()) {
                             List<BMXMessage> messages = new ArrayList<>();
                             for (int i = 0; i < messageList.size(); i++) {
@@ -370,7 +334,29 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                                 mView.showChatMessages(messages);
                             }
                         }
+                        return;
                     }
+                    // 历史消息没有拉到 从DB获取
+                    mConversation.loadMessages(msgId, MessageConfig.DEFAULT_PAGE_SIZE,
+                            (bmxErrorCode1, bmxMessageList) -> {
+                                if (BaseManager.bmxFinish(bmxErrorCode1)) {
+                                    if (!bmxMessageList.isEmpty()) {
+                                        List<BMXMessage> messages = new ArrayList<>();
+                                        for (int i = 0; i < bmxMessageList.size(); i++) {
+                                            messages.add(bmxMessageList.get(i));
+                                        }
+                                        if (mView != null) {
+                                            mView.showChatMessages(messages);
+                                        }
+                                    }
+                                } else {
+                                    if (bmxErrorCode1 != null
+                                            && !TextUtils.isEmpty(bmxErrorCode1.name())) {
+                                        TaskDispatcher.postMain(() -> ToastUtil
+                                                .showTextViewPrompt(bmxErrorCode1.name()));
+                                    }
+                                }
+                            });
                 });
     }
 
@@ -379,43 +365,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (mConversation == null || msgId < 0) {
             return;
         }
-        final BMXMessageList messageList = new BMXMessageList();
-        Observable.just(mConversation).map(new Func1<BMXConversation, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXConversation bmxConversation) {
-                return ChatManager.getInstance().retrieveHistoryMessages(bmxConversation, msgId,
-                        MessageConfig.DEFAULT_PAGE_SIZE, messageList);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode errorCode) {
-                if (errorCode != null
-                        && errorCode.swigValue() == BMXErrorCode.NoError.swigValue()) {
-                    return errorCode;
-                }
-                // 历史消息没有拉到 从DB获取
-                return mConversation.loadMessages(msgId, MessageConfig.DEFAULT_PAGE_SIZE,
-                        messageList);
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
+        ChatManager.getInstance().retrieveHistoryMessages(mConversation, msgId,
+                MessageConfig.DEFAULT_PAGE_SIZE, (bmxErrorCode, messageList) -> {
+                    if (BaseManager.bmxFinish(bmxErrorCode)) {
                         if (!messageList.isEmpty()) {
                             List<BMXMessage> messages = new ArrayList<>();
                             for (int i = 0; i < messageList.size(); i++) {
@@ -425,7 +377,23 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                                 mView.showPullChatMessages(messages, offset);
                             }
                         }
+                        return;
                     }
+                    // 历史消息没有拉到 从DB获取
+                    mConversation.loadMessages(msgId, MessageConfig.DEFAULT_PAGE_SIZE,
+                            (bmxErrorCode1, bmxMessageList) -> {
+                                if (BaseManager.bmxFinish(bmxErrorCode1)) {
+                                    if (!bmxMessageList.isEmpty()) {
+                                        List<BMXMessage> messages = new ArrayList<>();
+                                        for (int i = 0; i < messageList.size(); i++) {
+                                            messages.add(messageList.get(i));
+                                        }
+                                        if (mView != null) {
+                                            mView.showPullChatMessages(messages, offset);
+                                        }
+                                    }
+                                }
+                            });
                 });
     }
 
@@ -463,53 +431,43 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         mChatId = chatId;
         mSendUtils = new MessageSendUtils();
         if (mConversation == null || mConversation.conversationId() != chatId) {
+            BMXDataCallBack<BMXConversation> callBack = (bmxErrorCode, bmxConversation) -> {
+                if (BaseManager.bmxFinish(bmxErrorCode) && bmxConversation != null) {
+                    mConversation = bmxConversation;
+                    // 设置已读
+                    if (mConversation.unreadNumber() > 0) {
+                        mConversation.setAllMessagesRead(null);
+                    }
+                    // 获取草稿
+                    if (mView != null) {
+                        mView.setControlBarText(mConversation.editMessage());
+                    }
+                    initChatData(0);
+                }
+            };
             if (chatType != null && chatType == BMXMessage.MessageType.Single) {
-                mConversation = ChatManager.getInstance().openConversation(chatId,
-                        BMXConversation.Type.Single, true);
+                ChatManager.getInstance().openConversation(chatId, BMXConversation.Type.Single,
+                        true, callBack);
             } else if (chatType != null && chatType == BMXMessage.MessageType.Group) {
-                mConversation = ChatManager.getInstance().openConversation(chatId,
-                        BMXConversation.Type.Group, true);
+                ChatManager.getInstance().openConversation(chatId, BMXConversation.Type.Group, true,
+                        callBack);
             }
-        }
-        if (mConversation != null) {
+        } else {
             // 设置已读
             if (mConversation.unreadNumber() > 0) {
-                mConversation.setAllMessagesRead();
+                mConversation.setAllMessagesRead(null);
             }
             // 获取草稿
             if (mView != null) {
                 mView.setControlBarText(mConversation.editMessage());
             }
+            initChatData(0);
         }
-        initChatData(0);
-
-        final BMXUserProfile profile = new BMXUserProfile();
-        Observable.just(myUserId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long aLong) {
-                return UserManager.getInstance().getProfile(profile, false);
+        UserManager.getInstance().getProfile(false, (bmxErrorCode, bmxUserProfile) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                myUserName = bmxUserProfile == null ? "" : bmxUserProfile.username();
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        myUserName = profile == null ? "" : profile.username();
-                    }
-                });
+        });
     }
 
     @Override
@@ -522,27 +480,16 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     private void receiveRxBus() {
         Subscription subscription = RxBus.getInstance().toObservable(RefreshChatActivityEvent.class)
-                .map(new Func1<RefreshChatActivityEvent, Pair<Integer, List<BMXMessage>>>() {
+                .map(new Func1<RefreshChatActivityEvent, Pair<Integer, List<String>>>() {
                     @Override
-                    public Pair<Integer, List<BMXMessage>> call(
+                    public Pair<Integer, List<String>> call(
                             RefreshChatActivityEvent refreshChatActivityEvent) {
                         List<String> list = refreshChatActivityEvent == null ? null
                                 : refreshChatActivityEvent.getMsgBeans();
-                        if (list != null && !list.isEmpty()) {
-                            List<BMXMessage> msgs = new ArrayList<>();
-                            for (String msgId : list) {
-                                BMXMessage msg = ChatManager.getInstance()
-                                        .getMessage(Long.valueOf(msgId));
-                                if (isCurrentSession(msg)) {
-                                    msgs.add(msg);
-                                }
-                            }
-                            return new Pair<>(refreshChatActivityEvent.getRefreshType(), msgs);
-                        }
-                        return null;
+                        return new Pair<>(refreshChatActivityEvent.getRefreshType(), list);
                     }
                 }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Pair<Integer, List<BMXMessage>>>() {
+                .subscribe(new Subscriber<Pair<Integer, List<String>>>() {
                     @Override
                     public void onCompleted() {
 
@@ -554,35 +501,44 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     }
 
                     @Override
-                    public void onNext(Pair<Integer, List<BMXMessage>> pair) {
+                    public void onNext(Pair<Integer, List<String>> pair) {
                         if (pair == null || pair.second == null || pair.second.isEmpty()) {
                             return;
                         }
                         int type = pair.first;
-                        List<BMXMessage> msgs = pair.second;
-                        switch (type) {
-                            case RefreshChatActivityEvent.TYPE_ADD:
-                                // 添加
-                                if (mView != null) {
-                                    mView.sendChatMessages(msgs);
-                                }
-                                break;
-                            case RefreshChatActivityEvent.TYPE_DELETE:
-                                for (BMXMessage msg : msgs) {
+                        List<String> list = pair.second;
+                        BMXDataCallBack<BMXMessage> callBack = (bmxErrorCode, bmxMessage) -> {
+                            List<BMXMessage> msgs = new ArrayList<>();
+                            if (isCurrentSession(bmxMessage)) {
+                                msgs.add(bmxMessage);
+                            }
+                            switch (type) {
+                                case RefreshChatActivityEvent.TYPE_ADD:
+                                    // 添加
                                     if (mView != null) {
-                                        mView.deleteChatMessage(msg);
+                                        mView.sendChatMessages(msgs);
                                     }
-                                }
-                                break;
-                            case RefreshChatActivityEvent.TYPE_UPDATE:
-                                for (BMXMessage msg : msgs) {
-                                    if (mView != null) {
-                                        mView.updateChatMessage(msg);
+                                    break;
+                                case RefreshChatActivityEvent.TYPE_DELETE:
+                                    for (BMXMessage msg : msgs) {
+                                        if (mView != null) {
+                                            mView.deleteChatMessage(msg);
+                                        }
                                     }
-                                }
-                                break;
-                            default:
-                                break;
+                                    break;
+                                case RefreshChatActivityEvent.TYPE_UPDATE:
+                                    for (BMXMessage msg : msgs) {
+                                        if (mView != null) {
+                                            mView.updateChatMessage(msg);
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        };
+                        for (String msgId : list) {
+                            ChatManager.getInstance().getMessage(Long.valueOf(msgId), callBack);
                         }
                     }
                 });
@@ -921,28 +877,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (message == null || mConversation == null) {
             return;
         }
-        Observable.just(message).map(new Func1<BMXMessage, BMXMessage>() {
-            @Override
-            public BMXMessage call(BMXMessage message) {
-                ChatManager.getInstance().recallMessage(message);
-                return message;
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXMessage>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXMessage message) {
-                    }
-                });
+        ChatManager.getInstance().recallMessage(message);
     }
 
     /**
@@ -954,25 +889,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (message == null || mConversation == null) {
             return;
         }
-        Observable.just(message).map(msg -> {
-            ChatManager.getInstance().resendMessage(msg);
-            return msg;
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXMessage>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(BMXMessage message) {
-                    }
-                });
+        ChatManager.getInstance().resendMessage(message);
     }
 
     /**

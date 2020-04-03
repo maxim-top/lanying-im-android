@@ -18,10 +18,6 @@ import android.support.v4.app.NotificationCompat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.utils.AppContextUtils;
@@ -168,24 +164,9 @@ public class NotificationUtils {
     }
 
     private void getAllCount(Notification notification) {
-        Observable.just("").map(s -> ChatManager.getInstance().getAllConversationsUnreadCount())
-                .subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<Integer>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(Integer count) {
-                        setCorner(notification, count);
-                    }
-                });
+        ChatManager.getInstance().getAllConversationsUnreadCount((bmxErrorCode, integer) -> {
+            setCorner(notification, integer == null ? 0 : integer);
+        });
     }
     
     public void setCorner(Notification notification, int count) {

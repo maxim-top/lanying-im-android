@@ -25,7 +25,6 @@ import im.floo.floolib.ListOfLongLong;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -34,6 +33,7 @@ import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -41,8 +41,6 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
-import top.maxim.im.push.PushClientMgr;
-import top.maxim.im.push.PushUtils;
 
 /**
  * Description : 消息分发 Created by mango on 2018/12/20.
@@ -215,10 +213,7 @@ public class MessageDispatcher {
 
                             @Override
                             public void onNext(String s) {
-                                SharePreferenceUtils.getInstance().putLoginStatus(false);
-                                PushClientMgr.getManager().unRegister();
-                                PushUtils.getInstance().unregisterActivityListener(
-                                        AppContextUtils.getApplication());
+                                CommonUtils.getInstance().logout();
                                 WelcomeActivity.openWelcome(AppContextUtils.getAppContext());
                             }
                         });
@@ -460,39 +455,16 @@ public class MessageDispatcher {
         if (profile == null) {
             return;
         }
-        Observable.just("").map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().downloadAvatar(profile, new FileProgressListener(){
-                    @Override
-                    public int onProgressChange(String percent) {
-                        return 0;
-                    }
-                });
+        UserManager.getInstance().downloadAvatar(profile, s -> {
+            return 0;
+        }, bmxErrorCode -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                RosterFetcher.getFetcher().putProfile(profile);
+                Intent intent = new Intent();
+                intent.setAction("onInfoUpdated");
+                RxBus.getInstance().send(intent);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        RosterFetcher.getFetcher().putProfile(profile);
-                        Intent intent = new Intent();
-                        intent.setAction("onInfoUpdated");
-                        RxBus.getInstance().send(intent);
-                    }
-                });
+        });
     }
 
     /**
@@ -502,39 +474,19 @@ public class MessageDispatcher {
         if (item == null) {
             return;
         }
-        Observable.just(item).map(new Func1<BMXRosterItem, BMXErrorCode>() {
+        RosterManager.getInstance().downloadAvatar(item, new FileProgressListener() {
             @Override
-            public BMXErrorCode call(BMXRosterItem s) {
-                return RosterManager.getInstance().downloadAvatar(s, new FileProgressListener(){
-                    @Override
-                    public int onProgressChange(String percent) {
-                        return 0;
-                    }
-                });
+            public int onProgressChange(String s) {
+                return 0;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+        }, bmxErrorCode -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                RosterFetcher.getFetcher().putRoster(item);
+                Intent intent = new Intent();
+                intent.setAction("onRosterInfoUpdate");
+                RxBus.getInstance().send(intent);
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        RosterFetcher.getFetcher().putRoster(item);
-                        Intent intent = new Intent();
-                        intent.setAction("onRosterInfoUpdate");
-                        RxBus.getInstance().send(intent);
-                    }
-                });
+        });
     }
 
     /**
@@ -544,39 +496,19 @@ public class MessageDispatcher {
         if (item == null) {
             return;
         }
-        Observable.just(item).map(new Func1<BMXGroup, BMXErrorCode>() {
+        GroupManager.getInstance().downloadAvatar(item, new FileProgressListener() {
             @Override
-            public BMXErrorCode call(BMXGroup s) {
-                return GroupManager.getInstance().downloadAvatar(s, new FileProgressListener(){
-                    @Override
-                    public int onProgressChange(String percent) {
-                        return 0;
-                    }
-                });
+            public int onProgressChange(String percent) {
+                return 0;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+        }, bmxErrorCode -> {
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                RosterFetcher.getFetcher().putGroup(item);
+                Intent intent = new Intent();
+                intent.setAction("onGroupInfoUpdate");
+                RxBus.getInstance().send(intent);
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        RosterFetcher.getFetcher().putGroup(item);
-                        Intent intent = new Intent();
-                        intent.setAction("onGroupInfoUpdate");
-                        RxBus.getInstance().send(intent);
-                    }
-                });
+        });
     }
 
     /**

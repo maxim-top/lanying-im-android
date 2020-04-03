@@ -20,15 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import im.floo.floolib.BMXErrorCode;
+import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.ListOfLongLong;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -64,8 +59,6 @@ public class RosterChooseActivity extends BaseTitleActivity {
     private List<String> mFilterList;
 
     protected Map<Long, Boolean> mSelected = new HashMap<>();
-
-    protected BMXRosterItemList itemList = new BMXRosterItemList();
 
     private static final String CHOOSE = "choose";
 
@@ -220,63 +213,38 @@ public class RosterChooseActivity extends BaseTitleActivity {
     }
 
     protected void init() {
-        final ListOfLongLong listOfLongLong = new ListOfLongLong();
         showLoadingDialog(true);
-        Observable.just(listOfLongLong).map(new Func1<ListOfLongLong, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(ListOfLongLong longs) {
-                if (itemList != null && !itemList.isEmpty()) {
-                    itemList.clear();
-                }
-                return initData(listOfLongLong, false);
-            }
-        }).map(new Func1<BMXErrorCode, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(BMXErrorCode errorCode) {
-                if (!listOfLongLong.isEmpty()) {
-                    BMXErrorCode errorCode1 = RosterManager.getInstance().search(listOfLongLong,
-                            itemList, true);
-                    RosterFetcher.getFetcher().putRosters(itemList);
-                    return errorCode1;
-                }
-                return errorCode;
-            }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                        if (itemList != null && !itemList.isEmpty()) {
-                            itemList.clear();
+        BMXDataCallBack<ListOfLongLong> callBack = (bmxErrorCode, list) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                if (!list.isEmpty()) {
+                    RosterManager.getInstance().getRosterList(list, true, (bmxErrorCode1, itemList) -> {
+                        RosterFetcher.getFetcher().putRosters(itemList);
+                        if (BaseManager.bmxFinish(bmxErrorCode1)) {
+                            bindData(itemList);
+                        } else {
+                            String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";
+                            ToastUtil.showTextViewPrompt(error);
+                            bindData(null);
                         }
-                        initData(listOfLongLong, false);
-                        bindData();
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        bindData();
-                    }
-                });
+                    });
+                } else {
+                    bindData(null);
+                }
+            } else {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                ToastUtil.showTextViewPrompt(error);
+                bindData(null);
+            }
+        };
+        initData(false, callBack);
     }
 
-    protected BMXErrorCode initData(ListOfLongLong listOfLongLong, boolean forceRefresh) {
-        return RosterManager.getInstance().get(listOfLongLong, forceRefresh);
+    protected void initData(boolean forceRefresh, BMXDataCallBack<ListOfLongLong> callBack) {
+        RosterManager.getInstance().get(forceRefresh, callBack);
     }
 
-    protected void bindData() {
+    protected void bindData(BMXRosterItemList itemList) {
         if (itemList != null && !itemList.isEmpty()) {
             List<BMXRosterItem> rosterItems = new ArrayList<>();
             for (int i = 0; i < itemList.size(); i++) {

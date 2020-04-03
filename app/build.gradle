@@ -7,7 +7,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1907071346
-        versionName "v2.1.0"
+        versionName "v2.2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "100565061",
@@ -91,14 +91,11 @@ dependencies {
 
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_2.1.6.20200317',ext:'aar')
+    implementation(name:'floo-android_2.2.0.20200331',ext:'aar')
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
 
     implementation 'com.squareup.okhttp3:okhttp:3.12.3'
-
-//    implementation project(path: ':floo-android')
-//    implementation files('libs/floo-android.jar')
 
 //    //fresco图片控件
 //    implementation 'com.facebook.fresco:fresco:1.4.0'

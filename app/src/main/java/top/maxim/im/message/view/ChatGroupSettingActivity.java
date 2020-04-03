@@ -14,13 +14,9 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import im.floo.BMXCallBack;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -316,34 +312,16 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
 
     private void initGroupInfo() {
         showLoadingDialog(true);
-        Observable.just(mGroupId).map(new Func1<Long, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(Long aLong) {
-                return GroupManager.getInstance().search(mGroupId, mGroup, true);
+        GroupManager.getInstance().getGroupList(mGroupId, true, (bmxErrorCode, bmxGroup) -> {
+            dismissLoadingDialog();
+            if (bmxGroup != null) {
+                mGroup = bmxGroup;
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                toastError(bmxErrorCode);
             }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        bindGroupInfo();
-                    }
-                });
+            bindGroupInfo();
+        });
     }
 
     private void bindGroupInfo() {
@@ -497,72 +475,48 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
     /**
      * 更新信息
      */
-    private void setGroupInfo(final String title, final int stringResId) {
+    private void setGroupInfo(String title, final int stringResId) {
         if (stringResId <= 0) {
             return;
         }
         showLoadingDialog(true);
-        Observable.just(title).map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
+        BMXCallBack callBack = bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (TextUtils.equals(title, getString(R.string.group_notify_mode))) {
                     // 群消息通知
-                    BMXGroup.MsgPushMode pushMode = pushModeMap.get(stringResId);
-                    return GroupManager.getInstance().setMsgPushMode(mGroup, pushMode);
-                }
-                if (TextUtils.equals(title, getString(R.string.group_join_auth_mode))) {
+                    mGroupNotifyMode.setEndContent(getString(stringResId));
+                } else if (TextUtils.equals(title, getString(R.string.group_join_auth_mode))) {
                     // 入群审批模式
-                    BMXGroup.JoinAuthMode joinAuthMode = joinAuthModeMap.get(stringResId);
-                    return GroupManager.getInstance().setJoinAuthMode(mGroup, joinAuthMode);
-                }
-                if (TextUtils.equals(title, getString(R.string.group_invite_mode))) {
+                    mGroupJoinAuthMode.setEndContent(getString(stringResId));
+                } else if (TextUtils.equals(title, getString(R.string.group_invite_mode))) {
                     // 设置邀请模式
-                    BMXGroup.InviteMode inviteMode = inviteModeMap.get(stringResId);
-                    return GroupManager.getInstance().setInviteMode(mGroup, inviteMode);
-                }
-                if (TextUtils.equals(title, getString(R.string.group_mute_msg))) {
+                    mGroupInviteMode.setEndContent(getString(stringResId));
+                } else if (TextUtils.equals(title, getString(R.string.group_mute_msg))) {
                     // 屏蔽群消息
-                    BMXGroup.MsgMuteMode muteMode = muteModeMap.get(stringResId);
-                    return GroupManager.getInstance().muteMessage(mGroup, muteMode);
+                    mMuteGroupMessage.setEndContent(getString(stringResId));
                 }
-                return null;
+            } else {
+                toastError(bmxErrorCode);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        toastError(e);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        dismissLoadingDialog();
-                        if (TextUtils.equals(title, getString(R.string.group_notify_mode))) {
-                            // 群消息通知
-                            mGroupNotifyMode.setEndContent(getString(stringResId));
-                        } else if (TextUtils.equals(title,
-                                getString(R.string.group_join_auth_mode))) {
-                            // 入群审批模式
-                            mGroupJoinAuthMode.setEndContent(getString(stringResId));
-                        } else if (TextUtils.equals(title, getString(R.string.group_invite_mode))) {
-                            // 设置邀请模式
-                            mGroupInviteMode.setEndContent(getString(stringResId));
-                        } else if (TextUtils.equals(title, getString(R.string.group_mute_msg))) {
-                            // 屏蔽群消息
-                            mMuteGroupMessage.setEndContent(getString(stringResId));
-                        }
-                    }
-                });
+        };
+        if (TextUtils.equals(title, getString(R.string.group_notify_mode))) {
+            // 群消息通知
+            BMXGroup.MsgPushMode pushMode = pushModeMap.get(stringResId);
+            GroupManager.getInstance().setMsgPushMode(mGroup, pushMode, callBack);
+        } else if (TextUtils.equals(title, getString(R.string.group_join_auth_mode))) {
+            // 入群审批模式
+            BMXGroup.JoinAuthMode joinAuthMode = joinAuthModeMap.get(stringResId);
+            GroupManager.getInstance().setJoinAuthMode(mGroup, joinAuthMode, callBack);
+        } else if (TextUtils.equals(title, getString(R.string.group_invite_mode))) {
+            // 设置邀请模式
+            BMXGroup.InviteMode inviteMode = inviteModeMap.get(stringResId);
+            GroupManager.getInstance().setInviteMode(mGroup, inviteMode, callBack);
+        } else if (TextUtils.equals(title, getString(R.string.group_mute_msg))) {
+            // 屏蔽群消息
+            BMXGroup.MsgMuteMode muteMode = muteModeMap.get(stringResId);
+            GroupManager.getInstance().muteMessage(mGroup, muteMode, callBack);
+        }
     }
 
     @Override
@@ -572,6 +526,11 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
 
     private void toastError(Throwable e) {
         String error = e != null ? e.getMessage() : "网络异常";
+        ToastUtil.showTextViewPrompt(error);
+    }
+
+    private void toastError(BMXErrorCode e) {
+        String error = e != null ? e.name() : "网络异常";
         ToastUtil.showTextViewPrompt(error);
     }
 }

@@ -436,6 +436,8 @@
 
         <activity android:name=".filebrowser.FileBrowserActivity" />
 
+        <activity android:name=".login.view.LogViewActivity" />
+
         <receiver
             android:name=".push.huawei.HuaWeiPushReceiver"
             android:permission="${applicationId}.permission.PROCESS_PUSH_MSG">

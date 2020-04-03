@@ -15,12 +15,6 @@ import java.util.List;
 
 import im.floo.floolib.BMXDevice;
 import im.floo.floolib.BMXDeviceList;
-import im.floo.floolib.BMXErrorCode;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
@@ -73,35 +67,16 @@ public class DeviceListActivity extends BaseTitleActivity {
 
     private void deleteDevice(final int deviceSn) {
         showLoadingDialog(true);
-        Observable.just("").map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().deleteDevice(deviceSn);
+        UserManager.getInstance().deleteDevice(deviceSn, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                init();
+            } else {
+                dismissLoadingDialog();
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                ToastUtil.showTextViewPrompt(error);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        init();
-                    }
-                });
+        });
     }
 
     @Override
@@ -115,35 +90,16 @@ public class DeviceListActivity extends BaseTitleActivity {
             deviceList.clear();
         }
         showLoadingDialog(true);
-        Observable.just("").map(new Func1<String, BMXErrorCode>() {
-            @Override
-            public BMXErrorCode call(String s) {
-                return UserManager.getInstance().getDeviceList(deviceList);
+        UserManager.getInstance().getDeviceList((bmxErrorCode, bmxDeviceList) -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                deviceList = bmxDeviceList;
+                bindData();
+            } else {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                ToastUtil.showTextViewPrompt(error);
             }
-        }).flatMap(new Func1<BMXErrorCode, Observable<BMXErrorCode>>() {
-            @Override
-            public Observable<BMXErrorCode> call(BMXErrorCode errorCode) {
-                return BaseManager.bmxFinish(errorCode, errorCode);
-            }
-        }).subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<BMXErrorCode>() {
-                    @Override
-                    public void onCompleted() {
-                        dismissLoadingDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
-                        ToastUtil.showTextViewPrompt(error);
-                    }
-
-                    @Override
-                    public void onNext(BMXErrorCode errorCode) {
-                        bindData();
-                    }
-                });
+        });
     }
 
     private void bindData() {

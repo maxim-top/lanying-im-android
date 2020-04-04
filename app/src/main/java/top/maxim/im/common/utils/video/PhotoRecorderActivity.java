@@ -18,9 +18,7 @@ import java.util.List;
 import top.maxim.im.R;
 
 /**
- * Description :长按录制，点击拍照页面 Created by zhuxinhong on 2017/3/14. Job
- * number：135198 Phone ：13520295328 Email：zhuxinhong@syswin.com Person in charge
- * : zhuxinhong Leader：zhuxinhong
+ * Description :长按录制，点击拍照页面
  */
 public class PhotoRecorderActivity extends Activity implements IRecordView {
     public static final String EXTRA_CAMERA_PATH = "camera_path";

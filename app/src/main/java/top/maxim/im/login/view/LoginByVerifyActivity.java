@@ -61,6 +61,8 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     /* 注册 */
     private TextView mRegister;
 
+    private View mWXContainer;
+
     /* 微信登录 */
     private ImageView mWXLogin;
 
@@ -119,6 +121,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
         mSendVerify.setEnabled(false);
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
         mRegister = view.findViewById(R.id.tv_register);
+        mWXContainer = view.findViewById(R.id.ll_wx_container);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
@@ -368,6 +371,10 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText("APPID:" + mChangeAppId);
+                        mWXContainer.setVisibility(
+                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
+                                        ? View.VISIBLE
+                                        : View.GONE);
                     }
                 });
         mSubscription.add(changeAppId);

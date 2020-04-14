@@ -38,6 +38,7 @@ import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.wxapi.WXUtils;
 
 /**
@@ -79,6 +80,8 @@ public class RegisterActivity extends BaseTitleActivity {
     private String mChangeAppId;
 
     private TextView mTvRegisterProtocol;
+
+    private View mWXContainer;
 
     /* 微信登录 */
     private ImageView mWXLogin;
@@ -134,6 +137,7 @@ public class RegisterActivity extends BaseTitleActivity {
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
+        mWXContainer = view.findViewById(R.id.ll_wx_container);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         buildProtocol();
         view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
@@ -440,6 +444,10 @@ public class RegisterActivity extends BaseTitleActivity {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText("APPID:" + mChangeAppId);
+                        mWXContainer.setVisibility(
+                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
+                                        ? View.VISIBLE
+                                        : View.GONE);
                     }
                 });
         mSubscription.add(changeAppId);

@@ -26,14 +26,14 @@ public class GroupManager extends BaseManager {
 
     private static final GroupManager sInstance = new GroupManager();
 
-    private im.floo.manager.GroupManager mService;
+    private im.floo.floolib.GroupManager mService;
 
     public static GroupManager getInstance() {
         return sInstance;
     }
 
     private GroupManager() {
-        mService = im.floo.manager.GroupManager.getInstance();
+        mService = bmxClient.getGroupManager();
     }
 
     /**

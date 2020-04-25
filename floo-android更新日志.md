@@ -1,5 +1,11 @@
 # floo-android更新日志
 
+## v2.3.0 - 2020/04/25
+
+变更:
+1. 新的floo包
+   修改获取ChatManager UserManager RosterManager GroupManager的方式
+   
 ## v2.2.1 - 2020/04/07
 
 变更：

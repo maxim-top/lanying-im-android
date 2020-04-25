@@ -19,14 +19,14 @@ public class UserManager extends BaseManager {
 
     private static final UserManager sInstance = new UserManager();
 
-    private im.floo.manager.UserManager mService;
+    private im.floo.floolib.UserManager mService;
 
     public static UserManager getInstance() {
         return sInstance;
     }
 
     private UserManager() {
-        mService = im.floo.manager.UserManager.getInstance();
+        mService = bmxClient.getUserManager();
     }
 
     /**

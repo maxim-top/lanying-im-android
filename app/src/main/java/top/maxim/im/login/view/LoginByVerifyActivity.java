@@ -371,10 +371,10 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText("APPID:" + mChangeAppId);
-                        mWXContainer.setVisibility(
-                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
-                                        ? View.VISIBLE
-                                        : View.GONE);
+//                        mWXContainer.setVisibility(
+//                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
+//                                        ? View.VISIBLE
+//                                        : View.GONE);
                     }
                 });
         mSubscription.add(changeAppId);

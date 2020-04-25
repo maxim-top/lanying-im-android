@@ -19,14 +19,14 @@ public class RosterManager extends BaseManager {
 
     private static final RosterManager sInstance = new RosterManager();
 
-    private im.floo.manager.RosterManager mService;
+    private im.floo.floolib.RosterManager mService;
 
     public static RosterManager getInstance() {
         return sInstance;
     }
 
     private RosterManager() {
-        mService = im.floo.manager.RosterManager.getInstance();
+        mService = bmxClient.getRosterManager();
     }
 
     /**

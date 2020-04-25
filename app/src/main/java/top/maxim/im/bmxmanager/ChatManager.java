@@ -20,14 +20,14 @@ public class ChatManager extends BaseManager {
 
     private static final ChatManager sInstance = new ChatManager();
 
-    private im.floo.manager.ChatManager mService;
+    private im.floo.floolib.ChatManager mService;
 
     public static ChatManager getInstance() {
         return sInstance;
     }
 
     private ChatManager() {
-        mService = im.floo.manager.ChatManager.getInstance();
+        mService = bmxClient.getChatManager();
     }
 
     /**

@@ -38,7 +38,6 @@ import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
-import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.wxapi.WXUtils;
 
 /**
@@ -444,10 +443,10 @@ public class RegisterActivity extends BaseTitleActivity {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText("APPID:" + mChangeAppId);
-                        mWXContainer.setVisibility(
-                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
-                                        ? View.VISIBLE
-                                        : View.GONE);
+//                        mWXContainer.setVisibility(
+//                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
+//                                        ? View.VISIBLE
+//                                        : View.GONE);
                     }
                 });
         mSubscription.add(changeAppId);

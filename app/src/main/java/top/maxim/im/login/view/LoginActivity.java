@@ -218,12 +218,12 @@ public class LoginActivity extends BaseTitleActivity {
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
-//        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
-//            mChangeAppId = appId;
-//            mWXContainer.setVisibility(View.GONE);
-//        } else {
-//            mWXContainer.setVisibility(View.VISIBLE);
-//        }
+        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
+            mChangeAppId = appId;
+            mWXContainer.setVisibility(View.GONE);
+        } else {
+            mWXContainer.setVisibility(View.VISIBLE);
+        }
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
@@ -455,10 +455,10 @@ public class LoginActivity extends BaseTitleActivity {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText("APPID:" + mChangeAppId);
-//                        mWXContainer.setVisibility(
-//                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
-//                                        ? View.VISIBLE
-//                                        : View.GONE);
+                        mWXContainer.setVisibility(
+                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
+                                        ? View.VISIBLE
+                                        : View.GONE);
                     }
                 });
         mSubscription.add(changeAppId);

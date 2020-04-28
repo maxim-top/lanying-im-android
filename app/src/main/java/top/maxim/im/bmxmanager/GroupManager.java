@@ -7,6 +7,7 @@ import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupAnnouncementList;
 import im.floo.floolib.BMXGroupBannedMemberList;
 import im.floo.floolib.BMXGroupList;
+import im.floo.floolib.BMXGroupManager;
 import im.floo.floolib.BMXGroupMemberList;
 import im.floo.floolib.BMXGroupService;
 import im.floo.floolib.BMXGroupServiceListener;
@@ -26,7 +27,7 @@ public class GroupManager extends BaseManager {
 
     private static final GroupManager sInstance = new GroupManager();
 
-    private im.floo.floolib.GroupManager mService;
+    private BMXGroupManager mService;
 
     public static GroupManager getInstance() {
         return sInstance;

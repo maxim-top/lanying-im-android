@@ -68,6 +68,8 @@ public class LoginActivity extends BaseTitleActivity {
     /* 切换登陆模式 */
     private TextView mSwitchLoginMode;
 
+    private View mWXContainer;
+
     /* 微信登录 */
     private ImageView mWXLogin;
 
@@ -108,6 +110,7 @@ public class LoginActivity extends BaseTitleActivity {
         mLogin = view.findViewById(R.id.tv_login);
         mRegister = view.findViewById(R.id.tv_register);
         mVerifyLogin = view.findViewById(R.id.tv_verify);
+        mWXContainer = view.findViewById(R.id.ll_wx_container);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
@@ -215,9 +218,12 @@ public class LoginActivity extends BaseTitleActivity {
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
-        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
-            mChangeAppId = appId;
-        }
+//        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
+//            mChangeAppId = appId;
+//            mWXContainer.setVisibility(View.GONE);
+//        } else {
+//            mWXContainer.setVisibility(View.VISIBLE);
+//        }
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
@@ -449,6 +455,10 @@ public class LoginActivity extends BaseTitleActivity {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText("APPID:" + mChangeAppId);
+//                        mWXContainer.setVisibility(
+//                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
+//                                        ? View.VISIBLE
+//                                        : View.GONE);
                     }
                 });
         mSubscription.add(changeAppId);

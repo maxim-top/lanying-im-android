@@ -3,6 +3,7 @@ package top.maxim.im.bmxmanager;
 
 import im.floo.BMXCallBack;
 import im.floo.BMXDataCallBack;
+import im.floo.floolib.BMXChatManager;
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXConversation;
 import im.floo.floolib.BMXConversationList;
@@ -20,14 +21,14 @@ public class ChatManager extends BaseManager {
 
     private static final ChatManager sInstance = new ChatManager();
 
-    private im.floo.manager.ChatManager mService;
+    private BMXChatManager mService;
 
     public static ChatManager getInstance() {
         return sInstance;
     }
 
     private ChatManager() {
-        mService = im.floo.manager.ChatManager.getInstance();
+        mService = bmxClient.getChatManager();
     }
 
     /**

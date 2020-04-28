@@ -6,6 +6,7 @@ import im.floo.BMXDataCallBack;
 import im.floo.floolib.ApplicationPage;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXRosterItemList;
+import im.floo.floolib.BMXRosterManager;
 import im.floo.floolib.BMXRosterServiceListener;
 import im.floo.floolib.FileProgressListener;
 import im.floo.floolib.ListOfLongLong;
@@ -19,14 +20,14 @@ public class RosterManager extends BaseManager {
 
     private static final RosterManager sInstance = new RosterManager();
 
-    private im.floo.manager.RosterManager mService;
+    private BMXRosterManager mService;
 
     public static RosterManager getInstance() {
         return sInstance;
     }
 
     private RosterManager() {
-        mService = im.floo.manager.RosterManager.getInstance();
+        mService = bmxClient.getRosterManager();
     }
 
     /**

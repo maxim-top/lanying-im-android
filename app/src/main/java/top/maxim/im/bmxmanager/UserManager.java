@@ -6,6 +6,7 @@ import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXConnectStatus;
 import im.floo.floolib.BMXDeviceList;
 import im.floo.floolib.BMXSignInStatus;
+import im.floo.floolib.BMXUserManager;
 import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.BMXUserServiceListener;
 import im.floo.floolib.FileProgressListener;
@@ -19,14 +20,14 @@ public class UserManager extends BaseManager {
 
     private static final UserManager sInstance = new UserManager();
 
-    private im.floo.manager.UserManager mService;
+    private BMXUserManager mService;
 
     public static UserManager getInstance() {
         return sInstance;
     }
 
     private UserManager() {
-        mService = im.floo.manager.UserManager.getInstance();
+        mService = bmxClient.getUserManager();
     }
 
     /**

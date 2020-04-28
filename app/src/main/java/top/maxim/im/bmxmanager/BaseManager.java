@@ -19,6 +19,8 @@ import top.maxim.im.push.PushClientMgr;
 
 public class BaseManager {
 
+    protected static BMXClient bmxClient;
+
     static {
         System.loadLibrary("floo");
     }
@@ -40,7 +42,7 @@ public class BaseManager {
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
         conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
-        im.floo.manager.BaseManager.initClient(conf);
+        bmxClient = BMXClient.create(conf);
     }
 
     public static String getPushId() {
@@ -95,6 +97,6 @@ public class BaseManager {
     }
 
     public static BMXClient getBMXClient() {
-        return im.floo.manager.BaseManager.getClient();
+        return bmxClient;
     }
 }

@@ -2,3 +2,4 @@
 .gradle/
 .idea/
 app/app.iml
+app/bugly/

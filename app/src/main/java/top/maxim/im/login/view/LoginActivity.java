@@ -127,6 +127,12 @@ public class LoginActivity extends BaseTitleActivity {
             SharePreferenceUtils.getInstance().putCustomDns(newIndex);
             ToastUtil.showTextViewPrompt("切换新的环境配置:" + newIndex);
         });
+        // 三次点击打开日志
+        ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_open_log), 3, () -> {
+            // 跳转查看日志
+            LogViewActivity.openLogView(this);
+        });
+        
         initRxBus();
         return view;
     }

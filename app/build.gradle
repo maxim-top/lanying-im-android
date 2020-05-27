@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'bugly'
 
 android {
     compileSdkVersion 28
@@ -7,7 +8,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1907071346
-        versionName "v2.3.0"
+        versionName "v2.3.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "100565061",
@@ -24,8 +25,9 @@ android {
                 "VIVO_APP_KEY"   : "5060fd43f996444ab0e5e5c8dba57ffd",
                 "VIVO_APP_SECRET" : "17046a6edd9f4be1a87c3badb2e9b755",
 
-                "WEIXIN_APPID"   : "wxf0f8e197ecfb0925",
-                "BUGLY_APPID"    : "ae2c13667e"
+                "WEIXIN_APPID" : "wxf0f8e197ecfb0925",
+                "BUGLY_APPID"  : "ae2c13667e",
+                "BUGLY_APP_KEY": "6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc"
         ]
 
         ndk {
@@ -46,7 +48,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
@@ -65,6 +67,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+}
+
+bugly {
+    appId = 'ae2c13667e'
+    appKey = '6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc'
 }
 
 dependencies {
@@ -91,7 +98,7 @@ dependencies {
 
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_2.3.2.20200506',ext:'aar')
+    implementation(name:'floo-android_2.4.2.20200527',ext:'aar')
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
 

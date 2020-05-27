@@ -149,6 +149,7 @@
         android:textSize="@dimen/dimen_16" />
 
     <LinearLayout
+        android:id="@+id/login_mode_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -182,6 +183,16 @@
             android:textColor="@color/color_576B95"
             android:textSize="@dimen/dimen_14" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_open_log"
+        android:layout_width="@dimen/dimen_72"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login_mode_container"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/dimen_20"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_18" />
 
     <LinearLayout
         android:id="@+id/ll_wx_container"

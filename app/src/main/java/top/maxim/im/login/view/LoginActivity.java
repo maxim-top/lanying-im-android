@@ -127,6 +127,12 @@ public class LoginActivity extends BaseTitleActivity {
             SharePreferenceUtils.getInstance().putCustomDns(newIndex);
             ToastUtil.showTextViewPrompt("切换新的环境配置:" + newIndex);
         });
+        // 三次点击打开日志
+        ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_open_log), 3, () -> {
+            // 跳转查看日志
+            LogViewActivity.openLogView(this);
+        });
+        
         initRxBus();
         return view;
     }
@@ -218,12 +224,12 @@ public class LoginActivity extends BaseTitleActivity {
         }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
-//        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
-//            mChangeAppId = appId;
-//            mWXContainer.setVisibility(View.GONE);
-//        } else {
-//            mWXContainer.setVisibility(View.VISIBLE);
-//        }
+        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
+            mChangeAppId = appId;
+            mWXContainer.setVisibility(View.GONE);
+        } else {
+            mWXContainer.setVisibility(View.VISIBLE);
+        }
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
@@ -455,10 +461,10 @@ public class LoginActivity extends BaseTitleActivity {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText("APPID:" + mChangeAppId);
-//                        mWXContainer.setVisibility(
-//                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
-//                                        ? View.VISIBLE
-//                                        : View.GONE);
+                        mWXContainer.setVisibility(
+                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
+                                        ? View.VISIBLE
+                                        : View.GONE);
                     }
                 });
         mSubscription.add(changeAppId);

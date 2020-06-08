@@ -193,8 +193,8 @@ public class MessageDispatcher {
         }
 
         @Override
-        public void onUserSignOut(BMXErrorCode error) {
-            super.onUserSignOut(error);
+        public void onUserSignOut(BMXErrorCode error, long userId) {
+            super.onUserSignOut(error, userId);
             toastListener("onUserSignOut");
             if (error.swigValue() == BMXErrorCode.UserRemoved.swigValue()) {
                 // 被其他设备踢下线 跳转到登录页面

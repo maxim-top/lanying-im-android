@@ -26,6 +26,8 @@ public interface CommonConfig {
 
     String VERIFY_TYPE = "verifyType";
 
+    String VERIFY_OPERATE_TYPE = "verifyOperateType";
+
     String PHONE = "phone";
     
     String CHANGE_APP_ID_ACTION = "changeAppIdAction";
@@ -56,14 +58,27 @@ public interface CommonConfig {
      */
     interface VerifyType {
 
-        // 微信
+        // 微信验证
         int TYPE_WX = 0;
 
-        // 手机号
-        int TYPE_PHONE = 1;
+        // 密码验证
+        int TYPE_PWD = 1;
 
-        // 手机号验证码
+        // 手机号验证码验证码
         int TYPE_PHONE_CAPTCHA = 2;
+
+    }
+
+    /**
+     * 验证之后操作类型
+     */
+    interface VerifyOperateType {
+
+        // 绑定手机号
+        int TYPE_BIND_MOBILE = 0;
+
+        // 修改密码
+        int TYPE_CHANGE_PWD = 1;
 
     }
 }

@@ -81,6 +81,9 @@ public class SettingUserActivity extends BaseTitleActivity {
     /* 设置手机号 */
     private ItemEnableArrow.Builder mSetPhone;
 
+    /* 修改密码 */
+    private ItemLineArrow.Builder mSetPwd;
+
     /* 绑定微信 */
     private ItemEnableArrow.Builder mBindWeChat;
 
@@ -118,6 +121,7 @@ public class SettingUserActivity extends BaseTitleActivity {
     /* 头像路径 */
     private String mIconPath;
 
+    /* 绑定的手机号 */
     private String mPhone;
 
     private CompositeSubscription mSubscription;
@@ -168,9 +172,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mUserId.build());
 
         // 分割线
-        ItemLine.Builder itemLine1 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine1.build());
+        addLineView(container);
 
         // 二维码
         mQrCode = new ItemLineArrow.Builder(this).setStartContent(getString(R.string.my_qrcode))
@@ -179,9 +181,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mQrCode.build());
 
         // 分割线
-        ItemLine.Builder itemLine2 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine2.build());
+        addLineView(container);
 
         // 推送昵称
         mSetName = new ItemLineArrow.Builder(this)
@@ -195,77 +195,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mSetName.build());
 
         // 分割线
-        ItemLine.Builder itemLine3 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine3.build());
-
-        // 公开扩展信息
-        mSetPublic = new ItemLineArrow.Builder(this)
-                .setStartContent(getString(R.string.setting_user_public))
-                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
-                    @Override
-                    public void onItemClick(View v) {
-                        showSettingDialog(getString(R.string.setting_user_public));
-                    }
-                });
-        container.addView(mSetPublic.build());
-
-        // 分割线
-        ItemLine.Builder itemLine5 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine5.build());
-
-        mTvPublic = new TextView(this);
-        LinearLayout.LayoutParams publicP = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mTvPublic.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
-                ScreenUtils.dp2px(15));
-        mTvPublic.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        mTvPublic.setTextColor(getResources().getColor(R.color.color_black));
-        mTvPublic.setBackgroundColor(getResources().getColor(R.color.color_white));
-        mTvPublic.setLayoutParams(publicP);
-        mTvPublic.setVisibility(View.GONE);
-        container.addView(mTvPublic);
-
-        // 分割线
-        ItemLine.Builder itemLine6 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(mLinePublic = itemLine6.build());
-        mLinePublic.setVisibility(View.GONE);
-
-        // 私密扩展信息
-        mSetPrivate = new ItemLineArrow.Builder(this)
-                .setStartContent(getString(R.string.setting_user_private))
-                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
-                    @Override
-                    public void onItemClick(View v) {
-                        showSettingDialog(getString(R.string.setting_user_private));
-                    }
-                });
-        container.addView(mSetPrivate.build());
-
-        // 分割线
-        ItemLine.Builder itemLine7 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine7.build());
-
-        mTvPrivate = new TextView(this);
-        LinearLayout.LayoutParams privateP = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mTvPrivate.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
-                ScreenUtils.dp2px(15));
-        mTvPrivate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        mTvPrivate.setTextColor(getResources().getColor(R.color.color_black));
-        mTvPrivate.setBackgroundColor(getResources().getColor(R.color.color_white));
-        mTvPrivate.setLayoutParams(privateP);
-        mTvPrivate.setVisibility(View.GONE);
-        container.addView(mTvPrivate);
-
-        // 分割线
-        ItemLine.Builder itemLine8 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(mLinePrivate = itemLine8.build());
-        mLinePrivate.setVisibility(View.GONE);
+        addLineView(container);
 
         // 手机号
         mSetPhone = new ItemEnableArrow.Builder(this)
@@ -284,9 +214,26 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mSetPhone.build());
 
         // 分割线
-        ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine4.build());
+        addLineView(container);
+
+        // 修改密码
+        mSetPwd = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.setting_user_pwd))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                        if (TextUtils.isEmpty(mPhone)) {
+                            // 手机号为空 未绑定手机 跳转绑定手机号
+                            BindMobileActivity.openBindMobile(SettingUserActivity.this);
+                            return;
+                        }
+                        showChangePwd(mPhone);
+                    }
+                });
+        container.addView(mSetPwd.build());
+
+        // 分割线
+        addLineView(container);
 
         // 绑定微信
         mBindWeChat = new ItemEnableArrow.Builder(this)
@@ -295,8 +242,8 @@ public class SettingUserActivity extends BaseTitleActivity {
                     @Override
                     public void onItemClick(View v) {
                         // 解绑微信
-                        VerifyActivity.startVerifyPwdActivity(SettingUserActivity.this,
-                                CommonConfig.VerifyType.TYPE_WX, "");
+                        VerifyActivity.startVerifyActivity(SettingUserActivity.this,
+                                CommonConfig.VerifyType.TYPE_WX, "", 0);
                     }
 
                     @Override
@@ -309,9 +256,67 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mBindWeChat.build());
 
         // 分割线
-        ItemLine.Builder itemLine9 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine9.build());
+        addLineView(container);
+
+        // 公开扩展信息
+        mSetPublic = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.setting_user_public))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                        showSettingDialog(getString(R.string.setting_user_public));
+                    }
+                });
+        container.addView(mSetPublic.build());
+
+        // 分割线
+        addLineView(container);
+
+        mTvPublic = new TextView(this);
+        LinearLayout.LayoutParams publicP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mTvPublic.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                ScreenUtils.dp2px(15));
+        mTvPublic.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        mTvPublic.setTextColor(getResources().getColor(R.color.color_black));
+        mTvPublic.setBackgroundColor(getResources().getColor(R.color.color_white));
+        mTvPublic.setLayoutParams(publicP);
+        mTvPublic.setVisibility(View.GONE);
+        container.addView(mTvPublic);
+
+        // 分割线
+        mLinePublic = addLineView(container);
+        mLinePublic.setVisibility(View.GONE);
+
+        // 私密扩展信息
+        mSetPrivate = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.setting_user_private))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                        showSettingDialog(getString(R.string.setting_user_private));
+                    }
+                });
+        container.addView(mSetPrivate.build());
+
+        // 分割线
+        addLineView(container);
+
+        mTvPrivate = new TextView(this);
+        LinearLayout.LayoutParams privateP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mTvPrivate.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                ScreenUtils.dp2px(15));
+        mTvPrivate.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        mTvPrivate.setTextColor(getResources().getColor(R.color.color_black));
+        mTvPrivate.setBackgroundColor(getResources().getColor(R.color.color_white));
+        mTvPrivate.setLayoutParams(privateP);
+        mTvPrivate.setVisibility(View.GONE);
+        container.addView(mTvPrivate);
+
+        // 分割线
+        mLinePrivate = addLineView(container);
+        mLinePrivate.setVisibility(View.GONE);
 
         // 好友验证类型
         mSetAddFriendAuthMode = new ItemLineArrow.Builder(this)
@@ -325,9 +330,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mSetAddFriendAuthMode.build());
 
         // 分割线
-        ItemLine.Builder itemLine11 = new ItemLine.Builder(this, container)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine11.build());
+        addLineView(container);
 
         mLlAuthQuestion = new LinearLayout(this);
         mLlAuthQuestion.setOrientation(LinearLayout.VERTICAL);
@@ -335,6 +338,16 @@ public class SettingUserActivity extends BaseTitleActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         buildAuthQuestion();
+        return view;
+    }
+    
+    // 添加分割线
+    private View addLineView(ViewGroup container) {
+        // 分割线
+        View view;
+        ItemLine.Builder itemLine = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(view = itemLine.build());
         return view;
     }
 
@@ -487,9 +500,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         mLlAuthQuestion.addView(mSetAddFriendQuestion.build());
 
         // 分割线
-        ItemLine.Builder itemLine8 = new ItemLine.Builder(this, mLlAuthQuestion)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        mLlAuthQuestion.addView(itemLine8.build());
+        addLineView(mLlAuthQuestion);
 
         // 问题
         mTvQuestion = new TextView(this);
@@ -504,9 +515,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         mLlAuthQuestion.addView(mTvQuestion);
 
         // 分割线
-        ItemLine.Builder itemLine9 = new ItemLine.Builder(this, mLlAuthQuestion)
-                .setMarginLeft(ScreenUtils.dp2px(15));
-        mLlAuthQuestion.addView(itemLine9.build());
+        addLineView(mLlAuthQuestion);
 
         // 答案
         mTvAnswer = new TextView(this);
@@ -554,10 +563,10 @@ public class SettingUserActivity extends BaseTitleActivity {
         String privateInfo = profile.privateInfo();
         if (TextUtils.isEmpty(privateInfo)) {
             mTvPrivate.setVisibility(View.GONE);
-            mTvPrivate.setVisibility(View.GONE);
+            mLinePrivate.setVisibility(View.GONE);
         } else {
             mTvPrivate.setVisibility(View.VISIBLE);
-            mTvPrivate.setVisibility(View.VISIBLE);
+            mLinePrivate.setVisibility(View.VISIBLE);
             mTvPrivate.setText(privateInfo);
         }
 
@@ -864,11 +873,15 @@ public class SettingUserActivity extends BaseTitleActivity {
                 mSetName.setEndContent(TextUtils.isEmpty(info) ? "" : info);
             } else if (TextUtils.equals(title, getString(R.string.setting_user_public))) {
                 // 设置公有信息
-                mTvPublic.setVisibility(TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                boolean hide = TextUtils.isEmpty(info);
+                mTvPublic.setVisibility(hide ? View.GONE : View.VISIBLE);
+                mLinePublic.setVisibility(hide ? View.GONE : View.VISIBLE);
                 mTvPublic.setText(TextUtils.isEmpty(info) ? "" : info);
             } else if (TextUtils.equals(title, getString(R.string.setting_user_private))) {
                 // 设置私密信息
-                mTvPrivate.setVisibility(TextUtils.isEmpty(info) ? View.GONE : View.VISIBLE);
+                boolean hide = TextUtils.isEmpty(info);
+                mTvPrivate.setVisibility(hide ? View.GONE : View.VISIBLE);
+                mLinePrivate.setVisibility(hide ? View.GONE : View.VISIBLE);
                 mTvPrivate.setText(TextUtils.isEmpty(info) ? "" : info);
             } else if (TextUtils.equals(title, getString(R.string.setting_add_friend_auth_mode))) {
                 // 设置好友验证类型
@@ -933,18 +946,46 @@ public class SettingUserActivity extends BaseTitleActivity {
         CustomDialog dialog = new CustomDialog();
         tvPhoneVerify.setOnClickListener(v -> {
             // 旧手机号验证
-            VerifyActivity.startVerifyPwdActivity(this, CommonConfig.VerifyType.TYPE_PHONE_CAPTCHA,
-                    phone);
+            VerifyActivity.startVerifyActivity(this, CommonConfig.VerifyType.TYPE_PHONE_CAPTCHA,
+                    phone, CommonConfig.VerifyOperateType.TYPE_BIND_MOBILE);
             dialog.dismiss();
         });
         tvPwdVerify.setOnClickListener(v -> {
-            VerifyActivity.startVerifyPwdActivity(this, CommonConfig.VerifyType.TYPE_PHONE, "");
+            VerifyActivity.startVerifyActivity(this, CommonConfig.VerifyType.TYPE_PWD, "",
+                    CommonConfig.VerifyOperateType.TYPE_BIND_MOBILE);
             dialog.dismiss();
         });
         dialog.setCustomView(view);
         dialog.showDialog(this);
     }
 
+    /**
+     * 展示修改手机
+     */
+    private void showChangePwd(final String phone) {
+        View view = View.inflate(this, R.layout.dialog_change_phone, null);
+        TextView tvTitle = view.findViewById(R.id.tv_change_phone_title);
+        TextView tvPhone = view.findViewById(R.id.tv_bind_phone_title);
+        tvPhone.setText(String.format(getString(R.string.bind_phone_tag), phone));
+        TextView tvPhoneVerify = view.findViewById(R.id.tv_phone_verify);
+        TextView tvPwdVerify = view.findViewById(R.id.tv_pwd_verify);
+        tvTitle.setText(R.string.change_pwd_tag);
+        CustomDialog dialog = new CustomDialog();
+        tvPhoneVerify.setOnClickListener(v -> {
+            // 旧手机号验证
+            VerifyActivity.startVerifyActivity(this, CommonConfig.VerifyType.TYPE_PHONE_CAPTCHA,
+                    phone, CommonConfig.VerifyOperateType.TYPE_CHANGE_PWD);
+            dialog.dismiss();
+        });
+        tvPwdVerify.setOnClickListener(v -> {
+            VerifyActivity.startVerifyActivity(this, CommonConfig.VerifyType.TYPE_PWD, "",
+                    CommonConfig.VerifyOperateType.TYPE_CHANGE_PWD);
+            dialog.dismiss();
+        });
+        dialog.setCustomView(view);
+        dialog.showDialog(this);
+    }
+    
     /**
      * 上传头像
      * 

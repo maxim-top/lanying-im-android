@@ -52,6 +52,8 @@ public class VerifyActivity extends BaseTitleActivity {
     private String mPhone;
 
     private int mVerifyType = CommonConfig.VerifyType.TYPE_WX;
+    
+    private int mVerifyOperateType = CommonConfig.VerifyOperateType.TYPE_BIND_MOBILE;
 
     private boolean mCountDown;
 
@@ -72,10 +74,11 @@ public class VerifyActivity extends BaseTitleActivity {
         }
     };
 
-    public static void startVerifyPwdActivity(Context context, int type, String phone) {
+    public static void startVerifyActivity(Context context, int type, String phone, int operateType) {
         Intent intent = new Intent(context, VerifyActivity.class);
         intent.putExtra(CommonConfig.VERIFY_TYPE, type);
         intent.putExtra(CommonConfig.PHONE, phone);
+        intent.putExtra(CommonConfig.VERIFY_OPERATE_TYPE, operateType);
         context.startActivity(intent);
     }
 
@@ -153,6 +156,8 @@ public class VerifyActivity extends BaseTitleActivity {
         if (intent != null) {
             mVerifyType = intent.getIntExtra(CommonConfig.VERIFY_TYPE,
                     CommonConfig.VerifyType.TYPE_WX);
+            mVerifyOperateType = intent.getIntExtra(CommonConfig.VERIFY_OPERATE_TYPE,
+                    CommonConfig.VerifyOperateType.TYPE_BIND_MOBILE);
             mPhone = intent.getStringExtra(CommonConfig.PHONE);
         }
     }
@@ -177,12 +182,12 @@ public class VerifyActivity extends BaseTitleActivity {
                 tag = getString(R.string.un_bind_wechat_tag);
                 continueTitle = getString(R.string.unbind_wechat_continue);
                 break;
-            case CommonConfig.VerifyType.TYPE_PHONE:
+            case CommonConfig.VerifyType.TYPE_PWD:
                 // 更换手机号验证密码
                 mVerifyPhone.setVisibility(View.GONE);
                 mVerifyPwd.setVisibility(View.VISIBLE);
                 mGetVerify.setVisibility(View.GONE);
-                title = getString(R.string.change_mobile);
+                title = getString(R.string.verify_pwd_title);
                 tag = getString(R.string.verify_pwd_tag);
                 continueTitle = getString(R.string.verify_continue);
                 break;
@@ -191,7 +196,7 @@ public class VerifyActivity extends BaseTitleActivity {
                 mVerifyPhone.setVisibility(View.VISIBLE);
                 mGetVerify.setVisibility(View.VISIBLE);
                 mVerifyPwd.setVisibility(View.GONE);
-                title = getString(R.string.change_mobile);
+                title = getString(R.string.verify_captcha_title);
                 tag = getString(R.string.verify_captcha_tag);
                 mTvPhone.setText(mPhone);
                 continueTitle = getString(R.string.verify_continue);
@@ -223,10 +228,16 @@ public class VerifyActivity extends BaseTitleActivity {
                                 // 解绑微信
                                 unBindWX();
                                 break;
-                            case CommonConfig.VerifyType.TYPE_PHONE:
+                            case CommonConfig.VerifyType.TYPE_PWD:
                             case CommonConfig.VerifyType.TYPE_PHONE_CAPTCHA:
-                                // 更换手机号
-                                BindMobileActivity.openChangeMobile(VerifyActivity.this, result);
+                                if (mVerifyOperateType == CommonConfig.VerifyOperateType.TYPE_BIND_MOBILE) {
+                                    // 更换手机号
+                                    BindMobileActivity.openChangeMobile(VerifyActivity.this,
+                                            result);
+                                } else if (mVerifyOperateType == CommonConfig.VerifyOperateType.TYPE_CHANGE_PWD) {
+                                    // 修改密码
+                                    ChangePwdActivity.startChangePwdActivity(VerifyActivity.this, result);
+                                }
                                 finish();
                                 break;
                             default:

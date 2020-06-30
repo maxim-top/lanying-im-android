@@ -114,6 +114,11 @@
             android:name=".login.view.BindMobileActivity"
             android:screenOrientation="portrait"></activity>
 
+        <!--修改密码-->
+        <activity
+            android:name=".login.view.ChangePwdActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!--注册-->
         <activity
             android:name=".login.view.RegisterActivity"

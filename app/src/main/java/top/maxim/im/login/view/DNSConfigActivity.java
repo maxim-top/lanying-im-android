@@ -92,10 +92,30 @@ public class DNSConfigActivity extends BaseTitleActivity {
         container.addView(mSetAppId.build());
 
         // 自定义服务
-        mSetCustom = new ItemLineSwitch.Builder(this)
-                .setMarginTop(ScreenUtils.dp2px(20))
+        mSetCustom = new ItemLineSwitch.Builder(this).setMarginTop(ScreenUtils.dp2px(20))
                 .setLeftText(getString(R.string.dns_config_custom))
-                .setOnItemSwitchListener((v, curCheck) -> changeCustomStatus(curCheck));
+                .setOnItemSwitchListener((v, curCheck) -> {
+                    if (curCheck) {
+                        // 开启
+                        changeCustomStatus(true);
+                        return;
+                    }
+                    // 关闭需要弹出提示
+                    DialogUtils.getInstance().showDialog(this,
+                            getString(R.string.dns_config_custom),
+                            getString(R.string.dns_change_custom_title),
+                            new CommonDialog.OnDialogListener() {
+                                @Override
+                                public void onConfirmListener() {
+                                    changeCustomStatus(false);
+                                }
+
+                                @Override
+                                public void onCancelListener() {
+                                    changeCustomStatus(true);
+                                }
+                            });
+                });
         container.addView(mSetCustom.build());
         addLineView(container);
 
@@ -163,43 +183,41 @@ public class DNSConfigActivity extends BaseTitleActivity {
 
     /**
      * 切换自定义开关
+     * 
      * @param curCheck 状态
      */
     private void changeCustomStatus(boolean curCheck) {
-        if (curCheck) {
-            // 开启
-            mCustom = curCheck;
-            return;
+        mCustom = curCheck;
+        if (mSetCustom != null) {
+            mSetCustom.setCheckStatus(curCheck);
         }
-        // 关闭需要弹出提示
-        DialogUtils.getInstance().showDialog(this, getString(R.string.dns_config_custom),
-                getString(R.string.dns_change_custom_title), new CommonDialog.OnDialogListener() {
-                    @Override
-                    public void onConfirmListener() {
-                        mCustom = curCheck;
-                    }
-
-                    @Override
-                    public void onCancelListener() {
-                        if (mSetCustom != null) {
-                            mSetCustom.setCheckStatus(!curCheck);
-                        }
-                    }
-                });
+        if (!mCustom) {
+            if (mSetServer != null) {
+                mServer = null;
+                mSetServer.setEndContent(getString(R.string.dns_config_default));
+            }
+            if (mSetPort != null) {
+                mPort = null;
+                mSetPort.setEndContent(getString(R.string.dns_config_default));
+            }
+            if (mSetRestServer != null) {
+                mRestServer = null;
+                mSetRestServer.setEndContent(getString(R.string.dns_config_default));
+            }
+        }
     }
-
+    
     /**
      * 展示输入框dialog
      * 
      * @param title 标题
-     * @param builder view
      */
     private void showEditDialog(String title, boolean number) {
         DialogUtils.getInstance().showEditDialog(this, title, getString(R.string.confirm),
                 getString(R.string.cancel), number, new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        if (!TextUtils.equals(title, getString(R.string.dns_change_appId_title))) {
+                        if (TextUtils.equals(title, getString(R.string.dns_change_appId_title))) {
                             // 修改appId
                             mAppId = content;
                             if (mSetAppId != null) {
@@ -207,7 +225,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
                                         TextUtils.isEmpty(content) ? ScanConfigs.CODE_APP_ID
                                                 : content);
                             }
-                        } else if (!TextUtils.equals(title,
+                        } else if (TextUtils.equals(title,
                                 getString(R.string.dns_change_server_title))) {
                             // 修改IM Server
                             mServer = content;
@@ -216,7 +234,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
                                         ? getString(R.string.dns_config_default)
                                         : content);
                             }
-                        } else if (!TextUtils.equals(title,
+                        } else if (TextUtils.equals(title,
                                 getString(R.string.dns_change_port_title))) {
                             // 修改IM Port
                             mPort = content;
@@ -225,7 +243,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
                                         ? getString(R.string.dns_config_default)
                                         : content);
                             }
-                        } else if (!TextUtils.equals(title,
+                        } else if (TextUtils.equals(title,
                                 getString(R.string.dns_change_rest_server_title))) {
                             // 修改Rest Server
                             mRestServer = content;
@@ -256,16 +274,12 @@ public class DNSConfigActivity extends BaseTitleActivity {
                     || TextUtils.isEmpty(mRestServer)) {
                 // 三项配置有一项为空 则不保存
                 ToastUtil.showTextViewPrompt(getString(R.string.dns_change_save_tip));
-                if (mSetCustom != null) {
-                    mSetCustom.setCheckStatus(false);
-                    mCustom = false;
-                }
+                changeCustomStatus(false);
                 return;
             }
             event.setServer(mServer);
             event.setPort(Integer.valueOf(mPort).intValue());
             event.setRestServer(mRestServer);
         }
-        
     }
 }

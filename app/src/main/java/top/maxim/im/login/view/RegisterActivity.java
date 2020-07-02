@@ -34,8 +34,6 @@ import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
-import top.maxim.im.common.utils.dialog.CommonEditDialog;
-import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
@@ -312,19 +310,22 @@ public class RegisterActivity extends BaseTitleActivity {
             });
         });
         // 修改appId
-        mIvChangeAppId.setOnClickListener(v -> DialogUtils.getInstance().showEditDialog(this,
-                "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
-                new CommonEditDialog.OnDialogListener() {
-                    @Override
-                    public void onConfirmListener(String content) {
-                        LoginActivity.changeAppId(RegisterActivity.this, content);
-                    }
-
-                    @Override
-                    public void onCancelListener() {
-
-                    }
-                }));
+        mIvChangeAppId.setOnClickListener(v -> {
+            DNSConfigActivity.startDNSConfigActivity(this);
+//            DialogUtils.getInstance().showEditDialog(this,
+//                    "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
+//                    new CommonEditDialog.OnDialogListener() {
+//                        @Override
+//                        public void onConfirmListener(String content) {
+//                            LoginActivity.changeAppId(RegisterActivity.this, content);
+//                        }
+//
+//                        @Override
+//                        public void onCancelListener() {
+//
+//                        }
+//                    });
+        });
     }
 
     /**

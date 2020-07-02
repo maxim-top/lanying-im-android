@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import java.io.File;
 
-import im.floo.floolib.BMXFileAttachment;
 import im.floo.floolib.BMXImageAttachment;
 import im.floo.floolib.BMXMessage;
 import top.maxim.im.R;
@@ -208,12 +207,17 @@ public class MessageItemImage extends MessageItemBaseView {
         }
         mImageView.setLayoutParams(imgLayoutParams);
         String picUrl = null;
-//        if (!TextUtils.isEmpty(body.thumbnailPath()) && new File(body.thumbnailPath()).exists()) {
-//            picUrl = "file://" + body.thumbnailPath();
-//            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
-//        } else 
-        if (!TextUtils.isEmpty(body.path()) && new File(body.path()).exists()) {
+        if (!TextUtils.isEmpty(body.thumbnailPath()) && new File(body.thumbnailPath()).exists()) {
+            picUrl = "file://" + body.thumbnailPath();
+            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+        } else if (!TextUtils.isEmpty(body.path()) && new File(body.path()).exists()) {
             picUrl = "file://" + body.path();
+            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+        } else if (!TextUtils.isEmpty(body.thumbnailUrl())) {
+            picUrl = body.thumbnailUrl();
+            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+        } else if (!TextUtils.isEmpty(body.url())) {
+            picUrl = body.url();
             BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
         } else {
             BMImageLoader.getInstance().display(mImageView, "", mImageConfig);
@@ -230,9 +234,14 @@ public class MessageItemImage extends MessageItemBaseView {
             return;
         }
         boolean register = false;
-        BMXFileAttachment body = BMXImageAttachment.dynamic_cast(mMaxMessage.attachment());
+        BMXImageAttachment body = BMXImageAttachment.dynamic_cast(mMaxMessage.attachment());
         boolean notExit = body != null
                 && (TextUtils.isEmpty(body.path()) || !new File(body.path()).exists());
+        if (body != null
+                && (!TextUtils.isEmpty(body.thumbnailUrl()) || !TextUtils.isEmpty(body.url()))) {
+            // 有缩略图 不需要下载
+            notExit = false;
+        }
         long msgId = mMaxMessage.msgId();
         if (mItemPos == ITEM_RIGHT) {
             BMXMessage.DeliveryStatus sendStatus = mMaxMessage.deliveryStatus();

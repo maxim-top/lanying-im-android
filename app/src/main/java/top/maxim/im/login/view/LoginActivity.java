@@ -37,8 +37,6 @@ import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
-import top.maxim.im.common.utils.dialog.CommonEditDialog;
-import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
@@ -117,16 +115,6 @@ public class LoginActivity extends BaseTitleActivity {
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
         mSwitchLoginMode.setVisibility(View.GONE);
-        // 三次点击 进入另一套环境配置
-        ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_login_tag), 3, () -> {
-            int newIndex = SharePreferenceUtils.getInstance().getCustomDns();
-            if (newIndex < 0 || newIndex > 4) {
-                newIndex = 0;
-            }
-            BaseManager.initTestBMXSDK(newIndex);
-            SharePreferenceUtils.getInstance().putCustomDns(newIndex);
-            ToastUtil.showTextViewPrompt("切换新的环境配置:" + newIndex);
-        });
         // 三次点击打开日志
         ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_open_log), 3, () -> {
             // 跳转查看日志
@@ -198,19 +186,22 @@ public class LoginActivity extends BaseTitleActivity {
         });
 
         // 修改appId
-        mIvChangeAppId.setOnClickListener(v -> DialogUtils.getInstance().showEditDialog(this,
-                "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
-                new CommonEditDialog.OnDialogListener() {
-                    @Override
-                    public void onConfirmListener(String content) {
-                        changeAppId(LoginActivity.this, content);
-                    }
-
-                    @Override
-                    public void onCancelListener() {
-
-                    }
-                }));
+        mIvChangeAppId.setOnClickListener(v -> {
+            DNSConfigActivity.startDNSConfigActivity(this);
+//            DialogUtils.getInstance().showEditDialog(this,
+//                    "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
+//                    new CommonEditDialog.OnDialogListener() {
+//                        @Override
+//                        public void onConfirmListener(String content) {
+//                            changeAppId(LoginActivity.this, content);
+//                        }
+//
+//                        @Override
+//                        public void onCancelListener() {
+//
+//                        }
+//                    });
+        });
     }
 
     @Override

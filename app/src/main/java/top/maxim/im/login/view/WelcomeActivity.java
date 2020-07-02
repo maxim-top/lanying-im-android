@@ -315,7 +315,7 @@ public class WelcomeActivity extends BaseTitleActivity {
         TextView tv = new TextView(this);
         tv.setMovementMethod(LinkMovementMethod.getInstance());
         tv.setText(builder);
-        DialogUtils.getInstance().showCustomDialog(this, tv, title.toString(), "同意", "暂不使用",
+        DialogUtils.getInstance().showCustomDialog(this, tv, false, title.toString(), "同意", "暂不使用",
                 new CommonCustomDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener() {

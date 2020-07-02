@@ -207,6 +207,10 @@ public class MessageItemVideo extends MessageItemBaseView {
         if (!TextUtils.isEmpty(body.path()) && new File(body.path()).exists()) {
             picUrl = "file://" + body.path();
             BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+        } else if (!TextUtils.isEmpty(body.thumbnailUrl())) {
+            picUrl = body.thumbnailUrl();
+            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+            ChatManager.getInstance().downloadAttachment(mMaxMessage);
         } else {
             BMImageLoader.getInstance().display(mImageView, "", mImageConfig);
             ChatManager.getInstance().downloadAttachment(mMaxMessage);

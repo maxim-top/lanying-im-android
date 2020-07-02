@@ -1165,6 +1165,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             picUrl = body.thumbnailPath();
         } else if (!TextUtils.isEmpty(body.path()) && new File(body.path()).exists()) {
             picUrl = body.path();
+        } else if (!TextUtils.isEmpty(body.thumbnailUrl())) {
+            picUrl = body.thumbnailUrl();
+        } else if (!TextUtils.isEmpty(body.url())) {
+            picUrl = body.url();
         }
         if (TextUtils.isEmpty(picUrl)) {
             // 正在下载
@@ -1174,6 +1178,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         PhotoViewBean photoViewBean = new PhotoViewBean();
         photoViewBean.setLocalPath(body.path());
         photoViewBean.setThumbLocalPath(body.thumbnailPath());
+        photoViewBean.setThumbHttpUrl(body.thumbnailUrl());
+        photoViewBean.setHttpUrl(body.url());
         photoViewBeans.add(photoViewBean);
         PhotoViewListBean listBean = new PhotoViewListBean();
         listBean.setPhotoViewBeans(photoViewBeans);

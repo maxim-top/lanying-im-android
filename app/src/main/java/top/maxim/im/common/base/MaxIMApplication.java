@@ -18,7 +18,6 @@ import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.BuglyTask;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
-import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
@@ -94,10 +93,6 @@ public class MaxIMApplication extends Application {
      * 初始化sdk
      */
     private void initBMXSDK() {
-        int custom = SharePreferenceUtils.getInstance().getCustomDns();
-        if (custom < 0 || custom > 4) {
-            custom = 0;
-        }
-        BaseManager.initTestBMXSDK(custom);
+        BaseManager.initBMXSDK();
     }
 }

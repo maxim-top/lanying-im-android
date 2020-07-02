@@ -31,7 +31,12 @@ public class CommonCustomDialog extends BaseDialog implements View.OnClickListen
 
     public static final String DIALOG_CANCEL = "dialogCancel";
 
+    public static final String DIALOG_CAN_CANCEL = "dialogCanCancel";
+
     private String mDialogTitle, mConfirm, mCancel;
+
+    // 点击外部和返回键是否可取消 默认true
+    private boolean mCanCancel = true;
 
     @Override
     protected View onCreateDialogView() {
@@ -60,8 +65,18 @@ public class CommonCustomDialog extends BaseDialog implements View.OnClickListen
         mDialogTitle = bundle.getString(DIALOG_TITLE);
         mConfirm = bundle.getString(DIALOG_CONFIRM);
         mCancel = bundle.getString(DIALOG_CANCEL);
+        mCanCancel = bundle.getBoolean(DIALOG_CAN_CANCEL, true);
     }
-    
+
+    @Override
+    protected void init() {
+        super.init();
+        if (getDialog() != null) {
+            getDialog().setCanceledOnTouchOutside(mCanCancel);
+        }
+
+    }
+
     public void setCustomView(View view) {
         mCustomView = view;
     }

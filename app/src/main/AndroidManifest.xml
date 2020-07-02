@@ -119,6 +119,11 @@
             android:name=".login.view.ChangePwdActivity"
             android:screenOrientation="portrait"></activity>
 
+        <!--DNS配置-->
+        <activity
+            android:name=".login.view.DNSConfigActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!--注册-->
         <activity
             android:name=".login.view.RegisterActivity"

@@ -181,8 +181,24 @@
     <string name="change_pwd_new_hint">请输入新密码</string>
     <string name="change_pwd_new_again_hint">请再次输入新密码</string>
 
-
     <string name="log_info">日志信息</string>
+
+    <string name="dns_config">配置</string>
+    <string name="dns_config_custom">自定义服务</string>
+    <string name="dns_config_appId">AppID</string>
+    <string name="dns_config_server">IM Server</string>
+    <string name="dns_config_port">IM Port</string>
+    <string name="dns_config_rest_server">Rest Server</string>
+    <string name="dns_config_default">默认</string>
+
+    <string name="dns_change_custom_title">您确认要关闭自定义服务吗</string>
+    <string name="dns_change_appId_title">修改AppID</string>
+    <string name="dns_change_server_title">修改IM Server</string>
+    <string name="dns_change_port_title">修改IM Port</string>
+    <string name="dns_change_rest_server_title">修改Rest Server</string>
+    <string name="dns_change_custom_tips">尚未启动自定义服务</string>
+    <string name="dns_change_save">保存</string>
+    <string name="dns_change_save_tip">请填写三项完整信息</string>
 
     <!--群设置-->
     <string name="group_notify_all">所有人</string>

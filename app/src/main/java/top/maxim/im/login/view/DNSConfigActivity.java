@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 
 import top.maxim.im.R;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -281,5 +282,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
             event.setPort(Integer.valueOf(mPort).intValue());
             event.setRestServer(mRestServer);
         }
+        RxBus.getInstance().send(event);
+        finish();
     }
 }

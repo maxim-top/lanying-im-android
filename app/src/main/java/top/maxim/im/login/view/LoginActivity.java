@@ -213,6 +213,7 @@ public class LoginActivity extends BaseTitleActivity {
             mInputName.setText(scanUserName);
             ScanConfigs.CODE_USER_NAME = "";
         }
+        // 如果是扫码登陆 会将appId存入 会导致和默认appId不同
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
         if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
@@ -224,11 +225,16 @@ public class LoginActivity extends BaseTitleActivity {
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
-        login(activity, name, pwd, isLoginById, null);
+        login(activity, name, pwd, isLoginById, SharePreferenceUtils.getInstance().getAppId());
     }
 
     public static void login(final Activity activity, String name, final String pwd,
             final boolean isLoginById, final String changeAppId) {
+        login(activity, name, pwd, isLoginById, changeAppId, "", 0, "");
+    }
+
+    public static void login(final Activity activity, String name, final String pwd,
+            final boolean isLoginById, final String changeAppId, String server, int port, String restServer) {
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pwd)) {
             ToastUtil.showTextViewPrompt("不能为空");
@@ -237,7 +243,12 @@ public class LoginActivity extends BaseTitleActivity {
         if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
             ((BaseTitleActivity)activity).showLoadingDialog(true);
         }
-
+        // 是否自定义dns配置
+        boolean changeDns = !TextUtils.isEmpty(server) && port > 0
+                && !TextUtils.isEmpty(restServer);
+        if (changeDns) {
+            BaseManager.initBMXSDK(server, port, restServer);
+        }
         BMXCallBack callBack = (bmxErrorCode) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 // 登陆成功后 需要将userId存储SP 作为下次自动登陆
@@ -245,9 +256,14 @@ public class LoginActivity extends BaseTitleActivity {
                     TaskDispatcher.exec(() -> {
                         if (BaseManager.bmxFinish(bmxErrorCode1) && profile != null
                                 && profile.userId() > 0) {
-                            CommonUtils.getInstance()
-                                    .addUser(new UserBean(profile.username(), profile.userId(), pwd,
-                                            changeAppId, System.currentTimeMillis()));
+                            UserBean bean = new UserBean(profile.username(), profile.userId(), pwd,
+                                    changeAppId, System.currentTimeMillis());
+                            if (changeDns) {
+                                bean.setServer(server);
+                                bean.setPort(port);
+                                bean.setRestServer(restServer);
+                            }
+                            CommonUtils.getInstance().addUser(bean);
                             // 登陆成功消息预加载
                             WelcomeActivity.initData();
                         }
@@ -272,7 +288,6 @@ public class LoginActivity extends BaseTitleActivity {
             String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
             ToastUtil.showTextViewPrompt(error);
         };
-        
         boolean isChange = !TextUtils.isEmpty(changeAppId)
                 && !TextUtils.equals(changeAppId, SharePreferenceUtils.getInstance().getAppId());
         if (isChange) {

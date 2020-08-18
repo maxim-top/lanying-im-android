@@ -14,7 +14,6 @@
     <!-- 写SD卡权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -26,7 +25,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- Android O版本调用安装需要使用该权限 -->
@@ -578,6 +576,13 @@
         <meta-data
             android:name="BUGLY_ENABLE_DEBUG"
             android:value="true" />
+        <!-- *************BUGLY END************** -->
+
+        <!-- *************AGENT START************** -->
+        <meta-data
+            android:name="AGENT_APP_KEY"
+            android:value="${AGENT_APP_KEY}" />
+        <!-- *************AGENT END************** -->
 
     </application>
 

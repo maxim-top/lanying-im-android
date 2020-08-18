@@ -43,6 +43,8 @@ public class SharePreferenceUtils {
 
     private static String LOGIN_USER_DATA = "loginUserData";
 
+    private static String DNS_CONFIG = "dnsConfig";
+
     private static volatile SharePreferenceUtils instance;
 
     private static SharedPreferences.Editor saveEditor;
@@ -234,6 +236,18 @@ public class SharePreferenceUtils {
     public String getLoginUserData() {
         if (saveInfo != null) {
             return saveInfo.getString(LOGIN_USER_DATA, "");
+        }
+        return "";
+    }
+
+    public boolean putDNSConfig(String data) {
+        saveEditor.putString(DNS_CONFIG, data);
+        return saveEditor.commit();
+    }
+
+    public String getDnsConfig() {
+        if (saveInfo != null) {
+            return saveInfo.getString(DNS_CONFIG, "");
         }
         return "";
     }

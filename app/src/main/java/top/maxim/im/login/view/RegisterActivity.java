@@ -148,6 +148,12 @@ public class RegisterActivity extends BaseTitleActivity {
     protected void initDataForActivity() {
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
+        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
+            mChangeAppId = appId;
+            mWXContainer.setVisibility(View.GONE);
+        } else {
+            mWXContainer.setVisibility(View.VISIBLE);
+        }
     }
 
     private void buildProtocol() {

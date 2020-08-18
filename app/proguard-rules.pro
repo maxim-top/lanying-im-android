@@ -19,3 +19,21 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# ProGuard configurationsfor NetworkBench Lens
+-keep class com.networkbench.** { *; }
+-dontwarn com.networkbench.**
+-keepattributes Exceptions, Signature, InnerClasses
+-keepattributes SourceFile,LineNumberTable
+# End NetworkBench Lens
+#-keep public class im.floo.**
+#-keep public class im.floo.floolib.**
+## 保留本地native方法不被混淆
+#-keepclasseswithmembernames class * {
+#    native <methods>;
+#}
+## 保留枚举类不被混淆
+#-keepclassmembers enum * {
+#    public static **[] values();
+#    public static ** valueOf(java.lang.String);
+#}

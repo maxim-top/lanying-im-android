@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import java.util.List;
 
 import rx.Observable;
@@ -33,6 +35,8 @@ import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.common.provider.CommonProvider;
+import top.maxim.im.common.utils.AgentTask;
+import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -41,6 +45,7 @@ import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.SplashVideoPlayView;
+import top.maxim.im.login.bean.DNSConfigEvent;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.sdk.utils.MessageDispatcher;
@@ -82,6 +87,8 @@ public class WelcomeActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
+        //听云
+        AgentTask.get().init(AppContextUtils.getApplication());
         NotificationUtils.getInstance().cancelAll();
         if (checkPermission()) {
             showProtocol();
@@ -198,6 +205,29 @@ public class WelcomeActivity extends BaseTitleActivity {
      * 自动登陆
      */
     private void autoLogin(long userId, final String pwd) {
+        String dns = SharePreferenceUtils.getInstance().getDnsConfig();
+        // 是否自定义dns配置
+        boolean changeDns = false;
+        String server = "";
+        int port = 0;
+        String restServer = "";
+        if (!TextUtils.isEmpty(dns)) {
+            DNSConfigEvent event = new Gson().fromJson(dns, DNSConfigEvent.class);
+            if (event != null) {
+                server = event.getServer();
+                port = event.getPort();
+                restServer = event.getRestServer();
+                changeDns = !TextUtils.isEmpty(server) && port > 0
+                        && !TextUtils.isEmpty(restServer);
+                if (changeDns) {
+                    BaseManager.changeDNS(server, port, restServer);
+                }
+            }
+        }
+        boolean finalChangeDns = changeDns;
+        String finalServer = server;
+        int finalPort = port;
+        String finalRestServer = restServer;
         UserManager.getInstance().signInById(userId, pwd, bmxErrorCode -> {
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
                 ToastUtil.showTextViewPrompt("网络异常");
@@ -207,17 +237,22 @@ public class WelcomeActivity extends BaseTitleActivity {
             UserManager.getInstance().getProfile(false, (bmxErrorCode1, profile) -> {
                 if (BaseManager.bmxFinish(bmxErrorCode1) && profile != null
                         && profile.userId() > 0) {
+                    UserBean bean = new UserBean(profile.username(), profile.userId(), pwd,
+                            SharePreferenceUtils.getInstance().getAppId(),
+                            System.currentTimeMillis());
+                    if (finalChangeDns) {
+                        bean.setServer(finalServer);
+                        bean.setPort(finalPort);
+                        bean.setRestServer(finalRestServer);
+                    }
                     CommonUtils.getInstance()
-                            .addUser(new UserBean(profile.username(), profile.userId(), pwd,
-                                    SharePreferenceUtils.getInstance().getAppId(),
-                                    System.currentTimeMillis()));
+                            .addUser(bean);
                 }
             });
             initData();
             SharePreferenceUtils.getInstance().putLoginStatus(true);
             MessageDispatcher.getDispatcher().initialize();
             MainActivity.openMain(WelcomeActivity.this);
-            finish();
         });
     }
 

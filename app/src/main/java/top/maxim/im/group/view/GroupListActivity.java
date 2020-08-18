@@ -255,7 +255,7 @@ public class GroupListActivity extends BaseTitleFragment {
                 BMXGroup group = groupList.get(i);
                 if (group != null && group.groupStatus() != null) {
                     BMXGroup.GroupStatus status = group.groupStatus();
-                    if (status == BMXGroup.GroupStatus.Normal) {
+                    if (status == BMXGroup.GroupStatus.Normal && group.isMember()) {
                         list.add(group);
                     }
                 }

@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,6 +40,7 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.login.bean.DNSConfigEvent;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
@@ -230,7 +233,20 @@ public class LoginActivity extends BaseTitleActivity {
 
     public static void login(final Activity activity, String name, final String pwd,
             final boolean isLoginById, final String changeAppId) {
-        login(activity, name, pwd, isLoginById, changeAppId, "", 0, "");
+        // 登陆时候获取
+        String dns = ScanConfigs.DNS_CONFIG;
+        String server = "";
+        int port = 0;
+        String restServer = "";
+        if (!TextUtils.isEmpty(dns)) {
+            DNSConfigEvent event = new Gson().fromJson(dns, DNSConfigEvent.class);
+            if (event != null) {
+                server = event.getServer();
+                port = event.getPort();
+                restServer = event.getRestServer();
+            }
+        }
+        login(activity, name, pwd, isLoginById, changeAppId, server, port, restServer);
     }
 
     public static void login(final Activity activity, String name, final String pwd,
@@ -247,7 +263,18 @@ public class LoginActivity extends BaseTitleActivity {
         boolean changeDns = !TextUtils.isEmpty(server) && port > 0
                 && !TextUtils.isEmpty(restServer);
         if (changeDns) {
-            BaseManager.initBMXSDK(server, port, restServer);
+            // 保存dns配置
+            DNSConfigEvent event = new DNSConfigEvent();
+            event.setAppId(changeAppId);
+            event.setServer(server);
+            event.setPort(port);
+            event.setRestServer(restServer);
+            SharePreferenceUtils.getInstance().putDNSConfig(new Gson().toJson(event));
+            BaseManager.changeDNS(server, port, restServer);
+        } else {
+            // 还原
+            SharePreferenceUtils.getInstance().putDNSConfig("");
+            BaseManager.changeDNS("", 0, "");
         }
         BMXCallBack callBack = (bmxErrorCode) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
@@ -264,18 +291,17 @@ public class LoginActivity extends BaseTitleActivity {
                                 bean.setRestServer(restServer);
                             }
                             CommonUtils.getInstance().addUser(bean);
-                            // 登陆成功消息预加载
-                            WelcomeActivity.initData();
                         }
                         TaskDispatcher.postMain(() -> {
                             if (activity instanceof BaseTitleActivity
                                     && !activity.isFinishing()) {
                                 ((BaseTitleActivity)activity).dismissLoadingDialog();
                             }
+                            // 登陆成功消息预加载
+                            WelcomeActivity.initData();
                             SharePreferenceUtils.getInstance().putLoginStatus(true);
                             MessageDispatcher.getDispatcher().initialize();
                             MainActivity.openMain(activity);
-                            activity.finish();
                         });
                     });
                 });
@@ -296,6 +322,10 @@ public class LoginActivity extends BaseTitleActivity {
                     SharePreferenceUtils.getInstance().putAppId(changeAppId);
                     realLogin(isLoginById, name, pwd, callBack);
                 } else {
+                    // 失败
+                    if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+                        ((BaseTitleActivity)activity).dismissLoadingDialog();
+                    }
                     String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
                     ToastUtil.showTextViewPrompt(error);
                 }

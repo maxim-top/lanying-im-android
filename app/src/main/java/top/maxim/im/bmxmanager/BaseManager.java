@@ -29,13 +29,6 @@ public class BaseManager {
      * 配置环境
      */
     public static void initBMXSDK() {
-        initBMXSDK(null, 0, null);
-    }
-
-    /**
-     * 配置环境
-     */
-    public static void initBMXSDK(String server, int port, String restServer) {
         String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
         File dataPath = new File(appPath + "/data_dir");
         File cachePath = new File(appPath + "/cache_dir");
@@ -49,16 +42,31 @@ public class BaseManager {
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
         conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
-        if (!TextUtils.isEmpty(server) && port > 0 && !TextUtils.isEmpty(restServer)) {
-            // 三项数据都不为空才设置
-            BMXSDKConfig.HostConfig hostConfig = new BMXSDKConfig.HostConfig();
-            hostConfig.setImHost(server);
-            hostConfig.setImPort(port);
-            hostConfig.setRestHost(restServer);
-        }
         bmxClient = BMXClient.create(conf);
     }
 
+    /**
+     * 配置环境
+     */
+    public static void changeDNS(String server, int port, String restServer) {
+        if (bmxClient == null || bmxClient.getSDKConfig() == null) {
+            return;
+        }
+        BMXSDKConfig conf = bmxClient.getSDKConfig();
+        if (!TextUtils.isEmpty(server) && port > 0 && !TextUtils.isEmpty(restServer)) {
+            // 三项数据都不为空才设置
+            BMXSDKConfig.HostConfig hostConfig = conf.getHostConfig();
+            hostConfig.setImHost(server);
+            hostConfig.setImPort(port);
+            hostConfig.setRestHost(restServer);
+            conf.setHostConfig(hostConfig);
+            conf.setEnableDNS(false);
+        } else {
+            conf.setEnableDNS(true);
+        }
+        bmxClient = BMXClient.create(conf);
+    }
+    
     public static String getPushId() {
         Context context = AppContextUtils.getAppContext();
         if (context == null) {

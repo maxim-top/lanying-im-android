@@ -19,4 +19,7 @@ public class ScanConfigs {
     /* 扫码登陆userName */
     public static String CODE_USER_NAME;
 
+    /* 自定义dns配置 */
+    public static String DNS_CONFIG;
+
 }

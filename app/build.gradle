@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
-apply plugin: 'bugly'
+//apply plugin: 'bugly'
+//听云符号表插件
+apply plugin: 'newlens'
+
 
 android {
     compileSdkVersion 28
@@ -27,7 +30,9 @@ android {
 
                 "WEIXIN_APPID" : "wxf0f8e197ecfb0925",
                 "BUGLY_APPID"  : "ae2c13667e",
-                "BUGLY_APP_KEY": "6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc"
+                "BUGLY_APP_KEY": "6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc",
+
+                "AGENT_APP_KEY": "9bf09e3791fa4a1ca9d0c6dbbfa4d759"
         ]
 
         ndk {
@@ -48,7 +53,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
@@ -69,9 +74,13 @@ android {
     }
 }
 
-bugly {
-    appId = 'ae2c13667e'
-    appKey = '6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc'
+//bugly {
+//    appId = 'ae2c13667e'
+//    appKey = '6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc'
+//}
+
+newlensExt{
+    soDebugOpen = true
 }
 
 dependencies {
@@ -99,6 +108,7 @@ dependencies {
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     implementation(name:'floo-android_2.4.3.20200630',ext:'aar')
+//    implementation(name:'floo-android_2.3.1.20200428',ext:'aar')
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
 
@@ -125,7 +135,13 @@ dependencies {
     //微信
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
 
-    //bugly
-    implementation 'com.tencent.bugly:crashreport:latest.release'
-    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
+//    //bugly
+//    implementation 'com.tencent.bugly:crashreport:latest.release'
+//    implementation 'com.tencent.bugly:nativecrashreport:latest.release'
+
+    //听云
+    implementation "com.networkbench.newlens.agent.android:nbs.newlens.agent:$tingyun_sdk_version"
+    //采集听云native崩溃
+    implementation "com.networkbench.newlens.agent.android:nbs.newlens.nativecrash:$tingyun_ndk_version"
+
 }

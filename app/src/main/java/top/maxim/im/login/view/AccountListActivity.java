@@ -306,6 +306,7 @@ public class AccountListActivity extends BaseTitleActivity {
         protected void onBindHolder(BaseViewHolder holder, int position) {
             TextView tvName = holder.findViewById(R.id.txt_name);
             TextView tvUserId = holder.findViewById(R.id.txt_userId);
+            TextView tvAppId = holder.findViewById(R.id.txt_appId);
             CheckBox checkBox = holder.findViewById(R.id.cb_choice);
             ImageView selecIcon = holder.findViewById(R.id.iv_seleced_skin);
             UserBean bean = getItem(position);
@@ -323,7 +324,9 @@ public class AccountListActivity extends BaseTitleActivity {
             }
             String name = bean.getUserName();
             long userId = bean.getUserId();
+            String appId = TextUtils.isEmpty(bean.getAppId()) ? ScanConfigs.CODE_APP_ID : bean.getAppId();
             tvName.setText(TextUtils.isEmpty(name) ? "" : name);
+            tvAppId.setText("(AppID:" + appId + ")");
             tvUserId.setText(String.valueOf(userId));
         }
     }

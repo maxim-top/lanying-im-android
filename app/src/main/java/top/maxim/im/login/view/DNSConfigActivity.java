@@ -9,9 +9,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.google.gson.Gson;
+
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.base.BaseTitleActivity;
-import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -179,6 +181,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
     protected void initDataForActivity() {
         super.initDataForActivity();
         String appId = SharePreferenceUtils.getInstance().getAppId();
+        mAppId = appId;
         mSetAppId.setEndContent(appId);
     }
 
@@ -205,6 +208,31 @@ public class DNSConfigActivity extends BaseTitleActivity {
                 mRestServer = null;
                 mSetRestServer.setEndContent(getString(R.string.dns_config_default));
             }
+        }
+        //TODO
+        else {
+//            mAppId = "cmcfwyywonqm";
+//            mServer = "app-cmcfwyywonqm-145-sync.maximtop.com.cn";
+//            mRestServer = "https://app-cmcfwyywonqm-145-api.maximtop.com.cn";
+//            mPort = "80";
+////             修改Rest Server
+//            if (mSetServer != null) {
+//                mSetServer.setEndContent(
+//                        TextUtils.isEmpty(mServer) ? getString(R.string.dns_config_default)
+//                                : mServer);
+//            }
+//            // 修改Rest Server
+//            if (mSetPort != null) {
+//                mSetPort.setEndContent(
+//                        TextUtils.isEmpty(mPort) ? getString(R.string.dns_config_default) : mPort);
+//            }
+//            // 修改Rest Server
+//            if (mSetRestServer != null) {
+//                mSetRestServer.setEndContent(
+//                        TextUtils.isEmpty(mRestServer) ? getString(R.string.dns_config_default)
+//                                : mRestServer);
+//            }
+//            mSetAppId.setEndContent(mAppId);
         }
     }
     
@@ -281,8 +309,15 @@ public class DNSConfigActivity extends BaseTitleActivity {
             event.setServer(mServer);
             event.setPort(Integer.valueOf(mPort).intValue());
             event.setRestServer(mRestServer);
+            // 保存时候直接初始化DNS 如果没有登录 仍然会还原
+            BaseManager.changeDNS(mServer, Integer.valueOf(mPort).intValue(), mRestServer);
+            ScanConfigs.DNS_CONFIG = new Gson().toJson(event);
+        } else {
+            // 还原
+            BaseManager.changeDNS("", 0, "");
+            ScanConfigs.DNS_CONFIG = "";
         }
-        RxBus.getInstance().send(event);
+        LoginActivity.changeAppId(this, mAppId);
         finish();
     }
 }

@@ -18,7 +18,6 @@ import com.xiaomi.mipush.sdk.MiPushClient;
 
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
-import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.RomUtil;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -154,7 +153,12 @@ public final class PushClientMgr {
         if (TextUtils.isEmpty(token)) {
             return;
         }
-        UserManager.getInstance().bindDevice(token, bmxErrorCode -> {
+//        UserManager.getInstance().bindDevice(token, bmxErrorCode -> {
+//            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+//                Log.e("bindDevice failed", bmxErrorCode.name());
+//            }
+//        });
+        top.maxim.im.bmxmanager.PushManager.getInstance().bindDeviceToken(token, bmxErrorCode -> {
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
                 Log.e("bindDevice failed", bmxErrorCode.name());
             }

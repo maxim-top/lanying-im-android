@@ -241,4 +241,30 @@
     <string name="common_empty">这里什么都没有～</string>
     <string name="support_empty">如果想联系技术支持,请退出后,将APPID切换成"welovemaxim"</string>
 
+    <!--push设置-->
+    <string name="set_push">推送设置</string>
+    <string name="set_push_token">推送token</string>
+    <string name="set_push_cert">推送cert</string>
+    <string name="set_push_status">推送状态</string>
+    <string name="set_push_start">开启推送</string>
+    <string name="set_push_alias">推送别名</string>
+    <string name="set_push_switch">推送开关</string>
+    <string name="set_push_tags">推送Tag</string>
+    <string name="set_push_del_tags">删除Tag</string>
+    <string name="set_push_add_tags">添加Tag</string>
+    <string name="set_push_clear_tags">清除Tag</string>
+    <string name="set_push_badge">推送角标</string>
+    <string name="set_push_mode">Push Mode</string>
+    <string name="set_push_time">推送时间</string>
+    <string name="set_push_silence_time">静默时间</string>
+    <string name="set_push_start_time">开始时间</string>
+    <string name="set_push_end_time">结束时间</string>
+    <string name="set_push_run_background">后台运行</string>
+    <string name="set_push_del_notification">删除通知</string>
+    <string name="set_push_clear_notification">清除通知</string>
+    <string name="set_push_send_message">发送消息</string>
+    <string name="set_push_msg_receiver">接收者</string>
+    <string name="set_push_msg_content">内容</string>
+    <string name="set_push_message">推送消息</string>
+
 </resources>

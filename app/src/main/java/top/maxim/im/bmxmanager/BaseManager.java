@@ -38,10 +38,12 @@ public class BaseManager {
         String pushId = getPushId();
         BMXSDKConfig conf = new BMXSDKConfig(BMXClientType.Android, "1", dataPath.getAbsolutePath(),
                 cachePath.getAbsolutePath(), TextUtils.isEmpty(pushId) ? "MaxIM" : pushId);
+        conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
+//        conf.setAppID("xbakhrtgxfc");
+        conf.setAppSecret("mCAelEYhltXumZgX");
         conf.setConsoleOutput(true);
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
-        conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
         bmxClient = BMXClient.create(conf);
     }
 

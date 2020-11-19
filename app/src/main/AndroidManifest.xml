@@ -249,6 +249,16 @@
             android:name=".login.view.MyQrCodeActivity"
             android:screenOrientation="portrait" />
 
+        <!--Push设置-->
+        <activity
+            android:name=".login.view.PushSetActivity"
+            android:screenOrientation="portrait" />
+
+        <!--Push消息-->
+        <activity
+            android:name=".login.view.PushMessageActivity"
+            android:screenOrientation="portrait" />
+
         <!--搜搜-->
         <activity
             android:name=".contact.view.ContactSearchActivity"
@@ -367,6 +377,10 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".push.MaxIMPushService"
+            android:exported="false">
+        </service>
 
         <!--华为push  配置-->
         <meta-data

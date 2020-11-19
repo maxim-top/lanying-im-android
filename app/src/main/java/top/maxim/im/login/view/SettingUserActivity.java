@@ -118,6 +118,9 @@ public class SettingUserActivity extends BaseTitleActivity {
     /* 显示答案的view */
     private TextView mTvAnswer;
 
+    /* 推送设置 */
+    private ItemLineArrow.Builder mPushSet;
+
     /* 头像路径 */
     private String mIconPath;
 
@@ -338,6 +341,13 @@ public class SettingUserActivity extends BaseTitleActivity {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         buildAuthQuestion();
+
+        // 推送设置
+        mPushSet = new ItemLineArrow.Builder(this).setStartContent(getString(R.string.set_push))
+                .setOnItemClickListener(v -> PushSetActivity.openPushSet(this));
+        container.addView(mPushSet.build());
+        // 分割线
+        addLineView(container);
         return view;
     }
     
@@ -529,7 +539,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         mTvAnswer.setLayoutParams(answerP);
         mLlAuthQuestion.addView(mTvAnswer);
     }
-
+    
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();

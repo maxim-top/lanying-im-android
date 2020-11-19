@@ -227,14 +227,13 @@ public class AccountListActivity extends BaseTitleActivity {
         if (bean == null) {
             return;
         }
-        long userId = bean.getUserId();
         showLoadingDialog(true);
-        UserManager.getInstance().signOut(userId, bmxErrorCode -> {
+        UserManager.getInstance().signOut(mUserId, bmxErrorCode -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 TaskDispatcher.exec(() -> {
                     CommonUtils.getInstance().logout();
                     if (remove) {
-                        CommonUtils.getInstance().removeAccount(userId);
+                        CommonUtils.getInstance().removeAccount(mUserId);
                     }
                     TaskDispatcher.postMain(() -> handleResult(bean));
                 });

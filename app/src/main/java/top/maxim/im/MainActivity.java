@@ -18,7 +18,6 @@ import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.contact.view.AllContactFragment;
 import top.maxim.im.login.view.MineFragment;
 import top.maxim.im.message.view.SessionFragment;
-import top.maxim.im.push.MaxIMPushService;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.push.PushClientMgr;
 
@@ -65,8 +64,8 @@ public class MainActivity extends BaseSwitchActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        //启动后台服务
-        MaxIMPushService.startPushService(this);
+//        //启动后台服务
+//        MaxIMPushService.startPushService(this);
     }
 
     @Override

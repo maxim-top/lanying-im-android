@@ -46,6 +46,7 @@ import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.SplashVideoPlayView;
 import top.maxim.im.login.bean.DNSConfigEvent;
+import top.maxim.im.push.MaxIMPushService;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.sdk.utils.MessageDispatcher;
@@ -95,6 +96,8 @@ public class WelcomeActivity extends BaseTitleActivity {
         } else {
             requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
         }
+        //启动后台服务
+        MaxIMPushService.startPushService(this);
     }
 
     private boolean checkPermission() {

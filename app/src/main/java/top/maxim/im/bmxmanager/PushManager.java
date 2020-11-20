@@ -2,7 +2,6 @@
 package top.maxim.im.bmxmanager;
 
 import im.floo.BMXCallBack;
-import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXPushManager;
 import im.floo.floolib.BMXPushService;
@@ -132,8 +131,8 @@ public class PushManager extends BaseManager {
         mService.clearAllNotifications();
     }
 
-    public void sendMessage(BMXMessage msg) {
-        mService.sendMessage(msg);
+    public void sendMessage(String content) {
+        mService.sendMessage(content);
     }
 
     public void loadLocalPushMessages(long refMsgId, long size, BMXMessageList result,

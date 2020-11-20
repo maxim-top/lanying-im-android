@@ -17,7 +17,6 @@ import java.util.UUID;
 import im.floo.BMXCallBack;
 import im.floo.floolib.BMXConnectStatus;
 import im.floo.floolib.BMXErrorCode;
-import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXPushService;
 import im.floo.floolib.TagList;
 import top.maxim.im.R;
@@ -26,7 +25,6 @@ import top.maxim.im.bmxmanager.PushManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ScreenUtils;
-import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.CommonDialog;
@@ -713,13 +711,11 @@ public class PushSetActivity extends BaseTitleActivity {
                     public void onConfirmListener() {
                         String startTime = editName.getEditableText().toString().trim();
                         String endTime = editDesc.getEditableText().toString().trim();
-                        if (!TextUtils.isEmpty(startTime) && !TextUtils.isEmpty(endTime)) {
-                            long from = SharePreferenceUtils.getInstance().getUserId();
-                            long to = Long.valueOf(startTime);
-                            BMXMessage msg = BMXMessage.createMessage(from, to,
-                                    BMXMessage.MessageType.Single, to, endTime);
-                            PushManager.getInstance().sendMessage(msg);
-                        }
+//                        if (!TextUtils.isEmpty(startTime) && !TextUtils.isEmpty(endTime)) {
+//                            BMXMessage msg = BMXMessage.createMessage(from, to,
+//                                    BMXMessage.MessageType.Single, to, endTime);
+//                            PushManager.getInstance().sendMessage(msg);
+//                        }
                     }
 
                     @Override

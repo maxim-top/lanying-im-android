@@ -8,12 +8,10 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import im.floo.BMXCallBack;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXPushServiceListener;
-import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.PushManager;
 
 /**
@@ -33,7 +31,7 @@ public class MaxIMPushService extends Service {
         @Override
         public void onPushStart(String bmxToken) {
             super.onPushStart(bmxToken);
-            Log.d(TAG, "onPushStart");
+            Log.d(TAG, "onPushStart"  +  bmxToken);
         }
 
         @Override
@@ -45,31 +43,31 @@ public class MaxIMPushService extends Service {
         @Override
         public void onGetTags(String operationId) {
             super.onGetTags(operationId);
-            Log.d(TAG, "onGetTags");
+            Log.d(TAG, "onGetTags" + operationId);
         }
 
         @Override
         public void onSetTags(String operationId) {
             super.onSetTags(operationId);
-            Log.d(TAG, "onSetTags");
+            Log.d(TAG, "onSetTags" + operationId);
         }
 
         @Override
         public void onDeleteTags(String operationId) {
             super.onDeleteTags(operationId);
-            Log.d(TAG, "onDeleteTags");
+            Log.d(TAG, "onDeleteTags" + operationId);
         }
 
         @Override
         public void onClearTags(String operationId) {
             super.onClearTags(operationId);
-            Log.d(TAG, "onClearTags");
+            Log.d(TAG, "onClearTags" + operationId);
         }
 
         @Override
         public void onStatusChanged(BMXMessage msg, BMXErrorCode error) {
             super.onStatusChanged(msg, error);
-            Log.d(TAG, "onStatusChanged");
+            Log.d(TAG, "onStatusChanged" + msg.content());
         }
 
         @Override
@@ -81,7 +79,7 @@ public class MaxIMPushService extends Service {
         @Override
         public void onCertRetrieved(String cert) {
             super.onCertRetrieved(cert);
-            Log.d(TAG, "onCertRetrieved");
+            Log.d(TAG, "onCertRetrieved" + cert);
         }
     };
 
@@ -97,15 +95,6 @@ public class MaxIMPushService extends Service {
         PushManager.getInstance().addPushListener(mListener);
         PushManager.getInstance().getToken();
         PushManager.getInstance().getCert();
-        PushManager.getInstance().start(new BMXCallBack() {
-            @Override
-            public void onResult(BMXErrorCode bmxErrorCode) {
-                Log.e(TAG, "start service");
-                if (!BaseManager.bmxFinish(bmxErrorCode)) {
-                    Log.e(TAG, "start failed");
-                }
-            }
-        });
     }
 
     @Override

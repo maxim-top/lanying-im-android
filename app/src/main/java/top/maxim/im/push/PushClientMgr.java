@@ -16,6 +16,8 @@ import com.meizu.cloud.pushsdk.util.MzSystemUtils;
 import com.vivo.push.PushClient;
 import com.xiaomi.mipush.sdk.MiPushClient;
 
+import im.floo.BMXCallBack;
+import im.floo.floolib.BMXErrorCode;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.utils.AppContextUtils;
@@ -161,6 +163,15 @@ public final class PushClientMgr {
         top.maxim.im.bmxmanager.PushManager.getInstance().bindDeviceToken(token, bmxErrorCode -> {
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
                 Log.e("bindDevice failed", bmxErrorCode.name());
+            }
+        });
+        top.maxim.im.bmxmanager.PushManager.getInstance().start("", token, new BMXCallBack() {
+            @Override
+            public void onResult(BMXErrorCode bmxErrorCode) {
+                Log.e("PushClientMgr", "start service");
+                if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                    Log.e("PushClientMgr", "start failed");
+                }
             }
         });
         notifierBind(token);

@@ -248,6 +248,7 @@
     <string name="set_push_status">推送状态</string>
     <string name="set_push_start">开启推送</string>
     <string name="set_push_alias">推送别名</string>
+    <string name="set_push_unbind">解绑推送</string>
     <string name="set_push_switch">推送开关</string>
     <string name="set_push_tags">推送Tag</string>
     <string name="set_push_del_tags">删除Tag</string>

@@ -3,6 +3,7 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
@@ -18,6 +19,7 @@ import im.floo.BMXCallBack;
 import im.floo.floolib.BMXConnectStatus;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXPushService;
+import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.TagList;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -50,7 +52,10 @@ public class PushSetActivity extends BaseTitleActivity {
     private ItemLineArrow.Builder mPushStatus;
 
     /* 开启push */
-    private ItemLineArrow.Builder mStartPush;
+    private ItemLineArrow.Builder mStartPushAlias;
+
+    /* 解绑push */
+    private ItemLineArrow.Builder mUnbindPushAlias;
 
     /* 切换push */
     private ItemLineSwitch.Builder mSwitchPush;
@@ -130,12 +135,19 @@ public class PushSetActivity extends BaseTitleActivity {
         // 分割线
         addLineView(container);
         // 开启push
-        // mStartPush = new ItemLineArrow.Builder(this)
-        // .setStartContent(getString(R.string.set_push_start))
-        // .setOnItemClickListener(v -> showStartPush());
-        // container.addView(mStartPush.build());
-        // // 分割线
-        // addLineView(container);
+        mStartPushAlias = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.set_push_alias))
+                .setOnItemClickListener(v -> showStartPushAlias());
+        container.addView(mStartPushAlias.build());
+        // 分割线
+        addLineView(container);
+        // 解绑push
+        mUnbindPushAlias = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.set_push_unbind))
+                .setOnItemClickListener(v -> showUnbindPush());
+        container.addView(mUnbindPushAlias.build());
+        // 分割线
+        addLineView(container);
 
         // 切换push开关
         mSwitchPush = new ItemLineSwitch.Builder(this)
@@ -236,23 +248,23 @@ public class PushSetActivity extends BaseTitleActivity {
         // 分割线
         addLineView(container);
 
-        // 后台运行
-        mSwitchRunBack = new ItemLineSwitch.Builder(this)
-                .setLeftText(getString(R.string.set_push_run_background))
-                .setOnItemSwitchListener((v, curCheck) -> {
-                    showLoadingDialog(true);
-                    BMXCallBack callBack = bmxErrorCode -> {
-                        dismissLoadingDialog();
-                        if (!BaseManager.bmxFinish(bmxErrorCode)) {
-                            mSwitchRunBack.setCheckStatus(!curCheck);
-                            toastError(bmxErrorCode);
-                        }
-                    };
-                    PushManager.getInstance().setRunBackgroundMode(curCheck, callBack);
-                });
-        container.addView(mSwitchRunBack.build());
-        // 分割线
-        addLineView(container);
+//        // 后台运行
+//        mSwitchRunBack = new ItemLineSwitch.Builder(this)
+//                .setLeftText(getString(R.string.set_push_run_background))
+//                .setOnItemSwitchListener((v, curCheck) -> {
+//                    showLoadingDialog(true);
+//                    BMXCallBack callBack = bmxErrorCode -> {
+//                        dismissLoadingDialog();
+//                        if (!BaseManager.bmxFinish(bmxErrorCode)) {
+//                            mSwitchRunBack.setCheckStatus(!curCheck);
+//                            toastError(bmxErrorCode);
+//                        }
+//                    };
+//                    PushManager.getInstance().setRunBackgroundMode(curCheck, callBack);
+//                });
+//        container.addView(mSwitchRunBack.build());
+//        // 分割线
+//        addLineView(container);
 
         // 删除通知
         mDelNotification = new ItemLineArrow.Builder(this)
@@ -301,9 +313,7 @@ public class PushSetActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        // 默认push相关的开关都是true
-        mSwitchPushMode.setCheckStatus(true);
-        mSwitchRunBack.setCheckStatus(true);
+//        mSwitchRunBack.setCheckStatus(true);
         initData();
     }
 
@@ -335,6 +345,8 @@ public class PushSetActivity extends BaseTitleActivity {
         mPushStatus.setEndContent(status);
         // Tag
         getTags();
+        // PushSetting
+        getPushSetting();
     }
 
     /**
@@ -357,9 +369,37 @@ public class PushSetActivity extends BaseTitleActivity {
     }
 
     /**
+     * PushSetting
+     */
+    private void getPushSetting() {
+        UserManager.getInstance().getProfile(false, (bmxErrorCode, profile) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode) && profile != null) {
+                // 获取设置的push开关
+                BMXUserProfile.MessageSetting setting = profile.messageSetting();
+                boolean isPush = false;
+                int pushStartTime = 0, pushEndTime = 0;
+                int silenceStartTime = 0, silenceEndTime = 0;
+                String alias = "";
+                if (setting != null) {
+                    isPush = setting.getMPushEnabled();
+                    pushStartTime = setting.getMPushStartTime();
+                    pushEndTime = setting.getMPushEndTime();
+                    silenceStartTime = setting.getMSilenceStartTime();
+                    silenceEndTime = setting.getMSilenceEndTime();
+                    alias = setting.getMPushNickname();
+                }
+                mStartPushAlias.setEndContent(alias);
+                mSwitchPushMode.setCheckStatus(isPush);
+                mPushTime.setEndContent(pushStartTime + "---" + pushEndTime);
+                mSilenceTime.setEndContent(silenceStartTime + "---" + silenceEndTime);
+            }
+        });
+    }
+
+    /**
      * 开启push
      */
-    private void showStartPush() {
+    private void showStartPushAlias() {
         final LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams textP = new LinearLayout.LayoutParams(
@@ -386,25 +426,25 @@ public class PushSetActivity extends BaseTitleActivity {
         editName.setMinHeight(ScreenUtils.dp2px(40));
         ll.addView(editName, editP);
 
-        // token
-        TextView desc = new TextView(this);
-        desc.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
-                ScreenUtils.dp2px(15));
-        desc.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        desc.setTextColor(getResources().getColor(R.color.color_black));
-        desc.setBackgroundColor(getResources().getColor(R.color.color_white));
-        desc.setText(getString(R.string.set_push_token));
-        ll.addView(desc, textP);
+//        // token
+//        TextView desc = new TextView(this);
+//        desc.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+//                ScreenUtils.dp2px(15));
+//        desc.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+//        desc.setTextColor(getResources().getColor(R.color.color_black));
+//        desc.setBackgroundColor(getResources().getColor(R.color.color_white));
+//        desc.setText(getString(R.string.set_push_token));
+//        ll.addView(desc, textP);
+//
+//        final EditText editDesc = new EditText(this);
+//        editDesc.setBackgroundResource(R.drawable.common_edit_corner_bg);
+//        editDesc.setPadding(ScreenUtils.dp2px(5), 0, ScreenUtils.dp2px(5), 0);
+//        editDesc.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+//        editDesc.setTextColor(getResources().getColor(R.color.color_black));
+//        editDesc.setMinHeight(ScreenUtils.dp2px(40));
+//        ll.addView(editDesc, editP);
 
-        final EditText editDesc = new EditText(this);
-        editDesc.setBackgroundResource(R.drawable.common_edit_corner_bg);
-        editDesc.setPadding(ScreenUtils.dp2px(5), 0, ScreenUtils.dp2px(5), 0);
-        editDesc.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-        editDesc.setTextColor(getResources().getColor(R.color.color_black));
-        editDesc.setMinHeight(ScreenUtils.dp2px(40));
-        ll.addView(editDesc, editP);
-
-        DialogUtils.getInstance().showCustomDialog(this, ll, getString(R.string.set_push_start),
+        DialogUtils.getInstance().showCustomDialog(this, ll, getString(R.string.set_push_alias),
                 getString(R.string.confirm), getString(R.string.cancel),
                 new CommonCustomDialog.OnDialogListener() {
                     @Override
@@ -413,19 +453,77 @@ public class PushSetActivity extends BaseTitleActivity {
                         BMXCallBack callBack = bmxErrorCode -> {
                             dismissLoadingDialog();
                             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                                initData();
+                                getPushSetting();
                             } else {
                                 toastError(bmxErrorCode);
                             }
                         };
                         String alias = editName.getEditableText().toString().trim();
-                        String token = editDesc.getEditableText().toString().trim();
-                        if (!TextUtils.isEmpty(alias) && !TextUtils.isEmpty(token)) {
-                            PushManager.getInstance().start(alias, token, callBack);
-                        } else if (!TextUtils.isEmpty(alias)) {
+//                        String token = editDesc.getEditableText().toString().trim();
+//                        if (!TextUtils.isEmpty(alias) && !TextUtils.isEmpty(token)) {
+//                            PushManager.getInstance().start(alias, token, callBack);
+                        // } else
+                        if (!TextUtils.isEmpty(alias)) {
                             PushManager.getInstance().start(alias, callBack);
                         } else {
                             PushManager.getInstance().start(callBack);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
+    }
+
+    /**
+     * 解绑push
+     */
+    private void showUnbindPush() {
+        final LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams textP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams editP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        editP.setMargins(ScreenUtils.dp2px(10), ScreenUtils.dp2px(5), ScreenUtils.dp2px(10),
+                ScreenUtils.dp2px(5));
+        // 别名
+        TextView name = new TextView(this);
+        name.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                ScreenUtils.dp2px(15));
+        name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        name.setTextColor(getResources().getColor(R.color.color_black));
+        name.setBackgroundColor(getResources().getColor(R.color.color_white));
+        name.setText(getString(R.string.set_push_alias));
+        ll.addView(name, textP);
+
+        final EditText editName = new EditText(this);
+        editName.setBackgroundResource(R.drawable.common_edit_corner_bg);
+        editName.setPadding(ScreenUtils.dp2px(5), 0, ScreenUtils.dp2px(5), 0);
+        editName.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        editName.setTextColor(getResources().getColor(R.color.color_black));
+        editName.setMinHeight(ScreenUtils.dp2px(40));
+        ll.addView(editName, editP);
+
+        DialogUtils.getInstance().showCustomDialog(this, ll, getString(R.string.set_push_unbind),
+                getString(R.string.confirm), getString(R.string.cancel),
+                new CommonCustomDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        BMXCallBack callBack = bmxErrorCode -> {
+                            dismissLoadingDialog();
+                            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                                getPushSetting();
+                            } else {
+                                toastError(bmxErrorCode);
+                            }
+                        };
+                        String alias = editName.getEditableText().toString().trim();
+                        if (!TextUtils.isEmpty(alias)) {
+                            showLoadingDialog(true);
+                            PushManager.getInstance().unbindAlias(alias, callBack);
                         }
                     }
 
@@ -610,7 +708,9 @@ public class PushSetActivity extends BaseTitleActivity {
                                 dismissLoadingDialog();
                                 if (!BaseManager.bmxFinish(bmxErrorCode)) {
                                     toastError(bmxErrorCode);
+                                    return;
                                 }
+                                getPushSetting();
                             };
                             if (TextUtils.equals(title, getString(R.string.set_push_time))) {
                                 PushManager.getInstance().setPushTime(Integer.valueOf(startTime),
@@ -678,18 +778,18 @@ public class PushSetActivity extends BaseTitleActivity {
         ll.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams textP = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        // 接受人
-        TextView name = new TextView(this);
-        name.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
-                ScreenUtils.dp2px(15));
-        name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        name.setTextColor(getResources().getColor(R.color.color_black));
-        name.setBackgroundColor(getResources().getColor(R.color.color_white));
-        name.setText(getString(R.string.set_push_msg_receiver));
-        ll.addView(name, textP);
-
-        final EditText editName = buildNumEdit(false);
-        ll.addView(editName);
+//        // 接受人
+//        TextView name = new TextView(this);
+//        name.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+//                ScreenUtils.dp2px(15));
+//        name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+//        name.setTextColor(getResources().getColor(R.color.color_black));
+//        name.setBackgroundColor(getResources().getColor(R.color.color_white));
+//        name.setText(getString(R.string.set_push_msg_receiver));
+//        ll.addView(name, textP);
+//
+//        final EditText editName = buildNumEdit(false);
+//        ll.addView(editName);
 
         // 内容
         TextView desc = new TextView(this);
@@ -709,13 +809,16 @@ public class PushSetActivity extends BaseTitleActivity {
                 new CommonCustomDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener() {
-                        String startTime = editName.getEditableText().toString().trim();
+//                        String startTime = editName.getEditableText().toString().trim();
                         String endTime = editDesc.getEditableText().toString().trim();
 //                        if (!TextUtils.isEmpty(startTime) && !TextUtils.isEmpty(endTime)) {
 //                            BMXMessage msg = BMXMessage.createMessage(from, to,
 //                                    BMXMessage.MessageType.Single, to, endTime);
 //                            PushManager.getInstance().sendMessage(msg);
 //                        }
+                        if (!TextUtils.isEmpty(endTime)) {
+                            PushManager.getInstance().sendMessage(endTime);
+                        }
                     }
 
                     @Override
@@ -732,9 +835,9 @@ public class PushSetActivity extends BaseTitleActivity {
         editDesc.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
         editDesc.setTextColor(getResources().getColor(R.color.color_black));
         editDesc.setMinHeight(ScreenUtils.dp2px(40));
-//        if (number) {
-//            editDesc.setInputType(InputType.TYPE_CLASS_NUMBER);
-//        }
+        if (number) {
+            editDesc.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
         LinearLayout.LayoutParams editP = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         editP.setMargins(ScreenUtils.dp2px(10), ScreenUtils.dp2px(5), ScreenUtils.dp2px(10),

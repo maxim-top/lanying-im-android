@@ -165,13 +165,17 @@ public final class PushClientMgr {
                 Log.e("bindDevice failed", bmxErrorCode.name());
             }
         });
-        top.maxim.im.bmxmanager.PushManager.getInstance().start("", token, new BMXCallBack() {
+        top.maxim.im.bmxmanager.PushManager.getInstance().start("maxIM-android", "", new BMXCallBack() {
             @Override
             public void onResult(BMXErrorCode bmxErrorCode) {
                 Log.e("PushClientMgr", "start service");
                 if (!BaseManager.bmxFinish(bmxErrorCode)) {
                     Log.e("PushClientMgr", "start failed");
                 }
+                String token = top.maxim.im.bmxmanager.PushManager.getInstance().getToken();
+                String cert = top.maxim.im.bmxmanager.PushManager.getInstance().getCert();
+                Log.e("PushClientMgr", token);
+                Log.e("PushClientMgr", cert);
             }
         });
         notifierBind(token);

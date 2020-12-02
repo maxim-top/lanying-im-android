@@ -228,7 +228,7 @@ public class AccountListActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        UserManager.getInstance().signOut(mUserId, bmxErrorCode -> {
+        UserManager.getInstance().signOut(bmxErrorCode -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 TaskDispatcher.exec(() -> {
                     CommonUtils.getInstance().logout();

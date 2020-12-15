@@ -8,7 +8,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "top.maxim.im"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 28
         versionCode 1907071346
         versionName "v3.0.0"
@@ -108,7 +108,8 @@ dependencies {
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 //    implementation(name:'floo-android_2.4.3.20200630',ext:'aar')
-    implementation(name:'floo-android_3.0.8.20201130',ext:'aar')
+//    implementation(name:'floo-android_3.0.8.20201130',ext:'aar')
+    implementation(name:'floo-android_3.0.11.20201210',ext:'aar')
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
 

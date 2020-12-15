@@ -16,15 +16,15 @@ import com.meizu.cloud.pushsdk.util.MzSystemUtils;
 import com.vivo.push.PushClient;
 import com.xiaomi.mipush.sdk.MiPushClient;
 
-import im.floo.BMXCallBack;
-import im.floo.floolib.BMXErrorCode;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.RomUtil;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.push.huawei.HWPushManager;
+import top.maxim.im.push.maxim.PushServiceConnection;
 import top.maxim.im.push.meizu.MZPushManager;
 import top.maxim.im.push.oppo.OppoPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
@@ -155,30 +155,19 @@ public final class PushClientMgr {
         if (TextUtils.isEmpty(token)) {
             return;
         }
-//        UserManager.getInstance().bindDevice(token, bmxErrorCode -> {
-//            if (!BaseManager.bmxFinish(bmxErrorCode)) {
-//                Log.e("bindDevice failed", bmxErrorCode.name());
-//            }
-//        });
-        top.maxim.im.bmxmanager.PushManager.getInstance().bindDeviceToken(token, bmxErrorCode -> {
+        UserManager.getInstance().bindDevice(token, bmxErrorCode -> {
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
                 Log.e("bindDevice failed", bmxErrorCode.name());
             }
         });
-        top.maxim.im.bmxmanager.PushManager.getInstance().start("maxIM-android", "", new BMXCallBack() {
-            @Override
-            public void onResult(BMXErrorCode bmxErrorCode) {
-                Log.e("PushClientMgr", "start service");
-                if (!BaseManager.bmxFinish(bmxErrorCode)) {
-                    Log.e("PushClientMgr", "start failed");
-                }
-                String token = top.maxim.im.bmxmanager.PushManager.getInstance().getToken();
-                String cert = top.maxim.im.bmxmanager.PushManager.getInstance().getCert();
-                Log.e("PushClientMgr", token);
-                Log.e("PushClientMgr", cert);
-            }
-        });
+//        top.maxim.im.bmxmanager.PushManager.getInstance().bindDeviceToken(token, bmxErrorCode -> {
+//            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+//                Log.e("bindDevice failed", bmxErrorCode.name());
+//            }
+//        });
         notifierBind(token);
+        //设置到子进程push
+        PushServiceConnection.getInstance().setPushIdAndToken(BaseManager.getPushId(), token);
     }
 
     /**

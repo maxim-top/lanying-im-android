@@ -86,6 +86,7 @@
         <activity
             android:name=".login.view.LoginActivity"
             android:screenOrientation="portrait"></activity>
+        <!--Push登陆-->
 
         <!--登陆-->
         <activity
@@ -252,11 +253,13 @@
         <!--Push设置-->
         <activity
             android:name=".login.view.PushSetActivity"
+            android:process=":pushService"
             android:screenOrientation="portrait" />
 
         <!--Push消息-->
         <activity
             android:name=".login.view.PushMessageActivity"
+            android:process=":pushService"
             android:screenOrientation="portrait" />
 
         <!--搜搜-->
@@ -377,15 +380,20 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".push.MaxIMPushService"
-            android:exported="false">
-        </service>
-
-        <!--华为push  配置-->
         <meta-data
             android:name="com.huawei.hms.client.appid"
             android:value="${HUAWEI_APPID}" />
+
+        <!--华为push  配置-->
+        <service
+            android:name=".push.maxim.MaxIMPushService"
+            android:process=":pushService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="top.maxim.im.push.maxim.action"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="HUAWEI_APPID"

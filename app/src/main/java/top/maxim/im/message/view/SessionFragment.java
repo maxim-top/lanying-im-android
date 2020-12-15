@@ -312,6 +312,11 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                 if (item == null) {
                     return;
                 }
+                long conversationId = item.conversationId();
+                if (conversationId == 1) {
+                    ToastUtil.showTextViewPrompt("推送发出的消息");
+                    return;
+                }
                 BMXMessage.MessageType type = null;
                 if (item.type() == BMXConversation.Type.Single) {
                     type = BMXMessage.MessageType.Single;

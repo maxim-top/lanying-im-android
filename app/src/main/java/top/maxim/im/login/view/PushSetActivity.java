@@ -24,7 +24,6 @@ import im.floo.floolib.TagList;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.PushManager;
-import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -44,9 +43,13 @@ public class PushSetActivity extends BaseTitleActivity {
 
     /* token */
     private ItemLineArrow.Builder mPushToken;
+    private View mLineToken;
+    private TextView mTvToken;
 
     /* cert */
     private ItemLineArrow.Builder mPushCert;
+    private View mLineCert;
+    private TextView mTvCert;
 
     /* push状态 */
     private ItemLineArrow.Builder mPushStatus;
@@ -117,17 +120,44 @@ public class PushSetActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.activity_push_set, null);
         LinearLayout container = view.findViewById(R.id.ll_setting_container);
         // push token
-//        mPushToken = new ItemLineArrow.Builder(this)
-//                .setStartContent(getString(R.string.set_push_token));
-//        container.addView(mPushToken.build());
-//        // 分割线
-//        addLineView(container);
-//        // push cert
-//        mPushCert = new ItemLineArrow.Builder(this)
-//                .setStartContent(getString(R.string.set_push_cert));
-//        container.addView(mPushCert.build());
-//        // 分割线
-//        addLineView(container);
+        mPushToken = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.set_push_token));
+        container.addView(mPushToken.build());
+        // 分割线
+        addLineView(container);
+        mTvToken = new TextView(this);
+        LinearLayout.LayoutParams tokenP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mTvToken.setPadding(45, 45, 45,
+                45);
+        mTvToken.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        mTvToken.setTextColor(getResources().getColor(R.color.color_black));
+        mTvToken.setBackgroundColor(getResources().getColor(R.color.color_white));
+        mTvToken.setLayoutParams(tokenP);
+        mTvToken.setVisibility(View.GONE);
+        container.addView(mTvToken);
+        // 分割线
+        mLineToken = addLineView(container);
+        mLineToken.setVisibility(View.GONE);
+        // push cert
+        mPushCert = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.set_push_cert));
+        container.addView(mPushCert.build());
+        // 分割线
+        addLineView(container);
+        mTvCert = new TextView(this);
+        LinearLayout.LayoutParams certP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mTvCert.setPadding(45, 45, 45, 45);
+                mTvCert.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        mTvCert.setTextColor(getResources().getColor(R.color.color_black));
+        mTvCert.setBackgroundColor(getResources().getColor(R.color.color_white));
+        mTvCert.setLayoutParams(certP);
+        mTvCert.setVisibility(View.GONE);
+        container.addView(mTvCert);
+        // 分割线
+        mLineCert = addLineView(container);
+        mLineCert.setVisibility(View.GONE);
         // push status
         mPushStatus = new ItemLineArrow.Builder(this)
                 .setStartContent(getString(R.string.set_push_status));
@@ -321,12 +351,26 @@ public class PushSetActivity extends BaseTitleActivity {
      * 初始化数据
      */
     private void initData() {
-//        String token = PushManager.getInstance().getToken();
-//        String cert = PushManager.getInstance().getCert();
-//        mPushToken.setEndContent(TextUtils.isEmpty(token) ? "" : token);
-//        mPushCert.setEndContent(TextUtils.isEmpty(cert) ? "" : token);
+        String token = PushManager.getInstance().getToken();
+        String cert = PushManager.getInstance().getCert();
+        if (!TextUtils.isEmpty(token)) {
+            mTvToken.setText(token);
+            mLineToken.setVisibility(View.VISIBLE);
+            mTvToken.setVisibility(View.VISIBLE);
+        } else {
+            mLineToken.setVisibility(View.GONE);
+            mTvToken.setVisibility(View.GONE);
+        }
+        if (!TextUtils.isEmpty(cert)) {
+            mTvCert.setText(cert);
+            mLineCert.setVisibility(View.VISIBLE);
+            mTvCert.setVisibility(View.VISIBLE);
+        } else {
+            mLineCert.setVisibility(View.GONE);
+            mTvCert.setVisibility(View.GONE);
+        }
         // IM连接状态
-        BMXConnectStatus connectStatus = UserManager.getInstance().connectStatus();
+        BMXConnectStatus connectStatus = PushManager.getInstance().connectStatus();
         mSwitchPush.setCheckStatus(connectStatus == BMXConnectStatus.Connected);
         // PushMode
         BMXPushService.PushSdkStatus pushStatus = PushManager.getInstance().status();
@@ -372,7 +416,7 @@ public class PushSetActivity extends BaseTitleActivity {
      * PushSetting
      */
     private void getPushSetting() {
-        UserManager.getInstance().getProfile(false, (bmxErrorCode, profile) -> {
+        PushManager.getInstance().getProfile(false, (bmxErrorCode, profile) -> {
             if (BaseManager.bmxFinish(bmxErrorCode) && profile != null) {
                 // 获取设置的push开关
                 BMXUserProfile.MessageSetting setting = profile.messageSetting();

@@ -1,30 +1,70 @@
 
 package top.maxim.im.bmxmanager;
 
+import android.app.Application;
+
+import java.io.File;
+
 import im.floo.BMXCallBack;
+import im.floo.BMXDataCallBack;
+import im.floo.floolib.BMXClient;
+import im.floo.floolib.BMXClientType;
+import im.floo.floolib.BMXConnectStatus;
+import im.floo.floolib.BMXLogLevel;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXPushManager;
 import im.floo.floolib.BMXPushService;
 import im.floo.floolib.BMXPushServiceListener;
+import im.floo.floolib.BMXSDKConfig;
+import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.TagList;
 
 /**
  * Description : push Created by Mango on 2020/09/07.
  */
-public class PushManager extends BaseManager {
+public class PushManager {
 
     private static final String TAG = PushManager.class.getSimpleName();
 
-    private static final PushManager sInstance = new PushManager();
+    private static PushManager sInstance;
 
-    private BMXPushManager mService;
+    private static BMXPushManager mService;
+
+    protected static BMXClient bmxClient;
+
+    static {
+        System.loadLibrary("floo");
+    }
 
     public static PushManager getInstance() {
+        if(sInstance == null){
+            sInstance = new PushManager();
+        }
         return sInstance;
     }
 
     private PushManager() {
         mService = bmxClient.getPushManager();
+    }
+
+    /**
+     * 配置环境
+     */
+    public static void initBMXPushSDK(Application application, String pushId) {
+        String appPath = application.getFilesDir().getPath();
+        File dataPath = new File(appPath + "/push_data_dir");
+        File cachePath = new File(appPath + "/push_cache_dir");
+        dataPath.mkdirs();
+        cachePath.mkdirs();
+
+        BMXSDKConfig conf = new BMXSDKConfig(BMXClientType.Android, "1", dataPath.getAbsolutePath(),
+                cachePath.getAbsolutePath(), pushId);
+        conf.setAppID("xbakhrtgxfc");
+        conf.setAppSecret("mCAelEYhltXumZgX");
+        conf.setConsoleOutput(true);
+        conf.setLoadAllServerConversations(true);
+        conf.setLogLevel(BMXLogLevel.Debug);
+        bmxClient = BMXClient.create(conf);
     }
 
     public void start(String alias, String bmxToken, BMXCallBack callBack) {
@@ -157,5 +197,23 @@ public class PushManager extends BaseManager {
      **/
     public void removePushListener(BMXPushServiceListener listener) {
         mService.removePushListener(listener);
+    }
+
+    /**
+     * 获取当前和服务器的连接状态
+     **/
+    public BMXConnectStatus connectStatus() {
+        return bmxClient.getUserManager().connectStatus();
+    }
+
+    /**
+     * 获取用户详情
+     **/
+    public void getProfile(boolean forceRefresh, BMXDataCallBack<BMXUserProfile> callBack) {
+        bmxClient.getUserManager().getProfile(forceRefresh, callBack);
+    }
+
+    public void setCert(String cert){
+        bmxClient.getSDKConfig().setPushCertName(cert);
     }
 }

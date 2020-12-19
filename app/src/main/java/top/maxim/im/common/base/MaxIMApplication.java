@@ -52,12 +52,9 @@ public class MaxIMApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (isMainProcess()) {
-            //主进程设置
-            initUtils();
-            initBMXSDK();
-            Thread.setDefaultUncaughtExceptionHandler(restartHandler);
-        }
+        initUtils();
+        initBMXSDK();
+        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
     }
 
     public void restartApp() {

@@ -95,6 +95,8 @@ public class WelcomeActivity extends BaseTitleActivity {
         } else {
             requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
         }
+        //启动后台服务
+//        MaxIMPushService.startPushService(this);
     }
 
     private boolean checkPermission() {

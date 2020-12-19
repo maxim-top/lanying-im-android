@@ -13,9 +13,11 @@ import im.floo.floolib.BMXLogLevel;
 import im.floo.floolib.BMXSDKConfig;
 import rx.Observable;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.RomUtil;
 import top.maxim.im.common.utils.RxError;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.push.PushClientMgr;
+import top.maxim.im.scan.config.ScanConfigs;
 
 public class BaseManager {
 
@@ -39,9 +41,11 @@ public class BaseManager {
         BMXSDKConfig conf = new BMXSDKConfig(BMXClientType.Android, "1", dataPath.getAbsolutePath(),
                 cachePath.getAbsolutePath(), TextUtils.isEmpty(pushId) ? "MaxIM" : pushId);
         conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
+        conf.setAppSecret(ScanConfigs.CODE_SECRET);
         conf.setConsoleOutput(true);
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
+        conf.setDeviceUuid(RomUtil.getDeviceId());
         bmxClient = BMXClient.create(conf);
     }
 

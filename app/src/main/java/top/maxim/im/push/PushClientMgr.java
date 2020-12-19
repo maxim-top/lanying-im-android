@@ -24,7 +24,6 @@ import top.maxim.im.common.utils.RomUtil;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.push.huawei.HWPushManager;
-import top.maxim.im.push.maxim.PushServiceConnection;
 import top.maxim.im.push.meizu.MZPushManager;
 import top.maxim.im.push.oppo.OppoPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
@@ -160,14 +159,12 @@ public final class PushClientMgr {
                 Log.e("bindDevice failed", bmxErrorCode.name());
             }
         });
-//        top.maxim.im.bmxmanager.PushManager.getInstance().bindDeviceToken(token, bmxErrorCode -> {
-//            if (!BaseManager.bmxFinish(bmxErrorCode)) {
-//                Log.e("bindDevice failed", bmxErrorCode.name());
-//            }
-//        });
+        top.maxim.im.bmxmanager.PushManager.getInstance().bindDeviceToken(token, bmxErrorCode -> {
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                Log.e("bindDevice failed", bmxErrorCode.name());
+            }
+        });
         notifierBind(token);
-        //设置到子进程push
-        PushServiceConnection.getInstance().setPushIdAndToken(BaseManager.getPushId(), token);
     }
 
     /**

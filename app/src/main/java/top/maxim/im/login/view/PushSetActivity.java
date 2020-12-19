@@ -16,10 +16,9 @@ import android.widget.TextView;
 import java.util.UUID;
 
 import im.floo.BMXCallBack;
-import im.floo.floolib.BMXConnectStatus;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXPushService;
-import im.floo.floolib.BMXUserProfile;
+import im.floo.floolib.BMXPushUserProfile;
 import im.floo.floolib.TagList;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -166,8 +165,8 @@ public class PushSetActivity extends BaseTitleActivity {
         addLineView(container);
         // 开启push
         mStartPushAlias = new ItemLineArrow.Builder(this)
-                .setStartContent(getString(R.string.set_push_alias))
-                .setOnItemClickListener(v -> showStartPushAlias());
+                .setStartContent(getString(R.string.set_push_alias));
+//                .setOnItemClickListener(v -> showStartPushAlias());
         container.addView(mStartPushAlias.build());
         // 分割线
         addLineView(container);
@@ -343,7 +342,6 @@ public class PushSetActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-//        mSwitchRunBack.setCheckStatus(true);
         initData();
     }
 
@@ -370,8 +368,8 @@ public class PushSetActivity extends BaseTitleActivity {
             mTvCert.setVisibility(View.GONE);
         }
         // IM连接状态
-        BMXConnectStatus connectStatus = PushManager.getInstance().connectStatus();
-        mSwitchPush.setCheckStatus(connectStatus == BMXConnectStatus.Connected);
+//        BMXConnectStatus connectStatus = UserManager.getInstance().connectStatus();
+//        mSwitchPush.setCheckStatus(connectStatus == BMXConnectStatus.Connected);
         // PushMode
         BMXPushService.PushSdkStatus pushStatus = PushManager.getInstance().status();
         String status = "不可用";
@@ -416,21 +414,22 @@ public class PushSetActivity extends BaseTitleActivity {
      * PushSetting
      */
     private void getPushSetting() {
-        PushManager.getInstance().getProfile(false, (bmxErrorCode, profile) -> {
+        PushManager.getInstance().getPushProfile(false, (bmxErrorCode, profile) -> {
             if (BaseManager.bmxFinish(bmxErrorCode) && profile != null) {
                 // 获取设置的push开关
-                BMXUserProfile.MessageSetting setting = profile.messageSetting();
+                BMXPushUserProfile.MessagePushSetting setting = profile.messagePushSetting();
                 boolean isPush = false;
                 int pushStartTime = 0, pushEndTime = 0;
                 int silenceStartTime = 0, silenceEndTime = 0;
-                String alias = "";
+                String alias = profile.pushAlias();
+                String token = profile.pushToken();
+                long userId = profile.userId();
                 if (setting != null) {
                     isPush = setting.getMPushEnabled();
                     pushStartTime = setting.getMPushStartTime();
                     pushEndTime = setting.getMPushEndTime();
                     silenceStartTime = setting.getMSilenceStartTime();
                     silenceEndTime = setting.getMSilenceEndTime();
-                    alias = setting.getMPushNickname();
                 }
                 mStartPushAlias.setEndContent(alias);
                 mSwitchPushMode.setCheckStatus(isPush);

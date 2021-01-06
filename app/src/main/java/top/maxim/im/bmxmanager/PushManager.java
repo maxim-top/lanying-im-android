@@ -70,7 +70,7 @@ public class PushManager extends BaseManager {
     }
 
     public void getPushProfile(boolean forceRefresh, final BMXDataCallBack<BMXPushUserProfile> callBack) {
-//        mService.getPushProfile(forceRefresh, callBack);
+        mService.getPushProfile(forceRefresh, callBack);
     }
 
     public void setTags(TagList tags, String operationId, BMXCallBack callBack) {

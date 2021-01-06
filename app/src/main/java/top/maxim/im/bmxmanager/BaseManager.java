@@ -10,6 +10,8 @@ import im.floo.floolib.BMXClient;
 import im.floo.floolib.BMXClientType;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXLogLevel;
+import im.floo.floolib.BMXPushEnvironmentType;
+import im.floo.floolib.BMXPushProviderType;
 import im.floo.floolib.BMXSDKConfig;
 import rx.Observable;
 import top.maxim.im.common.utils.AppContextUtils;
@@ -46,7 +48,28 @@ public class BaseManager {
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
         conf.setDeviceUuid(RomUtil.getDeviceId());
+        conf.setEnvironmentType(BMXPushEnvironmentType.Production);
+        conf.setPushProviderType(getProvideType(AppContextUtils.getAppContext()));
         bmxClient = BMXClient.create(conf);
+    }
+
+    private static BMXPushProviderType getProvideType(Context context){
+        if (PushClientMgr.isHuawei(context)) {
+            return BMXPushProviderType.HuaWei;
+        }
+        if (PushClientMgr.isXiaomi(context)) {
+            return BMXPushProviderType.XiaoMi;
+        }
+        if (PushClientMgr.isMeizu(context)) {
+            return BMXPushProviderType.MeiZu;
+        }
+        if (PushClientMgr.isOppo(context)) {
+            return BMXPushProviderType.OPPS;
+        }
+        if (PushClientMgr.isVivo(context)) {
+            return BMXPushProviderType.VIVO;
+        }
+        return BMXPushProviderType.Unknown;
     }
 
     /**

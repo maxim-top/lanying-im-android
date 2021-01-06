@@ -1,7 +1,6 @@
 
 package top.maxim.im.push;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -211,9 +210,9 @@ public final class PushClientMgr {
         return sDevType;
     }
 
-    public void register(Activity activity) {
+    public void register(Context context) {
         if (sManager != null) {
-            sManager.register(activity);
+            sManager.register(context);
         }
     }
 

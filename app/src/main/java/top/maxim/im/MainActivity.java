@@ -19,7 +19,6 @@ import top.maxim.im.contact.view.AllContactFragment;
 import top.maxim.im.login.view.MineFragment;
 import top.maxim.im.message.view.SessionFragment;
 import top.maxim.im.push.NotificationUtils;
-import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.maxim.MaxIMPushService;
 
 /**
@@ -43,7 +42,6 @@ public class MainActivity extends BaseSwitchActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        PushClientMgr.getManager().register(this);
         initRxBus();
         //启动后台服务
         MaxIMPushService.startPushService(this);

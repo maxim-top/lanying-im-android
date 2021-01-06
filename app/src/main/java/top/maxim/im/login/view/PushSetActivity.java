@@ -16,6 +16,7 @@ import android.widget.TextView;
 import java.util.UUID;
 
 import im.floo.BMXCallBack;
+import im.floo.floolib.BMXConnectStatus;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXPushService;
 import im.floo.floolib.BMXPushUserProfile;
@@ -23,6 +24,7 @@ import im.floo.floolib.TagList;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.PushManager;
+import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -368,9 +370,9 @@ public class PushSetActivity extends BaseTitleActivity {
             mTvCert.setVisibility(View.GONE);
         }
         // IM连接状态
-//        BMXConnectStatus connectStatus = UserManager.getInstance().connectStatus();
-//        mSwitchPush.setCheckStatus(connectStatus == BMXConnectStatus.Connected);
-        // PushMode
+        BMXConnectStatus connectStatus = UserManager.getInstance().connectStatus();
+        mSwitchPush.setCheckStatus(connectStatus == BMXConnectStatus.Connected);
+//         PushMode
         BMXPushService.PushSdkStatus pushStatus = PushManager.getInstance().status();
         String status = "不可用";
         if (pushStatus != null) {

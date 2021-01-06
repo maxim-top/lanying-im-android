@@ -132,7 +132,7 @@ public class PushMessageActivity extends BaseTitleActivity {
         if (mScrollListener != null) {
             mScrollListener.resetLoadStatus();
         }
-        if (list == null || !list.isEmpty()) {
+        if (list == null || list.isEmpty()) {
             return;
         }
         if (pullDown) {

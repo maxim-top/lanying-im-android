@@ -15,6 +15,7 @@ import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXPushServiceListener;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.PushManager;
+import top.maxim.im.push.PushClientMgr;
 
 /**
  * Description : push服务 Created by mango on 2020/9/10.
@@ -82,6 +83,8 @@ public class MaxIMPushService extends Service {
         public void onCertRetrieved(String cert) {
             super.onCertRetrieved(cert);
             Log.d(TAG, "onCertRetrieved" + cert);
+            BaseManager.getBMXClient().getSDKConfig().setPushCertName(cert);
+            PushClientMgr.getManager().register(MaxIMPushService.this);
         }
     };
 

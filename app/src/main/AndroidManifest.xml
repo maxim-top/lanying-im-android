@@ -379,15 +379,15 @@
             </intent-filter>
         </receiver>
 
-        <meta-data
-            android:name="com.huawei.hms.client.appid"
-            android:value="${HUAWEI_APPID}" />
-
-        <!--华为push  配置-->
         <service
             android:name=".push.maxim.MaxIMPushService"
             android:exported="false">
         </service>
+
+        <!--华为push  配置-->
+        <meta-data
+            android:name="com.huawei.hms.client.appid"
+            android:value="${HUAWEI_APPID}" />
 
         <meta-data
             android:name="HUAWEI_APPID"

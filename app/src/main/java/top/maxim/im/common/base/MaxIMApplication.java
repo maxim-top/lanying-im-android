@@ -4,7 +4,6 @@ package top.maxim.im.common.base;
 import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
-import android.text.TextUtils;
 
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
@@ -12,9 +11,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.utils.AppContextUtils;
@@ -98,20 +95,4 @@ public class MaxIMApplication extends Application {
         BaseManager.initBMXSDK();
     }
 
-    /**
-     * 是否主进程
-     * @return boolean
-     */
-    private boolean isMainProcess(){
-        String processName = "";
-        try {
-            File file = new File("/proc/" + android.os.Process.myPid() + "/" + "cmdline");
-            BufferedReader mBufferedReader = new BufferedReader(new FileReader(file));
-            processName = mBufferedReader.readLine().trim();
-            mBufferedReader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return TextUtils.equals(processName, getPackageName());
-    }
 }

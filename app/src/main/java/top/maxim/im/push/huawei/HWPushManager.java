@@ -22,7 +22,7 @@ public class HWPushManager extends IPushManager {
 
     @Override
     public void register(Context context) {
-        HMSAgent.connect((Activity) context, new ConnectHandler() {
+        HMSAgent.connect(context, new ConnectHandler() {
             @Override
             public void onConnect(int rst) {
                 getToken();

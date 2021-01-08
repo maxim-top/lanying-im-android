@@ -8,10 +8,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "top.maxim.im"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 28
         versionCode 1907071346
-        versionName "v2.3.2"
+        versionName "v3.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "100565061",
@@ -35,10 +35,10 @@ android {
                 "AGENT_APP_KEY": "9bf09e3791fa4a1ca9d0c6dbbfa4d759"
         ]
 
-        ndk {
-            // 设置支持的SO库架构
-            abiFilters 'armeabi' ,'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
-        }
+//        ndk {
+//            // 设置支持的SO库架构
+//            abiFilters 'armeabi' ,'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
+//        }
         multiDexEnabled true
     }
 
@@ -107,7 +107,7 @@ dependencies {
 
     //UIL
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_2.4.3.20200630',ext:'aar')
+    implementation(name:'floo-android_3.0.14.20210105',ext:'aar')
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
 

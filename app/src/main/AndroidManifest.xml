@@ -12,6 +12,7 @@
     <!-- 在SDCard中创建与删除文件权限 -->
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <!-- 写SD卡权限 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -86,6 +87,7 @@
         <activity
             android:name=".login.view.LoginActivity"
             android:screenOrientation="portrait"></activity>
+        <!--Push登陆-->
 
         <!--登陆-->
         <activity
@@ -249,6 +251,16 @@
             android:name=".login.view.MyQrCodeActivity"
             android:screenOrientation="portrait" />
 
+        <!--Push设置-->
+        <activity
+            android:name=".login.view.PushSetActivity"
+            android:screenOrientation="portrait" />
+
+        <!--Push消息-->
+        <activity
+            android:name=".login.view.PushMessageActivity"
+            android:screenOrientation="portrait" />
+
         <!--搜搜-->
         <activity
             android:name=".contact.view.ContactSearchActivity"
@@ -367,11 +379,15 @@
             </intent-filter>
         </receiver>
 
-
-        <!--华为push  配置-->
         <meta-data
             android:name="com.huawei.hms.client.appid"
             android:value="${HUAWEI_APPID}" />
+
+        <!--华为push  配置-->
+        <service
+            android:name=".push.maxim.MaxIMPushService"
+            android:exported="false">
+        </service>
 
         <meta-data
             android:name="HUAWEI_APPID"

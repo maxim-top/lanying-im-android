@@ -232,7 +232,7 @@ public final class HMSAgent implements INoProguard {
      * @param activity 当前界面的activity， 不能传空 | Activity of the current activity, cannot be empty
      * @param callback 连接结果回调 | Connection Result Callback
      */
-    public static void connect(Activity activity, final ConnectHandler callback) {
+    public static void connect(Context activity, final ConnectHandler callback) {
         HMSAgentLog.i("start connect");
         ApiClientMgr.INST.connect(new IClientConnectCallback() {
             @Override

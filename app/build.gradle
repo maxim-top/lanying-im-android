@@ -10,7 +10,7 @@ android {
         applicationId "top.maxim.im"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 2001081741
+        versionCode 202101081741
         versionName "v3.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [

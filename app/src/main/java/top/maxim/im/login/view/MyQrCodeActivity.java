@@ -23,7 +23,7 @@ import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.scan.utils.QRCodeShowUtils;
 
 /**
- * Description : 我的二维码 Created by sunpengfei on 2019-06-26.
+ * Description : 我的二维码 Created by Mango on 2019-06-26.
  */
 public class MyQrCodeActivity extends BaseTitleActivity {
 

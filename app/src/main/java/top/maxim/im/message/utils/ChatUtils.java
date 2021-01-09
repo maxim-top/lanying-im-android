@@ -203,7 +203,10 @@ public class ChatUtils {
         }
         // 对需要展示的view加入缓存 防止在页面频繁刷新 view复用的时候展示错乱
         String avatarUrl = "";
-        if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
+        // 新增直接展示头像地址 不需下载
+        if (!TextUtils.isEmpty(profile.avatarUrl())) {
+            avatarUrl = profile.avatarUrl();
+        } else if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
                 && new File(profile.avatarThumbnailPath()).exists()
                 && new File(profile.avatarThumbnailPath()).isFile()) {
             avatarUrl = "file://" + profile.avatarThumbnailPath();
@@ -235,7 +238,12 @@ public class ChatUtils {
         }
         // 对需要展示的view加入缓存 防止在页面频繁刷新 view复用的时候展示错乱
         String avatarUrl = "";
-        if (!TextUtils.isEmpty(rosterItem.avatarThumbnailPath())
+        // 新增直接展示头像地址 不需下载
+        if (!TextUtils.isEmpty(rosterItem.avatarThumbnailUrl())) {
+            avatarUrl = rosterItem.avatarThumbnailUrl();
+        } else if (!TextUtils.isEmpty(rosterItem.avatarUrl())) {
+            avatarUrl = rosterItem.avatarUrl();
+        } else if (!TextUtils.isEmpty(rosterItem.avatarThumbnailPath())
                 && new File(rosterItem.avatarThumbnailPath()).exists()
                 && new File(rosterItem.avatarThumbnailPath()).isFile()) {
             avatarUrl = "file://" + rosterItem.avatarThumbnailPath();
@@ -267,20 +275,23 @@ public class ChatUtils {
         }
         // 对需要展示的view加入缓存 防止在页面频繁刷新 view复用的时候展示错乱
         String avatarUrl = "";
-        if (!TextUtils.isEmpty(groupItem.avatarThumbnailPath())
+        // 新增直接展示头像地址 不需下载
+        if (!TextUtils.isEmpty(groupItem.avatarThumbnailUrl())) {
+            avatarUrl = groupItem.avatarThumbnailUrl();
+        } else if (!TextUtils.isEmpty(groupItem.avatarUrl())) {
+            avatarUrl = groupItem.avatarUrl();
+        } else if (!TextUtils.isEmpty(groupItem.avatarThumbnailPath())
                 && new File(groupItem.avatarThumbnailPath()).exists()
                 && new File(groupItem.avatarThumbnailPath()).isFile()) {
             avatarUrl = "file://" + groupItem.avatarThumbnailPath();
-            BMImageLoader.getInstance().display(imageView, avatarUrl, config);
         } else if (!TextUtils.isEmpty(groupItem.avatarPath())
                 && new File(groupItem.avatarPath()).exists()
                 && new File(groupItem.avatarPath()).isFile()) {
             avatarUrl = "file://" + groupItem.avatarPath();
-            BMImageLoader.getInstance().display(imageView, avatarUrl, config);
         } else {
-            BMImageLoader.getInstance().display(imageView, "", config);
             downloadGroupAvatar(groupItem, imageView, config);
         }
+        BMImageLoader.getInstance().display(imageView, avatarUrl, config);
     }
 
     /**

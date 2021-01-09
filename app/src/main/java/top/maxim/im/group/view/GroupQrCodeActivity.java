@@ -27,7 +27,7 @@ import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.utils.QRCodeShowUtils;
 
 /**
- * Description : 群二维码 Created by sunpengfei on 2019-06-26.
+ * Description : 群二维码 Created by Mango on 2019-06-26.
  */
 public class GroupQrCodeActivity extends BaseTitleActivity {
 

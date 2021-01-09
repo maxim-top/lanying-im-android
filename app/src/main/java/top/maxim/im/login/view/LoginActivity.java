@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,9 +39,8 @@ import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
-import top.maxim.im.common.utils.dialog.CommonEditDialog;
-import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.login.bean.DNSConfigEvent;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
@@ -117,16 +118,6 @@ public class LoginActivity extends BaseTitleActivity {
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
         mSwitchLoginMode.setVisibility(View.GONE);
-        // 三次点击 进入另一套环境配置
-        ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_login_tag), 3, () -> {
-            int newIndex = SharePreferenceUtils.getInstance().getCustomDns();
-            if (newIndex < 0 || newIndex > 4) {
-                newIndex = 0;
-            }
-            BaseManager.initTestBMXSDK(newIndex);
-            SharePreferenceUtils.getInstance().putCustomDns(newIndex);
-            ToastUtil.showTextViewPrompt("切换新的环境配置:" + newIndex);
-        });
         // 三次点击打开日志
         ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_open_log), 3, () -> {
             // 跳转查看日志
@@ -198,19 +189,22 @@ public class LoginActivity extends BaseTitleActivity {
         });
 
         // 修改appId
-        mIvChangeAppId.setOnClickListener(v -> DialogUtils.getInstance().showEditDialog(this,
-                "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
-                new CommonEditDialog.OnDialogListener() {
-                    @Override
-                    public void onConfirmListener(String content) {
-                        changeAppId(LoginActivity.this, content);
-                    }
-
-                    @Override
-                    public void onCancelListener() {
-
-                    }
-                }));
+        mIvChangeAppId.setOnClickListener(v -> {
+            DNSConfigActivity.startDNSConfigActivity(this);
+//            DialogUtils.getInstance().showEditDialog(this,
+//                    "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
+//                    new CommonEditDialog.OnDialogListener() {
+//                        @Override
+//                        public void onConfirmListener(String content) {
+//                            changeAppId(LoginActivity.this, content);
+//                        }
+//
+//                        @Override
+//                        public void onCancelListener() {
+//
+//                        }
+//                    });
+        });
     }
 
     @Override
@@ -222,6 +216,7 @@ public class LoginActivity extends BaseTitleActivity {
             mInputName.setText(scanUserName);
             ScanConfigs.CODE_USER_NAME = "";
         }
+        // 如果是扫码登陆 会将appId存入 会导致和默认appId不同
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText("APPID:" + appId);
         if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
@@ -233,11 +228,29 @@ public class LoginActivity extends BaseTitleActivity {
     }
 
     public static void login(Activity activity, String name, String pwd, boolean isLoginById) {
-        login(activity, name, pwd, isLoginById, null);
+        login(activity, name, pwd, isLoginById, SharePreferenceUtils.getInstance().getAppId());
     }
 
     public static void login(final Activity activity, String name, final String pwd,
             final boolean isLoginById, final String changeAppId) {
+        // 登陆时候获取
+        String dns = ScanConfigs.DNS_CONFIG;
+        String server = "";
+        int port = 0;
+        String restServer = "";
+        if (!TextUtils.isEmpty(dns)) {
+            DNSConfigEvent event = new Gson().fromJson(dns, DNSConfigEvent.class);
+            if (event != null) {
+                server = event.getServer();
+                port = event.getPort();
+                restServer = event.getRestServer();
+            }
+        }
+        login(activity, name, pwd, isLoginById, changeAppId, server, port, restServer);
+    }
+
+    public static void login(final Activity activity, String name, final String pwd,
+            final boolean isLoginById, final String changeAppId, String server, int port, String restServer) {
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pwd)) {
             ToastUtil.showTextViewPrompt("不能为空");
@@ -246,7 +259,23 @@ public class LoginActivity extends BaseTitleActivity {
         if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
             ((BaseTitleActivity)activity).showLoadingDialog(true);
         }
-
+        // 是否自定义dns配置
+        boolean changeDns = !TextUtils.isEmpty(server) && port > 0
+                && !TextUtils.isEmpty(restServer);
+        if (changeDns) {
+            // 保存dns配置
+            DNSConfigEvent event = new DNSConfigEvent();
+            event.setAppId(changeAppId);
+            event.setServer(server);
+            event.setPort(port);
+            event.setRestServer(restServer);
+            SharePreferenceUtils.getInstance().putDNSConfig(new Gson().toJson(event));
+            BaseManager.changeDNS(server, port, restServer);
+        } else {
+            // 还原
+            SharePreferenceUtils.getInstance().putDNSConfig("");
+            BaseManager.changeDNS("", 0, "");
+        }
         BMXCallBack callBack = (bmxErrorCode) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 // 登陆成功后 需要将userId存储SP 作为下次自动登陆
@@ -254,21 +283,25 @@ public class LoginActivity extends BaseTitleActivity {
                     TaskDispatcher.exec(() -> {
                         if (BaseManager.bmxFinish(bmxErrorCode1) && profile != null
                                 && profile.userId() > 0) {
-                            CommonUtils.getInstance()
-                                    .addUser(new UserBean(profile.username(), profile.userId(), pwd,
-                                            changeAppId, System.currentTimeMillis()));
-                            // 登陆成功消息预加载
-                            WelcomeActivity.initData();
+                            UserBean bean = new UserBean(profile.username(), profile.userId(), pwd,
+                                    changeAppId, System.currentTimeMillis());
+                            if (changeDns) {
+                                bean.setServer(server);
+                                bean.setPort(port);
+                                bean.setRestServer(restServer);
+                            }
+                            CommonUtils.getInstance().addUser(bean);
                         }
                         TaskDispatcher.postMain(() -> {
                             if (activity instanceof BaseTitleActivity
                                     && !activity.isFinishing()) {
                                 ((BaseTitleActivity)activity).dismissLoadingDialog();
                             }
+                            // 登陆成功消息预加载
+                            WelcomeActivity.initData();
                             SharePreferenceUtils.getInstance().putLoginStatus(true);
                             MessageDispatcher.getDispatcher().initialize();
                             MainActivity.openMain(activity);
-                            activity.finish();
                         });
                     });
                 });
@@ -281,7 +314,6 @@ public class LoginActivity extends BaseTitleActivity {
             String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
             ToastUtil.showTextViewPrompt(error);
         };
-        
         boolean isChange = !TextUtils.isEmpty(changeAppId)
                 && !TextUtils.equals(changeAppId, SharePreferenceUtils.getInstance().getAppId());
         if (isChange) {
@@ -290,6 +322,10 @@ public class LoginActivity extends BaseTitleActivity {
                     SharePreferenceUtils.getInstance().putAppId(changeAppId);
                     realLogin(isLoginById, name, pwd, callBack);
                 } else {
+                    // 失败
+                    if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
+                        ((BaseTitleActivity)activity).dismissLoadingDialog();
+                    }
                     String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
                     ToastUtil.showTextViewPrompt(error);
                 }

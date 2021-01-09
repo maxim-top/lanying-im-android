@@ -12,11 +12,17 @@ public class ScanConfigs {
 
     /* 扫码登陆appId */
     public static final String CODE_APP_ID = "welovemaxim";
+//    public static final String CODE_APP_ID = "xbakhrtgxfc";
+
+    public static final String CODE_SECRET = "mCAelEYhltXumZgX";
 
     /* 扫码登陆userId */
     public static String CODE_USER_ID;
 
     /* 扫码登陆userName */
     public static String CODE_USER_NAME;
+
+    /* 自定义dns配置 */
+    public static String DNS_CONFIG;
 
 }

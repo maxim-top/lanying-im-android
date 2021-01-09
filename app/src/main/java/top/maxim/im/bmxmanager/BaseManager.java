@@ -10,12 +10,16 @@ import im.floo.floolib.BMXClient;
 import im.floo.floolib.BMXClientType;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXLogLevel;
+import im.floo.floolib.BMXPushEnvironmentType;
+import im.floo.floolib.BMXPushProviderType;
 import im.floo.floolib.BMXSDKConfig;
 import rx.Observable;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.RomUtil;
 import top.maxim.im.common.utils.RxError;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.push.PushClientMgr;
+import top.maxim.im.scan.config.ScanConfigs;
 
 public class BaseManager {
 
@@ -28,7 +32,7 @@ public class BaseManager {
     /**
      * 配置环境
      */
-    public static void initTestBMXSDK(int index) {
+    public static void initBMXSDK() {
         String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
         File dataPath = new File(appPath + "/data_dir");
         File cachePath = new File(appPath + "/cache_dir");
@@ -38,13 +42,58 @@ public class BaseManager {
         String pushId = getPushId();
         BMXSDKConfig conf = new BMXSDKConfig(BMXClientType.Android, "1", dataPath.getAbsolutePath(),
                 cachePath.getAbsolutePath(), TextUtils.isEmpty(pushId) ? "MaxIM" : pushId);
+        conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
+        conf.setAppSecret(ScanConfigs.CODE_SECRET);
         conf.setConsoleOutput(true);
         conf.setLoadAllServerConversations(true);
         conf.setLogLevel(BMXLogLevel.Debug);
-        conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
+        conf.setDeviceUuid(RomUtil.getDeviceId());
+        conf.setEnvironmentType(BMXPushEnvironmentType.Production);
+        conf.setPushProviderType(getProvideType(AppContextUtils.getAppContext()));
         bmxClient = BMXClient.create(conf);
     }
 
+    private static BMXPushProviderType getProvideType(Context context){
+        if (PushClientMgr.isHuawei(context)) {
+            return BMXPushProviderType.HuaWei;
+        }
+        if (PushClientMgr.isXiaomi(context)) {
+            return BMXPushProviderType.XiaoMi;
+        }
+        if (PushClientMgr.isMeizu(context)) {
+            return BMXPushProviderType.MeiZu;
+        }
+        if (PushClientMgr.isOppo(context)) {
+            return BMXPushProviderType.OPPS;
+        }
+        if (PushClientMgr.isVivo(context)) {
+            return BMXPushProviderType.VIVO;
+        }
+        return BMXPushProviderType.Unknown;
+    }
+
+    /**
+     * 配置环境
+     */
+    public static void changeDNS(String server, int port, String restServer) {
+        if (bmxClient == null || bmxClient.getSDKConfig() == null) {
+            return;
+        }
+        BMXSDKConfig conf = bmxClient.getSDKConfig();
+        if (!TextUtils.isEmpty(server) && port > 0 && !TextUtils.isEmpty(restServer)) {
+            // 三项数据都不为空才设置
+            BMXSDKConfig.HostConfig hostConfig = conf.getHostConfig();
+            hostConfig.setImHost(server);
+            hostConfig.setImPort(port);
+            hostConfig.setRestHost(restServer);
+            conf.setHostConfig(hostConfig);
+            conf.setEnableDNS(false);
+        } else {
+            conf.setEnableDNS(true);
+        }
+        bmxClient = BMXClient.create(conf);
+    }
+    
     public static String getPushId() {
         Context context = AppContextUtils.getAppContext();
         if (context == null) {

@@ -99,6 +99,10 @@ public class PhotoVisitorView extends RelativeLayout {
                 loadUrl = "file://" + mPhotoViewBean.getLocalPath();
             } else if (!TextUtils.isEmpty(mPhotoViewBean.getThumbLocalPath())) {
                 loadUrl = "file://" + mPhotoViewBean.getThumbLocalPath();
+            } else if (!TextUtils.isEmpty(mPhotoViewBean.getHttpUrl())) {
+                loadUrl = mPhotoViewBean.getHttpUrl();
+            } else if (!TextUtils.isEmpty(mPhotoViewBean.getThumbHttpUrl())) {
+                loadUrl = mPhotoViewBean.getThumbHttpUrl();
             }
         }
         mPhotoView.setVisibility(View.VISIBLE);

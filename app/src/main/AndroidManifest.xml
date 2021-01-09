@@ -12,9 +12,9 @@
     <!-- 在SDCard中创建与删除文件权限 -->
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
     <!-- 写SD卡权限 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -26,7 +26,6 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- Android O版本调用安装需要使用该权限 -->
@@ -88,6 +87,7 @@
         <activity
             android:name=".login.view.LoginActivity"
             android:screenOrientation="portrait"></activity>
+        <!--Push登陆-->
 
         <!--登陆-->
         <activity
@@ -112,6 +112,16 @@
         <!--绑定手机号-->
         <activity
             android:name=".login.view.BindMobileActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--修改密码-->
+        <activity
+            android:name=".login.view.ChangePwdActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--DNS配置-->
+        <activity
+            android:name=".login.view.DNSConfigActivity"
             android:screenOrientation="portrait"></activity>
 
         <!--注册-->
@@ -241,6 +251,16 @@
             android:name=".login.view.MyQrCodeActivity"
             android:screenOrientation="portrait" />
 
+        <!--Push设置-->
+        <activity
+            android:name=".login.view.PushSetActivity"
+            android:screenOrientation="portrait" />
+
+        <!--Push消息-->
+        <activity
+            android:name=".login.view.PushMessageActivity"
+            android:screenOrientation="portrait" />
+
         <!--搜搜-->
         <activity
             android:name=".contact.view.ContactSearchActivity"
@@ -359,6 +379,10 @@
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".push.maxim.MaxIMPushService"
+            android:exported="false">
+        </service>
 
         <!--华为push  配置-->
         <meta-data
@@ -568,6 +592,13 @@
         <meta-data
             android:name="BUGLY_ENABLE_DEBUG"
             android:value="true" />
+        <!-- *************BUGLY END************** -->
+
+        <!-- *************AGENT START************** -->
+        <meta-data
+            android:name="AGENT_APP_KEY"
+            android:value="${AGENT_APP_KEY}" />
+        <!-- *************AGENT END************** -->
 
     </application>
 

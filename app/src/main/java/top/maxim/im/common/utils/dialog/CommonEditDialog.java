@@ -3,6 +3,7 @@ package top.maxim.im.common.utils.dialog;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -31,8 +32,12 @@ public class CommonEditDialog extends BaseDialog implements View.OnClickListener
 
     public static final String DIALOG_CANCEL = "dialogCancel";
 
+    public static final String DIALOG_INPUT_NUMBER = "dialogInputNumber";
+    
     private String mDialogTitle, mConfirm, mCancel;
-
+    
+    private boolean mInputNumber = false;
+    
     @Override
     protected View onCreateDialogView() {
         initFromFront();
@@ -43,6 +48,9 @@ public class CommonEditDialog extends BaseDialog implements View.OnClickListener
         mTvConfirm.setOnClickListener(this);
         mTvCancel = (TextView)view.findViewById(R.id.tv_dialog_cancel);
         mTvCancel.setOnClickListener(this);
+        if (mInputNumber) {
+            mTvContent.setInputType(InputType.TYPE_CLASS_NUMBER);
+        }
         return view;
     }
 
@@ -57,6 +65,7 @@ public class CommonEditDialog extends BaseDialog implements View.OnClickListener
         mDialogTitle = bundle.getString(DIALOG_TITLE);
         mConfirm = bundle.getString(DIALOG_CONFIRM);
         mCancel = bundle.getString(DIALOG_CANCEL);
+        mInputNumber = bundle.getBoolean(DIALOG_INPUT_NUMBER, false);
     }
 
     @Override
@@ -126,4 +135,5 @@ public class CommonEditDialog extends BaseDialog implements View.OnClickListener
          */
         void onCancelListener();
     }
+    
 }

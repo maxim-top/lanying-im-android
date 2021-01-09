@@ -133,7 +133,8 @@
     <string name="un_bind_wechat">解绑微信</string>
     <string name="un_bind_wechat_tag">解绑时,需要输入密码验证</string>
     <string name="unbind_wechat_continue">确认解绑</string>
-    <string name="change_mobile">更换手机号</string>
+    <string name="verify_pwd_title">验证密码</string>
+    <string name="verify_captcha_title">验证手机号</string>
     <string name="verify_pwd_tag">登录密码验证身份</string>
     <string name="verify_captcha_tag">已绑定手机号验证身份</string>
 
@@ -155,6 +156,7 @@
     <string name="about_us">关于我们</string>
     <string name="setting_user_name">昵称</string>
     <string name="setting_user_phone">手机号</string>
+    <string name="setting_user_pwd">修改密码</string>
     <string name="setting_user_wx">微信</string>
     <string name="setting_user_public">公开信息</string>
     <string name="setting_roster_alias">设置别名</string>
@@ -171,10 +173,32 @@
 
     <string name="change_phone_tag">更换绑定手机号</string>
     <string name="bind_phone_tag">你已绑定手机号%1s</string>
-    <string name="phone_verify_change">手机验证更换</string>
-    <string name="pwd_verify_change">密码验证更换</string>
+    <string name="phone_verify_change">通过手机验证码方式</string>
+    <string name="pwd_verify_change">通过密码更换</string>
+
+    <string name="change_pwd_tag">更改密码</string>
+
+    <string name="change_pwd_new_hint">请输入新密码</string>
+    <string name="change_pwd_new_again_hint">请再次输入新密码</string>
 
     <string name="log_info">日志信息</string>
+
+    <string name="dns_config">配置</string>
+    <string name="dns_config_custom">自定义服务</string>
+    <string name="dns_config_appId">AppID</string>
+    <string name="dns_config_server">IM Server</string>
+    <string name="dns_config_port">IM Port</string>
+    <string name="dns_config_rest_server">Rest Server</string>
+    <string name="dns_config_default">默认</string>
+
+    <string name="dns_change_custom_title">您确认要关闭自定义服务吗</string>
+    <string name="dns_change_appId_title">修改AppID</string>
+    <string name="dns_change_server_title">修改IM Server</string>
+    <string name="dns_change_port_title">修改IM Port</string>
+    <string name="dns_change_rest_server_title">修改Rest Server</string>
+    <string name="dns_change_custom_tips">尚未启动自定义服务</string>
+    <string name="dns_change_save">保存</string>
+    <string name="dns_change_save_tip">请填写三项完整信息</string>
 
     <!--群设置-->
     <string name="group_notify_all">所有人</string>
@@ -216,5 +240,32 @@
 
     <string name="common_empty">这里什么都没有～</string>
     <string name="support_empty">如果想联系技术支持,请退出后,将APPID切换成"welovemaxim"</string>
+
+    <!--push设置-->
+    <string name="set_push">推送设置</string>
+    <string name="set_push_token">推送token</string>
+    <string name="set_push_cert">推送cert</string>
+    <string name="set_push_status">推送状态</string>
+    <string name="set_push_start">开启推送</string>
+    <string name="set_push_alias">推送别名</string>
+    <string name="set_push_unbind">解绑推送</string>
+    <string name="set_push_switch">推送开关</string>
+    <string name="set_push_tags">推送Tag</string>
+    <string name="set_push_del_tags">删除Tag</string>
+    <string name="set_push_add_tags">添加Tag</string>
+    <string name="set_push_clear_tags">清除Tag</string>
+    <string name="set_push_badge">推送角标</string>
+    <string name="set_push_mode">Push Mode</string>
+    <string name="set_push_time">推送时间</string>
+    <string name="set_push_silence_time">静默时间</string>
+    <string name="set_push_start_time">开始时间</string>
+    <string name="set_push_end_time">结束时间</string>
+    <string name="set_push_run_background">后台运行</string>
+    <string name="set_push_del_notification">删除通知</string>
+    <string name="set_push_clear_notification">清除通知</string>
+    <string name="set_push_send_message">发送消息</string>
+    <string name="set_push_msg_receiver">接收者</string>
+    <string name="set_push_msg_content">内容</string>
+    <string name="set_push_message">推送消息</string>
 
 </resources>

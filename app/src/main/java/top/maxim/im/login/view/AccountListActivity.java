@@ -119,20 +119,11 @@ public class AccountListActivity extends BaseTitleActivity {
                         // 如果是自己不响应
                         return;
                     }
-                    long userId = -1;
-                    String userName = null;
-                    String pwd = null;
-                    String appId = null;
+                    UserBean bean = null;
                     if (mAccounts != null && mAccounts.size() > 0) {
-                        UserBean bean = mAccounts.get(rosterId);
-                        if (bean != null) {
-                            userId = bean.getUserId();
-                            userName = bean.getUserName();
-                            pwd = bean.getUserPwd();
-                            appId = bean.getAppId();
-                        }
+                        bean = mAccounts.get(rosterId);
                     }
-                    changeAccount(userId, userName, pwd, appId, false);
+                    changeAccount(bean, false);
                 }
             }
         });
@@ -220,7 +211,7 @@ public class AccountListActivity extends BaseTitleActivity {
         }
         if (removeId == mUserId) {
             // 移除的是自己 跳转退出
-            changeAccount(mUserId, "", "", "", true);
+            changeAccount(new UserBean("", mUserId, "", "", 0), true);
         } else {
             // 不是自己 只需要清除数据
             CommonUtils.getInstance().removeAccount(removeId);
@@ -231,19 +222,20 @@ public class AccountListActivity extends BaseTitleActivity {
     /**
      * 切换账号 首先推出当前账号 然后再登陆
      */
-    private void changeAccount(long userId, String userName, String pwd, String appId,
+    private void changeAccount(UserBean bean,
             boolean remove) {
+        if (bean == null) {
+            return;
+        }
         showLoadingDialog(true);
-        UserManager.getInstance().signOut(userId, bmxErrorCode -> {
+        UserManager.getInstance().signOut(bmxErrorCode -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 TaskDispatcher.exec(() -> {
                     CommonUtils.getInstance().logout();
                     if (remove) {
-                        CommonUtils.getInstance().removeAccount(userId);
+                        CommonUtils.getInstance().removeAccount(mUserId);
                     }
-                    TaskDispatcher.postMain(() -> {
-                        handleResult(userName, pwd, appId);
-                    });
+                    TaskDispatcher.postMain(() -> handleResult(bean));
                 });
                 return;
             }
@@ -255,7 +247,19 @@ public class AccountListActivity extends BaseTitleActivity {
         });
     }
 
-    private void handleResult(String userName, String pwd, String appId) {
+    private void handleResult(UserBean bean) {
+        String userName = "", pwd = "", appId = "";
+        String server = "";
+        int port = 0;
+        String restServer = "";
+        if (bean != null) {
+            userName = bean.getUserName();
+            pwd = bean.getUserPwd();
+            appId = bean.getAppId();
+            server = bean.getServer();
+            port = bean.getPort();
+            restServer = bean.getRestServer();
+        }
         if (!TextUtils.isEmpty(userName) && !TextUtils.isEmpty(pwd)) {
             // 查看切换账号的appId是否和当前一致 一致不需要切换
             if (TextUtils.isEmpty(appId)) {
@@ -265,7 +269,7 @@ public class AccountListActivity extends BaseTitleActivity {
             String currentAppId = SharePreferenceUtils.getInstance().getAppId();
             // 有数据 直接登录
             LoginActivity.login(AccountListActivity.this, userName, pwd, false,
-                    TextUtils.equals(currentAppId, appId) ? "" : appId);
+                    TextUtils.equals(currentAppId, appId) ? "" : appId, server, port, restServer);
         } else {
             dismissLoadingDialog();
             // 无数据进入登录页
@@ -301,6 +305,7 @@ public class AccountListActivity extends BaseTitleActivity {
         protected void onBindHolder(BaseViewHolder holder, int position) {
             TextView tvName = holder.findViewById(R.id.txt_name);
             TextView tvUserId = holder.findViewById(R.id.txt_userId);
+            TextView tvAppId = holder.findViewById(R.id.txt_appId);
             CheckBox checkBox = holder.findViewById(R.id.cb_choice);
             ImageView selecIcon = holder.findViewById(R.id.iv_seleced_skin);
             UserBean bean = getItem(position);
@@ -318,7 +323,9 @@ public class AccountListActivity extends BaseTitleActivity {
             }
             String name = bean.getUserName();
             long userId = bean.getUserId();
+            String appId = TextUtils.isEmpty(bean.getAppId()) ? ScanConfigs.CODE_APP_ID : bean.getAppId();
             tvName.setText(TextUtils.isEmpty(name) ? "" : name);
+            tvAppId.setText("(AppID:" + appId + ")");
             tvUserId.setText(String.valueOf(userId));
         }
     }

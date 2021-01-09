@@ -22,8 +22,8 @@ public abstract class BaseDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             Bundle savedInstanceState) {
-        init();
         View view = onCreateDialogView();
+        init();
         if (container != null) {
             container.addView(container);
         }

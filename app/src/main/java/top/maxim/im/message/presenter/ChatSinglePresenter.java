@@ -12,6 +12,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatSingleContract;
@@ -55,6 +56,9 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
             }
         }
         RosterManager.getInstance().getRosterList(chatId, true, (bmxErrorCode, bmxRosterItem) -> {
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                return;
+            }
             if (bmxRosterItem != null) {
                 mRoster = bmxRosterItem;
             }

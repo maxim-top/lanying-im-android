@@ -17,7 +17,7 @@ public class RosterFetcher {
 
     private static RosterFetcher sFetcher = new RosterFetcher();
 
-    private LruCache<Long, BMXRosterItem> mRosterCache = new LruCache<>(30);
+    private LruCache<Long, BMXRosterItem> mRosterCache = new LruCache<>(50);
 
     private LruCache<Long, BMXGroup> mGroupCache = new LruCache(50);
     
@@ -52,10 +52,18 @@ public class RosterFetcher {
         if (rosterId <= 0) {
             return null;
         }
+        //优先从缓存获取
         BMXRosterItem item = mRosterCache.get(rosterId);
         if (item != null) {
             return item;
         }
+        //从DB获取
+        item = RosterManager.getInstance().getRosterListByDB(rosterId);
+        if (item != null) {
+            putRoster(item);
+            return item;
+        }
+        //从service获取
         RosterManager.getInstance().getRosterList(rosterId, true, (bmxErrorCode, bmxRosterItem) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 putRoster(bmxRosterItem);

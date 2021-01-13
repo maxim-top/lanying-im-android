@@ -3,6 +3,7 @@ package top.maxim.im.bmxmanager;
 
 import im.floo.BMXCallBack;
 import im.floo.BMXDataCallBack;
+import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupAnnouncementList;
 import im.floo.floolib.BMXGroupBannedMemberList;
@@ -29,12 +30,15 @@ public class GroupManager extends BaseManager {
 
     private BMXGroupManager mService;
 
+    private BMXGroupService mGroupService;
+
     public static GroupManager getInstance() {
         return sInstance;
     }
 
     private GroupManager() {
         mService = bmxClient.getGroupManager();
+        mGroupService = bmxClient.getGroupService();
     }
 
     /**
@@ -57,6 +61,18 @@ public class GroupManager extends BaseManager {
      **/
     public void getGroupList(long groupId, boolean forceUpdate, BMXDataCallBack<BMXGroup> callBack) {
         mService.getGroupList(groupId, forceUpdate, callBack);
+    }
+
+    /**
+     * 获取群信息
+     **/
+    public BMXGroup getGroupListByDB(long groupId) {
+        BMXGroup group = new BMXGroup();
+        BMXErrorCode error = mGroupService.search(groupId, group, false);
+        if (error == null || error.swigValue() != BMXErrorCode.NoError.swigValue()) {
+            return null;
+        }
+        return group;
     }
 
     /**

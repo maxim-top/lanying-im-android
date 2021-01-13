@@ -21,7 +21,7 @@ public class RosterFetcher {
 
     private LruCache<Long, BMXGroup> mGroupCache = new LruCache(50);
     
-    private LruCache<Long, BMXUserProfile> mProfileCache = new LruCache(1);
+    private LruCache<Long, BMXUserProfile> mProfileCache = new LruCache(5);
 
     private RosterFetcher() {
     }
@@ -102,10 +102,18 @@ public class RosterFetcher {
     }
 
     public BMXUserProfile getProfile() {
+        //优先从缓存获取
         BMXUserProfile profile = mProfileCache.get(SharePreferenceUtils.getInstance().getUserId());
         if (profile != null) {
             return profile;
         }
+        //从DB获取
+        profile = UserManager.getInstance().getProfileByDB();
+        if (profile != null) {
+            putProfile(profile);
+            return profile;
+        }
+        //从service获取
         UserManager.getInstance().getProfile(false, (bmxErrorCode, bmxUserProfile) -> {
             if (BaseManager.bmxFinish(bmxErrorCode) && bmxUserProfile != null) {
                 putProfile(bmxUserProfile);

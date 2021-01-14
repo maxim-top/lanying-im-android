@@ -5,9 +5,11 @@ import im.floo.BMXCallBack;
 import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXConnectStatus;
 import im.floo.floolib.BMXDeviceList;
+import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXSignInStatus;
 import im.floo.floolib.BMXUserManager;
 import im.floo.floolib.BMXUserProfile;
+import im.floo.floolib.BMXUserService;
 import im.floo.floolib.BMXUserServiceListener;
 import im.floo.floolib.FileProgressListener;
 
@@ -22,12 +24,15 @@ public class UserManager extends BaseManager {
 
     private BMXUserManager mService;
 
+    private BMXUserService mUserService;
+
     public static UserManager getInstance() {
         return sInstance;
     }
 
     private UserManager() {
         mService = bmxClient.getUserManager();
+        mUserService = bmxClient.getUserService();
     }
 
     /**
@@ -138,6 +143,18 @@ public class UserManager extends BaseManager {
      **/
     public void getProfile(boolean forceRefresh, BMXDataCallBack<BMXUserProfile> callBack) {
         mService.getProfile(forceRefresh, callBack);
+    }
+
+    /**
+     * 获取用户详情
+     **/
+    public BMXUserProfile getProfileByDB() {
+        BMXUserProfile profile = new BMXUserProfile();
+        BMXErrorCode error = mUserService.getProfile(profile, false);
+        if (error == null || error.swigValue() != BMXErrorCode.NoError.swigValue()) {
+            return null;
+        }
+        return profile;
     }
 
     /**

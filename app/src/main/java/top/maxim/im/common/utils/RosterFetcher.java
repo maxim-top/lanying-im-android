@@ -17,11 +17,11 @@ public class RosterFetcher {
 
     private static RosterFetcher sFetcher = new RosterFetcher();
 
-    private LruCache<Long, BMXRosterItem> mRosterCache = new LruCache<>(30);
+    private LruCache<Long, BMXRosterItem> mRosterCache = new LruCache<>(50);
 
     private LruCache<Long, BMXGroup> mGroupCache = new LruCache(50);
     
-    private LruCache<Long, BMXUserProfile> mProfileCache = new LruCache(1);
+    private LruCache<Long, BMXUserProfile> mProfileCache = new LruCache(5);
 
     private RosterFetcher() {
     }
@@ -52,10 +52,18 @@ public class RosterFetcher {
         if (rosterId <= 0) {
             return null;
         }
+        //优先从缓存获取
         BMXRosterItem item = mRosterCache.get(rosterId);
         if (item != null) {
             return item;
         }
+        //从DB获取
+        item = RosterManager.getInstance().getRosterListByDB(rosterId);
+        if (item != null) {
+            putRoster(item);
+            return item;
+        }
+        //从service获取
         RosterManager.getInstance().getRosterList(rosterId, true, (bmxErrorCode, bmxRosterItem) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 putRoster(bmxRosterItem);
@@ -81,8 +89,15 @@ public class RosterFetcher {
         if (groupId <= 0) {
             return null;
         }
+        //优先从缓存获取
         BMXGroup item = mGroupCache.get(groupId);
         if (item != null) {
+            return item;
+        }
+        //从DB获取
+        item = GroupManager.getInstance().getGroupListByDB(groupId);
+        if (item != null) {
+            putGroup(item);
             return item;
         }
         GroupManager.getInstance().getGroupList(groupId, true, (bmxErrorCode, bmxGroup) -> {
@@ -94,10 +109,18 @@ public class RosterFetcher {
     }
 
     public BMXUserProfile getProfile() {
+        //优先从缓存获取
         BMXUserProfile profile = mProfileCache.get(SharePreferenceUtils.getInstance().getUserId());
         if (profile != null) {
             return profile;
         }
+        //从DB获取
+        profile = UserManager.getInstance().getProfileByDB();
+        if (profile != null) {
+            putProfile(profile);
+            return profile;
+        }
+        //从service获取
         UserManager.getInstance().getProfile(false, (bmxErrorCode, bmxUserProfile) -> {
             if (BaseManager.bmxFinish(bmxErrorCode) && bmxUserProfile != null) {
                 putProfile(bmxUserProfile);

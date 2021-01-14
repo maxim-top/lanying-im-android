@@ -236,6 +236,9 @@ public class RosterDetailActivity extends BaseTitleActivity {
             } else {
                 RosterManager.getInstance().getRosterList(mRosterId, false,
                         (bmxErrorCode1, bmxRosterItem1) -> {
+                            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                                return;
+                            }
                             if (bmxRosterItem1 != null) {
                                 mRosterItem = bmxRosterItem1;
                             }

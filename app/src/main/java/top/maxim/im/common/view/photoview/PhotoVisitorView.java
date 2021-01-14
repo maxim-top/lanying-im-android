@@ -97,7 +97,8 @@ public class PhotoVisitorView extends RelativeLayout {
             if (!TextUtils.isEmpty(mPhotoViewBean.getLocalPath())
                     && new File(mPhotoViewBean.getLocalPath()).exists()) {
                 loadUrl = "file://" + mPhotoViewBean.getLocalPath();
-            } else if (!TextUtils.isEmpty(mPhotoViewBean.getThumbLocalPath())) {
+            } else if (!TextUtils.isEmpty(mPhotoViewBean.getThumbLocalPath())
+                    && new File(mPhotoViewBean.getThumbLocalPath()).exists()) {
                 loadUrl = "file://" + mPhotoViewBean.getThumbLocalPath();
             } else if (!TextUtils.isEmpty(mPhotoViewBean.getHttpUrl())) {
                 loadUrl = mPhotoViewBean.getHttpUrl();

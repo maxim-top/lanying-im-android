@@ -10,8 +10,8 @@ android {
         applicationId "top.maxim.im"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 2001081741
-        versionName "v3.0.0"
+        versionCode 2101131207
+        versionName "v3.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "100565061",

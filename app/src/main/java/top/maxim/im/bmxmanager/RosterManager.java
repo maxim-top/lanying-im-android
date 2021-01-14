@@ -4,9 +4,11 @@ package top.maxim.im.bmxmanager;
 import im.floo.BMXCallBack;
 import im.floo.BMXDataCallBack;
 import im.floo.floolib.ApplicationPage;
+import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.BMXRosterManager;
+import im.floo.floolib.BMXRosterService;
 import im.floo.floolib.BMXRosterServiceListener;
 import im.floo.floolib.FileProgressListener;
 import im.floo.floolib.ListOfLongLong;
@@ -22,12 +24,15 @@ public class RosterManager extends BaseManager {
 
     private BMXRosterManager mService;
 
+    private BMXRosterService mRosterService;
+
     public static RosterManager getInstance() {
         return sInstance;
     }
 
     private RosterManager() {
         mService = bmxClient.getRosterManager();
+        mRosterService = bmxClient.getRosterService();
     }
 
     /**
@@ -42,6 +47,18 @@ public class RosterManager extends BaseManager {
      **/
     public void getRosterList(long rosterId, boolean forceRefresh, BMXDataCallBack<BMXRosterItem> callBack) {
         mService.search(rosterId, forceRefresh, callBack);
+    }
+
+    /**
+     * 搜索用户
+     **/
+    public BMXRosterItem getRosterListByDB(long rosterId) {
+        BMXRosterItem item = new BMXRosterItem();
+        BMXErrorCode error = mRosterService.search(rosterId, false, item);
+        if (error == null || error.swigValue() != BMXErrorCode.NoError.swigValue()) {
+            return null;
+        }
+        return item;
     }
 
     /**

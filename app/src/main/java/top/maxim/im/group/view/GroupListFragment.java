@@ -3,8 +3,6 @@ package top.maxim.im.group.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
@@ -14,6 +12,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +46,7 @@ import top.maxim.im.message.view.ChatBaseActivity;
 /**
  * Description : 群 Created by Mango on 2018/11/21.
  */
-public class GroupListActivity extends BaseTitleFragment {
+public class GroupListFragment extends BaseTitleFragment {
 
     private RecyclerView mGroupView;
 

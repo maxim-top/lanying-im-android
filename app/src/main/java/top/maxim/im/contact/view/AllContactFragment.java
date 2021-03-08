@@ -41,7 +41,7 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.RightMenuPopWindow;
 import top.maxim.im.common.view.ViewPagerFixed;
-import top.maxim.im.group.view.GroupListActivity;
+import top.maxim.im.group.view.GroupListFragment;
 import top.maxim.im.message.view.ChatBaseActivity;
 import top.maxim.im.message.view.ChatGroupListMemberActivity;
 import top.maxim.im.scan.view.ScannerActivity;
@@ -59,7 +59,7 @@ public class AllContactFragment extends BaseTitleFragment {
 
     private ContactFragment mContactFragment;
 
-    private GroupListActivity mGroupFragment;
+    private GroupListFragment mGroupFragment;
 
     private SupportFragment mSupportFragment;
 
@@ -89,7 +89,7 @@ public class AllContactFragment extends BaseTitleFragment {
         mViewPager = view.findViewById(R.id.contact_view_pager);
         mTabLayout = view.findViewById(R.id.tablayout);
         mFragments = new BaseTitleFragment[] {
-                mContactFragment = new ContactFragment(), mGroupFragment = new GroupListActivity(),
+                mContactFragment = new ContactFragment(), mGroupFragment = new GroupListFragment(),
                 mSupportFragment = new SupportFragment()
         };
         mTabTitles = new String[] {
@@ -221,7 +221,7 @@ public class AllContactFragment extends BaseTitleFragment {
                     break;
                 case RightMenuFlag.CREATE_GROUP:
                     RosterChooseActivity.startRosterListActivity(getActivity(), true, true,
-                            GroupListActivity.CHOOSE_MEMBER_CODE);
+                            GroupListFragment.CHOOSE_MEMBER_CODE);
                     break;
                 case RightMenuFlag.SCAN:
                     ScannerActivity.openScan(getActivity());
@@ -270,7 +270,7 @@ public class AllContactFragment extends BaseTitleFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == GroupListActivity.CHOOSE_MEMBER_CODE && resultCode == Activity.RESULT_OK
+        if (requestCode == GroupListFragment.CHOOSE_MEMBER_CODE && resultCode == Activity.RESULT_OK
                 && data != null) {
             List<Long> chooseList = (List<Long>)data
                     .getSerializableExtra(ChatGroupListMemberActivity.CHOOSE_DATA);

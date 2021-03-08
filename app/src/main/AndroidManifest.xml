@@ -266,11 +266,6 @@
             android:name=".contact.view.ContactSearchActivity"
             android:screenOrientation="portrait" />
 
-        <!--群组-->
-        <activity
-            android:name=".group.view.GroupListActivity"
-            android:screenOrientation="portrait" />
-
         <!--群组搜索-->
         <activity
             android:name=".group.view.GroupSearchActivity"

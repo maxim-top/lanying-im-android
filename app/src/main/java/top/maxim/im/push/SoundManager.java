@@ -6,8 +6,9 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Vibrator;
-import android.support.annotation.RawRes;
 import android.util.SparseIntArray;
+
+import androidx.annotation.RawRes;
 
 import top.maxim.im.R;
 

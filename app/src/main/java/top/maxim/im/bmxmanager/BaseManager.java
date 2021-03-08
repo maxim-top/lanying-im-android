@@ -69,6 +69,9 @@ public class BaseManager {
         if (PushClientMgr.isVivo(context)) {
             return BMXPushProviderType.VIVO;
         }
+        if(PushClientMgr.isGoogle(context)){
+            return BMXPushProviderType.FCM;
+        }
         return BMXPushProviderType.Unknown;
     }
 

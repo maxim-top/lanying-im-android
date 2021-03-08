@@ -2,7 +2,7 @@
 package top.maxim.im.message.customviews;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;

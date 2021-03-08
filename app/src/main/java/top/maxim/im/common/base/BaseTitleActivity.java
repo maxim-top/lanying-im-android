@@ -4,12 +4,13 @@ package top.maxim.im.common.base;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
-import android.support.v4.graphics.ColorUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import androidx.annotation.ColorInt;
+import androidx.core.graphics.ColorUtils;
 
 import java.util.List;
 

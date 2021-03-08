@@ -2,7 +2,7 @@
 package top.maxim.im.common.utils;
 
 import android.content.Context;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;

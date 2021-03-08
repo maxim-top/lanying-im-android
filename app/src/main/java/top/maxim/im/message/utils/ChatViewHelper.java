@@ -3,7 +3,7 @@ package top.maxim.im.message.utils;
 
 import android.app.Activity;
 import android.os.Message;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.List;
 

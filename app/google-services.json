@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "272266865369",
+    "project_id": "maxim-im-demo",
+    "storage_bucket": "maxim-im-demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272266865369:android:988c770685ab0d7a0eecc8",
+        "android_client_info": {
+          "package_name": "top.maxim.im"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "272266865369-lnn77chqehdqepsr3tkufhfkd70d8r3e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDfOm_xdU4AMS5XXRS_geBRNQXUgg_UcHI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "272266865369-lnn77chqehdqepsr3tkufhfkd70d8r3e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

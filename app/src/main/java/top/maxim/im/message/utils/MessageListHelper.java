@@ -1,7 +1,7 @@
 
 package top.maxim.im.message.utils;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import im.floo.floolib.BMXMessage;
 

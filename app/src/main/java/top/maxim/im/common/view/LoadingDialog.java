@@ -3,7 +3,7 @@ package top.maxim.im.common.view;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;

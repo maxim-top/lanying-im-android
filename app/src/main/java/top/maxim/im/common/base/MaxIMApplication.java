@@ -3,7 +3,7 @@ package top.maxim.im.common.base;
 
 import android.app.Application;
 import android.content.Context;
-import android.support.multidex.MultiDex;
+import androidx.multidex.MultiDex;
 
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
@@ -39,7 +39,7 @@ public class MaxIMApplication extends Application {
             restartApp();
         }
     };
-    
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -51,7 +51,7 @@ public class MaxIMApplication extends Application {
         super.onCreate();
         initUtils();
         initBMXSDK();
-        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+//        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
     }
 
     public void restartApp() {

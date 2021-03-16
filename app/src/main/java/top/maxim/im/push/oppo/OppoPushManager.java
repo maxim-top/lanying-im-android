@@ -62,6 +62,7 @@ public class OppoPushManager extends IPushManager {
                 super.onUnRegister(i);
             }
         });
+        PushManager.getInstance().requestNotificationPermission();
     }
 
     @Override

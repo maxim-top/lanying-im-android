@@ -16,8 +16,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -25,6 +23,9 @@ import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -91,6 +92,7 @@ import top.maxim.im.message.utils.VoicePlayManager;
 import top.maxim.im.message.view.ChooseFileActivity;
 import top.maxim.im.message.view.PhotoDetailActivity;
 import top.maxim.im.message.view.VideoDetailActivity;
+import top.maxim.im.rtc.RTCActivity;
 import top.maxim.im.sdk.utils.MessageSendUtils;
 
 /**
@@ -132,6 +134,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     /* 视频权限 */
     private final int TYPE_VIDEO_PERMISSION = 6;
+
+    /* 视频通话权限 */
+    private final int TYPE_VIDEO_CALL_PERMISSION = 7;
 
     /* 我的id */
     protected long mMyUserId;
@@ -595,6 +600,15 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         requestPermissions(TYPE_LOCATION_PERMISSION,
                                 PermissionsConstant.FINE_LOCATION);
                     }
+                }
+                break;
+            case "视频通话":
+                // 视频需要SD卡读写 麦克风权限
+                if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.RECORD_AUDIO)) {
+                    showVideoCall();
+                } else {
+                    // 如果没有权限 首先请求SD读权限
+                    requestPermissions(TYPE_VIDEO_CALL_PERMISSION, PermissionsConstant.CAMERA);
                 }
                 break;
             default:
@@ -1498,6 +1512,13 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         } else {
                             requestPermissions(requestType, PermissionsConstant.RECORD_AUDIO);
                         }
+                    } else if (requestType == TYPE_VIDEO_CALL_PERMISSION) {
+                        //视频通话
+                        if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
+                            showVideoCall();
+                        } else {
+                            requestPermissions(requestType, PermissionsConstant.RECORD_AUDIO);
+                        }
                     }
                     break;
                 case PermissionsConstant.RECORD_AUDIO:
@@ -1510,6 +1531,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     } else if (requestType == TYPE_VIDEO_PERMISSION) {
                         // 视频
                         showVideoView();
+                    } else if (requestType == TYPE_VIDEO_CALL_PERMISSION) {
+                        // 视频通话
+                        showVideoCall();
                     }
                     break;
                 case PermissionsConstant.FINE_LOCATION:
@@ -1554,6 +1578,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     } else if (requestType == TYPE_VIDEO_PERMISSION) {
                         ToastUtil.showTextViewPrompt(
                                 mView.getContext().getString(R.string.video_fail_check_permission));
+                    } else if (requestType == TYPE_VIDEO_CALL_PERMISSION) {
+                        ToastUtil.showTextViewPrompt(
+                                mView.getContext().getString(R.string.video_fail_check_permission));
                     }
                     break;
                 case PermissionsConstant.RECORD_AUDIO:
@@ -1562,6 +1589,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         ToastUtil.showTextViewPrompt(mView.getContext()
                                 .getString(R.string.record_fail_check_permission));
                     } else if (requestType == TYPE_VIDEO_PERMISSION) {
+                        ToastUtil.showTextViewPrompt(
+                                mView.getContext().getString(R.string.video_fail_check_permission));
+                    } else if (requestType == TYPE_VIDEO_CALL_PERMISSION) {
                         ToastUtil.showTextViewPrompt(
                                 mView.getContext().getString(R.string.video_fail_check_permission));
                     }
@@ -1674,6 +1704,13 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      */
     private void chooseFile() {
         ChooseFileActivity.openChooseFileActivity(mView.getContext(), FILE_REQUEST);
+    }
+
+    /**
+     * 视频通话
+     */
+    private void showVideoCall() {
+        RTCActivity.openVideoCall(mView.getContext());
     }
 
     /**

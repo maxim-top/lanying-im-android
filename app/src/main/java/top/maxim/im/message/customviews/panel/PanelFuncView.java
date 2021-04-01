@@ -2,12 +2,13 @@
 package top.maxim.im.message.customviews.panel;
 
 import android.content.Context;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +54,10 @@ public class PanelFuncView implements IPanel {
         location.text = "位置";
         location.resId = R.drawable.panel_normal_location;
         items.add(location);
+        FuncItem videoCall = new FuncItem();
+        videoCall.text = "视频通话";
+        videoCall.resId = R.drawable.panel_normal_video;
+        items.add(videoCall);
     }
 
     @Override

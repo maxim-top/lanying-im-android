@@ -11,6 +11,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
+import org.webrtc.PeerConnectionFactory;
+
 import java.io.File;
 
 import top.maxim.im.bmxmanager.BaseManager;
@@ -51,7 +53,11 @@ public class MaxIMApplication extends Application {
         super.onCreate();
         initUtils();
         initBMXSDK();
-//        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+        PeerConnectionFactory.initialize(
+                PeerConnectionFactory.InitializationOptions.builder(this)
+                        .setEnableInternalTracer(true)
+                        .createInitializationOptions());
     }
 
     public void restartApp() {

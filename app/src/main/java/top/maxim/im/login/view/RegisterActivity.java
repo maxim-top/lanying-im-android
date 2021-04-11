@@ -4,7 +4,6 @@ package top.maxim.im.login.view;
 import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
-import androidx.annotation.NonNull;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -20,6 +19,9 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
+import im.floo.floolib.BMXErrorCode;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -377,7 +379,11 @@ public class RegisterActivity extends BaseTitleActivity {
                         mInputPwd.getEditableText().toString().trim(), mChangeAppId);
                 finish();
             } else {
-                ToastUtil.showTextViewPrompt("网络异常");
+                if (bmxErrorCode.swigValue() == BMXErrorCode.InvalidRequestParameter.swigValue()) {
+                    ToastUtil.showTextViewPrompt("用户名仅支持字母数字下划线中文组合，且不能是纯数字，不能以maxim、mta开头");
+                } else {
+                    ToastUtil.showTextViewPrompt("网络异常");
+                }
             }
         });
     }

@@ -11,10 +11,8 @@ public class ScanConfigs {
     public static final String CODE_RESULT = "codeResult";
 
     /* 扫码登陆appId */
-//    public static final String CODE_APP_ID = "welovemaxim";
-    public static final String CODE_APP_ID = "xbakhrtgxfc";
-
-    public static final String CODE_SECRET = "mCAelEYhltXumZgX";
+    public static final String CODE_APP_ID = "welovemaxim";
+//    public static final String CODE_APP_ID = "xbakhrtgxfc";
 
     /* 扫码登陆userId */
     public static String CODE_USER_ID;

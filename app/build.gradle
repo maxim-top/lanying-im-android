@@ -26,9 +26,9 @@ android {
                 "OPPO_APP_KEY"   : "5060fd43f996444ab0e5e5c8dba57ffd",
                 "OPPO_APP_SECRET" : "17046a6edd9f4be1a87c3badb2e9b755",
 
-                "VIVO_APPID"     : "30006831",
-                "VIVO_APP_KEY"   : "5060fd43f996444ab0e5e5c8dba57ffd",
-                "VIVO_APP_SECRET" : "17046a6edd9f4be1a87c3badb2e9b755",
+                "VIVO_APPID"     : "100122979",
+                "VIVO_APP_KEY"   : "20e9451070bbb5de77f16a31c4d61f94",
+                "VIVO_APP_SECRET" : "86a3152b-68b1-4c3a-ac1c-047f4ed34fcf",
 
                 "WEIXIN_APPID" : "wxf0f8e197ecfb0925",
                 "BUGLY_APPID"  : "ae2c13667e",
@@ -61,7 +61,7 @@ android {
         }
 
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }

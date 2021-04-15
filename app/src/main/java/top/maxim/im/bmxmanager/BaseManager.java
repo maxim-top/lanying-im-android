@@ -124,7 +124,7 @@ public class BaseManager {
                 return metaAppKey.substring(2);
             }
         } else if (PushClientMgr.isVivo(context)) {
-            String metaAppId = PushClientMgr.getPushAppId("VIVO_APP_ID");
+            String metaAppId = PushClientMgr.getPushAppId("VIVO_APPID");
             if (!TextUtils.isEmpty(metaAppId)) {
                 return metaAppId.substring(2);
             }

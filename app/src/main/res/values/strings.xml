@@ -268,4 +268,18 @@
     <string name="set_push_msg_content">内容</string>
     <string name="set_push_message">推送消息</string>
 
+    <!--    音视频会话-->
+    <string name="call_waiting_peer_accept">正在等待对方接受邀请...</string>
+    <string name="call_switch_audio">切到语音通话</string>
+    <string name="call_switch_camera">切换摄像头</string>
+    <string name="call_hangup">挂断</string>
+    <string name="call_mute">静音</string>
+    <string name="call_un_mute">取消静音</string>
+    <string name="call_hand_free">免提</string>
+    <string name="call_open_hand_free">打开免提</string>
+    <string name="call_close_hand_free">关闭免提</string>
+    <string name="call_reject">拒绝</string>
+    <string name="call_answer">接听</string>
+    <string name="call_cancel">取消</string>
+
 </resources>

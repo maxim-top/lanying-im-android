@@ -368,6 +368,8 @@
 
         <activity android:name=".rtc.RTCActivity" />
 
+        <activity android:name=".videocall.SingleVideoCallActivity" />
+
         <!-- fileProvider -->
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -27,6 +27,11 @@ public interface MessageConfig {
     String KEY_CAMERA_PATH = "camera_path";
 
     /**
+     * 音视频类型
+     */
+    String CALL_MODE = "call_mode";
+
+    /**
      * 添加
      */
     long MEMBER_ADD = -1;
@@ -67,10 +72,14 @@ public interface MessageConfig {
      * 媒体的格式
      */
     interface MediaFormat {
-        /** 音频文件格式 **/
+        /**
+         * 音频文件格式
+         **/
         String VOICE_FORMAT = ".amr";
 
-        /** 视频文件格式 **/
+        /**
+         * 视频文件格式
+         **/
         String VIDEO_FORMAT = ".mp4";
     }
 
@@ -119,6 +128,21 @@ public interface MessageConfig {
         int LINUX = 5;
 
         int WEB = 6;
+    }
+
+    /**
+     * 音视频
+     */
+    interface CallMode {
+        /**
+         * 音频
+         **/
+        int CALL_AUDIO = 0;
+
+        /**
+         * 视频
+         **/
+        int CALL_VIDEO = 1;
     }
 
 }

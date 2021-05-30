@@ -20,6 +20,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -92,7 +93,6 @@ import top.maxim.im.message.utils.VoicePlayManager;
 import top.maxim.im.message.view.ChooseFileActivity;
 import top.maxim.im.message.view.PhotoDetailActivity;
 import top.maxim.im.message.view.VideoDetailActivity;
-import top.maxim.im.rtc.RTCActivity;
 import top.maxim.im.sdk.utils.MessageSendUtils;
 
 /**
@@ -137,6 +137,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     /* 视频通话权限 */
     private final int TYPE_VIDEO_CALL_PERMISSION = 7;
+
+    /* 音频通话权限 */
+    private final int TYPE_AUDIO_CALL_PERMISSION = 8;
 
     /* 我的id */
     protected long mMyUserId;
@@ -603,13 +606,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 }
                 break;
             case "视频通话":
-                // 视频需要SD卡读写 麦克风权限
-                if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.RECORD_AUDIO)) {
-                    showVideoCall();
-                } else {
-                    // 如果没有权限 首先请求SD读权限
-                    requestPermissions(TYPE_VIDEO_CALL_PERMISSION, PermissionsConstant.CAMERA);
-                }
+                showVideoCallDialog();
                 break;
             default:
                 break;
@@ -1515,7 +1512,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     } else if (requestType == TYPE_VIDEO_CALL_PERMISSION) {
                         //视频通话
                         if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
-                            showVideoCall();
+                            handelVideoCall(true);
                         } else {
                             requestPermissions(requestType, PermissionsConstant.RECORD_AUDIO);
                         }
@@ -1533,7 +1530,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         showVideoView();
                     } else if (requestType == TYPE_VIDEO_CALL_PERMISSION) {
                         // 视频通话
-                        showVideoCall();
+                        handelVideoCall(true);
+                    } else if (requestType == TYPE_AUDIO_CALL_PERMISSION) {
+                        // 音频通话
+                        handelVideoCall(false);
                     }
                     break;
                 case PermissionsConstant.FINE_LOCATION:
@@ -1594,6 +1594,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     } else if (requestType == TYPE_VIDEO_CALL_PERMISSION) {
                         ToastUtil.showTextViewPrompt(
                                 mView.getContext().getString(R.string.video_fail_check_permission));
+                    } else if (requestType == TYPE_AUDIO_CALL_PERMISSION) {
+                        ToastUtil.showTextViewPrompt(mView.getContext()
+                                .getString(R.string.record_fail_check_permission));
                     }
                     break;
                 case PermissionsConstant.FINE_LOCATION:
@@ -1709,8 +1712,58 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     /**
      * 视频通话
      */
-    private void showVideoCall() {
-        RTCActivity.openVideoCall(mView.getContext());
+    private void showVideoCallDialog() {
+        final CustomDialog dialog = new CustomDialog();
+        LinearLayout ll = new LinearLayout(mView.getContext());
+        ll.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        // 视频通话
+        TextView video = new TextView(mView.getContext());
+        video.setPadding(ScreenUtils.dp2px(15), 0, ScreenUtils.dp2px(15), 0);
+        video.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        video.setTextColor(mView.getContext().getResources().getColor(R.color.color_black));
+        video.setBackgroundColor(mView.getContext().getResources().getColor(R.color.color_white));
+        video.setText(mView.getContext().getString(R.string.call_video));
+        video.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                // 视频需要摄像头 麦克风权限
+                if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.RECORD_AUDIO)) {
+                    handelVideoCall(true);
+                } else {
+                    // 如果没有权限 首先请求SD读权限
+                    requestPermissions(TYPE_VIDEO_CALL_PERMISSION, PermissionsConstant.CAMERA);
+                }
+
+            }
+        });
+        ll.addView(video, params);
+        // 语音通话
+        TextView audio = new TextView(mView.getContext());
+        audio.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), 0);
+        audio.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        audio.setTextColor(mView.getContext().getResources().getColor(R.color.color_black));
+        audio.setBackgroundColor(mView.getContext().getResources().getColor(R.color.color_white));
+        audio.setText(mView.getContext().getString(R.string.call_audio));
+        audio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                // 音频需要麦克风权限
+                if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
+                    handelVideoCall(false);
+                } else {
+                    // 如果没有权限 首先请求SD读权限
+                    requestPermissions(TYPE_AUDIO_CALL_PERMISSION, PermissionsConstant.RECORD_AUDIO);
+                }
+            }
+        });
+        ll.addView(audio, params);
+        dialog.setCustomView(ll);
+        dialog.showDialog((Activity) mView.getContext());
     }
 
     /**
@@ -1846,5 +1899,11 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      * 处理inputStatus
      */
     protected void handelInputStatus(String extension) {
+    }
+
+    /**
+     * 音视频  是否有视频
+     */
+    protected void handelVideoCall(boolean hasVideo) {
     }
 }

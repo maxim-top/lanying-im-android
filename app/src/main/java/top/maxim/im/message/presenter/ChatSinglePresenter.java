@@ -17,6 +17,7 @@ import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatSingleContract;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.videocall.SingleVideoCallActivity;
 
 /**
  * Description : 单聊presenter Created by Mango on 2018/11/11.
@@ -145,5 +146,10 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
     @Override
     public void sendInputStatus(String extension) {
         mSendUtils.sendInputStatusMessage(mChatType, mMyUserId, mChatId, extension);
+    }
+
+    @Override
+    protected void handelVideoCall(boolean hasVideo) {
+        SingleVideoCallActivity.openVideoCall(mView.getContext(), mChatId, hasVideo ? MessageConfig.CallMode.CALL_VIDEO : MessageConfig.CallMode.CALL_AUDIO);
     }
 }

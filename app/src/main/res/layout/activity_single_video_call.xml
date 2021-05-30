@@ -11,7 +11,7 @@
 
     <!--音频-->
     <include
-        android:id="@+id/layout_voice_container"
+        android:id="@+id/layout_audio_container"
         layout="@layout/view_single_audio_call"
         android:visibility="gone" />
 

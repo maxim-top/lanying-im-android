@@ -3,6 +3,7 @@ package top.maxim.im.common.base;
 
 import android.app.Application;
 import android.content.Context;
+
 import androidx.multidex.MultiDex;
 
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
@@ -11,10 +12,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
-import org.webrtc.PeerConnectionFactory;
-
 import java.io.File;
 
+import top.maxim.im.BuildConfig;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.FileConfig;
@@ -22,6 +22,8 @@ import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
+import top.maxim.rtc.engine.UCloudEngine;
+import top.maxim.rtc.manager.RTCManager;
 
 /**
  * Description : application Created by Mango on 2018/11/5.
@@ -53,11 +55,14 @@ public class MaxIMApplication extends Application {
         super.onCreate();
         initUtils();
         initBMXSDK();
-        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
-        PeerConnectionFactory.initialize(
-                PeerConnectionFactory.InitializationOptions.builder(this)
-                        .setEnableInternalTracer(true)
-                        .createInitializationOptions());
+        initRtc();
+        if (!BuildConfig.DEBUG) {
+            Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+        }
+//        PeerConnectionFactory.initialize(
+//                PeerConnectionFactory.InitializationOptions.builder(this)
+//                        .setEnableInternalTracer(true)
+//                        .createInitializationOptions());
     }
 
     public void restartApp() {
@@ -99,6 +104,14 @@ public class MaxIMApplication extends Application {
      */
     private void initBMXSDK() {
         BaseManager.initBMXSDK();
+    }
+
+    /**
+     * 初始化Rtc
+     */
+    private void initRtc(){
+        UCloudEngine.init(this, PushClientMgr.getPushAppId("RTC_APP_ID"), PushClientMgr.getPushAppId("RTC_APP_KEY"));
+        RTCManager.getInstance().setupRTCEngine(new UCloudEngine());
     }
 
 }

@@ -366,8 +366,6 @@
 
         <activity android:name=".login.view.LogViewActivity" />
 
-        <activity android:name=".rtc.RTCActivity" />
-
         <activity android:name=".videocall.SingleVideoCallActivity" />
 
         <!-- fileProvider -->
@@ -633,6 +631,15 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <!-- *************RTC START************** -->
+        <meta-data
+            android:name="RTC_APP_ID"
+            android:value="${RTC_APP_ID}" />
+        <meta-data
+            android:name="RTC_APP_KEY"
+            android:value="${RTC_APP_KEY}" />
+        <!-- *************RTC END************** -->
 
         <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
      See README(https://goo.gl/l4GJaQ) for more. -->

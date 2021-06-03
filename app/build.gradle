@@ -24,17 +24,20 @@ android {
 
                 "OPPO_APPID"     : "30006831",
                 "OPPO_APP_KEY"   : "5060fd43f996444ab0e5e5c8dba57ffd",
-                "OPPO_APP_SECRET" : "17046a6edd9f4be1a87c3badb2e9b755",
+                "OPPO_APP_SECRET": "17046a6edd9f4be1a87c3badb2e9b755",
 
                 "VIVO_APPID"     : "100122979",
                 "VIVO_APP_KEY"   : "20e9451070bbb5de77f16a31c4d61f94",
-                "VIVO_APP_SECRET" : "86a3152b-68b1-4c3a-ac1c-047f4ed34fcf",
+                "VIVO_APP_SECRET": "86a3152b-68b1-4c3a-ac1c-047f4ed34fcf",
 
-                "WEIXIN_APPID" : "wxf0f8e197ecfb0925",
-                "BUGLY_APPID"  : "ae2c13667e",
-                "BUGLY_APP_KEY": "6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc",
+                "WEIXIN_APPID"   : "wxf0f8e197ecfb0925",
+                "BUGLY_APPID"    : "ae2c13667e",
+                "BUGLY_APP_KEY"  : "6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc",
 
-                "AGENT_APP_KEY": "9bf09e3791fa4a1ca9d0c6dbbfa4d759"
+                "AGENT_APP_KEY"  : "9bf09e3791fa4a1ca9d0c6dbbfa4d759",
+
+                "RTC_APP_ID"     : "urtc-gzfrt5ch",
+                "RTC_APP_KEY"    : "bdc8c2ef728b18f3938ac716e7a8e364"
         ]
 
         ndk {
@@ -157,8 +160,8 @@ dependencies {
 //    implementation 'com.google.firebase:firebase-messaging:21.0.1'
 //    implementation 'com.google.firebase:firebase-analytics:18.0.1'
 
-    implementation 'org.webrtc:google-webrtc:1.0.30039'
-    implementation 'io.socket:socket.io-client:1.0.0'
+//    implementation 'org.webrtc:google-webrtc:1.0.30039'
+//    implementation 'io.socket:socket.io-client:1.0.0'
 
-//    implementation project(':floo-rtc-ucloud')
+    implementation project(':floo-rtc-ucloud')
 }

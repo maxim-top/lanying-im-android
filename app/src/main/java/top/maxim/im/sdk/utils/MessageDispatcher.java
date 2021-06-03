@@ -41,6 +41,9 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.rtc.bean.BMXRtcStreamInfo;
+import top.maxim.rtc.interfaces.BMXRTCEngineListener;
+import top.maxim.rtc.manager.RTCManager;
 
 /**
  * Description : 消息分发 Created by mango on 2018/12/20.
@@ -406,6 +409,104 @@ public class MessageDispatcher {
         }
     };
 
+    private BMXRTCEngineListener mRtcListener = new BMXRTCEngineListener(){
+
+        @Override
+        public void onConnectionStateChanged() {
+
+        }
+
+        @Override
+        public void onNetworkTypeChanged() {
+
+        }
+
+        @Override
+        public void onJoinRoom(int code, String msg, String roomId) {
+
+        }
+
+        @Override
+        public void onLeaveRoom(int code, String msg, String roomId) {
+
+        }
+
+        @Override
+        public void onReJoinRoom() {
+
+        }
+
+        @Override
+        public void onMemberJoined(String uid) {
+
+        }
+
+        @Override
+        public void onMemberExited(String uid, int reason) {
+
+        }
+
+        @Override
+        public void onLocalPublish(int code, String msg, BMXRtcStreamInfo streamInfo) {
+
+        }
+
+        @Override
+        public void onLocalUnPublish(int code, String msg, BMXRtcStreamInfo streamInfo) {
+
+        }
+
+        @Override
+        public void onRemotePublish(BMXRtcStreamInfo streamInfo) {
+
+        }
+
+        @Override
+        public void onRemoteUnPublish(BMXRtcStreamInfo streamInfo) {
+
+        }
+
+        @Override
+        public void onSubscribe(int code, String msg, BMXRtcStreamInfo streamInfo) {
+
+        }
+
+        @Override
+        public void onUnSubscribe(int code, String msg, BMXRtcStreamInfo streamInfo) {
+
+        }
+
+        @Override
+        public void onLocalAudioLevel() {
+
+        }
+
+        @Override
+        public void onRemoteAudioLevel() {
+
+        }
+
+        @Override
+        public void onKickoff() {
+
+        }
+
+        @Override
+        public void onWarning() {
+
+        }
+
+        @Override
+        public void onError() {
+
+        }
+
+        @Override
+        public void onNetworkQuality() {
+
+        }
+    };
+
     private MessageDispatcher() {
     }
 
@@ -418,6 +519,7 @@ public class MessageDispatcher {
         RosterManager.getInstance().addRosterListener(mRosterListener);
         UserManager.getInstance().addUserListener(mUserListener);
         GroupManager.getInstance().addGroupListener(mGroupListener);
+        RTCManager.getInstance().addRtcListener(mRtcListener);
     }
 
     private void toastListener(String content) {

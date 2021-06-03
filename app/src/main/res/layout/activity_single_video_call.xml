@@ -35,6 +35,7 @@
                 android:layout_width="@dimen/dimen_70"
                 android:layout_height="@dimen/dimen_70"
                 android:scaleType="fitCenter"
+                android:onClick="onCallReject"
                 android:src="@drawable/icon_call_hangup" />
 
             <TextView
@@ -58,6 +59,7 @@
                 android:layout_width="@dimen/dimen_70"
                 android:layout_height="@dimen/dimen_70"
                 android:scaleType="fitCenter"
+                android:onClick="onCallAnswer"
                 android:src="@drawable/icon_call_answer" />
 
             <TextView
@@ -90,6 +92,7 @@
                 android:layout_width="@dimen/dimen_70"
                 android:layout_height="@dimen/dimen_70"
                 android:scaleType="fitCenter"
+                android:onClick="onCallCancel"
                 android:src="@drawable/icon_call_hangup" />
 
             <TextView

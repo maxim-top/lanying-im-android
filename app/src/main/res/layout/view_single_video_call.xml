@@ -16,11 +16,8 @@
         android:id="@+id/video_view_container_small"
         android:layout_width="120dp"
         android:layout_height="212dp"
-        android:layout_gravity="right"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:background="@color/color_black"
+        android:layout_gravity="right"
         android:visibility="gone" />
 
     <LinearLayout
@@ -29,18 +26,18 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:orientation="horizontal"
-        android:padding="@dimen/dimen_30">
+        android:padding="@dimen/dimen_10">
 
         <top.maxim.im.common.view.ShapeImageView
             android:id="@+id/iv_video_peer_avatar"
-            android:layout_width="@dimen/dimen_70"
-            android:layout_height="@dimen/dimen_70"
+            android:layout_width="@dimen/dimen_60"
+            android:layout_height="@dimen/dimen_60"
             android:layout_gravity="center_vertical" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/dimen_20"
+            android:layout_marginLeft="@dimen/dimen_10"
             android:orientation="vertical">
 
             <TextView
@@ -48,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/color_white"
-                android:textSize="@dimen/dimen_20" />
+                android:textSize="@dimen/dimen_18" />
 
             <TextView
                 android:id="@+id/tv_video_peer_notice"
@@ -56,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:text="@string/call_waiting_peer_accept"
-                android:layout_marginTop="@dimen/dimen_15"
+                android:layout_marginTop="@dimen/dimen_10"
                 android:textColor="@color/color_white"
                 android:textSize="@dimen/dimen_15" />
 

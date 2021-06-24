@@ -79,6 +79,12 @@
 	 **/
 	- public void onReceiveCommandMessages(BMXMessageList list) {}
 	```
-	
+ 
+## v3.0.4 - 2021/06/24
+
+新增:
+
+1.  创建群聊可配置是否是聊天室
+
 
 

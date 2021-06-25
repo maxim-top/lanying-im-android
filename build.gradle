@@ -2,24 +2,30 @@
 
 buildscript {
 
-    ext.tingyun_sdk_version = '2.14.6'//听云SDK版本
-    ext.tingyun_ndk_version = '1.2.1'//听云NDK版本
+    ext.tingyun_sdk_version = '2.14.8'//听云SDK版本
+    ext.tingyun_ndk_version = '2.0.0'//听云NDK版本
 
     repositories {
         google()
         jcenter()
+        maven {
+            url 'https://developer.huawei.com/repo/'
+        }
         // 听云
         maven {
             url "http://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:4.1.0'
 //        bugly 符号表
 //        classpath 'com.tencent.bugly:symtabfileuploader:latest.release'
         //听云
         classpath "com.networkbench.newlens.agent.android:agent-gradle-plugin:$tingyun_sdk_version"
-
+        //google service
+        classpath 'com.google.gms:google-services:4.3.5'
+        // 增加agcp配置。
+        classpath 'com.huawei.agconnect:agcp:1.4.2.300'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -29,10 +35,9 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven{
-            url 'http://developer.huawei.com/repo/'
+        maven {
+            url 'https://developer.huawei.com/repo/'
         }
-
         // 听云
         maven {
             url "http://nexus2.tingyun.com/nexus/content/repositories/snapshots/"

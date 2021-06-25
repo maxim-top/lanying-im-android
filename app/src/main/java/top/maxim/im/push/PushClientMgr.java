@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.heytap.mcssdk.PushManager;
 import com.huawei.hms.api.ConnectionResult;
 import com.huawei.hms.api.HuaweiApiAvailability;
@@ -22,9 +23,11 @@ import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.RomUtil;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.push.google.FirebasePushManager;
 import top.maxim.im.push.huawei.HWPushManager;
 import top.maxim.im.push.meizu.MZPushManager;
 import top.maxim.im.push.oppo.OppoPushManager;
+import top.maxim.im.push.vivo.VivoPushManager;
 import top.maxim.im.push.xiaomi.MIPushManager;
 
 /**
@@ -48,6 +51,8 @@ public final class PushClientMgr {
     
     public static final int VIVO_TYPE = 5;
 
+    public static final int GOOGLE_TYPE = 6;
+
     private static PushClientMgr sPushMgr = new PushClientMgr();
 
     private PushClientMgr() {
@@ -60,7 +65,7 @@ public final class PushClientMgr {
             return true;
         } else {
             if (isHuawei(application.getApplicationContext())) {
-                sManager = new HWPushManager(application);
+                sManager = new HWPushManager(application.getApplicationContext());
                 sDevType = HW_TYPE;
             } else if (isXiaomi(application.getApplicationContext())) {
                 sManager = new MIPushManager(application.getApplicationContext());
@@ -71,12 +76,13 @@ public final class PushClientMgr {
             } else if (isOppo(application.getApplicationContext())) {
                 sManager = new OppoPushManager(application.getApplicationContext());
                 sDevType = OPPO_TYPE;
-            }
-//            else if (isVivo(application.getApplicationContext())) {
-//                sManager = new VivoPushManager(application.getApplicationContext());
-//                sDevType = VIVO_TYPE;
-//            }
-            else {
+            } else if (isVivo(application.getApplicationContext())) {
+                sManager = new VivoPushManager(application.getApplicationContext());
+                sDevType = VIVO_TYPE;
+            } else if (isGoogle(application.getApplicationContext())) {
+                sManager = new FirebasePushManager(application);
+                sDevType = GOOGLE_TYPE;
+            } else {
                 sManager = new EmptyPushManager(application.getApplicationContext());
             }
             isInited = true;
@@ -125,6 +131,14 @@ public final class PushClientMgr {
         } catch (Exception e) {
         }
         return false;
+    }
+
+    /**
+     * 判断google
+     */
+    public static boolean isGoogle(Context context) {
+        int result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
+        return result == com.google.android.gms.common.ConnectionResult.SUCCESS || result == com.google.android.gms.common.ConnectionResult.SERVICE_VERSION_UPDATE_REQUIRED;
     }
 
     public static PushClientMgr getManager() {

@@ -25,7 +25,7 @@
             android:textColor="@color/color_333333"
             android:textSize="@dimen/dimen_16" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/gv_chat_group_member"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
             android:paddingBottom="@dimen/dimen_15"
             android:scrollbars="none">
 
-        </android.support.v7.widget.RecyclerView>
+        </androidx.recyclerview.widget.RecyclerView>
 
         <TextView
             android:layout_width="match_parent"

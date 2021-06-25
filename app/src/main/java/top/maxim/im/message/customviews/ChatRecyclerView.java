@@ -2,10 +2,11 @@
 package top.maxim.im.message.customviews;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import top.maxim.im.message.adapter.ChatMessageAdapter;
 import top.maxim.im.message.interfaces.ChatActionListener;

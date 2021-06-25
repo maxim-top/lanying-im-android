@@ -10,7 +10,7 @@
         android:layout_height="@dimen/dimen_56"
         android:background="@color/color_white">
 
-        <android.support.design.widget.TabLayout
+        <com.google.android.material.tabs.TabLayout
             android:id="@+id/tablayout"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

@@ -1,8 +1,8 @@
 
 package top.maxim.im.common.base;
 
-import android.support.annotation.DrawableRes;
-import android.support.v4.app.FragmentTransaction;
+import androidx.annotation.DrawableRes;
+import androidx.fragment.app.FragmentTransaction;
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.View;

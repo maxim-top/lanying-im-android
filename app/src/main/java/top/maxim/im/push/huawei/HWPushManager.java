@@ -1,65 +1,74 @@
 
 package top.maxim.im.push.huawei;
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
+import android.text.TextUtils;
 
+import com.huawei.hms.aaid.HmsInstanceId;
+import com.huawei.hms.common.ApiException;
+import com.huawei.hms.push.HmsMessaging;
+
+import im.floo.ThreadPool;
 import top.maxim.im.push.IPushManager;
-import top.maxim.im.push.huawei.agent.HMSAgent;
-import top.maxim.im.push.huawei.agent.common.handler.ConnectHandler;
-import top.maxim.im.push.huawei.agent.push.handler.EnableReceiveNotifyMsgHandler;
-import top.maxim.im.push.huawei.agent.push.handler.GetTokenHandler;
+import top.maxim.im.push.PushClientMgr;
 
 /**
  * Description : 华为push
  */
 public class HWPushManager extends IPushManager {
 
-    public HWPushManager(Application context) {
-        HMSAgent.init(context);
+    private String APP_ID;
+
+    Context mContext;
+
+    public HWPushManager(Context context) {
+        mContext = context;
+        String metaAppId = PushClientMgr.getPushAppId("HUAWEI_APPID");
+        if (!TextUtils.isEmpty(metaAppId)) {
+            APP_ID = metaAppId.substring(2);
+        }
     }
 
     @Override
     public void register(Context context) {
-        HMSAgent.connect(context, new ConnectHandler() {
+        ThreadPool.exec(new Runnable() {
             @Override
-            public void onConnect(int rst) {
-                getToken();
-            }
-        });
-    }
-
-    private void getToken() {
-        HMSAgent.Push.getToken(new GetTokenHandler() {
-            @Override
-            public void onResult(int rst) {
+            public void run() {
+                try {
+                    String token = HmsInstanceId.getInstance(context).getToken(APP_ID, HmsMessaging.DEFAULT_TOKEN_SCOPE);
+                    if (TextUtils.isEmpty(token)) {
+                        return;
+                    }
+                    // 设置push
+                    PushClientMgr.setPushToken(token);
+                }catch (ApiException e){
+                    e.printStackTrace();
+                }
             }
         });
     }
 
     @Override
     public void unRegister() {
-        HMSAgent.destroy();
+        ThreadPool.exec(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HmsInstanceId.getInstance(mContext).deleteToken(APP_ID, HmsMessaging.DEFAULT_TOKEN_SCOPE);
+                }catch (ApiException e){
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
     public void startReceiveNotification() {
-        HMSAgent.Push.enableReceiveNotifyMsg(true, new EnableReceiveNotifyMsgHandler() {
-            @Override
-            public void onResult(int rst) {
-
-            }
-        });
+        HmsMessaging.getInstance(mContext).turnOnPush();
     }
 
     @Override
     public void stopReceiveNotification() {
-        HMSAgent.Push.enableReceiveNotifyMsg(false, new EnableReceiveNotifyMsgHandler() {
-            @Override
-            public void onResult(int rst) {
-
-            }
-        });
+        HmsMessaging.getInstance(mContext).turnOffPush();
     }
 }

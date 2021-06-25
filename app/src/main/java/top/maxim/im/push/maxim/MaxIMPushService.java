@@ -4,9 +4,11 @@ package top.maxim.im.push.maxim;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import im.floo.BMXCallBack;
 import im.floo.floolib.BMXErrorCode;
@@ -15,6 +17,7 @@ import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXPushServiceListener;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.PushManager;
+import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.push.PushClientMgr;
 
 /**
@@ -115,6 +118,10 @@ public class MaxIMPushService extends Service {
     }
 
     private void startPush(String alias, String token) {
+        //创建channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationUtils.getInstance().createChannelId();
+        }
         PushManager.getInstance().addPushListener(mListener);
         PushManager.getInstance().start(alias, new BMXCallBack() {
             @Override

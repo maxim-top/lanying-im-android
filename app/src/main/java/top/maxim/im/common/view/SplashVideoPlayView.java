@@ -3,7 +3,7 @@ package top.maxim.im.common.view;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
-import android.support.annotation.RawRes;
+import androidx.annotation.RawRes;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;

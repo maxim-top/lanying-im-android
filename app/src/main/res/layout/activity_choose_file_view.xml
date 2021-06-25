@@ -4,14 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/elv_doc_file"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fadingEdge="none"
         android:scrollbars="none">
 
-    </android.support.v7.widget.RecyclerView>
+    </androidx.recyclerview.widget.RecyclerView>
 
     <ProgressBar
         android:id="@+id/file_progress"

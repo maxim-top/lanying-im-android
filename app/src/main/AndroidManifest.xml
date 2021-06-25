@@ -31,11 +31,11 @@
     <!-- Android O版本调用安装需要使用该权限 -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <!--华为push permission-->
-    <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />
-    <permission
-        android:name="${applicationId}.permission.PROCESS_PUSH_MSG"
-        android:protectionLevel="signatureOrSystem" />
+<!--    &lt;!&ndash;华为push permission&ndash;&gt;-->
+<!--    <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />-->
+<!--    <permission-->
+<!--        android:name="${applicationId}.permission.PROCESS_PUSH_MSG"-->
+<!--        android:protectionLevel="signatureOrSystem" />-->
 
     <!--小米push permission-->
     <permission
@@ -266,11 +266,6 @@
             android:name=".contact.view.ContactSearchActivity"
             android:screenOrientation="portrait" />
 
-        <!--群组-->
-        <activity
-            android:name=".group.view.GroupListActivity"
-            android:screenOrientation="portrait" />
-
         <!--群组搜索-->
         <activity
             android:name=".group.view.GroupSearchActivity"
@@ -359,9 +354,13 @@
             android:taskAffinity="net.sourceforge.simcpux"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
+        <activity android:name=".filebrowser.FileBrowserActivity" />
+
+        <activity android:name=".login.view.LogViewActivity" />
+
         <!-- fileProvider -->
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -382,7 +381,12 @@
         <service
             android:name=".push.maxim.MaxIMPushService"
             android:exported="false">
+
         </service>
+        <!--华为push  配置-->
+<!--        <meta-data-->
+<!--            android:name="com.huawei.hms.client.appid"-->
+<!--            android:value="${HUAWEI_APPID}" />-->
 
         <!--华为push  配置-->
         <meta-data
@@ -439,42 +443,45 @@
 
         <!-- 接入HMSSDK 需要注册的provider，authorities 一定不能与其他应用一样，所以这边 ${PACKAGE_NAME} 要替换上您应用的包名
     Access HMSSDK need to register provider,authorities must not be the same as other applications, so this side ${package_name} to replace the package name you applied-->
-        <provider
-            android:name="com.huawei.hms.update.provider.UpdateProvider"
-            android:authorities="${applicationId}.hms.update.provider"
-            android:exported="false"
-            android:grantUriPermissions="true" />
+<!--        <provider-->
+<!--            android:name="com.huawei.hms.update.provider.UpdateProvider"-->
+<!--            android:authorities="${applicationId}.hms.update.provider"-->
+<!--            android:exported="false"-->
+<!--            android:grantUriPermissions="true" />-->
 
-        <!-- BridgeActivity定义了HMS-SDK中一些跳转所需要的透明页面-->
-        <activity
-            android:name="com.huawei.hms.activity.BridgeActivity"
-            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            android:theme="@android:style/Theme.Translucent">
-            <meta-data
-                android:name="hwc-theme"
-                android:value="androidhwext:style/Theme.Emui.Translucent" />
-        </activity>
+<!--        &lt;!&ndash; BridgeActivity定义了HMS-SDK中一些跳转所需要的透明页面&ndash;&gt;-->
+<!--        <activity-->
+<!--            android:name="com.huawei.hms.activity.BridgeActivity"-->
+<!--            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"-->
+<!--            android:excludeFromRecents="true"-->
+<!--            android:exported="false"-->
+<!--            android:hardwareAccelerated="true"-->
+<!--            android:theme="@android:style/Theme.Translucent">-->
+<!--            <meta-data-->
+<!--                android:name="hwc-theme"-->
+<!--                android:value="androidhwext:style/Theme.Emui.Translucent" />-->
+<!--        </activity>-->
 
-        <activity android:name=".filebrowser.FileBrowserActivity" />
+<!--        <receiver-->
+<!--            android:name=".push.huawei.HuaWeiPushReceiver"-->
+<!--            android:permission="${applicationId}.permission.PROCESS_PUSH_MSG">-->
+<!--            <intent-filter>-->
+<!--                &lt;!&ndash; 必须,用于接收token &ndash;&gt;-->
+<!--                <action android:name="com.huawei.android.push.intent.REGISTRATION" />-->
+<!--                &lt;!&ndash; 必须, 用于接收透传消息 &ndash;&gt;-->
+<!--                <action android:name="com.huawei.android.push.intent.RECEIVE" />-->
+<!--                &lt;!&ndash; 必须, 用于接收通知栏消息点击事件 此事件不需要开发者处理，只需注册就可以&ndash;&gt;-->
+<!--                <action android:name="com.huawei.intent.action.PUSH_DELAY_NOTIFY" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
 
-        <activity android:name=".login.view.LogViewActivity" />
-
-        <receiver
-            android:name=".push.huawei.HuaWeiPushReceiver"
-            android:permission="${applicationId}.permission.PROCESS_PUSH_MSG">
+        <service
+            android:name=".push.huawei.HuaWeiPushService"
+            android:exported="false">
             <intent-filter>
-                <!-- 必须,用于接收token -->
-                <action android:name="com.huawei.android.push.intent.REGISTRATION" />
-                <!-- 必须, 用于接收透传消息 -->
-                <action android:name="com.huawei.android.push.intent.RECEIVE" />
-                <!-- 必须, 用于接收通知栏消息点击事件 此事件不需要开发者处理，只需注册就可以-->
-                <action android:name="com.huawei.intent.action.PUSH_DELAY_NOTIFY" />
+                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
             </intent-filter>
-        </receiver>
-
+        </service>
         <!--xiaomi push相关配置开始  xiaomi push相关配置开始  xiaomi push相关配置开始  xiaomi push相关配置开始  xiaomi push相关配置开始  xiaomi push相关配置开始  -->
         <service
             android:name="com.xiaomi.push.service.XMPushService"
@@ -577,6 +584,12 @@
                 <action android:name="com.vivo.pushclient.action.RECEIVE" />
             </intent-filter>
         </receiver>
+        <meta-data
+            android:name="com.vivo.push.api_key"
+            android:value="${VIVO_APP_KEY}" />
+        <meta-data
+            android:name="com.vivo.push.app_id"
+            android:value="${VIVO_APPID}" />
 
         <!-- 华为刘海 -->
         <meta-data
@@ -599,6 +612,31 @@
             android:name="AGENT_APP_KEY"
             android:value="${AGENT_APP_KEY}" />
         <!-- *************AGENT END************** -->
+
+        <!-- *************Firebase START************** -->
+        <service
+            android:name=".push.google.FirebasePushService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Set custom default icon. This is used when no icon is set for incoming notification messages.
+     See README(https://goo.gl/l4GJaQ) for more. -->
+<!--        <meta-data-->
+<!--            android:name="com.google.firebase.messaging.default_notification_icon"-->
+<!--            android:resource="@drawable/bmx_icon144" />-->
+<!--        &lt;!&ndash; Set color used with incoming notification messages. This is used when no color is set for the incoming-->
+<!--             notification message. See README(https://goo.gl/6BKBk7) for more. &ndash;&gt;-->
+<!--        <meta-data-->
+<!--            android:name="com.google.firebase.messaging.default_notification_color"-->
+<!--            android:resource="@color/colorAccent" />-->
+
+<!--        <meta-data-->
+<!--            android:name="com.google.firebase.messaging.default_notification_channel_id"-->
+<!--            android:value="google Push" />-->
+        <!-- *************Firebase START************** -->
 
     </application>
 

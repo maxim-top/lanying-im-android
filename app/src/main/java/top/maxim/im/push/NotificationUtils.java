@@ -12,8 +12,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -79,9 +79,10 @@ public class NotificationUtils {
     private void showNotify(int importance, String title, String content, Intent it, int notifyId,
             Bitmap bitmap, int count) {
         long when = System.currentTimeMillis();
-        String channelId = String.format(
-                AppContextUtils.getAppContext().getString(R.string.channel_id),
-                AppContextUtils.getPackageName(AppContextUtils.getAppContext()), notifyId);
+        String channelId = AppContextUtils.getPackageName(AppContextUtils.getAppContext());
+//        String channelId = String.format(
+//                AppContextUtils.getAppContext().getString(R.string.channel_id),
+//                AppContextUtils.getPackageName(AppContextUtils.getAppContext()), notifyId);
         // 这里必须设置chanenelId,要不然该通知在8.0手机上，不能正常显示
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannelId(importance, channelId);
@@ -110,38 +111,21 @@ public class NotificationUtils {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    public void createChannelId() {
+        createChannelId(MsgConstants.ChannelImportance.PUBLIC, AppContextUtils.getPackageName(AppContextUtils.getAppContext()));
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     private void createChannelId(int importance, String channelId) {
-        NotificationChannel channel;
-        switch (importance) {
-            case MsgConstants.ChannelImportance.PRIVATE:
-                channel = new NotificationChannel(channelId,
-                        MsgConstants.NOTIFICATION_CHANNEL_PRIVATE,
-                        NotificationManager.IMPORTANCE_HIGH);
-                channel.setDescription(MsgConstants.NOTIFICATION_CHANNEL_PRIVATE);
-                channel.canShowBadge();
-                channel.enableLights(true);
-                channel.setShowBadge(true);
-                channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PRIVATE);
-                break;
-            case MsgConstants.ChannelImportance.TOPIC:
-                channel = new NotificationChannel(channelId,
-                        MsgConstants.NOTIFICATION_CHANNEL_TOPIC,
-                        NotificationManager.IMPORTANCE_DEFAULT);
-                channel.setDescription(MsgConstants.NOTIFICATION_CHANNEL_TOPIC);
-                channel.canShowBadge();
-                channel.enableLights(true);
-                channel.setShowBadge(true);
-                channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_SECRET);
-                break;
-            case MsgConstants.ChannelImportance.PUBLIC:
-            default:
-                channel = new NotificationChannel(channelId,
-                        MsgConstants.NOTIFICATION_CHANNEL_PUBLIC,
-                        NotificationManager.IMPORTANCE_DEFAULT);
-                channel.setDescription(MsgConstants.NOTIFICATION_CHANNEL_PUBLIC);
-                break;
-        }
-        channel.setSound(null, null);
+        NotificationChannel channel = new NotificationChannel(channelId,
+                MsgConstants.NOTIFICATION_CHANNEL_PUBLIC,
+                NotificationManager.IMPORTANCE_HIGH);
+        channel.setDescription(MsgConstants.NOTIFICATION_CHANNEL_PUBLIC);
+        channel.canShowBadge();
+        channel.enableLights(true);
+        channel.setShowBadge(true);
+        channel.enableVibration(true);
+        channel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PRIVATE);
         if (manager != null) {
             manager.createNotificationChannel(channel);
         }

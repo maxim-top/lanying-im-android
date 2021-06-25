@@ -3,7 +3,6 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -15,6 +14,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 
@@ -89,14 +90,21 @@ public class WelcomeActivity extends BaseTitleActivity {
         super.initDataForActivity();
         //听云
         AgentTask.get().init(AppContextUtils.getApplication());
+    }
+
+    private void initPermission(){
         NotificationUtils.getInstance().cancelAll();
         if (checkPermission()) {
             showProtocol();
         } else {
             requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
         }
-        //启动后台服务
-//        MaxIMPushService.startPushService(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initPermission();
     }
 
     private boolean checkPermission() {

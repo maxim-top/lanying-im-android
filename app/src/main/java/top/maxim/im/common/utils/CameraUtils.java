@@ -11,7 +11,7 @@ import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 
 import java.io.File;
 import java.util.List;

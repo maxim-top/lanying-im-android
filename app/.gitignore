@@ -2,5 +2,11 @@
 .gradle/
 .idea/
 app/app.iml
+.DS_STORE
+floo-android/
 app/bugly/
 tingyun/
+maxIM.iml
+maxim-android.iml
+gradle/
+local.properties

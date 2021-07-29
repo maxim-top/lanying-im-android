@@ -3,18 +3,22 @@ package top.maxim.im.videocall;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Message;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import im.floo.floolib.BMXRosterItem;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import im.floo.floolib.BMXRosterItemList;
+import im.floo.floolib.ListOfLongLong;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -24,44 +28,38 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.WeakHandler;
 import top.maxim.im.common.view.Header;
-import top.maxim.im.common.view.ImageRequestConfig;
-import top.maxim.im.common.view.ShapeImageView;
-import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.rtc.bean.BMXRtcStreamInfo;
 import top.maxim.rtc.engine.StupidEngine;
 import top.maxim.rtc.interfaces.BMXRTCEngineListener;
 import top.maxim.rtc.manager.RTCManager;
-import top.maxim.rtc.view.BMXRtcRenderView;
-import top.maxim.rtc.view.UCloudRenderView;
 
 /**
  * Description 单视频会话
  */
-public class SingleVideoCallActivity extends BaseTitleActivity {
+public class GroupVideoCallActivity extends BaseTitleActivity {
 
-    private static final String TAG = "SingleVideoCallActivity";
+    private static final String TAG = "GroupVideoCallActivity";
 
-    public static void openVideoCall(Context context, long chatId, int callMode) {
-        Intent intent = new Intent(context, SingleVideoCallActivity.class);
-        intent.putExtra(MessageConfig.CHAT_ID, chatId);
+    public static void openVideoCall(Context context, ArrayList<Long> chatIds, int callMode) {
+        Intent intent = new Intent(context, GroupVideoCallActivity.class);
+        intent.putExtra(MessageConfig.CHAT_IDS, (Serializable) chatIds);
         intent.putExtra(MessageConfig.CALL_MODE, callMode);
         context.startActivity(intent);
     }
 
-    private ViewGroup mVideoContainer;
+    private RecyclerView mRecyclerView;
 
-    private BMXRtcRenderView mLocalView;
+    private GroupVideoCallAdapter mAdapter;
 
-    private BMXRtcRenderView mRemoteView;
+    private GridLayoutManager mLayoutManager;
 
-    private ViewGroup mAudioContainer;
+    private ViewGroup mInitiatorContainer;
+    private ViewGroup mRecipientContainer;
 
-    private long mChatId;
+    private List<Long> mChatIds;
 
     private long mUserId;
-
-    private BMXRosterItem mRosterItem = new BMXRosterItem();
 
     //默认音频
     private int mCallMode = MessageConfig.CallMode.CALL_AUDIO;
@@ -88,9 +86,11 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         hideStatusBar();
-        View view = View.inflate(this, R.layout.activity_single_video_call, null);
-        mVideoContainer = view.findViewById(R.id.layout_video_container);
-        mAudioContainer = view.findViewById(R.id.layout_audio_container);
+        View view = View.inflate(this, R.layout.activity_group_video_call, null);
+        mInitiatorContainer = view.findViewById(R.id.layout_group_initiator_container);
+        mRecipientContainer = view.findViewById(R.id.layout_group_recipient_container);
+        mRecyclerView = mInitiatorContainer.findViewById(R.id.rcy_member);
+        mRecyclerView.setAdapter(mAdapter = new GroupVideoCallAdapter(this));
         mHandler = new CallHandler(this);
         initRtc();
         return view;
@@ -136,7 +136,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     protected void initDataFromFront(Intent intent) {
         super.initDataFromFront(intent);
         if (intent != null) {
-            mChatId = intent.getLongExtra(MessageConfig.CHAT_ID, 0);
+            mChatIds = (List<Long>) intent.getSerializableExtra(MessageConfig.CHAT_IDS);
             mCallMode = intent.getIntExtra(MessageConfig.CALL_MODE, 0);
         }
         mUserId = SharePreferenceUtils.getInstance().getUserId();
@@ -159,7 +159,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             @Override
             public void onJoinRoom(int code, String msg, String roomId) {
                 if (code == 0) {
-                    mEngine.publish(mHasVideo, false);
+                    mEngine.publish(mHasVideo, true);
                     Log.e(TAG, "加入房间成功 开启发布本地流, roomId= " + roomId + "msg = " + msg);
                 } else {
                     Log.e(TAG, "加入房间失败 roomId= " + roomId + "msg = " + msg);
@@ -275,52 +275,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         });
     }
 
-    /**
-     * 添加本地视频view
-     */
-    private void addLocalView() {
-        ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_large);
-        localParent.setVisibility(View.VISIBLE);
-        mLocalView = new UCloudRenderView(this);
-        mLocalView.init();
-        mLocalView.getSurfaceView().setZOrderMediaOverlay(false);
-        localParent.addView(mLocalView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-    }
-
-    /**
-     * 添加远端视频view
-     */
-    private void addRemoteView() {
-        ViewGroup remoteParent = mVideoContainer.findViewById(R.id.video_view_container_small);
-        remoteParent.setVisibility(View.VISIBLE);
-        mRemoteView = new UCloudRenderView(this);
-        mRemoteView.init();
-        mRemoteView.getSurfaceView().setZOrderMediaOverlay(true);
-        remoteParent.addView(mRemoteView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-    }
-
-    /**
-     * 移除本地视频view
-     */
-    private void removeLocalView() {
-        if (mLocalView != null) {
-            mLocalView.release();
-        }
-        ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_large);
-        localParent.removeAllViews();
-    }
-
-    /**
-     * 移除远端视频view
-     */
-    private void removeRemoteView() {
-        if (mRemoteView != null) {
-            mRemoteView.release();
-        }
-        ViewGroup remoteParent = mVideoContainer.findViewById(R.id.video_view_container_small);
-        remoteParent.removeAllViews();
-    }
-
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
@@ -328,19 +282,23 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     }
 
     private void initRoster() {
-        RosterManager.getInstance().getRosterList(mChatId, false, (bmxErrorCode, bmxRosterItem) -> {
+        ListOfLongLong chatIds = new ListOfLongLong();
+        if (mChatIds != null && mChatIds.size() > 0) {
+            for (long chatId : mChatIds) {
+                chatIds.add(chatId);
+            }
+        }
+        RosterManager.getInstance().getRosterList(chatIds, false, (bmxErrorCode, itemList) -> {
+            RosterFetcher.getFetcher().putRosters(itemList);
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                mRosterItem = bmxRosterItem;
-                onInitiateCall();
+                onInitiateCall(itemList);
             } else {
-                RosterManager.getInstance().getRosterList(mChatId, true,
-                        (bmxErrorCode1, bmxRosterItem1) -> {
-                            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                RosterManager.getInstance().getRosterList(chatIds, true,
+                        (bmxErrorCode1, itemList1) -> {
+                            if (!BaseManager.bmxFinish(bmxErrorCode1)) {
                                 return;
                             }
-                            RosterFetcher.getFetcher().putRoster(bmxRosterItem1);
-                            mRosterItem = bmxRosterItem1;
-                            onInitiateCall();
+                            onInitiateCall(itemList1);
                         });
             }
         });
@@ -349,19 +307,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     /**
      * 作为发起方发起视频
      */
-    private void onInitiateCall() {
-        if (mHasVideo) {
-            // 视频
-            mVideoContainer.setVisibility(View.VISIBLE);
-            mAudioContainer.setVisibility(View.GONE);
-            showVideoPeerInfo();
-        } else {
-            // 音频
-            mVideoContainer.setVisibility(View.GONE);
-            mAudioContainer.setVisibility(View.VISIBLE);
-            showAudioPeerInfo();
-        }
-        showInitiatorView();
+    private void onInitiateCall(BMXRosterItemList list) {
+        showInitiatorView(list);
+        hideControlView();
         hideRecipientView();
         /* 30s无响应提示 */
         mHandler.sendEmptyMessageDelayed(CallHandler.MSG_30_SEC_NOTIFY,
@@ -373,117 +321,82 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     }
 
     /**
-     * 展示视频发起者信息
-     */
-    private void showVideoPeerInfo() {
-        ViewGroup peerInfo = mVideoContainer.findViewById(R.id.container_video_peer_info);
-        peerInfo.setVisibility(View.VISIBLE);
-        TextView nameText = mVideoContainer.findViewById(R.id.tv_video_peer_name);
-        ShapeImageView avatar = mVideoContainer.findViewById(R.id.iv_video_peer_avatar);
-        String name = "";
-        if (mRosterItem != null && !TextUtils.isEmpty(mRosterItem.alias())) {
-            name = mRosterItem.alias();
-        } else if (mRosterItem != null && !TextUtils.isEmpty(mRosterItem.nickname())) {
-            name = mRosterItem.nickname();
-        } else if (mRosterItem != null) {
-            name = mRosterItem.username();
-        }
-        nameText.setText(name);
-        ChatUtils.getInstance().showRosterAvatar(mRosterItem, avatar, new ImageRequestConfig.Builder().cacheInMemory(true)
-                .showImageForEmptyUri(R.drawable.default_avatar_icon)
-                .showImageOnFail(R.drawable.default_avatar_icon)
-                .cacheOnDisk(true)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .showImageOnLoading(R.drawable.default_avatar_icon).build());
-    }
-
-    /**
-     * 隐藏视频发起者信息
-     */
-    private void hideVideoPeerInfo() {
-        ViewGroup peerInfo = mVideoContainer.findViewById(R.id.container_video_peer_info);
-        peerInfo.setVisibility(View.GONE);
-    }
-
-    /**
-     * 展示音频发起者信息
-     */
-    private void showAudioPeerInfo() {
-        ViewGroup peerInfo = mAudioContainer.findViewById(R.id.container_audio_peer_info);
-        peerInfo.setVisibility(View.VISIBLE);
-        TextView nameText = mAudioContainer.findViewById(R.id.tv_audio_peer_name);
-        ShapeImageView avatar = mAudioContainer.findViewById(R.id.iv_audio_peer_avatar);
-        String name = "";
-        if (mRosterItem != null && !TextUtils.isEmpty(mRosterItem.alias())) {
-            name = mRosterItem.alias();
-        } else if (mRosterItem != null && !TextUtils.isEmpty(mRosterItem.nickname())) {
-            name = mRosterItem.nickname();
-        } else if (mRosterItem != null) {
-            name = mRosterItem.username();
-        }
-        nameText.setText(name);
-        ChatUtils.getInstance().showRosterAvatar(mRosterItem, avatar, new ImageRequestConfig.Builder().cacheInMemory(true)
-                .showImageForEmptyUri(R.drawable.default_avatar_icon)
-                .showImageOnFail(R.drawable.default_avatar_icon)
-                .cacheOnDisk(true)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .showImageOnLoading(R.drawable.default_avatar_icon).build());
-    }
-
-    /**
-     * 隐藏音频发起者信息
-     */
-    private void hideAudioPeerInfo() {
-        ViewGroup peerInfo = mAudioContainer.findViewById(R.id.container_audio_peer_info);
-        peerInfo.setVisibility(View.GONE);
-    }
-
-    /**
      * 展示发起音视频的view
      */
-    private void showInitiatorView() {
-        ViewGroup view = findViewById(R.id.ll_initiate_control);
-        view.setVisibility(View.VISIBLE);
+    private void showInitiatorView(BMXRosterItemList list) {
+        mInitiatorContainer.setVisibility(View.VISIBLE);
+        if(list == null){
+            return;
+        }
+        List<String> items = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            items.add(list.get(i).rosterId() + "");
+        }
+        //自己也加入列表 作为第一个
+        items.add(0, mUserId + "");
+        //会话成员大于4个  网格最大个数3
+        int spanCount = items.size() > 4 ? 3 : 2;
+        if (mLayoutManager == null) {
+            mLayoutManager = new GridLayoutManager(this, spanCount);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+        } else {
+            mLayoutManager.setSpanCount(spanCount);
+        }
+        mAdapter.setSpanCount(spanCount);
+        mAdapter.replaceList(items);
     }
 
     /**
      * 隐藏发起音视频的view
      */
     private void hideInitiatorView() {
-        ViewGroup view = findViewById(R.id.ll_initiate_control);
-        view.setVisibility(View.GONE);
+        mInitiatorContainer.setVisibility(View.GONE);
     }
 
     /**
-     * 展示接收音视频的view
+     * 展示发起音视频的view
      */
-    private void showRecipientView() {
-        ViewGroup view = findViewById(R.id.ll_recipient_control);
-        view.setVisibility(View.VISIBLE);
+    private void showRecipientView(BMXRosterItemList list) {
+        mRecipientContainer.setVisibility(View.VISIBLE);
+        if(list == null){
+            return;
+        }
+        List<String> items = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            items.add(list.get(i).rosterId() + "");
+        }
+        //自己也加入列表 作为第一个
+        items.add(0, mUserId + "");
+        //会话成员大于4个  网格最大个数3
+        int spanCount = items.size() > 4 ? 3 : 2;
+        if (mLayoutManager == null) {
+            mLayoutManager = new GridLayoutManager(this, spanCount);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+        } else {
+            mLayoutManager.setSpanCount(spanCount);
+        }
+        mAdapter.setSpanCount(spanCount);
+        mAdapter.replaceList(items);
     }
 
     /**
-     * 隐藏接收音视频的view
+     * 隐藏发起音视频的view
      */
     private void hideRecipientView() {
-        ViewGroup view = findViewById(R.id.ll_recipient_control);
-        view.setVisibility(View.GONE);
+        mRecipientContainer.setVisibility(View.GONE);
     }
 
     /**
      * 展示控制view
      */
     private void showControlView() {
-        View controlView = mHasVideo ? mVideoContainer.findViewById(R.id.ll_video_in_call_control) : mAudioContainer.findViewById(R.id.ll_audio_in_call_control);
-        controlView.setVisibility(View.VISIBLE);
     }
 
     /**
      * 隐藏控制view
      */
     private void hideControlView() {
-        View controlView = mHasVideo ? mVideoContainer.findViewById(R.id.ll_video_in_call_control) : mAudioContainer.findViewById(R.id.ll_audio_in_call_control);
-        controlView.setVisibility(View.GONE);
+
     }
 
     /**
@@ -533,10 +446,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         boolean hasVideo = info.isHasVideo();
         boolean hasAudio = info.isHasAudio();
         if (hasVideo) {
-            addLocalView();
-            mEngine.startLocalPreview(mLocalView, info);
         } else {
-
         }
     }
 
@@ -552,9 +462,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         hideInitiatorView();
         hideRecipientView();
         if (hasVideo) {
-            addRemoteView();
-            mEngine.startRemotePreview(mRemoteView, info);
-            hideVideoPeerInfo();
             showControlView();
         } else {
 
@@ -566,7 +473,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 远端用户离开
      */
     private void onRemoteLeave() {
-        removeRemoteView();
+        hideInitiatorView();
+        hideRecipientView();
         mHandler.removeAll();
         finish();
     }

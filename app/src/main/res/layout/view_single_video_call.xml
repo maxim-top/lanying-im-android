@@ -78,8 +78,8 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="@dimen/dimen_70"
-                android:layout_height="@dimen/dimen_70"
+                android:layout_width="@dimen/dimen_50"
+                android:layout_height="@dimen/dimen_50"
                 android:src="@drawable/icon_call_switch_audio" />
 
             <TextView
@@ -99,8 +99,8 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="@dimen/dimen_70"
-                android:layout_height="@dimen/dimen_70"
+                android:layout_width="@dimen/dimen_50"
+                android:layout_height="@dimen/dimen_50"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_call_hangup" />
 
@@ -121,8 +121,8 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="@dimen/dimen_70"
-                android:layout_height="@dimen/dimen_70"
+                android:layout_width="@dimen/dimen_50"
+                android:layout_height="@dimen/dimen_50"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_call_switch_camera" />
 

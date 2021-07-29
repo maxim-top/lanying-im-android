@@ -60,6 +60,7 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.filebrowser.FileBrowserActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.videocall.RTCConfigActivity;
 import top.maxim.im.wxapi.WXUtils;
 
 /**
@@ -120,6 +121,9 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     /* 推送设置 */
     private ItemLineArrow.Builder mPushSet;
+
+    /* RTC设置 */
+    private ItemLineArrow.Builder mRTCConfig;
 
     /* 头像路径 */
     private String mIconPath;
@@ -346,6 +350,12 @@ public class SettingUserActivity extends BaseTitleActivity {
         mPushSet = new ItemLineArrow.Builder(this).setStartContent(getString(R.string.set_push))
                 .setOnItemClickListener(v -> PushSetActivity.openPushSet(this));
         container.addView(mPushSet.build());
+        // 分割线
+        addLineView(container);
+        // RCT设置
+        mRTCConfig = new ItemLineArrow.Builder(this).setStartContent(getString(R.string.config_rtc))
+                .setOnItemClickListener(v -> RTCConfigActivity.openRTCConfig(this));
+        container.addView(mRTCConfig.build());
         // 分割线
         addLineView(container);
         return view;

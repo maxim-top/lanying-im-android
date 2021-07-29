@@ -32,6 +32,11 @@ public interface MessageConfig {
     String CALL_MODE = "call_mode";
 
     /**
+     * 会话id列表
+     */
+    String CHAT_IDS = "chatIds";
+
+    /**
      * 添加
      */
     long MEMBER_ADD = -1;

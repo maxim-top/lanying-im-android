@@ -17,9 +17,14 @@ import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.permissions.PermissionsConstant;
+import top.maxim.im.contact.view.RosterChooseActivity;
 import top.maxim.im.message.contract.ChatGroupContract;
+import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.view.ChatGroupAtActivity;
+import top.maxim.im.message.view.ChatGroupListMemberActivity;
 import top.maxim.im.message.view.GroupAckActivity;
+import top.maxim.im.videocall.GroupVideoCallActivity;
 
 /**
  * Description : 群聊presenter Created by Mango on 2018/11/11.
@@ -31,6 +36,8 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     private ChatGroupContract.Model mModel;
 
     private final int AT_REQUEST = 2000;
+
+    private final int VIDEO_CALL_REQUEST = 2001;
 
     /* 文本@的对象列表 以feedId作为唯一标志 */
     private Map<String, String> mAtMap;
@@ -134,7 +141,7 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AT_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            Map<String, String> map = (Map<String, String>)data
+            Map<String, String> map = (Map<String, String>) data
                     .getSerializableExtra(ChatGroupAtActivity.CHOOSE_DATA);
             if (map != null && !map.isEmpty()) {
                 if (mAtMap == null) {
@@ -147,6 +154,11 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                 }
             }
             handleAt();
+        } else if (requestCode == VIDEO_CALL_REQUEST && resultCode == Activity.RESULT_OK
+                && data != null) {
+            ArrayList<Long> chooseList = (ArrayList<Long>) data
+                    .getSerializableExtra(ChatGroupListMemberActivity.CHOOSE_DATA);
+            GroupVideoCallActivity.openVideoCall(mView.getContext(), chooseList, MessageConfig.CallMode.CALL_AUDIO);
         }
     }
 
@@ -197,5 +209,22 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                 ToastUtil.showTextViewPrompt("获取已读列表失败");
             }
         });
+    }
+
+    @Override
+    protected void showVideoCallDialog() {
+        // 视频需要摄像头 麦克风权限
+        if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.RECORD_AUDIO)) {
+            handelVideoCall(true);
+        } else {
+            // 如果没有权限 首先请求SD读权限
+            requestPermissions(TYPE_VIDEO_CALL_PERMISSION, PermissionsConstant.CAMERA);
+        }
+    }
+
+    @Override
+    protected void handelVideoCall(boolean hasVideo) {
+        RosterChooseActivity.startRosterListActivity((Activity) mView.getContext(), true, true,
+                VIDEO_CALL_REQUEST);
     }
 }

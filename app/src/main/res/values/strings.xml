@@ -268,12 +268,15 @@
     <string name="set_push_msg_content">内容</string>
     <string name="set_push_message">推送消息</string>
 
-    <!--    音视频会话-->
+    <!-- 音视频会话-->
     <string name="call_video">视频通话</string>
     <string name="call_audio">语音通话</string>
     <string name="call_waiting_peer_accept">正在等待对方接受邀请...</string>
+    <string name="call_invited_audio">邀请你加入语音聊天...</string>
     <string name="call_switch_audio">切到语音通话</string>
     <string name="call_switch_camera">切换摄像头</string>
+    <string name="call_open_camera">打开摄像头</string>
+    <string name="call_close_camera">关闭摄像头</string>
     <string name="call_hangup">挂断</string>
     <string name="call_mute">静音</string>
     <string name="call_un_mute">取消静音</string>
@@ -287,5 +290,14 @@
     <string name="call_peer_hangup">对方挂断，通话结束"</string>
     <string name="call_peer_not_answer">对方无应答</string>
     <string name="call_suggest_call_later">对方手机可能不在身边，建议稍后再次尝试</string>
+    <string name="call_invited_num_notice">还有%1s人参与聊天</string>
+
+    <!-- 音视频会话设置-->
+    <string name="config_rtc">音视频设置</string>
+    <string name="config_rtc_video_profile">分辨率</string>
+    <string name="config_rtc_camera">摄像头</string>
+    <string name="config_rtc_mic">麦克风</string>
+    <string name="config_rtc_auto_publish">自动发布</string>
+    <string name="config_rtc_auto_subscribe">自动订阅</string>
 
 </resources>

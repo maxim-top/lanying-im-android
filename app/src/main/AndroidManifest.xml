@@ -367,6 +367,8 @@
         <activity android:name=".login.view.LogViewActivity" />
 
         <activity android:name=".videocall.SingleVideoCallActivity" />
+        <activity android:name=".videocall.GroupVideoCallActivity" />
+        <activity android:name=".videocall.RTCConfigActivity" />
 
         <!-- fileProvider -->
         <provider

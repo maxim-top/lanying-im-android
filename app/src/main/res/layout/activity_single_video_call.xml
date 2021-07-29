@@ -17,7 +17,7 @@
 
     <!--接听或者挂断-->
     <LinearLayout
-        android:id="@+id/ll_ringing_control"
+        android:id="@+id/ll_recipient_control"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -55,7 +55,6 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/iv_ringing_answer"
                 android:layout_width="@dimen/dimen_70"
                 android:layout_height="@dimen/dimen_70"
                 android:scaleType="fitCenter"

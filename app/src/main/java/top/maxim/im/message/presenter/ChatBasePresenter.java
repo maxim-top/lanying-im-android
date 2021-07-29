@@ -136,7 +136,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     private final int TYPE_VIDEO_PERMISSION = 6;
 
     /* 视频通话权限 */
-    private final int TYPE_VIDEO_CALL_PERMISSION = 7;
+    protected final int TYPE_VIDEO_CALL_PERMISSION = 7;
 
     /* 音频通话权限 */
     private final int TYPE_AUDIO_CALL_PERMISSION = 8;
@@ -1435,7 +1435,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      * @param permissions 权限列表
      * @return 是否具有所有权限
      */
-    private boolean hasPermission(String... permissions) {
+    boolean hasPermission(String... permissions) {
         if (mView.getContext() instanceof PermissionActivity) {
             PermissionActivity activity = (PermissionActivity)mView.getContext();
             return activity.hasPermission(permissions);
@@ -1451,7 +1451,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      * @param permissions 权限列表
      * @return 是否具有所有权限
      */
-    private void requestPermissions(final int requestType, final String... permissions) {
+    void requestPermissions(final int requestType, final String... permissions) {
         if (!(mView.getContext() instanceof PermissionActivity)) {
             Log.d(TAG, "activity is not PermissionActivity");
             return;
@@ -1712,7 +1712,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     /**
      * 视频通话
      */
-    private void showVideoCallDialog() {
+    protected void showVideoCallDialog() {
         final CustomDialog dialog = new CustomDialog();
         LinearLayout ll = new LinearLayout(mView.getContext());
         ll.setOrientation(LinearLayout.VERTICAL);
@@ -1737,7 +1737,6 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     // 如果没有权限 首先请求SD读权限
                     requestPermissions(TYPE_VIDEO_CALL_PERMISSION, PermissionsConstant.CAMERA);
                 }
-
             }
         });
         ll.addView(video, params);

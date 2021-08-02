@@ -46,7 +46,7 @@
                     <ImageView
                         android:layout_width="@dimen/dimen_60"
                         android:layout_height="@dimen/dimen_60"
-                        android:src="@drawable/icon_call_mute_status_true" />
+                        android:src="@drawable/icon_call_mute_status_open" />
 
                     <TextView
                         android:layout_width="match_parent"

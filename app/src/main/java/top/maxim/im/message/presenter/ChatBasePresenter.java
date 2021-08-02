@@ -1886,6 +1886,13 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 if (jsonObject.has(MessageConfig.INPUT_STATUS)) {
                     handelInputStatus(message.extension());
                 }
+                //TODO
+                if (jsonObject.has("rtcKey") && jsonObject.has("rtcValue")) {
+                    if (TextUtils.equals(jsonObject.getString("rtcKey"), "join") && !TextUtils.isEmpty(jsonObject.getString("rtcValue"))) {
+                        String[] values = jsonObject.getString("rtcValue").split("_");
+                        receiveVideoCall(values[0], TextUtils.equals(MessageConfig.CallMode.CALL_VIDEO+"", values[1]));
+                    }
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -1904,5 +1911,11 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      * 音视频  是否有视频
      */
     protected void handelVideoCall(boolean hasVideo) {
+    }
+
+    /**
+     * 收到音视频
+     */
+    protected void receiveVideoCall(String roomId, boolean hasVideo) {
     }
 }

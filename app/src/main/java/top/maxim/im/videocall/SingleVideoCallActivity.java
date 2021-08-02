@@ -11,12 +11,20 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import im.floo.floolib.BMXChatServiceListener;
+import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXRosterItem;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.RosterFetcher;
@@ -28,7 +36,9 @@ import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.sdk.utils.MessageSendUtils;
 import top.maxim.rtc.bean.BMXRtcStreamInfo;
+import top.maxim.rtc.engine.EngineConfig;
 import top.maxim.rtc.engine.StupidEngine;
 import top.maxim.rtc.interfaces.BMXRTCEngineListener;
 import top.maxim.rtc.manager.RTCManager;
@@ -42,10 +52,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private static final String TAG = "SingleVideoCallActivity";
 
-    public static void openVideoCall(Context context, long chatId, int callMode) {
+    public static void openVideoCall(Context context, long chatId, String roomId, boolean isInitiator, int callMode) {
         Intent intent = new Intent(context, SingleVideoCallActivity.class);
         intent.putExtra(MessageConfig.CHAT_ID, chatId);
         intent.putExtra(MessageConfig.CALL_MODE, callMode);
+        intent.putExtra(MessageConfig.RTC_ROOM_ID, roomId);
+        intent.putExtra(MessageConfig.IS_INITIATOR, isInitiator);
         context.startActivity(intent);
     }
 
@@ -61,6 +73,11 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private long mUserId;
 
+    private String mRoomId;
+
+    //是否是发起者
+    private boolean mIsInitiator;
+
     private BMXRosterItem mRosterItem = new BMXRosterItem();
 
     //默认音频
@@ -68,11 +85,33 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private boolean mHasVideo = false;
 
+    //扬声器
+    private boolean mSpeaker = EngineConfig.SWITCH_SPEAKER;
+
+    //麦克风
+    private boolean mMic = true;
+
     private CallHandler mHandler;
 
     private StupidEngine mEngine;
 
     private BMXRTCEngineListener mListener;
+
+    private MessageSendUtils mSendUtils;
+
+    private BMXChatServiceListener mChatListener = new BMXChatServiceListener(){
+        @Override
+        public void onReceive(BMXMessageList list) {
+            super.onReceive(list);
+            // 收到消息
+            if (list != null && !list.isEmpty()) {
+                for (int i = 0; i < list.size(); i++) {
+                    BMXMessage message = list.get(i);
+                    handleRTCMessage(message);
+                }
+            }
+        }
+    };
 
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
@@ -92,7 +131,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         mVideoContainer = view.findViewById(R.id.layout_video_container);
         mAudioContainer = view.findViewById(R.id.layout_audio_container);
         mHandler = new CallHandler(this);
-        initRtc();
+        mSendUtils = new MessageSendUtils();
         return view;
     }
 
@@ -138,6 +177,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (intent != null) {
             mChatId = intent.getLongExtra(MessageConfig.CHAT_ID, 0);
             mCallMode = intent.getIntExtra(MessageConfig.CALL_MODE, 0);
+            mRoomId = intent.getStringExtra(MessageConfig.RTC_ROOM_ID);
+            mIsInitiator = intent.getBooleanExtra(MessageConfig.IS_INITIATOR, false);
         }
         mUserId = SharePreferenceUtils.getInstance().getUserId();
         mHasVideo = mCallMode == MessageConfig.CallMode.CALL_VIDEO;
@@ -273,6 +314,16 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
             }
         });
+        if (mIsInitiator) {
+            joinRoom();
+        }
+        //获取之前配置初始化
+        if (mHasVideo) {
+            mEngine.setVideoProfile(EngineConfig.VIDEO_PROFILE);
+            mEngine.setAudioProfile(true);//视频默认开启扬声器
+        } else {
+            mEngine.setAudioProfile(mSpeaker);
+        }
     }
 
     /**
@@ -324,6 +375,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
+        ChatManager.getInstance().addChatListener(mChatListener);
         initRoster();
     }
 
@@ -331,7 +383,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         RosterManager.getInstance().getRosterList(mChatId, false, (bmxErrorCode, bmxRosterItem) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 mRosterItem = bmxRosterItem;
-                onInitiateCall();
+                initCallView();
             } else {
                 RosterManager.getInstance().getRosterList(mChatId, true,
                         (bmxErrorCode1, bmxRosterItem1) -> {
@@ -340,42 +392,61 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                             }
                             RosterFetcher.getFetcher().putRoster(bmxRosterItem1);
                             mRosterItem = bmxRosterItem1;
-                            onInitiateCall();
+                            initCallView();
                         });
             }
         });
+    }
+
+    private void initCallView(){
+        if (mHasVideo) {
+            // 视频
+            hideAudioPeerInfo();
+            showVideoPeerInfo();
+        } else {
+            // 音频
+            hideVideoPeerInfo();
+            showAudioPeerInfo();
+        }
+        if (mIsInitiator) {
+            onInitiateCall();
+        } else {
+            onRecipientCall();
+        }
+        initRtc();
     }
 
     /**
      * 作为发起方发起视频
      */
     private void onInitiateCall() {
-        if (mHasVideo) {
-            // 视频
-            mVideoContainer.setVisibility(View.VISIBLE);
-            mAudioContainer.setVisibility(View.GONE);
-            showVideoPeerInfo();
-        } else {
-            // 音频
-            mVideoContainer.setVisibility(View.GONE);
-            mAudioContainer.setVisibility(View.VISIBLE);
-            showAudioPeerInfo();
-        }
         showInitiatorView();
         hideRecipientView();
+        hideControlView();
         /* 30s无响应提示 */
         mHandler.sendEmptyMessageDelayed(CallHandler.MSG_30_SEC_NOTIFY,
                 CallHandler.TIME_DELAY_NOTIFY_PEER_NOT_ANSWER);
         /* 无响应关闭 */
         mHandler.sendEmptyMessageDelayed(CallHandler.MSG_PEER_NOT_ANSWER_CLOSE_ACTIVITY,
                 CallHandler.TIME_DELAY_CLOSE_ACTIVITY_PEER_NOT_ANSWER);
-        joinRoom(true);
+    }
+
+    /**
+     * 作为接收方
+     */
+    private void onRecipientCall() {
+        showRecipientView();
+        hideInitiatorView();
+        hideControlView();
     }
 
     /**
      * 展示视频发起者信息
      */
     private void showVideoPeerInfo() {
+        mVideoContainer.setVisibility(View.VISIBLE);
+        mAudioContainer.setVisibility(View.GONE);
+
         ViewGroup peerInfo = mVideoContainer.findViewById(R.id.container_video_peer_info);
         peerInfo.setVisibility(View.VISIBLE);
         TextView nameText = mVideoContainer.findViewById(R.id.tv_video_peer_name);
@@ -409,6 +480,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 展示音频发起者信息
      */
     private void showAudioPeerInfo() {
+        mAudioContainer.setVisibility(View.VISIBLE);
+        mVideoContainer.setVisibility(View.GONE);
+
         ViewGroup peerInfo = mAudioContainer.findViewById(R.id.container_audio_peer_info);
         peerInfo.setVisibility(View.VISIBLE);
         TextView nameText = mAudioContainer.findViewById(R.id.tv_audio_peer_name);
@@ -444,6 +518,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private void showInitiatorView() {
         ViewGroup view = findViewById(R.id.ll_initiate_control);
         view.setVisibility(View.VISIBLE);
+
+        View initialView = mHasVideo ? view.findViewById(R.id.layout_initiator_video) : view.findViewById(R.id.layout_initiator_audio);
+        initialView.setVisibility(View.VISIBLE);
+        if (!mHasVideo) {
+            changeSpeaker(mSpeaker, initialView.findViewById(R.id.iv_audio_speaker), initialView.findViewById(R.id.tv_audio_speaker));
+        }
     }
 
     /**
@@ -460,6 +540,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private void showRecipientView() {
         ViewGroup view = findViewById(R.id.ll_recipient_control);
         view.setVisibility(View.VISIBLE);
+
+        View recipientView = mHasVideo ? view.findViewById(R.id.layout_recipient_video) : view.findViewById(R.id.layout_recipient_audio);
+        recipientView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -473,28 +556,46 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     /**
      * 展示控制view
      */
-    private void showControlView() {
-        View controlView = mHasVideo ? mVideoContainer.findViewById(R.id.ll_video_in_call_control) : mAudioContainer.findViewById(R.id.ll_audio_in_call_control);
-        controlView.setVisibility(View.VISIBLE);
+    private void showControlView(boolean hasVideo) {
+        ViewGroup view = findViewById(R.id.ll_in_call_control);
+        view.setVisibility(View.VISIBLE);
+
+        View inCallVideoView = view.findViewById(R.id.layout_calling_video);
+        View inCallAudioView = view.findViewById(R.id.layout_calling_audio);
+        if (hasVideo) {
+            inCallVideoView.setVisibility(View.VISIBLE);
+            inCallAudioView.setVisibility(View.GONE);
+        } else {
+            inCallVideoView.setVisibility(View.GONE);
+            inCallAudioView.setVisibility(View.VISIBLE);
+            changeSpeaker(mSpeaker, inCallAudioView.findViewById(R.id.iv_audio_speaker), inCallAudioView.findViewById(R.id.tv_audio_speaker));
+        }
     }
 
     /**
      * 隐藏控制view
      */
     private void hideControlView() {
-        View controlView = mHasVideo ? mVideoContainer.findViewById(R.id.ll_video_in_call_control) : mAudioContainer.findViewById(R.id.ll_audio_in_call_control);
-        controlView.setVisibility(View.GONE);
+        ViewGroup view = findViewById(R.id.ll_in_call_control);
+        view.setVisibility(View.GONE);
+    }
+
+    private void changeSpeaker(boolean enable, ImageView imageView, TextView textView) {
+        mSpeaker = enable;
+        if (imageView != null) {
+            imageView.setImageResource(mSpeaker ? R.drawable.icon_call_hand_free_status_opened : R.drawable.icon_call_hand_free_status_closed);
+        }
+        if (textView != null) {
+            textView.setText(mSpeaker ? R.string.call_open_hand_free : R.string.call_close_hand_free);
+        }
     }
 
     /**
      * 加入房间
      *
-     * @param myRoom
      */
-    private void joinRoom(boolean myRoom) {
-//        String roomId = myRoom ? String.valueOf(mUserId) + mChatId : String.valueOf(mChatId) + mUserId;
-        String roomId = "123";
-        mEngine.joinRoom(String.valueOf(mUserId), roomId);
+    private void joinRoom() {
+        mEngine.joinRoom(String.valueOf(mUserId), mRoomId);
     }
 
     /**
@@ -508,22 +609,62 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 接听
      */
     public void onCallAnswer(View view) {
-        joinRoom(false);
+        joinRoom();
     }
 
     /**
-     * 拒绝
+     * 挂断
      */
-    public void onCallReject(View view) {
-        finish();
-    }
-
-    /**
-     * 取消
-     */
-    public void onCallCancel(View view) {
+    public void onCallHangup(View view){
         leaveRoom();
         finish();
+    }
+
+    /**
+     * 切换摄像头
+     */
+    public void onSwitchCamera(View view) {
+        mEngine.switchCamera();
+    }
+
+    /**
+     * 切换语音通话
+     */
+    public void onSwitchAudio(View view) {
+        switchAudio();
+        sendRTCMessage("mute_video", "");
+    }
+
+    private void switchAudio(){
+        mEngine.stopLocalPreview();
+        mEngine.muteLocalVideo(true);
+        removeLocalView();
+        removeRemoteView();
+        hideVideoPeerInfo();
+        showAudioPeerInfo();
+        mCallMode = MessageConfig.CallMode.CALL_AUDIO;
+        mHasVideo = false;
+        showControlView(mHasVideo);
+    }
+
+    /**
+     * 切换扬声器
+     */
+    public void onSwitchSpeakerInitiator(View view) {
+        ViewGroup parent = findViewById(R.id.ll_initiate_control);
+        changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));
+        mEngine.setAudioProfile(mSpeaker);
+        ToastUtil.showTextViewPrompt(mSpeaker ? R.string.call_speaker_on_tips : R.string.call_speaker_off_tips);
+    }
+
+    /**
+     * 切换扬声器
+     */
+    public void onSwitchSpeakerCalling(View view) {
+        ViewGroup parent = findViewById(R.id.ll_in_call_control);
+        changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));
+        mEngine.setAudioProfile(mSpeaker);
+        ToastUtil.showTextViewPrompt(mSpeaker ? R.string.call_speaker_on_tips : R.string.call_speaker_off_tips);
     }
 
     private void onUserJoin(BMXRtcStreamInfo info){
@@ -538,6 +679,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         } else {
 
         }
+        if (mIsInitiator) {
+            //用户加入放入房间 发送给对方信息
+            sendRTCMessage("join", mRoomId + "_" + mCallMode);
+        }
     }
 
     /**
@@ -551,11 +696,11 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         boolean hasAudio = info.isHasAudio();
         hideInitiatorView();
         hideRecipientView();
+        showControlView(hasVideo);
         if (hasVideo) {
             addRemoteView();
             mEngine.startRemotePreview(mRemoteView, info);
             hideVideoPeerInfo();
-            showControlView();
         } else {
 
         }
@@ -581,6 +726,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         leaveRoom();
         mHandler.removeAll();
         RTCManager.getInstance().removeRtcListener(mListener);
+        ChatManager.getInstance().removeChatListener(mChatListener);
     }
 
     private class CallHandler extends WeakHandler<Activity> {
@@ -633,6 +779,53 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             removeMessages(TIME_DELAY_CLOSE_ACTIVITY);
             removeMessages(TIME_DELAY_CLOSE_ACTIVITY_PEER_NOT_ANSWER);
             removeMessages(TIME_DELAY_NOTIFY_PEER_NOT_ANSWER);
+        }
+    }
+
+    /**
+     * 发送RTC信息
+     */
+    private void sendRTCMessage(String config, String value){
+        String extension = "";
+        try {
+            JSONObject object = new JSONObject();
+            object.put("rtcKey", config);
+            object.put("rtcValue", value);
+            extension = object.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        mSendUtils.sendInputStatusMessage(BMXMessage.MessageType.Single, SharePreferenceUtils.getInstance().getUserId(), mChatId, extension);
+    }
+
+    /**
+     * 处理RTC消息
+     */
+    private void handleRTCMessage(BMXMessage message){
+        if (message == null) {
+            return;
+        }
+        if (message.contentType() == BMXMessage.ContentType.Text
+                && !TextUtils.isEmpty(message.extension())) {
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(message.extension());
+                if(!jsonObject.has("rtcKey")){
+                    return;
+                }
+                String key = jsonObject.getString("rtcKey");
+                switch (key){
+                    case "mute_video":
+                        switchAudio();
+                        break;
+                    case "mute_audio":
+                        break;
+                    default:
+                        break;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

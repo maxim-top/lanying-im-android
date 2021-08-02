@@ -32,6 +32,16 @@ public interface MessageConfig {
     String CALL_MODE = "call_mode";
 
     /**
+     * roomId
+     */
+    String RTC_ROOM_ID = "roomId";
+
+    /**
+     * 是否发起者
+     */
+    String IS_INITIATOR = "isInitiator";
+
+    /**
      * 会话id列表
      */
     String CHAT_IDS = "chatIds";

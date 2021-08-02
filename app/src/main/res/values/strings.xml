@@ -278,11 +278,10 @@
     <string name="call_open_camera">打开摄像头</string>
     <string name="call_close_camera">关闭摄像头</string>
     <string name="call_hangup">挂断</string>
-    <string name="call_mute">静音</string>
-    <string name="call_un_mute">取消静音</string>
-    <string name="call_hand_free">免提</string>
-    <string name="call_open_hand_free">打开免提</string>
-    <string name="call_close_hand_free">关闭免提</string>
+    <string name="call_mute">麦克风已关</string>
+    <string name="call_un_mute">麦克风已开</string>
+    <string name="call_open_hand_free">扬声器已开</string>
+    <string name="call_close_hand_free">扬声器已关</string>
     <string name="call_reject">拒绝</string>
     <string name="call_answer">接听</string>
     <string name="call_cancel">取消</string>
@@ -291,12 +290,15 @@
     <string name="call_peer_not_answer">对方无应答</string>
     <string name="call_suggest_call_later">对方手机可能不在身边，建议稍后再次尝试</string>
     <string name="call_invited_num_notice">还有%1s人参与聊天</string>
+    <string name="call_speaker_on_tips">声音将从扬声器播放</string>
+    <string name="call_speaker_off_tips">声音将从听筒播放</string>
 
     <!-- 音视频会话设置-->
     <string name="config_rtc">音视频设置</string>
     <string name="config_rtc_video_profile">分辨率</string>
     <string name="config_rtc_camera">摄像头</string>
     <string name="config_rtc_mic">麦克风</string>
+    <string name="config_rtc_speaker">扬声器</string>
     <string name="config_rtc_auto_publish">自动发布</string>
     <string name="config_rtc_auto_subscribe">自动订阅</string>
 

@@ -15,94 +15,63 @@
         layout="@layout/view_single_audio_call"
         android:visibility="gone" />
 
-    <!--接听或者挂断-->
-    <LinearLayout
-        android:id="@+id/ll_recipient_control"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="@dimen/dimen_0"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="@dimen/dimen_70"
-                android:layout_height="@dimen/dimen_70"
-                android:scaleType="fitCenter"
-                android:onClick="onCallReject"
-                android:src="@drawable/icon_call_hangup" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_3"
-                android:gravity="center"
-                android:text="@string/call_reject"
-                android:textColor="@color/color_white" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="@dimen/dimen_0"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="@dimen/dimen_70"
-                android:layout_height="@dimen/dimen_70"
-                android:scaleType="fitCenter"
-                android:onClick="onCallAnswer"
-                android:src="@drawable/icon_call_answer" />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:gravity="center"
-                android:text="@string/call_answer"
-                android:textColor="@color/color_white" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <!--接听或者挂断-->
-    <LinearLayout
+    <!--发起-->
+    <FrameLayout
         android:id="@+id/ll_initiate_control"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:orientation="horizontal"
         android:visibility="gone">
 
-        <LinearLayout
-            android:layout_width="@dimen/dimen_0"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+        <include
+            android:id="@+id/layout_initiator_video"
+            layout="@layout/view_single_initiator_call_video"
+            android:visibility="gone" />
 
-            <ImageView
-                android:layout_width="@dimen/dimen_70"
-                android:layout_height="@dimen/dimen_70"
-                android:scaleType="fitCenter"
-                android:onClick="onCallCancel"
-                android:src="@drawable/icon_call_hangup" />
+        <include
+            android:id="@+id/layout_initiator_audio"
+            layout="@layout/view_single_initiator_call_audio"
+            android:visibility="gone" />
+    </FrameLayout>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_3"
-                android:gravity="center"
-                android:text="@string/call_cancel"
-                android:textColor="@color/color_white" />
-        </LinearLayout>
+    <!--接收-->
+    <FrameLayout
+        android:id="@+id/ll_recipient_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone">
 
-    </LinearLayout>
+        <include
+            android:id="@+id/layout_recipient_video"
+            layout="@layout/view_single_recipient_call_video"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/layout_recipient_audio"
+            layout="@layout/view_single_recipient_call_audio"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <!--进行中-->
+    <FrameLayout
+        android:id="@+id/ll_in_call_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone">
+
+        <include
+            android:id="@+id/layout_calling_video"
+            layout="@layout/view_single_calling_video"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/layout_calling_audio"
+            layout="@layout/view_single_calling_audio"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
 </FrameLayout>

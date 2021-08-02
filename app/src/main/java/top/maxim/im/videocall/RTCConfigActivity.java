@@ -47,6 +47,9 @@ public class RTCConfigActivity extends BaseTitleActivity {
     /* 自动订阅 */
     private ItemLineSwitch.Builder mSwitchAutoSubscribe;
 
+    /* 扬声器 */
+    private ItemLineSwitch.Builder mSwitchSpeaker;
+
     public static void openRTCConfig(Context context) {
         Intent intent = new Intent(context, RTCConfigActivity.class);
         context.startActivity(intent);
@@ -98,6 +101,16 @@ public class RTCConfigActivity extends BaseTitleActivity {
 //        container.addView(mSwitchAutoSubscribe.build());
 //        // 分割线
 //        addLineView(container);
+
+        // 扬声器
+        mSwitchSpeaker = new ItemLineSwitch.Builder(this)
+                .setLeftText(getString(R.string.config_rtc_speaker))
+                .setCheckStatus(EngineConfig.SWITCH_SPEAKER)
+                .setOnItemSwitchListener((v, check) ->
+                        EngineConfig.SWITCH_SPEAKER = check);
+        container.addView(mSwitchSpeaker.build());
+        // 分割线
+        addLineView(container);
     }
 
     // 添加分割线

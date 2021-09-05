@@ -200,7 +200,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             @Override
             public void onJoinRoom(int code, String msg, String roomId) {
                 if (code == 0) {
-                    mEngine.publish(mHasVideo, false);
+                    mEngine.publish(mHasVideo, true);
                     Log.e(TAG, "加入房间成功 开启发布本地流, roomId= " + roomId + "msg = " + msg);
                 } else {
                     Log.e(TAG, "加入房间失败 roomId= " + roomId + "msg = " + msg);
@@ -616,6 +616,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 挂断
      */
     public void onCallHangup(View view){
+        sendRTCMessage("hangup", "");
         leaveRoom();
         finish();
     }
@@ -636,6 +637,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     }
 
     private void switchAudio(){
+        mEngine.unPublish();
         mEngine.stopLocalPreview();
         mEngine.muteLocalVideo(true);
         removeLocalView();
@@ -816,9 +818,15 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 String key = jsonObject.getString("rtcKey");
                 switch (key){
                     case "mute_video":
+                        //切换语音通话
                         switchAudio();
                         break;
                     case "mute_audio":
+                        break;
+                    case "hangup":
+                        //挂断
+                        leaveRoom();
+                        finish();
                         break;
                     default:
                         break;

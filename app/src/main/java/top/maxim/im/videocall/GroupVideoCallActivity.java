@@ -17,6 +17,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import im.floo.floolib.BMXChatServiceListener;
+import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXRosterItemList;
 import im.floo.floolib.ListOfLongLong;
 import top.maxim.im.R;
@@ -29,6 +32,7 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.WeakHandler;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.sdk.utils.MessageSendUtils;
 import top.maxim.rtc.bean.BMXRtcStreamInfo;
 import top.maxim.rtc.engine.StupidEngine;
 import top.maxim.rtc.interfaces.BMXRTCEngineListener;
@@ -72,6 +76,21 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
 
     private BMXRTCEngineListener mListener;
 
+    private MessageSendUtils mSendUtils;
+
+    private BMXChatServiceListener mChatListener = new BMXChatServiceListener(){
+        @Override
+        public void onReceive(BMXMessageList list) {
+            super.onReceive(list);
+            // 收到消息
+            if (list != null && !list.isEmpty()) {
+                for (int i = 0; i < list.size(); i++) {
+                    BMXMessage message = list.get(i);
+                }
+            }
+        }
+    };
+
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         return new Header.Builder(this, headerContainer).build();
@@ -93,6 +112,7 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
         mRecyclerView.setAdapter(mAdapter = new GroupVideoCallAdapter(this));
         mHandler = new CallHandler(this);
         initRtc();
+        mSendUtils = new MessageSendUtils();
         return view;
     }
 

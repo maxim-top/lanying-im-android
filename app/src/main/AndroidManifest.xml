@@ -366,9 +366,15 @@
 
         <activity android:name=".login.view.LogViewActivity" />
 
-        <activity android:name=".videocall.SingleVideoCallActivity" />
-        <activity android:name=".videocall.GroupVideoCallActivity" />
-        <activity android:name=".videocall.RTCConfigActivity" />
+        <activity
+            android:name=".videocall.SingleVideoCallActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".videocall.GroupVideoCallActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".videocall.RTCConfigActivity"
+            android:screenOrientation="portrait" />
 
         <!-- fileProvider -->
         <provider

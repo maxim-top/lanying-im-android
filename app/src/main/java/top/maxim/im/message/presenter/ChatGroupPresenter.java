@@ -224,7 +224,9 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
     @Override
     protected void handelVideoCall(boolean hasVideo) {
-        RosterChooseActivity.startRosterListActivity((Activity) mView.getContext(), true, true,
+        List<String> filterIdList = new ArrayList<>();
+        filterIdList.add(mMyUserId + "");
+        RosterChooseActivity.startRosterListActivity((Activity) mView.getContext(), true, true, filterIdList,
                 VIDEO_CALL_REQUEST);
     }
 }

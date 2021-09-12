@@ -4,6 +4,7 @@ package top.maxim.im.login.view;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -24,6 +25,7 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -44,8 +46,15 @@ public class LogViewActivity extends BaseTitleActivity {
     /* 日志路径 */
     private String mLogPath;
 
+    private String mAppId;
+
     public static void openLogView(Context context) {
+        openLogView(context, "");
+    }
+
+    public static void openLogView(Context context, String appId) {
         Intent intent = new Intent(context, LogViewActivity.class);
+        intent.putExtra(CommonConfig.CHANGE_APP_ID, appId);
         context.startActivity(intent);
     }
 
@@ -70,6 +79,14 @@ public class LogViewActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.activity_log_view, null);
         mTvLog = view.findViewById(R.id.tv_log);
         return view;
+    }
+
+    @Override
+    protected void initDataFromFront(Intent intent) {
+        super.initDataFromFront(intent);
+        if (intent != null) {
+            mAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
+        }
     }
 
     @Override
@@ -107,7 +124,7 @@ public class LogViewActivity extends BaseTitleActivity {
      */
     private String getLogPath() {
         String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
-        String appId = SharePreferenceUtils.getInstance().getAppId();
+        String appId = TextUtils.isEmpty(mAppId) ? SharePreferenceUtils.getInstance().getAppId() : mAppId;
         String path = appPath + "/data_dir/" + appId + "/flooLog/";
         return path;
     }

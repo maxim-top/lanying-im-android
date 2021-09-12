@@ -127,33 +127,36 @@ public class RosterApplyActivity extends BaseTitleActivity {
                 (bmxErrorCode, ap) -> {
                     dismissLoadingDialog();
                     if (BaseManager.bmxFinish(bmxErrorCode)) {
+                        BMXRosterServiceApplicationList list;
                         if (ap.result() != null && !ap.result().isEmpty()) {
                             mCursor = ap.cursor();
-                            ListOfLongLong listOfLongLong = new ListOfLongLong();
-                            BMXRosterServiceApplicationList list = ap.result();
-                            for (int i = 0; i < list.size(); i++) {
-                                listOfLongLong.add(list.get(i).getMRosterId());
-                            }
-                            RosterManager.getInstance().getRosterList(listOfLongLong, true,
-                                    (bmxErrorCode1, itemList) -> {
-                                        RosterFetcher.getFetcher().putRosters(itemList);
-                                        if (BaseManager.bmxFinish(bmxErrorCode1)) {
-                                            if (list != null && !list.isEmpty()) {
-                                                List<BMXRosterService.Application> applications = new ArrayList<>();
-                                                for (int i = 0; i < list.size(); i++) {
-                                                    applications.add(list.get(i));
-                                                }
-                                                showList(applications, ap.cursor(), upload);
-                                            } else {
-                                                showList(null, "", upload);
+                            list = ap.result();
+                        } else {
+                            list = new BMXRosterServiceApplicationList();
+                        }
+                        ListOfLongLong listOfLongLong = new ListOfLongLong();
+                        for (int i = 0; i < list.size(); i++) {
+                            listOfLongLong.add(list.get(i).getMRosterId());
+                        }
+                        RosterManager.getInstance().getRosterList(listOfLongLong, true,
+                                (bmxErrorCode1, itemList) -> {
+                                    RosterFetcher.getFetcher().putRosters(itemList);
+                                    if (BaseManager.bmxFinish(bmxErrorCode1)) {
+                                        if (list != null && !list.isEmpty()) {
+                                            List<BMXRosterService.Application> applications = new ArrayList<>();
+                                            for (int i = 0; i < list.size(); i++) {
+                                                applications.add(list.get(i));
                                             }
+                                            showList(applications, ap.cursor(), upload);
                                         } else {
-                                            String error = bmxErrorCode == null ? "网络错误" : bmxErrorCode.name();
-                                            ToastUtil.showTextViewPrompt(error);
                                             showList(null, "", upload);
                                         }
-                                    });
-                        }
+                                    } else {
+                                        String error = bmxErrorCode == null ? "网络错误" : bmxErrorCode.name();
+                                        ToastUtil.showTextViewPrompt(error);
+                                        showList(null, "", upload);
+                                    }
+                                });
                         return;
                     }
                     String error = bmxErrorCode == null ? "网络错误" : bmxErrorCode.name();

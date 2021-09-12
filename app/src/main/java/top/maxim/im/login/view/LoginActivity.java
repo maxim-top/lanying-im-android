@@ -121,7 +121,7 @@ public class LoginActivity extends BaseTitleActivity {
         // 三次点击打开日志
         ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_open_log), 3, () -> {
             // 跳转查看日志
-            LogViewActivity.openLogView(this);
+            LogViewActivity.openLogView(this, mChangeAppId);
         });
         
         initRxBus();

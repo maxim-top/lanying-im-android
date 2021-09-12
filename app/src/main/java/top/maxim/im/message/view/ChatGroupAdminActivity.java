@@ -93,12 +93,17 @@ public class ChatGroupAdminActivity extends ChatGroupListMemberActivity {
     }
 
     @Override
+    protected boolean hasPageLoad() {
+        return false;
+    }
+
+    @Override
     protected void initData(boolean forceRefresh, BMXDataCallBack<BMXGroupMemberList> callBack) {
         GroupManager.getInstance().getAdmins(mGroup, forceRefresh, callBack);
     }
 
     @Override
-    protected void bindData(BMXGroupMemberList memberList) {
+    protected void bindData(BMXGroupMemberList memberList, boolean upload) {
         List<BMXGroup.Member> members = new ArrayList<>();
         if (memberList != null && !memberList.isEmpty()) {
             for (int i = 0; i < memberList.size(); i++) {

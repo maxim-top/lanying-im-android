@@ -4,12 +4,14 @@ package top.maxim.im.message.view;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +34,10 @@ import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseRecyclerAdapter;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
-import top.maxim.im.common.view.recyclerview.FullyGridLayoutManager;
+import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
 import top.maxim.im.contact.view.RosterChooseActivity;
 import top.maxim.im.contact.view.RosterDetailActivity;
+import top.maxim.im.message.utils.ChatRecyclerScrollListener;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 
@@ -63,6 +66,12 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
     private boolean mIsOwner;
     
     private List<String> memberIdList;
+
+    private ChatRecyclerScrollListener mScrollListener;
+
+    private String mCursor = "";
+
+    private final int DEFAULT_PAGE_SIZE = 10;
     
     public static void startGroupMemberActivity(Context context, long groupId) {
         Intent intent = new Intent(context, ChatGroupMemberActivity.class);
@@ -87,7 +96,8 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
     protected View onCreateView() {
         View view = View.inflate(this, R.layout.chat_group_member_view, null);
         mGvGroupMember = view.findViewById(R.id.gv_chat_group_member);
-        mGvGroupMember.setLayoutManager(new FullyGridLayoutManager(this, 5));
+        mGvGroupMember.setLayoutManager(new LinearLayoutManager(this));
+        mGvGroupMember.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
         mGvGroupMember.setAdapter(mAdapter = new ChatGroupMemberAdapter(this));
         return view;
     }
@@ -103,6 +113,30 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
     @Override
     protected void setViewListener() {
         super.setViewListener();
+        /* 上下拉刷新 */
+        mGvGroupMember.addOnScrollListener(mScrollListener = new ChatRecyclerScrollListener(
+                (LinearLayoutManager)mGvGroupMember.getLayoutManager()) {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+
+            @Override
+            protected void onLoadPullDown(int offset) {
+                super.onLoadPullDown(offset);
+            }
+
+            @Override
+            protected void onLoadPullUp(int offset) {
+                super.onLoadPullUp(offset);
+                initGroupMembers(mCursor, true);
+            }
+        });
         mAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -124,6 +158,7 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
                 }
             }
         });
+
     }
 
     @Override
@@ -141,16 +176,23 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
                     mGroup = bmxGroup;
                 }
                 mIsOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
-                initGroupMembers();
+                initGroupMembers("", false);
             } else {
                 toastError(bmxErrorCode);
             }
         });
     }
 
-    private void initGroupMembers() {
-        GroupManager.getInstance().getMembers(mGroup, true, (bmxErrorCode, memberList) -> {
+    private void initGroupMembers(String cursor, boolean upload) {
+        GroupManager.getInstance().getMembers(mGroup, cursor, DEFAULT_PAGE_SIZE, (bmxErrorCode, page) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
+                BMXGroupMemberList memberList;
+                if (page != null && page.result() != null && !page.result().isEmpty()) {
+                    mCursor = page.cursor();
+                    memberList = page.result();
+                } else {
+                    memberList = new BMXGroupMemberList();
+                }
                 ListOfLongLong listOfLongLong = new ListOfLongLong();
                 for (int i = 0; i < memberList.size(); i++) {
                     listOfLongLong.add(memberList.get(i).getMUid());
@@ -161,7 +203,7 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
                             if (!BaseManager.bmxFinish(bmxErrorCode1)) {
                                 toastError(bmxErrorCode1);
                             }
-                            bindData(memberList);
+                            bindData(memberList, upload);
                         });
             } else {
                 toastError(bmxErrorCode);
@@ -169,12 +211,15 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
         });
     }
 
-    protected void bindData(BMXGroupMemberList memberList) {
+    protected void bindData(BMXGroupMemberList memberList, boolean upload) {
         List<BMXGroup.Member> members = new ArrayList<>();
         if (memberIdList == null) {
             memberIdList = new ArrayList<>();
         }
-        memberIdList.clear();
+        if (!upload) {
+            //非加载更多需要清空
+            memberIdList.clear();
+        }
         for (int i = 0; i < memberList.size(); i++) {
             BMXGroup.Member member = memberList.get(i);
             if (member != null) {
@@ -182,15 +227,21 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
                 memberIdList.add(String.valueOf(member.getMUid()));
             }
         }
-        // 群主才有添加 删除功能
-        if (mIsOwner) {
-            // 增加添加 移除
-            BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "", 0);
-            BMXGroup.Member remove = new BMXGroup.Member(MessageConfig.MEMBER_REMOVE, "", 0);
-            members.add(add);
-            members.add(remove);
+        if (upload) {
+            int count = mAdapter.getItemCount();
+            mAdapter.addList(members, count > 2 ? count - 2 : 0);
+        } else {
+            // 群主才有添加 删除功能
+            if (mIsOwner) {
+                // 增加添加 移除
+                BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "", 0);
+                BMXGroup.Member remove = new BMXGroup.Member(MessageConfig.MEMBER_REMOVE, "", 0);
+                members.add(add);
+                members.add(remove);
+            }
+            mAdapter.replaceList(members);
         }
-        mAdapter.replaceList(members);
+        mScrollListener.resetUpLoadStatus();
     }
 
     /**
@@ -238,7 +289,7 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
         GroupManager.getInstance().addMembers(mGroup, listOfLongLong, message, bmxErrorCode -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                initGroupMembers();
+                initGroupMembers("", false);
             } else {
                 toastError(bmxErrorCode);
             }
@@ -258,7 +309,7 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
         GroupManager.getInstance().removeMembers(mGroup, listOfLongLong, reason, bmxErrorCode -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                initGroupMembers();
+                initGroupMembers("", false);
             } else {
                 toastError(bmxErrorCode);
             }
@@ -331,7 +382,7 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
 
         @Override
         protected int onCreateViewById(int viewType) {
-            return R.layout.item_group_member;
+            return R.layout.item_group_list_member;
         }
 
         @Override

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,6 +15,8 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /* 群成员 */
     private TextView mChatGroupMember;
+
+    /* 群类型 */
+    private ItemLineArrow.Builder mChatGroupType;
 
     /* 群id */
     private ItemLineArrow.Builder mChatGroupId;
@@ -460,7 +464,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 });
         container.addView(mViewChatGroupShare = mChatGroupShare.build());
         // 分割线
-        itemLine11 = new ItemLine.Builder(this, container).build();
+        itemLine11 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15)).build();
         container.addView(itemLine11);
 
         /* 群已读 */
@@ -474,8 +478,18 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 });
         container.addView(mChatGroupReadModeView = mChatGroupReadMode.build());
         // 分割线
-        itemLine12 = new ItemLine.Builder(this, container).build();
+        itemLine12 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15)).build();
         container.addView(itemLine12);
+
+        //群类型
+        mChatGroupType = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.group_type))
+                .setArrowVisible(false);
+        container.addView(mChatGroupType.build());
+
+        // 分割线
+        View itemLine13 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15)).build();
+        container.addView(itemLine13);
 
         // 退出群聊
         mQuitGroup = new TextView(this);
@@ -599,6 +613,20 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         boolean readAck = mGroup.enableReadAck();
         mChatGroupReadMode.setCheckStatus(readAck);
 
+        //群类型
+        String groupType = "";
+        switch (mGroup.groupType()){
+            case Public:
+                groupType = getString(R.string.group_type_public);
+                break;
+            case Private:
+                groupType = getString(R.string.group_type_private);
+                break;
+            case Chatroom:
+                groupType = getString(R.string.group_type_chat_room);
+                break;
+        }
+        mChatGroupType.setEndContent(groupType);
         setManagerVisible();
     }
 

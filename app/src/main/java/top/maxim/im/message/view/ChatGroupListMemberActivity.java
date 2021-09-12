@@ -5,14 +5,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseRecyclerAdapter;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
+import top.maxim.im.message.utils.ChatRecyclerScrollListener;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 
@@ -67,6 +69,15 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
     protected static final String CHOOSE = "choose";
 
     public static final String CHOOSE_DATA = "chooseData";
+
+    //是否有分页拉取
+    private boolean mHasPageLoad;
+
+    protected ChatRecyclerScrollListener mScrollListener;
+
+    protected String mCursor = "";
+
+    protected final int DEFAULT_PAGE_SIZE = 10;
 
     public static void startGroupMemberListActivity(Activity context, long groupId,
             boolean isChoose, int requestCode) {
@@ -121,11 +132,43 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
         mGvGroupMember.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
         mGvGroupMember.setAdapter(mAdapter = new ChatGroupMemberAdapter(this));
         mAdapter.setShowCheck(mChoose);
+        mHasPageLoad = hasPageLoad();
         return view;
+    }
+
+    //是否有分页拉取 默认有
+    protected boolean hasPageLoad(){
+        return true;
     }
 
     @Override
     protected void setViewListener() {
+        /* 上下拉刷新 */
+        if(mHasPageLoad){
+            mGvGroupMember.addOnScrollListener(mScrollListener = new ChatRecyclerScrollListener(
+                    (LinearLayoutManager)mGvGroupMember.getLayoutManager()) {
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                }
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                }
+
+                @Override
+                protected void onLoadPullDown(int offset) {
+                    super.onLoadPullDown(offset);
+                }
+
+                @Override
+                protected void onLoadPullUp(int offset) {
+                    super.onLoadPullUp(offset);
+                    init(mCursor, true);
+                }
+            });
+        }
         mAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -177,12 +220,16 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
         });
     }
 
-    protected void init() {
+    protected void init(){
+        init("", false);
+    }
+
+    private void init(String cursor, boolean upload) {
         if (mGroup == null) {
             return;
         }
         showLoadingDialog(true);
-        initData(true, (bmxErrorCode, list) -> {
+        BMXDataCallBack<BMXGroupMemberList> callBack = (bmxErrorCode, list) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (!list.isEmpty()) {
@@ -193,18 +240,22 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
                     RosterManager.getInstance().getRosterList(listOfLongLong, true,
                             (bmxErrorCode1, itemList) -> {
                                 RosterFetcher.getFetcher().putRosters(itemList);
-                                bindData(list);
+                                bindData(list, upload);
                             });
                 } else {
-                    bindData(list);
+                    bindData(list, upload);
                 }
             } else {
                 toastError(bmxErrorCode);
-                initData(false, (bmxErrorCode1, list1) -> {
-                    bindData(list1);
-                });
+                initData(false, (bmxErrorCode1, list1) ->
+                        bindData(list1, false));
             }
-        });
+        };
+        if (mHasPageLoad) {
+            initData(cursor, callBack);
+        } else {
+            initData(true, callBack);
+        }
     }
 
     protected BMXDataCallBack<BMXGroupMemberList> handleCallBackData(BMXErrorCode errorCode,
@@ -241,19 +292,48 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
         });
     }
 
-    protected void bindData(BMXGroupMemberList memberList) {
-        if (memberList != null && !memberList.isEmpty()) {
-            List<BMXGroup.Member> members = new ArrayList<>();
-            for (int i = 0; i < memberList.size(); i++) {
-                members.add(memberList.get(i));
+    protected void initData(String cursor, BMXDataCallBack<BMXGroupMemberList> callBack) {
+        GroupManager.getInstance().getMembers(mGroup, cursor, DEFAULT_PAGE_SIZE, (bmxErrorCode, page) -> {
+            BMXGroupMemberList memberListTmp = new BMXGroupMemberList();
+            if (page != null && page.result() != null && !page.result().isEmpty()) {
+                mCursor = page.cursor();
+                BMXGroupMemberList list = page.result();
+                long myId = SharePreferenceUtils.getInstance().getUserId();
+                for (int i = 0; i < list.size(); i++) {
+                    long memberId = list.get(i).getMUid();
+                    if (myId != memberId) {
+                        memberListTmp.add(list.get(i));
+                    }
+                }
             }
-            mAdapter.replaceList(members);
-            mGvGroupMember.setVisibility(View.VISIBLE);
-            mEmptyView.setVisibility(View.GONE);
-        } else {
-            mGvGroupMember.setVisibility(View.GONE);
-            mEmptyView.setVisibility(View.VISIBLE);
+            if (callBack != null) {
+                callBack.onResult(bmxErrorCode, memberListTmp);
+            }
+        });
+    }
+
+    protected void bindData(BMXGroupMemberList memberList, boolean upload) {
+        if (memberList == null || memberList.isEmpty()) {
+            if (!upload) {
+                mGvGroupMember.setVisibility(View.GONE);
+                mEmptyView.setVisibility(View.VISIBLE);
+            }
+            return;
         }
+        List<BMXGroup.Member> members = new ArrayList<>();
+        for (int i = 0; i < memberList.size(); i++) {
+            members.add(memberList.get(i));
+        }
+        if (upload) {
+            mAdapter.addListAtEnd(members);
+        } else {
+            mAdapter.replaceList(members);
+        }
+        if (mScrollListener != null) {
+            mScrollListener.resetUpLoadStatus();
+        }
+        mGvGroupMember.setVisibility(View.VISIBLE);
+        mEmptyView.setVisibility(View.GONE);
     }
 
     @Override

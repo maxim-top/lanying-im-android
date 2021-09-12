@@ -7,9 +7,11 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupAnnouncementList;
 import im.floo.floolib.BMXGroupBannedMemberList;
+import im.floo.floolib.BMXGroupBannedMemberResultPage;
 import im.floo.floolib.BMXGroupList;
 import im.floo.floolib.BMXGroupManager;
 import im.floo.floolib.BMXGroupMemberList;
+import im.floo.floolib.BMXGroupMemberResultPage;
 import im.floo.floolib.BMXGroupService;
 import im.floo.floolib.BMXGroupServiceListener;
 import im.floo.floolib.BMXGroupSharedFileList;
@@ -133,6 +135,13 @@ public class GroupManager extends BaseManager {
     }
 
     /**
+     * 获取群成员列表，如果设置了forceRefresh则从服务器拉取
+     **/
+    public void getMembers(BMXGroup group, String cursor, int pageSize, BMXDataCallBack<BMXGroupMemberResultPage> callBack) {
+        mService.getMembers(group, cursor, pageSize, callBack);
+    }
+
+    /**
      * 添加群成员
      **/
     public void addMembers(BMXGroup group, ListOfLongLong listOfLongLong, String message, BMXCallBack callBack) {
@@ -193,6 +202,14 @@ public class GroupManager extends BaseManager {
     }
 
     /**
+     * 获取黑名单
+     **/
+    public void getBlockList(BMXGroup group, String cursor, int pageSize,
+            BMXDataCallBack<BMXGroupMemberResultPage> callBack) {
+        mService.getBlockList(group, cursor, pageSize, callBack);
+    }
+
+    /**
      * 禁言
      **/
     public void banMembers(BMXGroup group, ListOfLongLong listOfLongLong, long duration,
@@ -212,6 +229,13 @@ public class GroupManager extends BaseManager {
      **/
     public void getBannedMembers(BMXGroup group, BMXDataCallBack<BMXGroupBannedMemberList> callBack) {
         mService.getBannedMembers(group, callBack);
+    }
+
+    /**
+     * 获取禁言列表
+     **/
+    public void getBannedMembers(BMXGroup group, String cursor, int pageSize, BMXDataCallBack<BMXGroupBannedMemberResultPage> callBack) {
+        mService.getBannedMembers(group, cursor, pageSize, callBack);
     }
 
     /**

@@ -81,7 +81,7 @@ public class BaseManager {
         if (bmxClient == null || bmxClient.getSDKConfig() == null) {
             return;
         }
-        BMXSDKConfig conf = bmxClient.getSDKConfig();
+        BMXSDKConfig conf  = bmxClient.getSDKConfig();
         if (!TextUtils.isEmpty(server) && port > 0 && !TextUtils.isEmpty(restServer)) {
             // 三项数据都不为空才设置
             BMXSDKConfig.HostConfig hostConfig = conf.getHostConfig();

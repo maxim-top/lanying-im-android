@@ -225,6 +225,20 @@ public class GroupManager extends BaseManager {
     }
 
     /**
+     * 全员禁言
+     */
+    public void banGroup(BMXGroup group, long duration, BMXCallBack callBack) {
+        mService.banGroup(group, duration, callBack);
+    }
+
+    /**
+     * 解除全员禁言
+     */
+    public void unbanGroup(BMXGroup group, BMXCallBack callBack) {
+        mService.unbanGroup(group, callBack);
+    }
+
+    /**
      * 获取禁言列表
      **/
     public void getBannedMembers(BMXGroup group, BMXDataCallBack<BMXGroupBannedMemberList> callBack) {

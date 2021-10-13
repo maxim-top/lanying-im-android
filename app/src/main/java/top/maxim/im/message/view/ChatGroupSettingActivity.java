@@ -22,12 +22,15 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ScreenUtils;
+import top.maxim.im.common.utils.TimeUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
+import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
+import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.group.view.GroupApplyActivity;
 import top.maxim.im.message.utils.MessageConfig;
 
@@ -70,8 +73,11 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
     /* 群黑名单 */
     private ItemLineArrow.Builder mGroupBlock;
 
-    /* 群禁言列表 */
-    private ItemLineArrow.Builder mGroupBan;
+    /* 群成员禁言列表 */
+    private ItemLineArrow.Builder mGroupMemberBan;
+
+    /* 列表 */
+    private ItemLineSwitch.Builder mGroupBan;
 
     private SparseArray<BMXGroup.MsgMuteMode> muteModeMap = new SparseArray<>();
 
@@ -275,8 +281,8 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
                 .setMarginLeft(ScreenUtils.dp2px(15));
         container.addView(itemLine9.build());
 
-        // 群禁言
-        mGroupBan = new ItemLineArrow.Builder(this).setStartContent(getString(R.string.group_ban))
+        // 群成员禁言
+        mGroupMemberBan = new ItemLineArrow.Builder(this).setStartContent(getString(R.string.group_ban))
                 .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
@@ -284,6 +290,25 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
                                 mGroupId);
                     }
 
+                });
+        container.addView(mGroupMemberBan.build());
+
+        // 分割线
+        ItemLine.Builder itemLine10 = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(itemLine10.build());
+
+        // 全员禁言
+        mGroupBan = new ItemLineSwitch.Builder(this).setLeftText(getString(R.string.group_all_ban))
+                .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
+                    @Override
+                    public void onItemSwitch(View v, boolean curCheck) {
+                        if (curCheck) {
+                            banGroup();
+                        } else {
+                            unBanGroup();
+                        }
+                    }
                 });
         container.addView(mGroupBan.build());
 
@@ -370,7 +395,9 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
         mGroupBlock.setEndContent(blocks <= 0 ? "" : String.valueOf(blocks));
         // 禁言人数
         int banSize = mGroup.bannedListSize();
-        mGroupBan.setEndContent(banSize <= 0 ? "" : String.valueOf(banSize));
+        mGroupMemberBan.setEndContent(banSize <= 0 ? "" : String.valueOf(banSize));
+        //全员禁言
+        bindBanGroup();
     }
 
     private void initGroupMode() {
@@ -517,6 +544,71 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
             BMXGroup.MsgMuteMode muteMode = muteModeMap.get(stringResId);
             GroupManager.getInstance().muteMessage(mGroup, muteMode, callBack);
         }
+    }
+
+    /**
+     * 设置全员禁言
+     */
+    private void bindBanGroup(){
+        long banExpireTime = mGroup.banExpireTime() * 1000;
+        long currentTime = System.currentTimeMillis();
+        if (banExpireTime > currentTime) {
+            //判断是否当前在禁言
+            mGroupBan.setLeftText(getString(R.string.group_all_ban) + "(" + TimeUtils.millis2String(banExpireTime) + ")");
+            mGroupBan.setCheckStatus(true);
+        } else {
+            mGroupBan.setLeftText(getString(R.string.group_all_ban));
+            mGroupBan.setCheckStatus(false);
+        }
+    }
+
+    /**
+     * 全员禁言
+     */
+    private void banGroup(){
+        DialogUtils.getInstance().showEditDialog(this, "禁言持续时间(分钟)", getString(R.string.confirm),
+                getString(R.string.cancel), true, new CommonEditDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener(String content) {
+                        if (!TextUtils.isEmpty(content)) {
+                            showLoadingDialog(true);
+                            GroupManager.getInstance().banGroup(mGroup, Long.valueOf(content), new BMXCallBack() {
+                                @Override
+                                public void onResult(BMXErrorCode bmxErrorCode) {
+                                    dismissLoadingDialog();
+                                    if (BaseManager.bmxFinish(bmxErrorCode)) {
+                                        bindBanGroup();
+                                    } else {
+                                        toastError(bmxErrorCode);
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
+    }
+
+    /**
+     * 解除全员禁言
+     */
+    private void unBanGroup() {
+        showLoadingDialog(true);
+        GroupManager.getInstance().unbanGroup(mGroup, new BMXCallBack() {
+            @Override
+            public void onResult(BMXErrorCode bmxErrorCode) {
+                dismissLoadingDialog();
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    bindBanGroup();
+                } else {
+                    toastError(bmxErrorCode);
+                }
+            }
+        });
     }
 
     @Override

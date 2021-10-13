@@ -38,6 +38,7 @@
     <string name="group_trans">群主管理权转让</string>
     <string name="group_black">群成员黑名单</string>
     <string name="group_ban">群成员禁言</string>
+    <string name="group_all_ban">全员禁言</string>
     <string name="group_ban_time">禁言时间(分钟) 为空永久禁言</string>
     <string name="group_ban_reason">禁言原因</string>
     <string name="group_apply">入群申请</string>

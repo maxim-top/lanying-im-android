@@ -42,7 +42,6 @@ allprojects {
         maven {
             url "http://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
         }
-        maven { url 'https://repo1.maven.org/maven2/' }
     }
 }
 

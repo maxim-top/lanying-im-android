@@ -496,7 +496,6 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         mQuitGroup.setTextColor(getResources().getColor(R.color.color_FF475A));
         mQuitGroup.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
         mQuitGroup.setGravity(Gravity.CENTER);
-        mQuitGroup.setText(getString(R.string.group_quit));
         mQuitGroup.setBackgroundResource(R.color.color_white);
         mQuitGroup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -554,6 +553,8 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     private void bindGroupInfo() {
         mIsOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
+        //退出群聊文案
+        mQuitGroup.setText(getString(mIsOwner ? R.string.group_destroy : R.string.group_quit));
 
         long groupId = mGroup.groupId();
         mChatGroupId.setEndContent(groupId > 0 ? String.valueOf(groupId) : "");
@@ -791,6 +792,8 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 } else if (TextUtils.equals(title, getString(R.string.group_my_name))) {
                     // 我在群里的昵称
                     mGroupMyNickName.setEndContent(info);
+                    //设置完我在本群的昵称 刷新member名称
+                    initGroupMembers();
                 } else if (TextUtils.equals(title, getString(R.string.group_desc))) {
                     // 设置群描述
                     mViewGroupDesc
@@ -836,8 +839,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 toastError(bmxErrorCode);
             }
         };
-        boolean isOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
-        if (isOwner) {
+        if (mIsOwner) {
             GroupManager.getInstance().destroy(mGroup, callBack);
         } else {
             GroupManager.getInstance().leave(mGroup, callBack);
@@ -958,13 +960,15 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                         "drawable://" + R.drawable.default_remove_icon);
             } else {
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(memberId);
-                String name;
-                if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
+                String name = "";
+                if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
+                    name = rosterItem.alias();
+                } else if (member != null && !TextUtils.isEmpty(member.getMGroupNickname())) {
+                    name = member.getMGroupNickname();
+                } else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
                     name = rosterItem.nickname();
                 } else if (rosterItem != null) {
                     name = rosterItem.username();
-                } else {
-                    name = member.getMGroupNickname();
                 }
                 tvName.setText(TextUtils.isEmpty(name) ? "" : name);
                 ChatUtils.getInstance().showRosterAvatar(rosterItem, icon, mConfig);

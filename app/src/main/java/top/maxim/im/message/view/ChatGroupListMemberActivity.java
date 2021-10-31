@@ -404,15 +404,15 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
                         "drawable://" + R.drawable.default_remove_icon);
             } else {
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(member.getMUid());
-                String name;
+                String name = "";
                 if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
                     name = rosterItem.alias();
-                } else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
+                } else if (member != null && !TextUtils.isEmpty(member.getMGroupNickname())) {
+                    name = member.getMGroupNickname();
+                }else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
                     name = rosterItem.nickname();
                 } else if (rosterItem != null) {
                     name = rosterItem.username();
-                } else {
-                    name = member.getMGroupNickname();
                 }
                 tvName.setText(TextUtils.isEmpty(name) ? "" : name);
                 ChatUtils.getInstance().showRosterAvatar(rosterItem, icon, mConfig);

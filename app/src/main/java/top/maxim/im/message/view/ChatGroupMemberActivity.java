@@ -403,14 +403,14 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
             } else {
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(memberId);
                 String name = "";
-                if (rosterItem != null) {
-                    if (!TextUtils.isEmpty(rosterItem.alias())) {
-                        name = rosterItem.alias();
-                    } else if (!TextUtils.isEmpty(rosterItem.nickname())) {
-                        name = rosterItem.nickname();
-                    } else {
-                        name = rosterItem.username();
-                    }
+                if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
+                    name = rosterItem.alias();
+                } else if (member != null && !TextUtils.isEmpty(member.getMGroupNickname())) {
+                    name = member.getMGroupNickname();
+                }else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
+                    name = rosterItem.nickname();
+                } else if (rosterItem != null) {
+                    name = rosterItem.username();
                 }
                 tvName.setText(TextUtils.isEmpty(name) ? "" : name);
 

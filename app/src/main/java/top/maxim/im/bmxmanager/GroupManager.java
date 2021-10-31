@@ -142,6 +142,27 @@ public class GroupManager extends BaseManager {
     }
 
     /**
+     * 获取群成员
+     **/
+    public BMXGroup.Member getMemberByDB(long groupId, long memberId) {
+        BMXGroup group = getGroupListByDB(groupId);
+        BMXGroupMemberList list = new BMXGroupMemberList();
+        BMXErrorCode error = mGroupService.getMembers(group, list, false);
+        if (error == null || error.swigValue() != BMXErrorCode.NoError.swigValue()) {
+            return null;
+        }
+        if (list != null && !list.isEmpty()) {
+            for (int i = 0; i < list.size(); i++) {
+                BMXGroup.Member member = list.get(i);
+                if(member.getMUid() == memberId){
+                    return member;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * 添加群成员
      **/
     public void addMembers(BMXGroup group, ListOfLongLong listOfLongLong, String message, BMXCallBack callBack) {

@@ -30,6 +30,7 @@
     <string name="group_share">群共享列表</string>
     <string name="group_read_mode">群已读</string>
     <string name="group_quit">删除并退出</string>
+    <string name="group_destroy">解散群聊</string>
     <string name="group_quit_notice">确定退出群聊?</string>
     <string name="group_setting">群设置</string>
     <string name="group_mute_msg">屏蔽群消息</string>
@@ -156,7 +157,7 @@
     <string name="auto_download_attachment">是否自动下载缩略图附件</string>
     <string name="auto_accept_group_invite">是否自动接收群邀请</string>
     <string name="black_list">黑名单列表</string>
-    <string name="other_device_tips">是否多端提示</string>
+    <string name="other_device_tips">是否Toast提示</string>
     <string name="device_list">多设备列表</string>
     <string name="about_us">关于我们</string>
     <string name="setting_user_name">昵称</string>

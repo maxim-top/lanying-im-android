@@ -120,12 +120,12 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
                         showSetGroupMode(getString(R.string.group_mute_msg));
                     }
                 });
-        container.addView(mMuteGroupMessage.build());
+//        container.addView(mMuteGroupMessage.build());
 
         // 分割线
         ItemLine.Builder itemLine0 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine0.build());
+//        container.addView(itemLine0.build());
 
         // // 接收并显示群信息
         // mShowGroupMessage = new ItemLineSwitch.Builder(this)
@@ -186,16 +186,16 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
                     }
 
                 });
-        container.addView(mGroupNotifyMode.build());
+//        container.addView(mGroupNotifyMode.build());
 
         // 分割线
         ItemLine.Builder itemLine4 = new ItemLine.Builder(this, container)
                 .setMarginLeft(ScreenUtils.dp2px(15));
-        container.addView(itemLine4.build());
+//        container.addView(itemLine4.build());
 
         // 入群审批模式
         mGroupJoinAuthMode = new ItemLineArrow.Builder(this)
-                .setStartContent(getString(R.string.group_join_auth_mode))
+                .setStartContent(getString(R.string.group_join_auth_mode) )
                 .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {

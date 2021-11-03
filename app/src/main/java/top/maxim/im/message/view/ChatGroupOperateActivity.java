@@ -246,10 +246,13 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 if (bmxGroup != null) {
                     mGroup = bmxGroup;
                 }
-                bindGroupInfo();
-                if (syncMember) {
-                    initGroupMembers();
-                }
+                //需要获取群管理员列表  判断是否是管理员
+                GroupManager.getInstance().getAdmins(mGroup, true, (bmxErrorCode1, memberList) -> {
+                    bindGroupInfo();
+                    if (syncMember) {
+                        initGroupMembers();
+                    }
+                });
             } else {
                 toastError(bmxErrorCode);
             }

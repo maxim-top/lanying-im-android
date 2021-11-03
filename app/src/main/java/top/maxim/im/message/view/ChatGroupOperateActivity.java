@@ -42,6 +42,7 @@ import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.CommonDialog;
@@ -425,9 +426,6 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
-                        if (!mIsAdmin) {
-                            return;
-                        }
                         ChatGroupAnnomentActivity.startGroupAnnoucementActivity(
                                 ChatGroupOperateActivity.this, mGroupId);
                     }
@@ -567,7 +565,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
             @Override
             public void onClick(View v) {
                 DialogUtils.getInstance().showDialog(ChatGroupOperateActivity.this,
-                        getString(R.string.group_quit), getString(R.string.group_quit_notice),
+                        mQuitGroup.getText().toString(), getString(mIsOwner ? R.string.group_destroy_notice : R.string.group_quit_notice),
                         new CommonDialog.OnDialogListener() {
                             @Override
                             public void onConfirmListener() {
@@ -619,7 +617,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     private void bindGroupInfo() {
         mIsOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
-        mIsAdmin = mGroup.roleType() == BMXGroup.MemberRoleType.GroupAdmin || mIsOwner;
+        mIsAdmin = GroupManager.getInstance().isAdmin(mGroup, SharePreferenceUtils.getInstance().getUserId()) || mIsOwner;
         //创建者才能解散  退出群聊文案
         mQuitGroup.setText(getString(mIsOwner ? R.string.group_destroy : R.string.group_quit));
 

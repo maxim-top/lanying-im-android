@@ -32,6 +32,7 @@
     <string name="group_quit">删除并退出</string>
     <string name="group_destroy">解散群聊</string>
     <string name="group_quit_notice">确定退出群聊?</string>
+    <string name="group_destroy_notice">确定解散群聊?</string>
     <string name="group_setting">群设置</string>
     <string name="group_mute_msg">屏蔽群消息</string>
     <string name="group_show_msg">接收并提示群消息</string>

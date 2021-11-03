@@ -201,6 +201,26 @@ public class GroupManager extends BaseManager {
     }
 
     /**
+     * 是否是管理员
+     **/
+    public boolean isAdmin(BMXGroup group, long memberId) {
+        BMXGroupMemberList list = new BMXGroupMemberList();
+        BMXErrorCode error = mGroupService.getAdmins(group, list, false);
+        if (error == null || error.swigValue() != BMXErrorCode.NoError.swigValue()) {
+            return false;
+        }
+        if (list != null && !list.isEmpty()) {
+            for (int i = 0; i < list.size(); i++) {
+                BMXGroup.Member member = list.get(i);
+                if (member.getMUid() == memberId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * 添加黑名单
      **/
     public void blockMembers(BMXGroup group, ListOfLongLong listOfLongLong, BMXCallBack callBack) {

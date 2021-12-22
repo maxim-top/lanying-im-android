@@ -5,14 +5,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,11 +75,6 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
         intent.putExtra(MessageConfig.CHAT_ID, groupId);
         intent.putExtra(CHOOSE, isChoose);
         context.startActivityForResult(intent, requestCode);
-    }
-
-    public static void startGroupMemberListActivity(Activity context, long groupId,
-            int requestCode) {
-        startGroupMemberListActivity(context, groupId, false, requestCode);
     }
 
     @Override

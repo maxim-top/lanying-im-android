@@ -5,6 +5,10 @@ apply plugin: 'newlens'
 //google service
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.huawei.agconnect'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-parcelize'
+//apply plugin: 'com.kezong.fat-aar'
 
 android {
     compileSdkVersion 28
@@ -72,7 +76,8 @@ android {
     }
     repositories {
         flatDir {
-            dirs 'libs'   // aar目录
+//            dirs 'libs'   // aar目录
+            dirs project(':floo-android-rtc').file('libs')   // aar目录
         }
     }
 
@@ -115,7 +120,9 @@ dependencies {
     //UIL
 
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_3.0.16.20210304',ext:'aar')
+//    implementation(name:'floo-android_3.0.16.20210304',ext:'aar')
+//    implementation(name: 'floo-android_3.2.0.20211025', ext:'aar')
+
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
 
@@ -136,7 +143,7 @@ dependencies {
     //华为push
     implementation "com.huawei.hms:push:5.0.4.302"
     //魅族push
-    implementation 'com.meizu.flyme.internet:push-internal:3.8.1'
+    implementation 'com.meizu.flyme.internet:push-internal:4.0.4'
 
     implementation 'com.google.code.gson:gson:2.8.5'
     //微信
@@ -160,8 +167,8 @@ dependencies {
 //    implementation 'com.google.firebase:firebase-messaging:21.0.1'
 //    implementation 'com.google.firebase:firebase-analytics:18.0.1'
 
+//    implementation project(':floo-rtc-ucloud')
+    implementation project(':floo-android-rtc')
+//    implementation 'top.maxim.rtc:floo-android-rtc:1.0.0'
 //    implementation 'org.webrtc:google-webrtc:1.0.30039'
-//    implementation 'io.socket:socket.io-client:1.0.0'
-
-    implementation project(':floo-rtc-ucloud')
 }

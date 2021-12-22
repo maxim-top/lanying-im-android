@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <top.maxim.im.rtc.view.RTCRenderView
+        <top.maxim.rtc.view.RTCLocalRenderView
             android:id="@+id/rtc_local"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

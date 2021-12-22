@@ -1890,7 +1890,14 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 if (jsonObject.has("rtcKey") && jsonObject.has("rtcValue")) {
                     if (TextUtils.equals(jsonObject.getString("rtcKey"), "join") && !TextUtils.isEmpty(jsonObject.getString("rtcValue"))) {
                         String[] values = jsonObject.getString("rtcValue").split("_");
-                        receiveVideoCall(values[0], TextUtils.equals(MessageConfig.CallMode.CALL_VIDEO+"", values[1]));
+                        String roomId = values[0];
+                        String[] chatIdArray = values[1].split(",");
+                        boolean hasVideo = TextUtils.equals(MessageConfig.CallMode.CALL_VIDEO+"", values[2]);
+                        List<Long> chatIds = new ArrayList<>();
+                        for (String id : chatIdArray){
+                            chatIds.add(Long.valueOf(id));
+                        }
+                        receiveVideoCall(roomId, chatIds, hasVideo);
                     }
                 }
             } catch (JSONException e) {
@@ -1916,6 +1923,6 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     /**
      * 收到音视频
      */
-    protected void receiveVideoCall(String roomId, boolean hasVideo) {
+    protected void receiveVideoCall(String roomId, List<Long> chatIds, boolean hasVideo) {
     }
 }

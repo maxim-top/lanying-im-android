@@ -22,7 +22,7 @@ import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
-import top.maxim.rtc.engine.UCloudEngine;
+import top.maxim.rtc.engine.MaxEngine;
 import top.maxim.rtc.manager.RTCManager;
 
 /**
@@ -110,8 +110,10 @@ public class MaxIMApplication extends Application {
      * 初始化Rtc
      */
     private void initRtc(){
-        UCloudEngine.init(this, PushClientMgr.getPushAppId("RTC_APP_ID"), PushClientMgr.getPushAppId("RTC_APP_KEY"));
-        RTCManager.getInstance().setupRTCEngine(new UCloudEngine());
+//        UCloudEngine.init(this, PushClientMgr.getPushAppId("RTC_APP_ID"), PushClientMgr.getPushAppId("RTC_APP_KEY"));
+//        UCloudRTCManager.getInstance().setupRTCEngine(new UCloudEngine());
+        MaxEngine.Companion.init(this);
+        RTCManager.getInstance().setupRTCEngine(new MaxEngine(BaseManager.getBMXClient()));
     }
 
 }

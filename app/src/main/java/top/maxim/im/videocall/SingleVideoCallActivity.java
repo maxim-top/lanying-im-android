@@ -43,7 +43,7 @@ import top.maxim.rtc.engine.StupidEngine;
 import top.maxim.rtc.interfaces.BMXRTCEngineListener;
 import top.maxim.rtc.manager.RTCManager;
 import top.maxim.rtc.view.BMXRtcRenderView;
-import top.maxim.rtc.view.UCloudRenderView;
+import top.maxim.rtc.view.RTCRenderView;
 
 /**
  * Description 单视频会话
@@ -314,15 +314,17 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
             }
         });
-        if (mIsInitiator) {
-            joinRoom();
-        }
         //获取之前配置初始化
         if (mHasVideo) {
             mEngine.setVideoProfile(EngineConfig.VIDEO_PROFILE);
             mEngine.setAudioProfile(true);//视频默认开启扬声器
+            mEngine.setAudioOnlyMode(false);
         } else {
             mEngine.setAudioProfile(mSpeaker);
+            mEngine.setAudioOnlyMode(true);
+        }
+        if (mIsInitiator) {
+            joinRoom();
         }
     }
 
@@ -332,7 +334,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private void addLocalView() {
         ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_large);
         localParent.setVisibility(View.VISIBLE);
-        mLocalView = new UCloudRenderView(this);
+        mLocalView = new RTCRenderView(this);
         mLocalView.init();
         mLocalView.getSurfaceView().setZOrderMediaOverlay(false);
         localParent.addView(mLocalView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -344,7 +346,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private void addRemoteView() {
         ViewGroup remoteParent = mVideoContainer.findViewById(R.id.video_view_container_small);
         remoteParent.setVisibility(View.VISIBLE);
-        mRemoteView = new UCloudRenderView(this);
+        mRemoteView = new RTCRenderView(this);
         mRemoteView.init();
         mRemoteView.getSurfaceView().setZOrderMediaOverlay(true);
         remoteParent.addView(mRemoteView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -592,16 +594,25 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     /**
      * 加入房间
-     *
      */
     private void joinRoom() {
-        mEngine.joinRoom(String.valueOf(mUserId), mRoomId);
+        addLocalView();
+        mEngine.startLocalPreview(mLocalView, null);
+        mEngine.joinRoom(String.valueOf(mUserId), "1234");
     }
 
     /**
      * 离开房间
      */
     private void leaveRoom() {
+        if (mLocalView != null) {
+            mLocalView.release();
+            mLocalView = null;
+        }
+        if (mRemoteView != null) {
+            mRemoteView.release();
+            mRemoteView = null;
+        }
         mEngine.leaveRoom();
     }
 
@@ -676,14 +687,14 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         boolean hasVideo = info.isHasVideo();
         boolean hasAudio = info.isHasAudio();
         if (hasVideo) {
-            addLocalView();
-            mEngine.startLocalPreview(mLocalView, info);
+//            addLocalView();
+//            mEngine.startLocalPreview(mLocalView, info);
         } else {
 
         }
         if (mIsInitiator) {
             //用户加入放入房间 发送给对方信息
-            sendRTCMessage("join", mRoomId + "_" + mCallMode);
+            sendRTCMessage("join", mRoomId + "_" + mChatId + "_" + mCallMode);
         }
     }
 
@@ -716,10 +727,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         removeRemoteView();
         mHandler.removeAll();
         finish();
-    }
-
-    @Override
-    public void onBackPressed() {
     }
 
     @Override

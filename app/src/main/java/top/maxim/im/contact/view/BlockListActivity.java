@@ -128,7 +128,7 @@ public class BlockListActivity extends RosterChooseActivity {
             mRecycler.setVisibility(View.VISIBLE);
             mEmptyView.setVisibility(View.GONE);
         } else {
-            mRecycler.setVisibility(View.GONE);
+            mRecycler.setVisibility(View.VISIBLE);
             mEmptyView.setVisibility(View.VISIBLE);
         }
     }

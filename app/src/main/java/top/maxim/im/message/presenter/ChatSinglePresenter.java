@@ -5,6 +5,8 @@ import android.text.TextUtils;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXRosterItem;
 import rx.Observable;
@@ -150,11 +152,12 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
 
     @Override
     protected void handelVideoCall(boolean hasVideo) {
+//        BMXRRTCActivity.openVideoCall(mView.getContext());
         SingleVideoCallActivity.openVideoCall(mView.getContext(), mChatId, String.valueOf(mMyUserId), true, hasVideo ? MessageConfig.CallMode.CALL_VIDEO : MessageConfig.CallMode.CALL_AUDIO);
     }
 
     @Override
-    protected void receiveVideoCall(String roomId, boolean hasVideo) {
-        SingleVideoCallActivity.openVideoCall(mView.getContext(), mChatId, roomId, false, hasVideo ? MessageConfig.CallMode.CALL_VIDEO : MessageConfig.CallMode.CALL_AUDIO);
+    protected void receiveVideoCall(String roomId, List<Long> chatIds, boolean hasVideo) {
+        SingleVideoCallActivity.openVideoCall(mView.getContext(), chatIds.get(0), roomId, false, hasVideo ? MessageConfig.CallMode.CALL_VIDEO : MessageConfig.CallMode.CALL_AUDIO);
     }
 }

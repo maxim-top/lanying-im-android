@@ -18,13 +18,10 @@ import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
-import top.maxim.im.contact.view.RosterChooseActivity;
 import top.maxim.im.message.contract.ChatGroupContract;
-import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.view.ChatGroupAtActivity;
 import top.maxim.im.message.view.ChatGroupListMemberActivity;
 import top.maxim.im.message.view.GroupAckActivity;
-import top.maxim.im.videocall.GroupVideoCallActivity;
 
 /**
  * Description : 群聊presenter Created by Mango on 2018/11/11.
@@ -158,7 +155,7 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                 && data != null) {
             ArrayList<Long> chooseList = (ArrayList<Long>) data
                     .getSerializableExtra(ChatGroupListMemberActivity.CHOOSE_DATA);
-            GroupVideoCallActivity.openVideoCall(mView.getContext(), chooseList, MessageConfig.CallMode.CALL_AUDIO);
+//            GroupVideoCallActivity.openVideoCall(mView.getContext(), chooseList, String.valueOf(mChatId), true, MessageConfig.CallMode.CALL_AUDIO);
         }
     }
 
@@ -224,9 +221,11 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
     @Override
     protected void handelVideoCall(boolean hasVideo) {
-        List<String> filterIdList = new ArrayList<>();
-        filterIdList.add(mMyUserId + "");
-        RosterChooseActivity.startRosterListActivity((Activity) mView.getContext(), true, true, filterIdList,
-                VIDEO_CALL_REQUEST);
+        ChatGroupListMemberActivity.startGroupMemberListActivity((Activity) mView.getContext(), mChatId, true, VIDEO_CALL_REQUEST);
+    }
+
+    @Override
+    protected void receiveVideoCall(String roomId, List<Long> chatIds, boolean hasVideo) {
+//        GroupVideoCallActivity.openVideoCall(mView.getContext(), (ArrayList<Long>) chatIds, roomId, false, MessageConfig.CallMode.CALL_AUDIO);
     }
 }

@@ -596,9 +596,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 加入房间
      */
     private void joinRoom() {
-        addLocalView();
-        mEngine.startLocalPreview(mLocalView, null);
-        mEngine.joinRoom(String.valueOf(mUserId), "1234");
+        mEngine.joinRoom(String.valueOf(mUserId), "");
     }
 
     /**
@@ -687,8 +685,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         boolean hasVideo = info.isHasVideo();
         boolean hasAudio = info.isHasAudio();
         if (hasVideo) {
-//            addLocalView();
-//            mEngine.startLocalPreview(mLocalView, info);
+            addLocalView();
+            mEngine.startLocalPreview(mLocalView, info);
         } else {
 
         }

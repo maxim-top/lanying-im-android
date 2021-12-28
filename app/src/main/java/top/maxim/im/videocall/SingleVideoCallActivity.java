@@ -177,7 +177,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (intent != null) {
             mChatId = intent.getLongExtra(MessageConfig.CHAT_ID, 0);
             mCallMode = intent.getIntExtra(MessageConfig.CALL_MODE, 0);
-            mRoomId = intent.getStringExtra(MessageConfig.RTC_ROOM_ID);
+//            mRoomId = intent.getStringExtra(MessageConfig.RTC_ROOM_ID);
             mIsInitiator = intent.getBooleanExtra(MessageConfig.IS_INITIATOR, false);
         }
         mUserId = SharePreferenceUtils.getInstance().getUserId();
@@ -603,6 +603,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 离开房间
      */
     private void leaveRoom() {
+        mEngine.leaveRoom();
         if (mLocalView != null) {
             mLocalView.release();
             mLocalView = null;
@@ -611,7 +612,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             mRemoteView.release();
             mRemoteView = null;
         }
-        mEngine.leaveRoom();
     }
 
     /**
@@ -684,6 +684,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
         boolean hasVideo = info.isHasVideo();
         boolean hasAudio = info.isHasAudio();
+        mRoomId = info.getRoomId();
         if (hasVideo) {
             addLocalView();
             mEngine.startLocalPreview(mLocalView, info);
@@ -692,7 +693,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
         if (mIsInitiator) {
             //用户加入放入房间 发送给对方信息
-            sendRTCMessage("join", mRoomId + "_" + mChatId + "_" + mCallMode);
+            sendRTCMessage("join", mRoomId + "_" + info.getUid() + "_" + mCallMode);
         }
     }
 

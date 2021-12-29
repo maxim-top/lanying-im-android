@@ -177,7 +177,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (intent != null) {
             mChatId = intent.getLongExtra(MessageConfig.CHAT_ID, 0);
             mCallMode = intent.getIntExtra(MessageConfig.CALL_MODE, 0);
-//            mRoomId = intent.getStringExtra(MessageConfig.RTC_ROOM_ID);
+            mRoomId = intent.getStringExtra(MessageConfig.RTC_ROOM_ID);
             mIsInitiator = intent.getBooleanExtra(MessageConfig.IS_INITIATOR, false);
         }
         mUserId = SharePreferenceUtils.getInstance().getUserId();
@@ -336,7 +336,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         localParent.setVisibility(View.VISIBLE);
         mLocalView = new RTCRenderView(this);
         mLocalView.init();
-        mLocalView.getSurfaceView().setZOrderMediaOverlay(false);
         localParent.addView(mLocalView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
@@ -348,8 +347,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         remoteParent.setVisibility(View.VISIBLE);
         mRemoteView = new RTCRenderView(this);
         mRemoteView.init();
-        mRemoteView.getSurfaceView().setZOrderMediaOverlay(true);
-        remoteParent.addView(mRemoteView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        remoteParent.addView(mRemoteView, layoutParams);
     }
 
     /**
@@ -596,7 +595,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 加入房间
      */
     private void joinRoom() {
-        mEngine.joinRoom(String.valueOf(mUserId), "");
+        //如果需要创建 roomId传入空
+        mEngine.joinRoom(String.valueOf(mUserId), mRoomId);
     }
 
     /**

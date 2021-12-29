@@ -153,7 +153,8 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
     @Override
     protected void handelVideoCall(boolean hasVideo) {
 //        BMXRRTCActivity.openVideoCall(mView.getContext());
-        SingleVideoCallActivity.openVideoCall(mView.getContext(), mChatId, String.valueOf(mMyUserId), true, hasVideo ? MessageConfig.CallMode.CALL_VIDEO : MessageConfig.CallMode.CALL_AUDIO);
+        //发起音视频方 无roomId 需要创建
+        SingleVideoCallActivity.openVideoCall(mView.getContext(), mChatId, "", true, hasVideo ? MessageConfig.CallMode.CALL_VIDEO : MessageConfig.CallMode.CALL_AUDIO);
     }
 
     @Override

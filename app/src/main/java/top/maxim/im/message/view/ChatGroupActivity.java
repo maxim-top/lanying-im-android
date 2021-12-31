@@ -3,7 +3,11 @@ package top.maxim.im.message.view;
 
 import android.content.Context;
 
+import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXMessage;
+import top.maxim.im.R;
+import top.maxim.im.common.utils.dialog.CommonEditDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.message.contract.ChatGroupContract;
 import top.maxim.im.message.presenter.ChatGroupPresenter;
 
@@ -45,6 +49,38 @@ public class ChatGroupActivity extends ChatBaseActivity implements ChatGroupCont
         }
         super.showReadAck(readAck);
 
+    }
+
+    @Override
+    public void showJoinGroupDialog(BMXGroup group) {
+        if (group == null) {
+            return;
+        }
+        DialogUtils.getInstance().showEditDialog(this, "加入群聊",
+                getString(R.string.confirm), getString(R.string.cancel),
+                new CommonEditDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener(String content) {
+                        if (mPresenter != null) {
+                            mPresenter.joinGroup(group, content);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+                        finish();
+                    }
+                });
+    }
+
+    @Override
+    public void showLoading(boolean cancel) {
+        showLoadingDialog(cancel);
+    }
+
+    @Override
+    public void cancelLoading() {
+        dismissLoadingDialog();
     }
 
     @Override

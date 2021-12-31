@@ -47,6 +47,7 @@ import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.SplashVideoPlayView;
 import top.maxim.im.login.bean.DNSConfigEvent;
+import top.maxim.im.net.ConnectivityReceiver;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.sdk.utils.MessageDispatcher;
@@ -88,6 +89,8 @@ public class WelcomeActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
+        //启动网络监听
+        ConnectivityReceiver.start(getApplication());
         //听云
         AgentTask.get().init(AppContextUtils.getApplication());
     }

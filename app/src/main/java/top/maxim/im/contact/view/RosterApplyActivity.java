@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
@@ -14,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseRecyclerAdapter;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
+import top.maxim.im.message.utils.ChatRecyclerScrollListener;
 import top.maxim.im.message.utils.ChatUtils;
 
 /**
@@ -49,6 +51,10 @@ public class RosterApplyActivity extends BaseTitleActivity {
     private ApplyAdapter mAdapter;
 
     private View mEmptyView;
+
+    private ChatRecyclerScrollListener mScrollListener;
+
+    private String mCursor = "";
 
     private final int DEFAULT_PAGE_SIZE = 10;
 
@@ -84,57 +90,102 @@ public class RosterApplyActivity extends BaseTitleActivity {
 
     @Override
     protected void setViewListener() {
+        /* 上下拉刷新 */
+        mRecycler.addOnScrollListener(mScrollListener = new ChatRecyclerScrollListener(
+                (LinearLayoutManager)mRecycler.getLayoutManager()) {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+
+            @Override
+            protected void onLoadPullDown(int offset) {
+                super.onLoadPullDown(offset);
+            }
+
+            @Override
+            protected void onLoadPullUp(int offset) {
+                super.onLoadPullUp(offset);
+                initData(mCursor, true);
+            }
+        });
     }
 
     @Override
     protected void initDataForActivity() {
-        initData("");
+        initData("", false);
     }
 
-    private void initData(String cursor) {
+    private void initData(String cursor, boolean upload) {
         showLoadingDialog(true);
         RosterManager.getInstance().getApplicationList(cursor, DEFAULT_PAGE_SIZE,
                 (bmxErrorCode, ap) -> {
                     dismissLoadingDialog();
                     if (BaseManager.bmxFinish(bmxErrorCode)) {
+                        BMXRosterServiceApplicationList list;
                         if (ap.result() != null && !ap.result().isEmpty()) {
-                            ListOfLongLong listOfLongLong = new ListOfLongLong();
-                            BMXRosterServiceApplicationList list = ap.result();
-                            for (int i = 0; i < list.size(); i++) {
-                                listOfLongLong.add(list.get(i).getMRosterId());
-                            }
-                            RosterManager.getInstance().getRosterList(listOfLongLong, true,
-                                    (bmxErrorCode1, itemList) -> {
-                                        RosterFetcher.getFetcher().putRosters(itemList);
-                                        if (BaseManager.bmxFinish(bmxErrorCode1)) {
-                                            if (list != null && !list.isEmpty()) {
-                                                List<BMXRosterService.Application> applications = new ArrayList<>();
-                                                for (int i = 0; i < list.size(); i++) {
-                                                    applications.add(list.get(i));
-                                                }
-                                                mAdapter.replaceList(applications);
-                                                mRecycler.setVisibility(View.VISIBLE);
-                                                mEmptyView.setVisibility(View.GONE);
-                                            } else {
-                                                mRecycler.setVisibility(View.GONE);
-                                                mEmptyView.setVisibility(View.VISIBLE);
-                                            }
-                                        } else {
-                                            String error = bmxErrorCode1 == null ? "网络错误"
-                                                    : bmxErrorCode1.name();
-                                            ToastUtil.showTextViewPrompt(error);
-                                            mRecycler.setVisibility(View.GONE);
-                                            mEmptyView.setVisibility(View.VISIBLE);
-                                        }
-                                    });
+                            mCursor = ap.cursor();
+                            list = ap.result();
+                        } else {
+                            list = new BMXRosterServiceApplicationList();
                         }
+                        ListOfLongLong listOfLongLong = new ListOfLongLong();
+                        for (int i = 0; i < list.size(); i++) {
+                            listOfLongLong.add(list.get(i).getMRosterId());
+                        }
+                        RosterManager.getInstance().getRosterList(listOfLongLong, true,
+                                (bmxErrorCode1, itemList) -> {
+                                    RosterFetcher.getFetcher().putRosters(itemList);
+                                    if (BaseManager.bmxFinish(bmxErrorCode1)) {
+                                        if (list != null && !list.isEmpty()) {
+                                            List<BMXRosterService.Application> applications = new ArrayList<>();
+                                            for (int i = 0; i < list.size(); i++) {
+                                                applications.add(list.get(i));
+                                            }
+                                            showList(applications, ap.cursor(), upload);
+                                        } else {
+                                            showList(null, "", upload);
+                                        }
+                                    } else {
+                                        String error = bmxErrorCode == null ? "网络错误" : bmxErrorCode.name();
+                                        ToastUtil.showTextViewPrompt(error);
+                                        showList(null, "", upload);
+                                    }
+                                });
                         return;
                     }
                     String error = bmxErrorCode == null ? "网络错误" : bmxErrorCode.name();
                     ToastUtil.showTextViewPrompt(error);
-                    mRecycler.setVisibility(View.GONE);
-                    mEmptyView.setVisibility(View.VISIBLE);
+                    showList(null, "", upload);
                 });
+    }
+
+    /**
+     * 展示数据
+     */
+    private void showList(List<BMXRosterService.Application> applications, String cursor, boolean upload) {
+        if (applications == null || applications.isEmpty()) {
+            if(!upload){
+                mAdapter.removeAll();
+                mRecycler.setVisibility(View.GONE);
+                mEmptyView.setVisibility(View.VISIBLE);
+            }
+            return;
+        }
+        mCursor = cursor;
+        if (upload) {
+            mAdapter.addListAtEnd(applications);
+        } else {
+            mAdapter.replaceList(applications);
+        }
+        mScrollListener.resetUpLoadStatus();
+        mRecycler.setVisibility(View.VISIBLE);
+        mEmptyView.setVisibility(View.GONE);
     }
 
     class ApplyAdapter extends BaseRecyclerAdapter<BMXRosterService.Application> {
@@ -255,7 +306,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
             RosterManager.getInstance().accept(rosterId, bmxErrorCode -> {
                 dismissLoadingDialog();
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
-                    initData("");
+                    initData("", false);
                 } else {
                     String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
                     ToastUtil.showTextViewPrompt(error);
@@ -290,7 +341,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
             RosterManager.getInstance().decline(rosterId, reason, bmxErrorCode -> {
                 dismissLoadingDialog();
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
-                    initData("");
+                    initData("", false);
                 } else {
                     String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
                     ToastUtil.showTextViewPrompt(error);

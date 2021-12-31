@@ -4,8 +4,6 @@ package top.maxim.im.message.view;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
@@ -18,6 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
+import im.floo.floolib.BMXGroupBannedMemberList;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.ListOfLongLong;
 import top.maxim.im.R;
@@ -44,6 +46,7 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseRecyclerAdapter;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
+import top.maxim.im.message.utils.ChatRecyclerScrollListener;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 
@@ -73,6 +76,12 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
     private boolean isEdit = false;
 
     private int CHOOSE_MUTE_CODE = 1000;
+
+    private ChatRecyclerScrollListener mScrollListener;
+
+    private String mCursor = "";
+
+    private final int DEFAULT_PAGE_SIZE = 10;
 
     public static void startGroupBannedActivity(Context context, long groupId) {
         Intent intent = new Intent(context, ChatGroupBannedActivity.class);
@@ -120,6 +129,30 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
 
     @Override
     protected void setViewListener() {
+        /* 上下拉刷新 */
+        mGvGroupMember.addOnScrollListener(mScrollListener = new ChatRecyclerScrollListener(
+                (LinearLayoutManager)mGvGroupMember.getLayoutManager()) {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+
+            @Override
+            protected void onLoadPullDown(int offset) {
+                super.onLoadPullDown(offset);
+            }
+
+            @Override
+            protected void onLoadPullUp(int offset) {
+                super.onLoadPullUp(offset);
+                init(mCursor, true);
+            }
+        });
         mAdapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -168,21 +201,28 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
                 mGroup = bmxGroup;
             }
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                init();
+                init("", false);
             } else {
                 toastError(bmxErrorCode);
             }
         });
     }
 
-    private void init() {
+    private void init(String cursor, boolean upload) {
         if (mGroup == null) {
             return;
         }
         showLoadingDialog(true);
-        GroupManager.getInstance().getBannedMembers(mGroup, (bmxErrorCode, memberList) -> {
+        GroupManager.getInstance().getBannedMembers(mGroup, cursor, DEFAULT_PAGE_SIZE, (bmxErrorCode, page) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
+                BMXGroupBannedMemberList memberList;
+                if (page != null && page.result() != null && !page.result().isEmpty()) {
+                    mCursor = page.cursor();
+                    memberList = page.result();
+                }else{
+                    memberList = new BMXGroupBannedMemberList();
+                }
                 ListOfLongLong listOfLongLong = new ListOfLongLong();
                 for (int i = 0; i < memberList.size(); i++) {
                     listOfLongLong.add(memberList.get(i).getMUid());
@@ -196,10 +236,16 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
                                     members.add(memberList.get(i));
                                 }
                             }
-                            BMXGroup.BannedMember add = new BMXGroup.BannedMember();
-                            add.setMUid(MessageConfig.MEMBER_ADD);
-                            members.add(add);
-                            mAdapter.replaceList(members);
+                            if (upload) {
+                                int count = mAdapter.getItemCount();
+                                mAdapter.addList(members, count > 1 ? count - 1 : 0);
+                            } else {
+                                BMXGroup.BannedMember add = new BMXGroup.BannedMember();
+                                add.setMUid(MessageConfig.MEMBER_ADD);
+                                members.add(add);
+                                mAdapter.replaceList(members);
+                            }
+                            mScrollListener.resetUpLoadStatus();
                         });
             } else {
                 toastError(bmxErrorCode);
@@ -221,7 +267,7 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
         GroupManager.getInstance().unbanMembers(mGroup, black, bmxErrorCode -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                init();
+                init("", false);
             } else {
                 toastError(bmxErrorCode);
             }
@@ -236,7 +282,7 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
         GroupManager.getInstance().banMembers(mGroup, mute, time, reason, bmxErrorCode -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                init();
+                init("", false);
             } else {
                 toastError(bmxErrorCode);
             }

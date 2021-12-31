@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.Gson;
+
 import im.floo.floolib.BMXErrorCode;
 import rx.Subscriber;
 import rx.Subscription;
@@ -37,6 +39,7 @@ import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.login.bean.DNSConfigEvent;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.wxapi.WXUtils;
@@ -370,6 +373,57 @@ public class RegisterActivity extends BaseTitleActivity {
             ToastUtil.showTextViewPrompt("不能为空");
             return;
         }
+        // 注册时候获取 对其进行修改
+        String dns = ScanConfigs.DNS_CONFIG;
+        String server = "";
+        int port = 0;
+        String restServer = "";
+        if (!TextUtils.isEmpty(dns)) {
+            DNSConfigEvent event = new Gson().fromJson(dns, DNSConfigEvent.class);
+            if (event != null) {
+                server = event.getServer();
+                port = event.getPort();
+                restServer = event.getRestServer();
+            }
+        }
+        // 是否自定义dns配置
+        boolean changeDns = !TextUtils.isEmpty(server) && port > 0
+                && !TextUtils.isEmpty(restServer);
+        if (changeDns) {
+            // 保存dns配置
+            DNSConfigEvent event = new DNSConfigEvent();
+            event.setAppId(mChangeAppId);
+            event.setServer(server);
+            event.setPort(port);
+            event.setRestServer(restServer);
+            SharePreferenceUtils.getInstance().putDNSConfig(new Gson().toJson(event));
+            BaseManager.changeDNS(server, port, restServer);
+        } else {
+            // 还原
+            SharePreferenceUtils.getInstance().putDNSConfig("");
+            BaseManager.changeDNS("", 0, "");
+        }
+        //是否需要切换appId
+        boolean isChange = !TextUtils.isEmpty(mChangeAppId)
+                && !TextUtils.equals(mChangeAppId, SharePreferenceUtils.getInstance().getAppId());
+        if (isChange) {
+            UserManager.getInstance().changeAppId(mChangeAppId, bmxErrorCode -> {
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    SharePreferenceUtils.getInstance().putAppId(mChangeAppId);
+                    realRegister(account, pwd);
+                } else {
+                    // 失败
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
+                    ToastUtil.showTextViewPrompt(error);
+                }
+            });
+        } else {
+            realRegister(account, pwd);
+        }
+
+    }
+
+    private void realRegister(String account, String pwd){
         showLoadingDialog(true);
         UserManager.getInstance().signUpNewUser(account, pwd, (bmxErrorCode, bmxUserProfile) -> {
             dismissLoadingDialog();

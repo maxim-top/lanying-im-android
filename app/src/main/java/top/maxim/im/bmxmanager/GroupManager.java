@@ -7,9 +7,11 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupAnnouncementList;
 import im.floo.floolib.BMXGroupBannedMemberList;
+import im.floo.floolib.BMXGroupBannedMemberResultPage;
 import im.floo.floolib.BMXGroupList;
 import im.floo.floolib.BMXGroupManager;
 import im.floo.floolib.BMXGroupMemberList;
+import im.floo.floolib.BMXGroupMemberResultPage;
 import im.floo.floolib.BMXGroupService;
 import im.floo.floolib.BMXGroupServiceListener;
 import im.floo.floolib.BMXGroupSharedFileList;
@@ -133,6 +135,34 @@ public class GroupManager extends BaseManager {
     }
 
     /**
+     * 获取群成员列表，如果设置了forceRefresh则从服务器拉取
+     **/
+    public void getMembers(BMXGroup group, String cursor, int pageSize, BMXDataCallBack<BMXGroupMemberResultPage> callBack) {
+        mService.getMembers(group, cursor, pageSize, callBack);
+    }
+
+    /**
+     * 获取群成员
+     **/
+    public BMXGroup.Member getMemberByDB(long groupId, long memberId) {
+        BMXGroup group = getGroupListByDB(groupId);
+        BMXGroupMemberList list = new BMXGroupMemberList();
+        BMXErrorCode error = mGroupService.getMembers(group, list, false);
+        if (error == null || error.swigValue() != BMXErrorCode.NoError.swigValue()) {
+            return null;
+        }
+        if (list != null && !list.isEmpty()) {
+            for (int i = 0; i < list.size(); i++) {
+                BMXGroup.Member member = list.get(i);
+                if(member.getMUid() == memberId){
+                    return member;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * 添加群成员
      **/
     public void addMembers(BMXGroup group, ListOfLongLong listOfLongLong, String message, BMXCallBack callBack) {
@@ -171,6 +201,26 @@ public class GroupManager extends BaseManager {
     }
 
     /**
+     * 是否是管理员
+     **/
+    public boolean isAdmin(BMXGroup group, long memberId) {
+        BMXGroupMemberList list = new BMXGroupMemberList();
+        BMXErrorCode error = mGroupService.getAdmins(group, list, false);
+        if (error == null || error.swigValue() != BMXErrorCode.NoError.swigValue()) {
+            return false;
+        }
+        if (list != null && !list.isEmpty()) {
+            for (int i = 0; i < list.size(); i++) {
+                BMXGroup.Member member = list.get(i);
+                if (member.getMUid() == memberId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * 添加黑名单
      **/
     public void blockMembers(BMXGroup group, ListOfLongLong listOfLongLong, BMXCallBack callBack) {
@@ -193,6 +243,14 @@ public class GroupManager extends BaseManager {
     }
 
     /**
+     * 获取黑名单
+     **/
+    public void getBlockList(BMXGroup group, String cursor, int pageSize,
+            BMXDataCallBack<BMXGroupMemberResultPage> callBack) {
+        mService.getBlockList(group, cursor, pageSize, callBack);
+    }
+
+    /**
      * 禁言
      **/
     public void banMembers(BMXGroup group, ListOfLongLong listOfLongLong, long duration,
@@ -208,10 +266,31 @@ public class GroupManager extends BaseManager {
     }
 
     /**
+     * 全员禁言
+     */
+    public void banGroup(BMXGroup group, long duration, BMXCallBack callBack) {
+        mService.banGroup(group, duration, callBack);
+    }
+
+    /**
+     * 解除全员禁言
+     */
+    public void unbanGroup(BMXGroup group, BMXCallBack callBack) {
+        mService.unbanGroup(group, callBack);
+    }
+
+    /**
      * 获取禁言列表
      **/
     public void getBannedMembers(BMXGroup group, BMXDataCallBack<BMXGroupBannedMemberList> callBack) {
         mService.getBannedMembers(group, callBack);
+    }
+
+    /**
+     * 获取禁言列表
+     **/
+    public void getBannedMembers(BMXGroup group, String cursor, int pageSize, BMXDataCallBack<BMXGroupBannedMemberResultPage> callBack) {
+        mService.getBannedMembers(group, cursor, pageSize, callBack);
     }
 
     /**

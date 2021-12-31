@@ -6,12 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
@@ -21,6 +15,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -343,6 +345,17 @@ public class AllContactFragment extends BaseTitleFragment {
                 });
         ll.addView(isPublic.build(), textP);
 
+        // 聊天室
+        final ItemLineSwitch.Builder isChatRoom = new ItemLineSwitch.Builder(getActivity())
+                .setLeftText("是否是聊天室").setMarginTop(ScreenUtils.dp2px(15))
+                .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
+                    @Override
+                    public void onItemSwitch(View v, boolean curCheck) {
+
+                    }
+                });
+        ll.addView(isChatRoom.build(), textP);
+
         DialogUtils.getInstance().showCustomDialog(getActivity(), ll,
                 getString(R.string.create_group), getString(R.string.confirm),
                 getString(R.string.cancel), new CommonCustomDialog.OnDialogListener() {
@@ -351,7 +364,8 @@ public class AllContactFragment extends BaseTitleFragment {
                         String name = editName.getEditableText().toString().trim();
                         String desc = editDesc.getEditableText().toString().trim();
                         boolean publicCheckStatus = isPublic.getCheckStatus();
-                        createGroup(members, name, desc, publicCheckStatus);
+                        boolean chatRoomCheckStatus = isChatRoom.getCheckStatus();
+                        createGroup(members, name, desc, publicCheckStatus, chatRoomCheckStatus);
                     }
 
                     @Override
@@ -365,13 +379,13 @@ public class AllContactFragment extends BaseTitleFragment {
      * 创建群聊
      */
     private void createGroup(ListOfLongLong members, String name, String desc,
-            boolean publicCheckStatus) {
+            boolean publicCheckStatus, boolean chatRoomCheckStatus) {
         if (TextUtils.isEmpty(name)) {
             ToastUtil.showTextViewPrompt("群聊名称不能为空");
             return;
         }
         BMXGroupService.CreateGroupOptions options = new BMXGroupService.CreateGroupOptions(name,
-                desc, publicCheckStatus);
+                desc, publicCheckStatus, chatRoomCheckStatus);
         options.setMMembers(members);
         showLoadingDialog(true);
         GroupManager.getInstance().create(options, (bmxErrorCode, group) -> {

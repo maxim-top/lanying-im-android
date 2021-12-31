@@ -2,8 +2,6 @@
 package top.maxim.im.message.view;
 
 import android.content.Intent;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
@@ -12,6 +10,9 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,6 +88,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
 
         @Override
         public void onReceiveReadAcks(BMXMessageList list) {
+            loadSession();
         }
 
         @Override

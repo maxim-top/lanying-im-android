@@ -59,10 +59,6 @@ public class MaxIMApplication extends Application {
         if (!BuildConfig.DEBUG) {
             Thread.setDefaultUncaughtExceptionHandler(restartHandler);
         }
-//        PeerConnectionFactory.initialize(
-//                PeerConnectionFactory.InitializationOptions.builder(this)
-//                        .setEnableInternalTracer(true)
-//                        .createInitializationOptions());
     }
 
     public void restartApp() {

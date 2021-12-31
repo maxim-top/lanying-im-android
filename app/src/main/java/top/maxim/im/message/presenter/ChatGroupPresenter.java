@@ -68,6 +68,15 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
         }
         GroupManager.getInstance().getGroupList(chatId, true, (bmxErrorCode, group) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
+                if (group.groupType() == BMXGroup.GroupType.Chatroom) {
+                    //如果是聊天室  需要判断自己是否在群内  不在需要弹出提示框 再次手动入群
+                    if (!group.isMember()) {
+                        if (mView != null) {
+                            mView.showJoinGroupDialog(group);
+                        }
+                        return;
+                    }
+                }
                 RosterFetcher.getFetcher().putGroup(group);
                 if (mView != null) {
                     if (group != null) {
@@ -132,6 +141,28 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     @Override
     public void setGroupAck(boolean ack) {
         mShowAckRead = ack;
+    }
+
+    @Override
+    public void joinGroup(BMXGroup group, String reason) {
+        if (group == null) {
+            return;
+        }
+        if (mView != null) {
+            mView.showLoading(true);
+        }
+        GroupManager.getInstance().join(group, reason, bmxErrorCode -> {
+            if (mView != null) {
+                mView.cancelLoading();
+            }
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                ToastUtil.showTextViewPrompt("加入成功");
+            } else {
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : "加入失败";
+                ToastUtil.showTextViewPrompt(error);
+                ((Activity) mView.getContext()).finish();
+            }
+        });
     }
 
     @Override

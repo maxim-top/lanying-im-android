@@ -645,6 +645,14 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         sendRTCMessage("mute_video", "");
     }
 
+    /**
+     * 切换麦克风
+     * @param view
+     */
+    public void onCallMuteMic(View view){
+
+    }
+
     private void switchAudio(){
         mEngine.unPublish();
         mEngine.stopLocalPreview();

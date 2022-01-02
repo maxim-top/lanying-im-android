@@ -3,8 +3,6 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.LongSparseArray;
 import android.view.View;
@@ -13,6 +11,9 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -266,10 +267,9 @@ public class AccountListActivity extends BaseTitleActivity {
                 // 兼容之前版本 如果为空 则为默认appId
                 appId = ScanConfigs.CODE_APP_ID;
             }
-            String currentAppId = SharePreferenceUtils.getInstance().getAppId();
             // 有数据 直接登录
             LoginActivity.login(AccountListActivity.this, userName, pwd, false,
-                    TextUtils.equals(currentAppId, appId) ? "" : appId, server, port, restServer);
+                    appId, server, port, restServer);
         } else {
             dismissLoadingDialog();
             // 无数据进入登录页

@@ -93,7 +93,6 @@ public class BaseManager {
         } else {
             conf.setEnableDNS(true);
         }
-        bmxClient = BMXClient.create(conf);
     }
     
     public static String getPushId() {

@@ -89,7 +89,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private boolean mSpeaker = EngineConfig.SWITCH_SPEAKER;
 
     //麦克风
-    private boolean mMic = true;
+    private final boolean mMic = true;
 
     private CallHandler mHandler;
 
@@ -99,7 +99,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private MessageSendUtils mSendUtils;
 
-    private BMXChatServiceListener mChatListener = new BMXChatServiceListener(){
+    private final BMXChatServiceListener mChatListener = new BMXChatServiceListener(){
         @Override
         public void onReceive(BMXMessageList list) {
             super.onReceive(list);
@@ -347,6 +347,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         remoteParent.setVisibility(View.VISIBLE);
         mRemoteView = new RTCRenderView(this);
         mRemoteView.init();
+        mRemoteView.getSurfaceView().setZOrderMediaOverlay(true);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         remoteParent.addView(mRemoteView, layoutParams);
     }
@@ -654,7 +655,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     }
 
     private void switchAudio(){
-        mEngine.unPublish();
         mEngine.stopLocalPreview();
         mEngine.muteLocalVideo(true);
         removeLocalView();

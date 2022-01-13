@@ -89,7 +89,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private boolean mSpeaker = EngineConfig.SWITCH_SPEAKER;
 
     //麦克风
-    private final boolean mMic = true;
+    private boolean mMic = true;
 
     private CallHandler mHandler;
 
@@ -99,7 +99,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private MessageSendUtils mSendUtils;
 
-    private final BMXChatServiceListener mChatListener = new BMXChatServiceListener(){
+    private BMXChatServiceListener mChatListener = new BMXChatServiceListener(){
         @Override
         public void onReceive(BMXMessageList list) {
             super.onReceive(list);

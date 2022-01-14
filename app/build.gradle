@@ -16,8 +16,8 @@ android {
         applicationId "top.maxim.im"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 2111012028
-        versionName "v3.0.6"
+        versionCode 22010223
+        versionName "v3.0.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "100565061",
@@ -120,7 +120,8 @@ dependencies {
     //UIL
 
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-//    implementation(name: 'floo-android_3.2.0.20211025', ext:'aar')
+//    implementation(name:'floo-android_3.1.6.20210926',ext:'aar')
+//    implementation(name:'floo-android_3.1.23.20220105',ext:'aar')
 
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")

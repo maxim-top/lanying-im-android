@@ -22,6 +22,10 @@ import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXRosterItem;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
@@ -104,12 +108,27 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         public void onReceive(BMXMessageList list) {
             super.onReceive(list);
             // 收到消息
-            if (list != null && !list.isEmpty()) {
-                for (int i = 0; i < list.size(); i++) {
-                    BMXMessage message = list.get(i);
-                    handleRTCMessage(message);
-                }
-            }
+            //切换主线程
+            Observable.just("").subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<String>() {
+                        @Override
+                        public void onCompleted() {
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                        }
+
+                        @Override
+                        public void onNext(String s) {
+                            if (list != null && !list.isEmpty()) {
+                                for (int i = 0; i < list.size(); i++) {
+                                    BMXMessage message = list.get(i);
+                                    handleRTCMessage(message);
+                                }
+                            }
+                        }
+                    });
         }
     };
 
@@ -400,6 +419,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         });
     }
 
+    /**
+     * 发起或接受音视频view
+     */
     private void initCallView(){
         if (mHasVideo) {
             // 视频
@@ -592,6 +614,16 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
     }
 
+    private void changeMic(boolean enable, ImageView imageView, TextView textView) {
+        mMic = enable;
+        if (imageView != null) {
+            imageView.setImageResource(mMic ? R.drawable.icon_call_mute_status_open : R.drawable.icon_call_mute_status_close);
+        }
+        if (textView != null) {
+            textView.setText(mMic ? R.string.call_mute : R.string.call_un_mute);
+        }
+    }
+
     /**
      * 加入房间
      */
@@ -635,7 +667,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 切换摄像头
      */
     public void onSwitchCamera(View view) {
-        mEngine.switchCamera();
+        mEngine.switchCamera(mLocalView);
     }
 
     /**
@@ -651,7 +683,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * @param view
      */
     public void onCallMuteMic(View view){
-
+        ViewGroup parent = findViewById(R.id.ll_in_call_control);
+        changeMic(!mMic, parent.findViewById(R.id.iv_audio_mic), parent.findViewById(R.id.tv_audio_mic));
+        mEngine.muteLocalAudio(mMic);
     }
 
     private void switchAudio(){
@@ -693,7 +727,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         boolean hasVideo = info.isHasVideo();
         boolean hasAudio = info.isHasAudio();
         mRoomId = info.getRoomId();
-        if (hasVideo) {
+        if (mHasVideo) {
             addLocalView();
             mEngine.startLocalPreview(mLocalView, info);
         } else {
@@ -716,8 +750,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         boolean hasAudio = info.isHasAudio();
         hideInitiatorView();
         hideRecipientView();
-        showControlView(hasVideo);
-        if (hasVideo) {
+        showControlView(mHasVideo);
+        if (mHasVideo) {
             addRemoteView();
             mEngine.startRemotePreview(mRemoteView, info);
             hideVideoPeerInfo();

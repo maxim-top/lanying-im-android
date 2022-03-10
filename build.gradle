@@ -4,7 +4,7 @@ buildscript {
 
     ext.tingyun_sdk_version = '2.14.10'//听云SDK版本
     ext.tingyun_ndk_version = '2.0.0'//听云NDK版本
-    ext.kotlin_version = "1.4.32"
+    ext.kotlin_version = "1.5.20"
     repositories {
         google()
         jcenter()
@@ -13,7 +13,7 @@ buildscript {
         }
         // 听云
         maven {
-            url "http://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
+            url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
         }
     }
     dependencies {
@@ -42,7 +42,7 @@ allprojects {
         }
         // 听云
         maven {
-            url "http://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
+            url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
         }
         maven {
             url uri("${rootProject.projectDir}/repo")

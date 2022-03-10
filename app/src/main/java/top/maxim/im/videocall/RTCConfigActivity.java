@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import im.floo.floolib.BMXVideoProfile;
 import top.maxim.im.R;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ScreenUtils;
@@ -26,8 +27,6 @@ import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.recyclerview.BaseRecyclerAdapter;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
-import top.maxim.rtc.engine.EngineConfig;
-import top.maxim.rtc.engine.EngineParams;
 
 /**
  * Description 音视频设置
@@ -78,36 +77,36 @@ public class RTCConfigActivity extends BaseTitleActivity {
         // videoProfile
         mVideoProfile = new ItemLineArrow.Builder(this)
                 .setStartContent(getString(R.string.config_rtc_video_profile))
-                .setEndContent(EngineConfig.VIDEO_PROFILE)
+//                .setEndContent(EngineConfig.VIDEO_PROFILE)
                 .setOnItemClickListener(v -> showVideoProfile());
         container.addView(mVideoProfile.build());
         // 分割线
         addLineView(container);
         // 自动发布
         mSwitchAutoPublish = new ItemLineSwitch.Builder(this)
-                .setLeftText(getString(R.string.config_rtc_auto_publish))
-                .setCheckStatus(EngineConfig.SWITCH_AUTO_PUBLISH)
-                .setOnItemSwitchListener((v, check) ->
-                        EngineConfig.SWITCH_AUTO_PUBLISH = check);
+                .setLeftText(getString(R.string.config_rtc_auto_publish));
+//                .setCheckStatus(EngineConfig.SWITCH_AUTO_PUBLISH)
+//                .setOnItemSwitchListener((v, check) ->
+//                        EngineConfig.SWITCH_AUTO_PUBLISH = check);
 //        container.addView(mSwitchAutoPublish.build());
 //        // 分割线
 //        addLineView(container);
         // 自动订阅
         mSwitchAutoSubscribe = new ItemLineSwitch.Builder(this)
-                .setLeftText(getString(R.string.config_rtc_auto_subscribe))
-                .setCheckStatus(EngineConfig.SWITCH_AUTO_SUBSCRIBE)
-                .setOnItemSwitchListener((v, check) ->
-                        EngineConfig.SWITCH_AUTO_SUBSCRIBE = check);
+                .setLeftText(getString(R.string.config_rtc_auto_subscribe));
+//                .setCheckStatus(EngineConfig.SWITCH_AUTO_SUBSCRIBE)
+//                .setOnItemSwitchListener((v, check) ->
+//                        EngineConfig.SWITCH_AUTO_SUBSCRIBE = check);
 //        container.addView(mSwitchAutoSubscribe.build());
 //        // 分割线
 //        addLineView(container);
 
         // 扬声器
         mSwitchSpeaker = new ItemLineSwitch.Builder(this)
-                .setLeftText(getString(R.string.config_rtc_speaker))
-                .setCheckStatus(EngineConfig.SWITCH_SPEAKER)
-                .setOnItemSwitchListener((v, check) ->
-                        EngineConfig.SWITCH_SPEAKER = check);
+                .setLeftText(getString(R.string.config_rtc_speaker));
+//                .setCheckStatus(EngineConfig.SWITCH_SPEAKER)
+//                .setOnItemSwitchListener((v, check) ->
+//                        EngineConfig.SWITCH_SPEAKER = check);
         container.addView(mSwitchSpeaker.build());
         // 分割线
         addLineView(container);
@@ -132,13 +131,16 @@ public class RTCConfigActivity extends BaseTitleActivity {
      * 展示videoProfile
      */
     private void showVideoProfile() {
-        List<String> list = new ArrayList<>();
-        list.add(EngineParams.VideoProfile.VIDEO_PROFILE_320_180);
-        list.add(EngineParams.VideoProfile.VIDEO_PROFILE_480_360);
-        list.add(EngineParams.VideoProfile.VIDEO_PROFILE_640_360);
-        list.add(EngineParams.VideoProfile.VIDEO_PROFILE_640_480);
-        list.add(EngineParams.VideoProfile.VIDEO_PROFILE_1280_720);
-        list.add(EngineParams.VideoProfile.VIDEO_PROFILE_1920_1080);
+        List<BMXVideoProfile> list = new ArrayList<>();
+        list.add(BMXVideoProfile.Profile_240_180);
+        list.add(BMXVideoProfile.Profile_320_180);
+        list.add(BMXVideoProfile.Profile_320_240);
+        list.add(BMXVideoProfile.Profile_480_360);
+        list.add(BMXVideoProfile.Profile_640_360);
+        list.add(BMXVideoProfile.Profile_640_480);
+        list.add(BMXVideoProfile.Profile_960_720);
+        list.add(BMXVideoProfile.Profile_1280_720);
+        list.add(BMXVideoProfile.Profile_1920_1080);
         CustomDialog dialog = new CustomDialog();
         RecyclerView recyclerView = new RecyclerView(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -147,8 +149,8 @@ public class RTCConfigActivity extends BaseTitleActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 dialog.dismiss();
-                mVideoProfile.setEndContent(adapter.getItem(position));
-                EngineConfig.VIDEO_PROFILE = adapter.getItem(position);
+//                mVideoProfile.setEndContent(adapter.getItem(position));
+//                EngineConfig.VIDEO_PROFILE = adapter.getItem(position);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -161,13 +163,13 @@ public class RTCConfigActivity extends BaseTitleActivity {
         dialog.showDialog(this);
     }
 
-    private class VideoProfileAdapter extends BaseRecyclerAdapter<String> {
+    private class VideoProfileAdapter extends BaseRecyclerAdapter<BMXVideoProfile> {
 
         public VideoProfileAdapter(Context context) {
             super(context);
         }
 
-        public VideoProfileAdapter(Context context, List<String> list) {
+        public VideoProfileAdapter(Context context, List<BMXVideoProfile> list) {
             super(context, list);
         }
 
@@ -179,7 +181,30 @@ public class RTCConfigActivity extends BaseTitleActivity {
         @Override
         protected void onBindHolder(BaseViewHolder holder, int position) {
             TextView tv = holder.findViewById(R.id.tv_video_profile);
-            String text = getItem(position);
+            BMXVideoProfile profile = getItem(position);
+            String text = "";
+//            switch (profile.swigValue()){
+//                case BMXVideoProfile.Profile_240_180.swigValue():
+//                    break;
+//                case BMXVideoProfile.Profile_320_180:
+//                    break;
+//                case BMXVideoProfile.Profile_320_240:
+//                    break;
+//                case BMXVideoProfile.Profile_480_360:
+//                    break;
+//                case BMXVideoProfile.Profile_640_360:
+//                    break;
+//                case BMXVideoProfile.Profile_640_360:
+//                    break;
+//                case BMXVideoProfile.Profile_640_480:
+//                    break;
+//                case BMXVideoProfile.Profile_960_720:
+//                    break;
+//                case BMXVideoProfile.Profile_1280_720:
+//                    break;
+//                case BMXVideoProfile.Profile_1920_1080:
+//                    break;
+//            }
             tv.setText(TextUtils.isEmpty(text) ? "" : text);
         }
     }

@@ -167,6 +167,5 @@ dependencies {
 //    implementation 'com.google.firebase:firebase-messaging:21.0.1'
 //    implementation 'com.google.firebase:firebase-analytics:18.0.1'
 
-//    implementation project(':floo-rtc-ucloud')
     implementation project(':floo-rtc-android')
 }

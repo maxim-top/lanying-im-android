@@ -19,9 +19,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import im.floo.floolib.BMXChatServiceListener;
+import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
+import im.floo.floolib.BMXRTCEngine;
+import im.floo.floolib.BMXRTCEngineListener;
+import im.floo.floolib.BMXRoomAuth;
 import im.floo.floolib.BMXRosterItem;
+import im.floo.floolib.BMXStream;
+import im.floo.floolib.BMXVideoCanvas;
+import im.floo.floolib.BMXVideoMediaType;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -41,10 +48,6 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.sdk.utils.MessageSendUtils;
-import top.maxim.rtc.bean.BMXRtcStreamInfo;
-import top.maxim.rtc.engine.EngineConfig;
-import top.maxim.rtc.engine.StupidEngine;
-import top.maxim.rtc.interfaces.BMXRTCEngineListener;
 import top.maxim.rtc.manager.RTCManager;
 import top.maxim.rtc.view.BMXRtcRenderView;
 import top.maxim.rtc.view.RTCRenderView;
@@ -90,14 +93,15 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private boolean mHasVideo = false;
 
     //扬声器
-    private boolean mSpeaker = EngineConfig.SWITCH_SPEAKER;
+//    private boolean mSpeaker = EngineConfig.SWITCH_SPEAKER;
+    private boolean mSpeaker = true;
 
     //麦克风
     private boolean mMic = true;
 
     private CallHandler mHandler;
 
-    private StupidEngine mEngine;
+    private BMXRTCEngine mEngine;
 
     private BMXRTCEngineListener mListener;
 
@@ -205,142 +209,153 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private void initRtc() {
         mEngine = RTCManager.getInstance().getRTCEngine();
-        RTCManager.getInstance().addRtcListener(mListener = new BMXRTCEngineListener() {
-            @Override
-            public void onConnectionStateChanged() {
-
-            }
+        mEngine.addRTCEngineListener(mListener = new BMXRTCEngineListener() {
 
             @Override
-            public void onNetworkTypeChanged() {
-
-            }
-
-            @Override
-            public void onJoinRoom(int code, String msg, String roomId) {
-                if (code == 0) {
-                    mEngine.publish(mHasVideo, true);
-                    Log.e(TAG, "加入房间成功 开启发布本地流, roomId= " + roomId + "msg = " + msg);
-                } else {
-                    Log.e(TAG, "加入房间失败 roomId= " + roomId + "msg = " + msg);
+            public void onJoinRoom(String info, String roomId, BMXErrorCode error) {
+                super.onJoinRoom(info, roomId, error);
+                if (BaseManager.bmxFinish(error)) {
+                    mEngine.publish(BMXVideoMediaType.Camera, mHasVideo, true);
+                    Log.e(TAG, "加入房间成功 开启发布本地流, roomId= " + roomId + "msg = " + info);
+                }else{
+                    Log.e(TAG, "加入房间失败 roomId= " + roomId + "msg = " + info);
                 }
             }
 
             @Override
-            public void onLeaveRoom(int code, String msg, String roomId) {
-                if (code == 0) {
-                    Log.e(TAG, "离开房间成功 roomId= " + roomId + "msg = " + msg);
-                } else {
-                    Log.e(TAG, "离开房间失败 roomId= " + roomId + "msg = " + msg);
+            public void onLeaveRoom(String info, String roomId, BMXErrorCode error, String reason) {
+                super.onLeaveRoom(info, roomId, error, reason);
+                if (BaseManager.bmxFinish(error)) {
+                    Log.e(TAG, "离开房间成功 roomId= " + roomId + "msg = " + reason);
+                }else{
+                    Log.e(TAG, "离开房间失败 roomId= " + roomId + "msg = " + reason);
                 }
             }
 
             @Override
-            public void onReJoinRoom() {
-
+            public void onReJoinRoom(String info, String roomId, BMXErrorCode error) {
+                super.onReJoinRoom(info, roomId, error);
             }
 
             @Override
-            public void onMemberJoined(String uid) {
-                Log.e(TAG, "远端用户加入 uid= " + uid);
+            public void onMemberJoined(String roomId, long usedId) {
+                super.onMemberJoined(roomId, usedId);
+                Log.e(TAG, "远端用户加入 uid= " + usedId);
             }
 
             @Override
-            public void onMemberExited(String uid, int reason) {
-                Log.e(TAG, "远端用户离开 uid= " + uid);
+            public void onMemberExited(String roomId, long usedId, String reason) {
+                super.onMemberExited(roomId, usedId, reason);
+                Log.e(TAG, "远端用户离开 uid= " + usedId);
                 onRemoteLeave();
             }
 
             @Override
-            public void onLocalPublish(int code, String msg, BMXRtcStreamInfo streamInfo) {
-                if (code == 0) {
-                    onUserJoin(streamInfo);
-                    Log.e(TAG, "发布本地流成功 开启预览 msg = " + msg);
-                } else {
-                    Log.e(TAG, "发布本地流失败 msg = " + msg);
+            public void onLocalPublish(BMXStream stream, String info, BMXErrorCode error) {
+                super.onLocalPublish(stream, info, error);
+                if (BaseManager.bmxFinish(error)) {
+                    onUserJoin(stream);
+                    Log.e(TAG, "发布本地流成功 开启预览 msg = " + info);
+                }else{
+                    Log.e(TAG, "发布本地流失败 msg = " + info);
                 }
             }
 
             @Override
-            public void onLocalUnPublish(int code, String msg, BMXRtcStreamInfo streamInfo) {
-                if (code == 0) {
-                    Log.e(TAG, "停止发布本地流成功 msg = " + msg);
-                } else {
-                    Log.e(TAG, "停止发布本地流失败 msg = " + msg);
+            public void onLocalUnPublish(BMXStream stream, String info, BMXErrorCode error) {
+                super.onLocalUnPublish(stream, info, error);
+                if (BaseManager.bmxFinish(error)) {
+                    Log.e(TAG, "停止发布本地流成功 msg = " + info);
+                }else{
+                    Log.e(TAG, "停止发布本地流失败 msg = " + info);
                 }
             }
 
             @Override
-            public void onRemotePublish(BMXRtcStreamInfo streamInfo) {
-                mEngine.subscribe(streamInfo);
-                Log.e(TAG, "远端发布流 开启订阅");
-            }
-
-            @Override
-            public void onRemoteUnPublish(BMXRtcStreamInfo streamInfo) {
-                Log.e(TAG, "远端取消发布流");
-                mEngine.stopRemotePreview(streamInfo);
-                mEngine.unSubscribe(streamInfo);
-                onRemoteLeave();
-            }
-
-            @Override
-            public void onSubscribe(int code, String msg, BMXRtcStreamInfo streamInfo) {
-                if (code == 0) {
-                    onRemoteJoin(streamInfo);
-                    Log.e(TAG, "订阅远端流成功 msg = " + msg);
-                } else {
-                    Log.e(TAG, "订阅远端流失败 msg = " + msg);
+            public void onRemotePublish(BMXStream stream, String info, BMXErrorCode error) {
+                super.onRemotePublish(stream, info, error);
+                if (BaseManager.bmxFinish(error)) {
+                    mEngine.subscribe(stream);
+                    Log.e(TAG, "远端发布流 开启订阅");
+                }else{
+                    Log.e(TAG, "远端发布流失败 msg = " + info);
                 }
             }
 
             @Override
-            public void onUnSubscribe(int code, String msg, BMXRtcStreamInfo streamInfo) {
-                if (code == 0) {
-                    Log.e(TAG, "取消订阅远端流成功, 开启预览 msg = " + msg);
-                } else {
-                    Log.e(TAG, "取消订阅远端流失败 msg = " + msg);
+            public void onRemoteUnPublish(BMXStream stream, String info, BMXErrorCode error) {
+                super.onRemoteUnPublish(stream, info, error);
+                if (BaseManager.bmxFinish(error)) {
+                    Log.e(TAG, "远端取消发布流");
+                    BMXVideoCanvas canvas = new BMXVideoCanvas();
+                    canvas.setMView(mRemoteView);
+                    mEngine.stopRemoteView(canvas);
+                    mEngine.unSubscribe(stream);
+                    onRemoteLeave();
+                }else{
+                    Log.e(TAG, "远端取消发布流失败 msg = " + info);
                 }
             }
 
             @Override
-            public void onLocalAudioLevel() {
-
+            public void onSubscribe(BMXStream stream, String info, BMXErrorCode error) {
+                super.onSubscribe(stream, info, error);
+                if (BaseManager.bmxFinish(error)) {
+                    onRemoteJoin(stream);
+                    Log.e(TAG, "订阅远端流成功 msg = " + info);
+                } else {
+                    Log.e(TAG, "订阅远端流失败 msg = " + info);
+                }
             }
 
             @Override
-            public void onRemoteAudioLevel() {
-
+            public void onUnSubscribe(BMXStream stream, String info, BMXErrorCode error) {
+                super.onUnSubscribe(stream, info, error);
+                if (BaseManager.bmxFinish(error)) {
+                    Log.e(TAG, "取消订阅远端流成功, 开启预览 msg = " + info);
+                } else {
+                    Log.e(TAG, "取消订阅远端流失败 msg = " + info);
+                }
             }
 
             @Override
-            public void onKickoff() {
-
+            public void onLocalAudioLevel(int volume) {
+                super.onLocalAudioLevel(volume);
             }
 
             @Override
-            public void onWarning() {
-
+            public void onRemoteAudioLevel(BMXStream stream, int volume) {
+                super.onRemoteAudioLevel(stream, volume);
             }
 
             @Override
-            public void onError() {
-
+            public void onKickoff(String info, BMXErrorCode error) {
+                super.onKickoff(info, error);
             }
 
             @Override
-            public void onNetworkQuality() {
+            public void onWarning(String info, BMXErrorCode error) {
+                super.onWarning(info, error);
+            }
 
+            @Override
+            public void onError(String info, BMXErrorCode error) {
+                super.onError(info, error);
+            }
+
+            @Override
+            public void onNetworkQuality(BMXStream stream, String info, BMXErrorCode error) {
+                super.onNetworkQuality(stream, info, error);
             }
         });
         //获取之前配置初始化
         if (mHasVideo) {
-            mEngine.setVideoProfile(EngineConfig.VIDEO_PROFILE);
-            mEngine.setAudioProfile(true);//视频默认开启扬声器
-            mEngine.setAudioOnlyMode(false);
+//            mEngine.setVideoProfile(EngineConfig.VIDEO_PROFILE);
+//            mEngine.setAudioProfile(true);//视频默认开启扬声器
+//            mEngine.setAudioOnlyMode(false);
         } else {
-            mEngine.setAudioProfile(mSpeaker);
-            mEngine.setAudioOnlyMode(true);
+//            mEngine.setAudioProfile(mSpeaker);
+//            mEngine.setAudioOnlyMode(true);
         }
         if (mIsInitiator) {
             joinRoom();
@@ -629,7 +644,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      */
     private void joinRoom() {
         //如果需要创建 roomId传入空
-        mEngine.joinRoom(String.valueOf(mUserId), mRoomId);
+        BMXRoomAuth auth = new BMXRoomAuth();
+        auth.setMUserId(mUserId);
+        auth.setMRoomId(mRoomId);
+        mEngine.joinRoom(auth);
     }
 
     /**
@@ -667,7 +685,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 切换摄像头
      */
     public void onSwitchCamera(View view) {
-        mEngine.switchCamera(mLocalView);
+        mEngine.switchCamera();
     }
 
     /**
@@ -689,8 +707,11 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     }
 
     private void switchAudio(){
-        mEngine.stopLocalPreview();
-        mEngine.muteLocalVideo(true);
+        BMXVideoCanvas canvas = new BMXVideoCanvas();
+        canvas.setMView(mLocalView);
+        canvas.setMMediaType(BMXVideoMediaType.Camera);
+        mEngine.stopPreview(canvas);
+        mEngine.muteLocalVideo(BMXVideoMediaType.Camera, true);
         removeLocalView();
         removeRemoteView();
         hideVideoPeerInfo();
@@ -706,7 +727,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     public void onSwitchSpeakerInitiator(View view) {
         ViewGroup parent = findViewById(R.id.ll_initiate_control);
         changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));
-        mEngine.setAudioProfile(mSpeaker);
+//        mEngine.setAudioProfile(mSpeaker);
         ToastUtil.showTextViewPrompt(mSpeaker ? R.string.call_speaker_on_tips : R.string.call_speaker_off_tips);
     }
 
@@ -716,44 +737,51 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     public void onSwitchSpeakerCalling(View view) {
         ViewGroup parent = findViewById(R.id.ll_in_call_control);
         changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));
-        mEngine.setAudioProfile(mSpeaker);
+//        mEngine.setAudioProfile(mSpeaker);
         ToastUtil.showTextViewPrompt(mSpeaker ? R.string.call_speaker_on_tips : R.string.call_speaker_off_tips);
     }
 
-    private void onUserJoin(BMXRtcStreamInfo info){
+    private void onUserJoin(BMXStream info){
         if(info == null){
             return;
         }
-        boolean hasVideo = info.isHasVideo();
-        boolean hasAudio = info.isHasAudio();
-        mRoomId = info.getRoomId();
+        boolean hasVideo = info.getMEnableVideo();
+        boolean hasAudio = info.getMEnableAudio();
+        mRoomId = info.getMStreamId();
         if (mHasVideo) {
             addLocalView();
-            mEngine.startLocalPreview(mLocalView, info);
+            BMXVideoCanvas canvas = new BMXVideoCanvas();
+            canvas.setMView(mLocalView);
+            canvas.setMMediaType(BMXVideoMediaType.Camera);
+            mEngine.startPreview(canvas);
         } else {
 
         }
         if (mIsInitiator) {
             //用户加入放入房间 发送给对方信息
-            sendRTCMessage("join", mRoomId + "_" + info.getUid() + "_" + mCallMode);
+            sendRTCMessage("join", info.getMStreamId() + "_" + info.getMUserId() + "_" + mCallMode);
         }
     }
 
     /**
      * 远端用户加入
      */
-    private void onRemoteJoin(BMXRtcStreamInfo info) {
+    private void onRemoteJoin(BMXStream info) {
         if(info == null){
             return;
         }
-        boolean hasVideo = info.isHasVideo();
-        boolean hasAudio = info.isHasAudio();
+        boolean hasVideo = info.getMEnableVideo();
+        boolean hasAudio = info.getMEnableAudio();
         hideInitiatorView();
         hideRecipientView();
         showControlView(mHasVideo);
         if (mHasVideo) {
             addRemoteView();
-            mEngine.startRemotePreview(mRemoteView, info);
+            BMXVideoCanvas canvas = new BMXVideoCanvas();
+            canvas.setMView(mRemoteView);
+            canvas.setMUserId(info.getMUserId());
+            canvas.setMMediaType(info.getMMediaType());
+            mEngine.startRemoteView(canvas);
             hideVideoPeerInfo();
         } else {
 
@@ -775,7 +803,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         super.onDestroy();
         leaveRoom();
         mHandler.removeAll();
-        RTCManager.getInstance().removeRtcListener(mListener);
+        mEngine.removeRTCEngineListener(mListener);
         ChatManager.getInstance().removeChatListener(mChatListener);
     }
 

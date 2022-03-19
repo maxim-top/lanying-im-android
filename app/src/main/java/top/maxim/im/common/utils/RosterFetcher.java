@@ -128,5 +128,4 @@ public class RosterFetcher {
         });
         return null;
     }
-
 }

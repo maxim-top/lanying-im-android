@@ -51,7 +51,7 @@ public class MaxIMApplication extends Application {
         super.onCreate();
         initUtils();
         initBMXSDK();
-//        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
     }
 
     public void restartApp() {

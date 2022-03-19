@@ -2,11 +2,12 @@
 package top.maxim.im.common.view.recyclerview;
 
 import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,19 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseVi
         if (t != null) {
             mList.add(position, t);
             notifyItemInserted(position);
+        }
+    }
+
+    /**
+     * 添加数据
+     *
+     * @param list 数据
+     * @param position 位置
+     */
+    public void addList(List<T> list, int position) {
+        if (list != null && list.size() > 0) {
+            mList.addAll(position, list);
+            notifyDataSetChanged();
         }
     }
 

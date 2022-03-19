@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -15,10 +16,13 @@ import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXPushServiceListener;
+import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.PushManager;
+import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.push.PushClientMgr;
+import top.maxim.im.sdk.utils.MsgConstants;
 
 /**
  * Description : push服务 Created by mango on 2020/9/10.
@@ -80,6 +84,16 @@ public class MaxIMPushService extends Service {
         public void onReceivePush(BMXMessageList list) {
             super.onReceivePush(list);
             Log.d(TAG, "onReceivePush");
+            //弹出Notification
+            if (list != null && !list.isEmpty()) {
+                BMXMessage message = list.get(0);
+                if (message != null) {
+                    String title = !TextUtils.isEmpty(message.senderName()) ? message.senderName() : getString(R.string.app_name);
+                    String content = ChatUtils.getInstance().getMessageDesc(message);
+                    Intent intent = getPackageManager().getLaunchIntentForPackage(getApplication().getPackageName());
+                    NotificationUtils.getInstance().showNotify(MsgConstants.ChannelImportance.PRIVATE, title, content, intent);
+                }
+            }
         }
 
         @Override

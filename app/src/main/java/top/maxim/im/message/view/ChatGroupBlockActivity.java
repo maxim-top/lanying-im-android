@@ -18,6 +18,7 @@ import im.floo.floolib.ListOfLongLong;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.message.utils.MessageConfig;
 
@@ -92,21 +93,47 @@ public class ChatGroupBlockActivity extends ChatGroupListMemberActivity {
     }
 
     @Override
+    protected void initData(String cursor, BMXDataCallBack<BMXGroupMemberList> callBack) {
+        GroupManager.getInstance().getBlockList(mGroup, cursor, DEFAULT_PAGE_SIZE, (bmxErrorCode, page) -> {
+            BMXGroupMemberList memberListTmp = new BMXGroupMemberList();
+            if (page != null && page.result() != null && !page.result().isEmpty()) {
+                mCursor = page.cursor();
+                BMXGroupMemberList list = page.result();
+                long myId = SharePreferenceUtils.getInstance().getUserId();
+                for (int i = 0; i < list.size(); i++) {
+                    long memberId = list.get(i).getMUid();
+                    if (myId != memberId) {
+                        memberListTmp.add(list.get(i));
+                    }
+                }
+            }
+            if (callBack != null) {
+                callBack.onResult(bmxErrorCode, memberListTmp);
+            }
+        });
+    }
+
+    @Override
     protected void initData(boolean forceRefresh, BMXDataCallBack<BMXGroupMemberList> callBack) {
         GroupManager.getInstance().getBlockList(mGroup, forceRefresh, callBack);
     }
 
     @Override
-    protected void bindData(BMXGroupMemberList memberList) {
+    protected void bindData(BMXGroupMemberList memberList, boolean upload) {
         List<BMXGroup.Member> members = new ArrayList<>();
         if (memberList != null && !memberList.isEmpty()) {
             for (int i = 0; i < memberList.size(); i++) {
                 members.add(memberList.get(i));
             }
         }
-        BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "", 0);
-        members.add(add);
-        mAdapter.replaceList(members);
+        if (upload) {
+            int count = mAdapter.getItemCount();
+            mAdapter.addList(members, count > 1 ? count - 1 : 0);
+        } else {
+            BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "", 0);
+            members.add(add);
+            mAdapter.replaceList(members);
+        }
     }
 
     private void removeBlack() {

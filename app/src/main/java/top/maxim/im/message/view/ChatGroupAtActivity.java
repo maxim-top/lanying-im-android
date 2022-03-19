@@ -101,16 +101,20 @@ public class ChatGroupAtActivity extends ChatGroupListMemberActivity {
     }
 
     @Override
-    protected void bindData(BMXGroupMemberList memberList) {
+    protected void bindData(BMXGroupMemberList memberList, boolean upload) {
         List<BMXGroup.Member> members = new ArrayList<>();
         if (memberList != null && !memberList.isEmpty()) {
             for (int i = 0; i < memberList.size(); i++) {
                 members.add(memberList.get(i));
             }
         }
-        BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "全部成员", 0);
-        members.add(add);
-        mAdapter.replaceList(members);
+        if (upload) {
+            int count = mAdapter.getItemCount();
+            mAdapter.addList(members, count > 1 ? count - 1 : 0);
+        } else {
+            BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "全部成员", 0);
+            members.add(add);
+            mAdapter.replaceList(members);
+        }
     }
-
 }

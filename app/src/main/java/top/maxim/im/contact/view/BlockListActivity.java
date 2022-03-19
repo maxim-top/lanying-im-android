@@ -74,6 +74,7 @@ public class BlockListActivity extends RosterChooseActivity {
     @Override
     protected View onCreateView() {
         View view = super.onCreateView();
+        mEmptyView.setVisibility(View.GONE);
         buildFooterView();
         return view;
     }
@@ -119,18 +120,13 @@ public class BlockListActivity extends RosterChooseActivity {
 
     @Override
     protected void bindData(BMXRosterItemList itemList) {
+        List<BMXRosterItem> members = new ArrayList<>();
         if (itemList != null && !itemList.isEmpty()) {
-            List<BMXRosterItem> members = new ArrayList<>();
             for (int i = 0; i < itemList.size(); i++) {
                 members.add(itemList.get(i));
             }
-            mAdapter.replaceList(members);
-            mRecycler.setVisibility(View.VISIBLE);
-            mEmptyView.setVisibility(View.GONE);
-        } else {
-            mRecycler.setVisibility(View.GONE);
-            mEmptyView.setVisibility(View.VISIBLE);
         }
+        mAdapter.replaceList(members);
     }
 
     private void addBlock(long rosterId) {

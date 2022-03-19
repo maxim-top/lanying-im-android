@@ -5,9 +5,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -16,6 +17,8 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +42,9 @@ import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.CommonDialog;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
@@ -71,6 +76,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     /* 群成员 */
     private TextView mChatGroupMember;
+
+    /* 群类型 */
+    private ItemLineArrow.Builder mChatGroupType;
 
     /* 群id */
     private ItemLineArrow.Builder mChatGroupId;
@@ -135,6 +143,12 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     /* 设置群已读 */
     private ItemLineSwitch.Builder mChatGroupReadMode;
 
+    /* 屏蔽群信息模式 */
+    private ItemLineArrow.Builder mMuteGroupMessage;
+
+    /* 群消息通知模式 */
+    private ItemLineArrow.Builder mGroupNotifyMode;
+
     private View mChatGroupReadModeView;
 
     /* 群聊成员gridView */
@@ -159,6 +173,8 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     /* 减人 */
     private final int REMOVE_MEMBER_REQUEST = 1002;
 
+    /* 是否是群聊管理员 */
+    private boolean mIsAdmin;
     /* 是否是群聊创建者 */
     private boolean mIsOwner;
 
@@ -166,6 +182,10 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     
     // 最大展示数目
     private final int MAX_SHOW_MEMBER = 10;
+
+    private SparseArray<BMXGroup.MsgPushMode> pushModeMap = new SparseArray<>();
+
+    private SparseArray<BMXGroup.MsgMuteMode> muteModeMap = new SparseArray<>();
 
     public static void startGroupOperateActivity(Context context, long groupId) {
         Intent intent = new Intent(context, ChatGroupOperateActivity.class);
@@ -204,7 +224,18 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        initGroupMode();
         initGroupInfo(true);
+    }
+
+    private void initGroupMode() {
+        muteModeMap.put(R.string.group_mute_none, BMXGroup.MsgMuteMode.None);
+        muteModeMap.put(R.string.group_mute_notification, BMXGroup.MsgMuteMode.MuteNotification);
+        muteModeMap.put(R.string.group_mute_chat, BMXGroup.MsgMuteMode.MuteChat);
+
+        pushModeMap.put(R.string.group_notify_all, BMXGroup.MsgPushMode.All);
+        pushModeMap.put(R.string.group_notify_admin_at, BMXGroup.MsgPushMode.AdminOrAt);
+        pushModeMap.put(R.string.group_notify_none, BMXGroup.MsgPushMode.None);
     }
 
     private void initGroupInfo(final boolean syncMember) {
@@ -215,10 +246,13 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 if (bmxGroup != null) {
                     mGroup = bmxGroup;
                 }
-                bindGroupInfo();
-                if (syncMember) {
-                    initGroupMembers();
-                }
+                //需要获取群管理员列表  判断是否是管理员
+                GroupManager.getInstance().getAdmins(mGroup, true, (bmxErrorCode1, memberList) -> {
+                    bindGroupInfo();
+                    if (syncMember) {
+                        initGroupMembers();
+                    }
+                });
             } else {
                 toastError(bmxErrorCode);
             }
@@ -361,6 +395,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
+                        if (!mIsAdmin) {
+                            return;
+                        }
                         showSettingDialog(getString(R.string.group_desc));
                     }
                 });
@@ -423,6 +460,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
+                        if (!mIsAdmin) {
+                            return;
+                        }
                         showSettingDialog(getString(R.string.group_ext));
                     }
                 });
@@ -460,7 +500,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 });
         container.addView(mViewChatGroupShare = mChatGroupShare.build());
         // 分割线
-        itemLine11 = new ItemLine.Builder(this, container).build();
+        itemLine11 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15)).build();
         container.addView(itemLine11);
 
         /* 群已读 */
@@ -474,21 +514,61 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 });
         container.addView(mChatGroupReadModeView = mChatGroupReadMode.build());
         // 分割线
-        itemLine12 = new ItemLine.Builder(this, container).build();
+        itemLine12 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15)).build();
         container.addView(itemLine12);
+
+        //群类型
+        mChatGroupType = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.group_type))
+                .setArrowVisible(false);
+        container.addView(mChatGroupType.build());
+
+        // 分割线
+        View itemLine13 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15)).build();
+        container.addView(itemLine13);
+
+        // 屏蔽群信息
+        mMuteGroupMessage = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.group_mute_msg))
+                .setMarginTop(ScreenUtils.dp2px(10))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                        showSetGroupMode(getString(R.string.group_mute_msg));
+                    }
+                });
+        container.addView(mMuteGroupMessage.build());
+
+        // 分割线
+        ItemLine.Builder itemLine14 = new ItemLine.Builder(this, container)
+                .setMarginLeft(ScreenUtils.dp2px(15));
+        container.addView(itemLine14.build());
+
+        // 群消息通知模式
+        mGroupNotifyMode = new ItemLineArrow.Builder(this)
+                .setStartContent(getString(R.string.group_notify_mode))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                        showSetGroupMode(getString(R.string.group_notify_mode));
+                    }
+                });
+        container.addView(mGroupNotifyMode.build());
+        // 分割线
+        View itemLine15 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15)).build();
+        container.addView(itemLine15);
 
         // 退出群聊
         mQuitGroup = new TextView(this);
         mQuitGroup.setTextColor(getResources().getColor(R.color.color_FF475A));
         mQuitGroup.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
         mQuitGroup.setGravity(Gravity.CENTER);
-        mQuitGroup.setText(getString(R.string.group_quit));
         mQuitGroup.setBackgroundResource(R.color.color_white);
         mQuitGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DialogUtils.getInstance().showDialog(ChatGroupOperateActivity.this,
-                        getString(R.string.group_quit), getString(R.string.group_quit_notice),
+                        mQuitGroup.getText().toString(), getString(mIsOwner ? R.string.group_destroy_notice : R.string.group_quit_notice),
                         new CommonDialog.OnDialogListener() {
                             @Override
                             public void onConfirmListener() {
@@ -540,6 +620,9 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     private void bindGroupInfo() {
         mIsOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
+        mIsAdmin = GroupManager.getInstance().isAdmin(mGroup, SharePreferenceUtils.getInstance().getUserId()) || mIsOwner;
+        //创建者才能解散  退出群聊文案
+        mQuitGroup.setText(getString(mIsOwner ? R.string.group_destroy : R.string.group_quit));
 
         long groupId = mGroup.groupId();
         mChatGroupId.setEndContent(groupId > 0 ? String.valueOf(groupId) : "");
@@ -599,37 +682,67 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         boolean readAck = mGroup.enableReadAck();
         mChatGroupReadMode.setCheckStatus(readAck);
 
+        //群类型
+        String groupType = "";
+        switch (mGroup.groupType()){
+            case Public:
+                groupType = getString(R.string.group_type_public);
+                break;
+            case Private:
+                groupType = getString(R.string.group_type_private);
+                break;
+            case Chatroom:
+                groupType = getString(R.string.group_type_chat_room);
+                break;
+        }
+        mChatGroupType.setEndContent(groupType);
         setManagerVisible();
+        // 群消息通知模式
+        BMXGroup.MsgPushMode pushMode = mGroup.msgPushMode();
+        for (int i = 0; i < pushModeMap.size(); i++) {
+            if (pushModeMap.valueAt(i) == pushMode) {
+                mGroupNotifyMode.setEndContent(getString(pushModeMap.keyAt(i)));
+                break;
+            }
+        }
+        // 屏蔽群信息
+        BMXGroup.MsgMuteMode muteMode = mGroup.msgMuteMode();
+        for (int i = 0; i < muteModeMap.size(); i++) {
+            if (muteModeMap.valueAt(i) == muteMode) {
+                mMuteGroupMessage.setEndContent(getString(muteModeMap.keyAt(i)));
+                break;
+            }
+        }
     }
 
     /**
      * 设置群主和群成员的页面view显隐
      */
     private void setManagerVisible() {
-        mViewChatGroupManager.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-        mViewChatGroupRename.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-        mViewGroupAvatar.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-        // mViewGroupMyNickName.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-        mViewChatGroupManagerList.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+        mViewChatGroupManager.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
+        mViewChatGroupRename.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
+        mViewGroupAvatar.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
+        // mViewGroupMyNickName.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
+        mViewChatGroupManagerList.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
 
-        mViewChatGroupDesc.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-        mViewGroupDesc.setVisibility(mIsOwner ? mViewGroupDesc.getVisibility() : View.GONE);
+//        mViewChatGroupDesc.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
+//        mViewGroupDesc.setVisibility(mIsAdmin ? mViewGroupDesc.getVisibility() : View.GONE);
 
-        mViewChatGroupNotice.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-        mViewGroupNotice.setVisibility(mIsOwner ? mViewGroupNotice.getVisibility() : View.GONE);
+//        mViewChatGroupNotice.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
+//        mViewGroupNotice.setVisibility(mIsAdmin ? mViewGroupNotice.getVisibility() : View.GONE);
 
-        mViewChatGroupExt.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-        mViewGroupExt.setVisibility(mIsOwner ? mViewGroupExt.getVisibility() : View.GONE);
+//        mViewChatGroupExt.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
+//        mViewGroupExt.setVisibility(mIsAdmin ? mViewGroupExt.getVisibility() : View.GONE);
 
-        mViewChatGroupShare.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
-        mChatGroupReadModeView.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+//        mViewChatGroupShare.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
+        mChatGroupReadModeView.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
 
         View[] views = new View[] {
                 itemLine1, itemLine2, itemLine4, itemLine5, itemLine6, itemLine7, itemLine8,
                 itemLine9, itemLine10, itemLine11, itemLine12
         };
         for (View view : views) {
-            view.setVisibility(mIsOwner ? View.VISIBLE : View.GONE);
+            view.setVisibility(mIsAdmin ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -643,7 +756,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 if (!memberList.isEmpty()) {
                     ListOfLongLong listOfLongLong = new ListOfLongLong();
                     long size = memberList.size();
-                    int showSize = mIsOwner ? MAX_SHOW_MEMBER - 2 : MAX_SHOW_MEMBER;
+                    int showSize = mIsAdmin ? MAX_SHOW_MEMBER - 2 : MAX_SHOW_MEMBER;
                     for (int i = 0; i < size; i++) {
                         if (i < showSize) {
                             listOfLongLong.add(memberList.get(i).getMUid());
@@ -672,7 +785,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                                     mHeader.setTitle(String.format(getString(R.string.group_info),
                                             String.valueOf(memberCount)));
                                     // 群主才有添加 删除功能
-                                    if (mIsOwner) {
+                                    if (mIsAdmin) {
                                         // 增加添加 移除
                                         BMXGroup.Member add = new BMXGroup.Member(
                                                 MessageConfig.MEMBER_ADD, "", 0);
@@ -763,6 +876,8 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 } else if (TextUtils.equals(title, getString(R.string.group_my_name))) {
                     // 我在群里的昵称
                     mGroupMyNickName.setEndContent(info);
+                    //设置完我在本群的昵称 刷新member名称
+                    initGroupMembers();
                 } else if (TextUtils.equals(title, getString(R.string.group_desc))) {
                     // 设置群描述
                     mViewGroupDesc
@@ -808,8 +923,8 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 toastError(bmxErrorCode);
             }
         };
-        boolean isOwner = GroupManager.getInstance().isGroupOwner(mGroup.ownerId());
-        if (isOwner) {
+        //只有创建者才能解散群聊
+        if (mIsOwner) {
             GroupManager.getInstance().destroy(mGroup, callBack);
         } else {
             GroupManager.getInstance().leave(mGroup, callBack);
@@ -930,13 +1045,15 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                         "drawable://" + R.drawable.default_remove_icon);
             } else {
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(memberId);
-                String name;
-                if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
+                String name = "";
+                if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
+                    name = rosterItem.alias();
+                } else if (member != null && !TextUtils.isEmpty(member.getMGroupNickname())) {
+                    name = member.getMGroupNickname();
+                } else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
                     name = rosterItem.nickname();
                 } else if (rosterItem != null) {
                     name = rosterItem.username();
-                } else {
-                    name = member.getMGroupNickname();
                 }
                 tvName.setText(TextUtils.isEmpty(name) ? "" : name);
                 ChatUtils.getInstance().showRosterAvatar(rosterItem, icon, mConfig);
@@ -1064,6 +1181,105 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * 设置群聊mode
+     *
+     * @param title 标题
+     */
+    private void showSetGroupMode(final String title) {
+        final LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int[] array = null;
+        if (TextUtils.equals(title, getString(R.string.group_notify_mode))) {
+            // 群消息通知模式
+            array = new int[]{
+                    R.string.group_notify_all, R.string.group_notify_admin_at,
+                    R.string.group_notify_none
+            };
+        } else if (TextUtils.equals(title, getString(R.string.group_mute_msg))) {
+            //屏蔽群消息模式
+            array = new int[]{
+                    R.string.group_mute_none, R.string.group_mute_notification, R.string.group_mute_chat
+            };
+        }
+        if (array == null) {
+            return;
+        }
+        final int[] selectContent = new int[1];
+        for (final int s : array) {
+            final TextView tv = new TextView(this);
+            tv.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                    ScreenUtils.dp2px(15));
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+            tv.setTextColor(getResources().getColor(R.color.color_black));
+            tv.setBackgroundColor(getResources().getColor(R.color.color_white));
+            tv.setText(s);
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectContent[0] = s;
+                    for (int i = 0; i < ll.getChildCount(); i++) {
+                        TextView select = (TextView)ll.getChildAt(i);
+                        if (TextUtils.equals(select.getText().toString(), getString(s))) {
+                            select.setTextColor(Color.RED);
+                        } else {
+                            select.setTextColor(getResources().getColor(R.color.color_black));
+                        }
+                    }
+                }
+            });
+            ll.addView(tv, params);
+        }
+        DialogUtils.getInstance().showCustomDialog(this, ll, title, getString(R.string.confirm),
+                getString(R.string.cancel), new CommonCustomDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        setGroupInfo(title,
+                                selectContent[0]);
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
+    }
+
+    /**
+     * 更新信息
+     */
+    private void setGroupInfo(String title, final int stringResId) {
+        if (stringResId <= 0) {
+            return;
+        }
+        showLoadingDialog(true);
+        BMXCallBack callBack = bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                if (TextUtils.equals(title, getString(R.string.group_notify_mode))) {
+                    // 群消息通知
+                    mGroupNotifyMode.setEndContent(getString(stringResId));
+                } else if (TextUtils.equals(title, getString(R.string.group_mute_msg))) {
+                    // 屏蔽群消息
+                    mMuteGroupMessage.setEndContent(getString(stringResId));
+                }
+            } else {
+                toastError(bmxErrorCode);
+            }
+        };
+        if (TextUtils.equals(title, getString(R.string.group_notify_mode))) {
+            // 群消息通知
+            BMXGroup.MsgPushMode pushMode = pushModeMap.get(stringResId);
+            GroupManager.getInstance().setMsgPushMode(mGroup, pushMode, callBack);
+        } else if (TextUtils.equals(title, getString(R.string.group_mute_msg))) {
+            // 屏蔽群消息
+            BMXGroup.MsgMuteMode muteMode = muteModeMap.get(stringResId);
+            GroupManager.getInstance().muteMessage(mGroup, muteMode, callBack);
         }
     }
 }

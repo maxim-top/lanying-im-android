@@ -29,6 +29,7 @@ public class AgentTask {
             return;
         }
         NBSAppAgent.setLicenseKey(metaAppKey).withCrashReportEnabled(true)
+                .enableLogging(true)
                 .withLocationServiceEnabled(false).start(context);
     }
 

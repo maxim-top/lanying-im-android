@@ -2,6 +2,7 @@
 package top.maxim.im.bmxmanager;
 
 import android.content.Context;
+import android.os.Environment;
 import android.text.TextUtils;
 
 import java.io.File;
@@ -28,11 +29,24 @@ public class BaseManager {
         System.loadLibrary("floo");
     }
 
+    private static String getFilesPath( Context context ){
+        String filePath ;
+        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+                || !Environment.isExternalStorageRemovable()) {
+                //外部存储可用
+                filePath = context.getExternalFilesDir(null).getPath();
+        }else {
+                //外部存储不可用
+                filePath = context.getFilesDir().getPath() ;
+        }
+        return filePath ;
+    }
+
     /**
      * 配置环境
      */
     public static void initBMXSDK() {
-        String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
+        String appPath = getFilesPath(AppContextUtils.getAppContext());
         File dataPath = new File(appPath + "/data_dir");
         File cachePath = new File(appPath + "/cache_dir");
         dataPath.mkdirs();

@@ -108,8 +108,7 @@ public class MaxIMApplication extends Application {
     private void initRtc(){
 //        UCloudEngine.init(this, PushClientMgr.getPushAppId("RTC_APP_ID"), PushClientMgr.getPushAppId("RTC_APP_KEY"));
 //        UCloudRTCManager.getInstance().setupRTCEngine(new UCloudEngine());
-        MaxEngine.Companion.init(this);
-        RTCManager.getInstance().setupRTCEngine(new MaxEngine(BaseManager.getBMXClient()));
+        RTCManager.getInstance().init(this);
     }
 
 }

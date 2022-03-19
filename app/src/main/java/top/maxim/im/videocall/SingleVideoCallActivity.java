@@ -214,6 +214,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             @Override
             public void onJoinRoom(String info, String roomId, BMXErrorCode error) {
                 super.onJoinRoom(info, roomId, error);
+                mRoomId = roomId;
                 if (BaseManager.bmxFinish(error)) {
                     mEngine.publish(BMXVideoMediaType.Camera, mHasVideo, true);
                     Log.e(TAG, "加入房间成功 开启发布本地流, roomId= " + roomId + "msg = " + info);
@@ -747,7 +748,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
         boolean hasVideo = info.getMEnableVideo();
         boolean hasAudio = info.getMEnableAudio();
-        mRoomId = info.getMStreamId();
         if (mHasVideo) {
             addLocalView();
             BMXVideoCanvas canvas = new BMXVideoCanvas();
@@ -759,7 +759,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
         if (mIsInitiator) {
             //用户加入放入房间 发送给对方信息
-            sendRTCMessage("join", info.getMStreamId() + "_" + info.getMUserId() + "_" + mCallMode);
+            sendRTCMessage("join", mRoomId + "_" + info.getMUserId() + "_" + mCallMode);
         }
     }
 

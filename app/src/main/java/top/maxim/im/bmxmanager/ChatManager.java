@@ -112,6 +112,27 @@ public class ChatManager extends BaseManager {
     }
 
     /**
+     * 取消下载附件
+     **/
+    public void cancelDownloadAttachment(BMXMessage msg) {
+        mService.cancelDownloadAttachment(msg);
+    }
+
+    /**
+     * 取消下载附件
+     **/
+    public void cancelUploadAttachment(BMXMessage msg) {
+//        mService.cancelUploadAttachment(msg);
+    }
+
+    /**
+     * 获取正在上传或下载的任务总数
+     **/
+    public int transferingNum() {
+        return mService.transferingNum();
+    }
+
+    /**
      * 插入消息
      **/
     public void insertMessages(BMXMessageList list, BMXCallBack callBack) {

@@ -14,16 +14,15 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 import java.io.File;
 
-import top.maxim.im.BuildConfig;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.RTCManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
-import top.maxim.rtc.engine.MaxEngine;
-import top.maxim.rtc.manager.RTCManager;
+import top.maxim.rtc.BuildConfig;
 
 /**
  * Description : application Created by Mango on 2018/11/5.
@@ -106,8 +105,6 @@ public class MaxIMApplication extends Application {
      * 初始化Rtc
      */
     private void initRtc(){
-//        UCloudEngine.init(this, PushClientMgr.getPushAppId("RTC_APP_ID"), PushClientMgr.getPushAppId("RTC_APP_KEY"));
-//        UCloudRTCManager.getInstance().setupRTCEngine(new UCloudEngine());
         RTCManager.getInstance().init(this);
     }
 

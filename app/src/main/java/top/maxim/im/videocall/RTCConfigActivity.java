@@ -13,6 +13,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,7 @@ import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.recyclerview.BaseRecyclerAdapter;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
+import top.maxim.im.videocall.utils.EngineConfig;
 
 /**
  * Description 音视频设置
@@ -77,7 +80,7 @@ public class RTCConfigActivity extends BaseTitleActivity {
         // videoProfile
         mVideoProfile = new ItemLineArrow.Builder(this)
                 .setStartContent(getString(R.string.config_rtc_video_profile))
-//                .setEndContent(EngineConfig.VIDEO_PROFILE)
+                .setEndContent(buildProfileText(EngineConfig.VIDEO_PROFILE))
                 .setOnItemClickListener(v -> showVideoProfile());
         container.addView(mVideoProfile.build());
         // 分割线
@@ -103,10 +106,10 @@ public class RTCConfigActivity extends BaseTitleActivity {
 
         // 扬声器
         mSwitchSpeaker = new ItemLineSwitch.Builder(this)
-                .setLeftText(getString(R.string.config_rtc_speaker));
-//                .setCheckStatus(EngineConfig.SWITCH_SPEAKER)
-//                .setOnItemSwitchListener((v, check) ->
-//                        EngineConfig.SWITCH_SPEAKER = check);
+                .setLeftText(getString(R.string.config_rtc_speaker))
+                .setCheckStatus(EngineConfig.SWITCH_SPEAKER)
+                .setOnItemSwitchListener((v, check) ->
+                        EngineConfig.SWITCH_SPEAKER = check);
         container.addView(mSwitchSpeaker.build());
         // 分割线
         addLineView(container);
@@ -149,8 +152,8 @@ public class RTCConfigActivity extends BaseTitleActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 dialog.dismiss();
-//                mVideoProfile.setEndContent(adapter.getItem(position));
-//                EngineConfig.VIDEO_PROFILE = adapter.getItem(position);
+                mVideoProfile.setEndContent(buildProfileText(adapter.getItem(position)));
+                EngineConfig.VIDEO_PROFILE = adapter.getItem(position);
             }
         });
         recyclerView.setAdapter(adapter);
@@ -182,30 +185,33 @@ public class RTCConfigActivity extends BaseTitleActivity {
         protected void onBindHolder(BaseViewHolder holder, int position) {
             TextView tv = holder.findViewById(R.id.tv_video_profile);
             BMXVideoProfile profile = getItem(position);
-            String text = "";
-//            switch (profile.swigValue()){
-//                case BMXVideoProfile.Profile_240_180.swigValue():
-//                    break;
-//                case BMXVideoProfile.Profile_320_180:
-//                    break;
-//                case BMXVideoProfile.Profile_320_240:
-//                    break;
-//                case BMXVideoProfile.Profile_480_360:
-//                    break;
-//                case BMXVideoProfile.Profile_640_360:
-//                    break;
-//                case BMXVideoProfile.Profile_640_360:
-//                    break;
-//                case BMXVideoProfile.Profile_640_480:
-//                    break;
-//                case BMXVideoProfile.Profile_960_720:
-//                    break;
-//                case BMXVideoProfile.Profile_1280_720:
-//                    break;
-//                case BMXVideoProfile.Profile_1920_1080:
-//                    break;
-//            }
-            tv.setText(TextUtils.isEmpty(text) ? "" : text);
+            tv.setText(buildProfileText(profile));
         }
+    }
+
+    private String buildProfileText(BMXVideoProfile profile){
+        String text = "";
+        switch (profile){
+            case Profile_320_180:
+                text = "320_180";
+                break;
+            case Profile_480_360:
+                text = "480_360";
+                break;
+            case Profile_640_360:
+                text = "640_360";
+                break;
+            case Profile_1280_720:
+                text = "1280_720";
+                break;
+            case Profile_1920_1080:
+                text = "1920_1080";
+                break;
+            case Profile_640_480:
+            default:
+                text = "640_480";
+                break;
+        }
+        return text;
     }
 }

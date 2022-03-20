@@ -18,6 +18,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import im.floo.floolib.BMXAudioProfile;
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
@@ -28,6 +29,7 @@ import im.floo.floolib.BMXRoomAuth;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXStream;
 import im.floo.floolib.BMXVideoCanvas;
+import im.floo.floolib.BMXVideoConfig;
 import im.floo.floolib.BMXVideoMediaType;
 import rx.Observable;
 import rx.Subscriber;
@@ -36,6 +38,7 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
+import top.maxim.im.bmxmanager.RTCManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.RosterFetcher;
@@ -48,7 +51,7 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.sdk.utils.MessageSendUtils;
-import top.maxim.rtc.manager.RTCManager;
+import top.maxim.im.videocall.utils.EngineConfig;
 import top.maxim.rtc.view.BMXRtcRenderView;
 import top.maxim.rtc.view.RTCRenderView;
 
@@ -289,7 +292,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 if (BaseManager.bmxFinish(error)) {
                     Log.e(TAG, "远端取消发布流");
                     BMXVideoCanvas canvas = new BMXVideoCanvas();
-                    canvas.setMView(mRemoteView);
+                    canvas.setMStream(stream);
                     mEngine.stopRemoteView(canvas);
                     mEngine.unSubscribe(stream);
                     onRemoteLeave();
@@ -325,8 +328,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             }
 
             @Override
-            public void onRemoteAudioLevel(BMXStream stream, int volume) {
-                super.onRemoteAudioLevel(stream, volume);
+            public void onRemoteAudioLevel(long userId, int volume) {
+                super.onRemoteAudioLevel(userId, volume);
             }
 
             @Override
@@ -351,7 +354,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         });
         //获取之前配置初始化
         if (mHasVideo) {
-//            mEngine.setVideoProfile(EngineConfig.VIDEO_PROFILE);
+            BMXVideoConfig config = new BMXVideoConfig();
+            config.setProfile(EngineConfig.VIDEO_PROFILE);
+            mEngine.setVideoProfile(config);
 //            mEngine.setAudioProfile(true);//视频默认开启扬声器
 //            mEngine.setAudioOnlyMode(false);
         } else {
@@ -709,8 +714,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private void switchAudio(){
         BMXVideoCanvas canvas = new BMXVideoCanvas();
-        canvas.setMView(mLocalView);
-        canvas.setMMediaType(BMXVideoMediaType.Camera);
+        BMXStream stream = new BMXStream();
+        stream.setMMediaType(BMXVideoMediaType.Camera);
+        canvas.setMStream(stream);
         mEngine.stopPreview(canvas);
         mEngine.muteLocalVideo(BMXVideoMediaType.Camera, true);
         removeLocalView();
@@ -751,8 +757,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (mHasVideo) {
             addLocalView();
             BMXVideoCanvas canvas = new BMXVideoCanvas();
-            canvas.setMView(mLocalView);
-            canvas.setMMediaType(BMXVideoMediaType.Camera);
+            canvas.setMView(mLocalView.getObtainView());
+            canvas.setMStream(info);
             mEngine.startPreview(canvas);
         } else {
 
@@ -778,9 +784,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (mHasVideo) {
             addRemoteView();
             BMXVideoCanvas canvas = new BMXVideoCanvas();
-            canvas.setMView(mRemoteView);
+            canvas.setMView(mRemoteView.getObtainView());
             canvas.setMUserId(info.getMUserId());
-            canvas.setMMediaType(info.getMMediaType());
+            canvas.setMStream(info);
             mEngine.startRemoteView(canvas);
             hideVideoPeerInfo();
         } else {

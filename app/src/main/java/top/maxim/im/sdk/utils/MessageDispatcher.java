@@ -41,7 +41,6 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
-import top.maxim.rtc.manager.RTCManager;
 
 /**
  * Description : 消息分发 Created by mango on 2018/12/20.

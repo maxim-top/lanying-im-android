@@ -18,7 +18,6 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import im.floo.floolib.BMXAudioProfile;
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
@@ -807,7 +806,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        leaveRoom();
+//        leaveRoom();
         mHandler.removeAll();
         mEngine.removeRTCEngineListener(mListener);
         ChatManager.getInstance().removeChatListener(mChatListener);

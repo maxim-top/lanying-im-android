@@ -13,7 +13,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ucloudrtclib.sdkengine.define.UCloudRtcSdkVideoProfile;
 
 import java.util.ArrayList;
 import java.util.List;

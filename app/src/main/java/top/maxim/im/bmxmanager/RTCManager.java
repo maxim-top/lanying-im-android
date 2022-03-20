@@ -5,9 +5,7 @@ import android.app.Application;
 
 import im.floo.floolib.BMXRTCEngine;
 import im.floo.floolib.BMXRTCService;
-import top.maxim.im.push.PushClientMgr;
 import top.maxim.rtc.engine.MaxEngine;
-import top.maxim.rtc.engine.UCloudEngine;
 
 /**
  * Description : RTC Created by Mango on 2018/12/2.

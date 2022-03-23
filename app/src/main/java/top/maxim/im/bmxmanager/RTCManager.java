@@ -18,8 +18,6 @@ public class RTCManager extends BaseManager {
 
     private BMXRTCService mService;
 
-    private BMXRTCEngine mEngine;
-
     public static RTCManager getInstance() {
         return sInstance;
     }
@@ -30,13 +28,12 @@ public class RTCManager extends BaseManager {
 
     public void init(Application application){
         MaxEngine.Companion.init(application);
-        mService.setupRTCEngine(mEngine = new MaxEngine(bmxClient));
+        mService.setupRTCEngine(new MaxEngine(bmxClient));
 //        UCloudEngine.init(application);
 //        mService.setupRTCEngine(mEngine = new UCloudEngine());
     }
 
     public BMXRTCEngine getRTCEngine(){
-        return mEngine;
-//        return mService.getRTCEngine();
+        return mService.getRTCEngine();
     }
 }

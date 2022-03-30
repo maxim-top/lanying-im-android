@@ -18,6 +18,8 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
@@ -44,6 +46,9 @@ import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.WeakHandler;
+import top.maxim.im.common.utils.permissions.PermissionsConstant;
+import top.maxim.im.common.utils.permissions.PermissionsMgr;
+import top.maxim.im.common.utils.permissions.PermissionsResultAction;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
@@ -220,7 +225,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 if (BaseManager.bmxFinish(error)) {
                     mEngine.publish(BMXVideoMediaType.Camera, mHasVideo, true);
                     Log.e(TAG, "加入房间成功 开启发布本地流, roomId= " + roomId + "msg = " + info);
-                }else{
+                } else {
                     Log.e(TAG, "加入房间失败 roomId= " + roomId + "msg = " + info);
                 }
             }
@@ -457,7 +462,77 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         } else {
             onRecipientCall();
         }
-        initRtc();
+        checkPermission();
+    }
+
+    private void checkPermission() {
+        if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
+            if (mHasVideo) {
+                if (hasPermission(PermissionsConstant.CAMERA)) {
+                    initRtc();
+                } else {
+                    PermissionsMgr.getInstance().requestPermissionsIfNecessaryForResult(
+                            this, new String[]{PermissionsConstant.CAMERA}, new PermissionsResultAction() {
+
+                                @Override
+                                public void onGranted(List<String> perms) {
+                                    initRtc();
+                                }
+
+                                @Override
+                                public void onDenied(List<String> perms) {
+                                    deniedPermission();
+                                }
+                            });
+                }
+            } else {
+                initRtc();
+            }
+        } else {
+            PermissionsMgr.getInstance().requestPermissionsIfNecessaryForResult(
+                    this, new String[]{PermissionsConstant.RECORD_AUDIO}, new PermissionsResultAction() {
+
+                        @Override
+                        public void onGranted(List<String> perms) {
+                            if (mHasVideo) {
+                                if (hasPermission(PermissionsConstant.CAMERA)) {
+                                    initRtc();
+                                } else {
+                                    PermissionsMgr.getInstance().requestPermissionsIfNecessaryForResult(
+                                            SingleVideoCallActivity.this, new String[]{PermissionsConstant.CAMERA}, new PermissionsResultAction() {
+
+                                                @Override
+                                                public void onGranted(List<String> perms) {
+                                                    initRtc();
+                                                }
+
+                                                @Override
+                                                public void onDenied(List<String> perms) {
+                                                    deniedPermission();
+                                                }
+                                            });
+                                }
+                            } else {
+                                initRtc();
+                            }
+                        }
+
+                        @Override
+                        public void onDenied(List<String> perms) {
+                            deniedPermission();
+                        }
+                    });
+        }
+    }
+
+    /**
+     * 处理无权限
+     */
+    private void deniedPermission(){
+        sendRTCMessage("hangup", "");
+        ToastUtil.showTextViewPrompt(
+                getString(R.string.video_call_fail_check_permission));
+        finish();
     }
 
     /**
@@ -648,7 +723,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 加入房间
      */
     private void joinRoom() {
-        //如果需要创建 roomId传入空
         BMXRoomAuth auth = new BMXRoomAuth();
         auth.setMUserId(mUserId);
         auth.setMRoomId(mRoomId);
@@ -806,9 +880,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        leaveRoom();
         mHandler.removeAll();
-        mEngine.removeRTCEngineListener(mListener);
+        if (mEngine != null) {
+            mEngine.removeRTCEngineListener(mListener);
+        }
         ChatManager.getInstance().removeChatListener(mChatListener);
     }
 

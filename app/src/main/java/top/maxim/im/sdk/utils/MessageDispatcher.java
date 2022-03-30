@@ -1,10 +1,17 @@
 
 package top.maxim.im.sdk.utils;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.TextUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +48,8 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.videocall.GroupVideoCallActivity;
+import top.maxim.im.videocall.SingleVideoCallActivity;
 
 /**
  * Description : 消息分发 Created by mango on 2018/12/20.
@@ -50,6 +59,8 @@ public class MessageDispatcher {
     private static MessageDispatcher sDispatcher = new MessageDispatcher();
 
     private List<BMXChatServiceListener> mListener = new ArrayList<>();
+
+    private SoftReference<Activity> mActivityRef;
 
     private BMXChatServiceListener mChatListener = new BMXChatServiceListener() {
 
@@ -82,6 +93,7 @@ public class MessageDispatcher {
             super.onReceive(list);
             if (list != null && !list.isEmpty()) {
                 notifyNotification(list.get(0));
+                handleVideoCall(list.get(0));
             }
             for (BMXChatServiceListener listener : mListener) {
                 listener.onReceive(list);
@@ -418,6 +430,42 @@ public class MessageDispatcher {
         RosterManager.getInstance().addRosterListener(mRosterListener);
         UserManager.getInstance().addUserListener(mUserListener);
         GroupManager.getInstance().addGroupListener(mGroupListener);
+        AppContextUtils.getApplication().registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+                mActivityRef = new SoftReference<>(activity);
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+
+            }
+        });
     }
 
     private void toastListener(String content) {
@@ -530,5 +578,46 @@ public class MessageDispatcher {
         }
         intent.setPackage(context.getPackageName());
         context.sendBroadcast(intent);
+    }
+
+    /**
+     * 处理音视频消息
+     *
+     * @param message
+     */
+    protected void handleVideoCall(BMXMessage message) {
+        if (message == null) {
+            return;
+        }
+        if (message.contentType() == BMXMessage.ContentType.Text
+                && !TextUtils.isEmpty(message.extension())) {
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject(message.extension());
+                //TODO
+                if (jsonObject.has("rtcKey") && jsonObject.has("rtcValue")) {
+                    if (TextUtils.equals(jsonObject.getString("rtcKey"), "join") && !TextUtils.isEmpty(jsonObject.getString("rtcValue"))) {
+                        String[] values = jsonObject.getString("rtcValue").split("_");
+                        String roomId = values[0];
+                        String[] chatIdArray = values[1].split(",");
+                        boolean hasVideo = TextUtils.equals(MessageConfig.CallMode.CALL_VIDEO+"", values[2]);
+                        List<Long> chatIds = new ArrayList<>();
+                        for (String id : chatIdArray){
+                            chatIds.add(Long.valueOf(id));
+                        }
+                        if(mActivityRef != null && mActivityRef.get() != null){
+                            Context context = mActivityRef.get();
+                            if (message.type() == BMXMessage.MessageType.Group) {
+                                GroupVideoCallActivity.openVideoCall(context, (ArrayList<Long>) chatIds, roomId, false, MessageConfig.CallMode.CALL_AUDIO);
+                            } else {
+                                SingleVideoCallActivity.openVideoCall(context, chatIds.get(0), roomId, false, hasVideo ? MessageConfig.CallMode.CALL_VIDEO : MessageConfig.CallMode.CALL_AUDIO);
+                            }
+                        }
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

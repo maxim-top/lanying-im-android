@@ -106,6 +106,7 @@
     <string name="video_fail_check_permission">录制视频失败，请检查权限</string>
     <string name="location_fail_check_permission">定位失败，请检查权限</string>
     <string name="not_has_sd_permission">没有手机存储权限</string>
+    <string name="video_call_fail_check_permission">音视频会话失败，请检查权限</string>
 
     <!--登录-->
     <string name="login">登录</string>

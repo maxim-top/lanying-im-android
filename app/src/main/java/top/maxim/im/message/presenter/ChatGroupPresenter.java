@@ -19,9 +19,11 @@ import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.message.contract.ChatGroupContract;
+import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.view.ChatGroupAtActivity;
 import top.maxim.im.message.view.ChatGroupListMemberActivity;
 import top.maxim.im.message.view.GroupAckActivity;
+import top.maxim.im.videocall.GroupVideoCallActivity;
 
 /**
  * Description : 群聊presenter Created by Mango on 2018/11/11.
@@ -257,6 +259,6 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
     @Override
     protected void receiveVideoCall(String roomId, List<Long> chatIds, boolean hasVideo) {
-//        GroupVideoCallActivity.openVideoCall(mView.getContext(), (ArrayList<Long>) chatIds, roomId, false, MessageConfig.CallMode.CALL_AUDIO);
+        GroupVideoCallActivity.openVideoCall(mView.getContext(), (ArrayList<Long>) chatIds, roomId, false, MessageConfig.CallMode.CALL_AUDIO);
     }
 }

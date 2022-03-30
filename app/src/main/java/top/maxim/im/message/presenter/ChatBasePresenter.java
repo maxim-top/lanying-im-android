@@ -1887,19 +1887,19 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     handelInputStatus(message.extension());
                 }
                 //TODO
-                if (jsonObject.has("rtcKey") && jsonObject.has("rtcValue")) {
-                    if (TextUtils.equals(jsonObject.getString("rtcKey"), "join") && !TextUtils.isEmpty(jsonObject.getString("rtcValue"))) {
-                        String[] values = jsonObject.getString("rtcValue").split("_");
-                        String roomId = values[0];
-                        String[] chatIdArray = values[1].split(",");
-                        boolean hasVideo = TextUtils.equals(MessageConfig.CallMode.CALL_VIDEO+"", values[2]);
-                        List<Long> chatIds = new ArrayList<>();
-                        for (String id : chatIdArray){
-                            chatIds.add(Long.valueOf(id));
-                        }
-                        receiveVideoCall(roomId, chatIds, hasVideo);
-                    }
-                }
+//                if (jsonObject.has("rtcKey") && jsonObject.has("rtcValue")) {
+//                    if (TextUtils.equals(jsonObject.getString("rtcKey"), "join") && !TextUtils.isEmpty(jsonObject.getString("rtcValue"))) {
+//                        String[] values = jsonObject.getString("rtcValue").split("_");
+//                        String roomId = values[0];
+//                        String[] chatIdArray = values[1].split(",");
+//                        boolean hasVideo = TextUtils.equals(MessageConfig.CallMode.CALL_VIDEO+"", values[2]);
+//                        List<Long> chatIds = new ArrayList<>();
+//                        for (String id : chatIdArray){
+//                            chatIds.add(Long.valueOf(id));
+//                        }
+//                        receiveVideoCall(roomId, chatIds, hasVideo);
+//                    }
+//                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }

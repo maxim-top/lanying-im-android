@@ -44,6 +44,7 @@ import top.maxim.im.common.utils.ScreenUtils;
 public class RightMenuPopWindow extends PopupWindow implements AdapterView.OnItemClickListener {
 
     private static final String TAG = RightMenuPopWindow.class.getSimpleName();
+    public static final int CONTEXT_MENU_WIDTH = 144;
 
     private final int CORNER_MIDDLE = 0, CORNER_TOP = 1, CORNER_BOTTOM = 2;
 
@@ -251,7 +252,7 @@ public class RightMenuPopWindow extends PopupWindow implements AdapterView.OnIte
             listView.setSelector(mItemDrawable);
         }
 
-        LayoutParams lp = new LayoutParams(ScreenUtils.dp2px(104), LayoutParams.WRAP_CONTENT);
+        LayoutParams lp = new LayoutParams(ScreenUtils.dp2px(CONTEXT_MENU_WIDTH), LayoutParams.WRAP_CONTENT);
         int[] a = new int[2];
         mTargetView.getLocationOnScreen(a);
         // 计算标题栏底部的屏幕坐标作为pop中的上边距值

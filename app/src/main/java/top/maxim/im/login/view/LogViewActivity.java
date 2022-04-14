@@ -123,7 +123,7 @@ public class LogViewActivity extends BaseTitleActivity {
      * @return File
      */
     private String getLogPath() {
-        String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
+        String appPath = AppContextUtils.getAppContext().getExternalFilesDir(null).getPath();
         String appId = TextUtils.isEmpty(mAppId) ? SharePreferenceUtils.getInstance().getAppId() : mAppId;
         String path = appPath + "/data_dir/" + appId + "/flooLog/";
         return path;

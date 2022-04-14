@@ -5,8 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
@@ -14,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,6 +170,7 @@ public class GroupApplyActivity extends BaseTitleActivity {
         protected void onBindHolder(BaseViewHolder holder, int position) {
             ShapeImageView avatar = holder.findViewById(R.id.apply_avatar);
             TextView title = holder.findViewById(R.id.apply_title);
+            TextView reason = holder.findViewById(R.id.apply_reason);
             TextView status = holder.findViewById(R.id.apply_status);
             TextView accept = holder.findViewById(R.id.tv_accept);
             final BMXGroup.Application item = getItem(position);
@@ -197,7 +199,7 @@ public class GroupApplyActivity extends BaseTitleActivity {
                     statusDesc = getString(R.string.added);
                     accept.setVisibility(View.INVISIBLE);
                 } else if (inviteStatus == BMXGroup.ApplicationStatus.Pending) {
-                    statusDesc = getString(R.string.unprocessed);
+//                    statusDesc = getString(R.string.unprocessed);
                     accept.setVisibility(View.VISIBLE);
                 } else if (inviteStatus == BMXGroup.ApplicationStatus.Declined) {
                     statusDesc = getString(R.string.remove);
@@ -208,11 +210,18 @@ public class GroupApplyActivity extends BaseTitleActivity {
             } else {
                 accept.setVisibility(View.INVISIBLE);
             }
-            String reason = !TextUtils.isEmpty(item.getMReason()) ? item.getMReason() : "";
-            if (!TextUtils.isEmpty(reason)) {
-                statusDesc = statusDesc + "(" + reason + ")";
+            String applyReason = !TextUtils.isEmpty(item.getMReason()) ? item.getMReason() : "";
+            if (!TextUtils.isEmpty(applyReason)) {
+                reason.setText(applyReason);
+//                statusDesc = statusDesc + "(" + reason + ")";
+            } else {
+                reason.setText("");
             }
-            status.setText(statusDesc);
+            if (!TextUtils.isEmpty(statusDesc)) {
+                status.setText(statusDesc);
+            } else {
+                status.setText("");
+            }
             // 处理通知
             accept.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -12,6 +12,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.utils.RosterFetcher;
@@ -108,7 +109,7 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
                     String status = jsonObject.getString(MessageConfig.INPUT_STATUS);
                     if (TextUtils.equals(status, MessageConfig.InputStatus.TYING_STATUS)) {
                         // 显示正在输入
-                        name = "对方正在输入...";
+                        name = mView.getContext().getString(R.string.other_party_typing);
                     } else if (TextUtils.equals(status, MessageConfig.InputStatus.NOTHING_STATUS)) {
                         // 还原标题头
                         if (mRoster != null && !TextUtils.isEmpty(mRoster.nickname())) {

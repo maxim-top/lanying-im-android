@@ -41,7 +41,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/dimen_20"
         android:maxLines="1"
-        android:text="确定要加入该群?"
+        android:text="@string/confirm_join_group"
         android:textColor="@color/color_black"
         android:textSize="@dimen/dimen_20" />
 

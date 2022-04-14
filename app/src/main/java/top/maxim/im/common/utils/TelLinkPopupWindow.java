@@ -62,7 +62,7 @@ public class TelLinkPopupWindow extends BaseSlidingPopWindow implements View.OnC
     public void showAsDropDown(String url, View anchor) {
         mTelURL = url;
         String tel = url.replace("tel:", "");
-        String desc = "呼叫：" + tel;
+        String desc = getContext().getString(R.string.call_colon) + tel;
         mCall.setText(desc);
         showAtLocation(anchor, Gravity.BOTTOM | Gravity.CLIP_HORIZONTAL, 0, 0);
     }

@@ -144,7 +144,7 @@ public class RosterChooseActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.item_group_list_member, null);
         ShapeImageView icon = view.findViewById(R.id.img_icon);
         TextView tvName = view.findViewById(R.id.txt_name);
-        tvName.setText("添加");
+        tvName.setText(getString(R.string.add));
         icon.setImageResource(R.drawable.default_add_icon);
         CheckBox checkBox = view.findViewById(R.id.cb_choice);
         view.setOnClickListener(listener);
@@ -158,7 +158,7 @@ public class RosterChooseActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.item_group_list_member, null);
         ShapeImageView icon = view.findViewById(R.id.img_icon);
         TextView tvName = view.findViewById(R.id.txt_name);
-        tvName.setText("移除");
+        tvName.setText(getString(R.string.remove));
         BMImageLoader.getInstance().display(icon, "drawable://" + R.drawable.default_remove_icon);
         CheckBox checkBox = view.findViewById(R.id.cb_choice);
         view.setOnClickListener(listener);
@@ -223,7 +223,7 @@ public class RosterChooseActivity extends BaseTitleActivity {
                         if (BaseManager.bmxFinish(bmxErrorCode1)) {
                             bindData(itemList);
                         } else {
-                            String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";
+                            String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : getString(R.string.network_error);
                             ToastUtil.showTextViewPrompt(error);
                             bindData(null);
                         }
@@ -232,7 +232,7 @@ public class RosterChooseActivity extends BaseTitleActivity {
                     bindData(null);
                 }
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                 ToastUtil.showTextViewPrompt(error);
                 bindData(null);
             }

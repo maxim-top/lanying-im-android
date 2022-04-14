@@ -59,10 +59,10 @@ public class FileAdapter extends BaseAdapter {
         }
         File f = new File(paths.get(position).toString());
         if (items.get(position).toString().equals("b1")) {
-            holder.text.setText("返回根目录..");
+            holder.text.setText(convertView.getContext().getString(R.string.return_to_root));
             holder.icon.setImageBitmap(mIcon1);
         } else if (items.get(position).toString().equals("b2")) {
-            holder.text.setText("返回上一层..");
+            holder.text.setText(convertView.getContext().getString(R.string.return_to_upper_level));
             holder.icon.setImageBitmap(mIcon2);
         } else {
             holder.text.setText(f.getName());

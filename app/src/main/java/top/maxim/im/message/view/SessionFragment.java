@@ -316,7 +316,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                 }
                 long conversationId = item.conversationId();
                 if (conversationId == 1) {
-                    ToastUtil.showTextViewPrompt("推送发出的消息");
+                    ToastUtil.showTextViewPrompt(getString(R.string.push_the_outgoing_message));
                     return;
                 }
                 BMXMessage.MessageType type = null;
@@ -410,14 +410,14 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                 if (conversation != null) {
                     conversation.removeAllMessages(bmxErrorCode -> {
                         if (BaseManager.bmxFinish(bmxErrorCode)) {
-                            ToastUtil.showTextViewPrompt("清除成功");
+                            ToastUtil.showTextViewPrompt(getString(R.string.cleanup_successfully));
                             loadSession();
                         } else {
-                            ToastUtil.showTextViewPrompt("清除失败");
+                            ToastUtil.showTextViewPrompt(getString(R.string.failed_to_cleanup));
                         }
                     });
                 } else {
-                    ToastUtil.showTextViewPrompt("清除失败");
+                    ToastUtil.showTextViewPrompt(getString(R.string.failed_to_cleanup));
                 }
             }
         });

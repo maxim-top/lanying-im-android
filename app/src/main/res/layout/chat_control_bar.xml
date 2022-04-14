@@ -70,7 +70,7 @@
             android:inputType="textMultiLine"
             android:maxLength="5000"
             android:maxLines="5"
-            android:hint="请输入聊天内容"
+            android:hint="@string/input_message_content"
             android:textColorHint="#CCCCCC"
             android:minHeight="@dimen/dimen_32"
             android:paddingLeft="@dimen/dimen_11"
@@ -86,7 +86,7 @@
             android:background="@drawable/chat_voice_corner_selector"
             android:gravity="center"
             android:minHeight="@dimen/dimen_32"
-            android:text="按住说话"
+            android:text="@string/hold_talk"
             android:visibility="gone" />
 
     </RelativeLayout>

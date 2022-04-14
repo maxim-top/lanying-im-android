@@ -88,7 +88,7 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
 
     private void initGroup() {
         initQrCode();
-        mTvGroupId.setText(mGroupId <= 0 ? "" : "群Id:" + mGroupId);
+        mTvGroupId.setText(mGroupId <= 0 ? "" : getString(R.string.group_id_colon) + mGroupId);
         GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, group) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 String name = group.name();
@@ -123,7 +123,7 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
                                     public void onFailure(int errorCode, String errorMsg,
                                             Throwable t) {
                                         dismissLoadingDialog();
-                                        ToastUtil.showTextViewPrompt("获取群二维码失败");
+                                        ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_group_qr_code));
                                     }
                                 });
                     }
@@ -131,7 +131,7 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("获取群二维码失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_group_qr_code));
                     }
                 });
     }

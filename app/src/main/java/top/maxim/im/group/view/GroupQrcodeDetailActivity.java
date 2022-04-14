@@ -98,7 +98,7 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
     }
 
     private void initGroup() {
-        mUserId.setText(mGroupId <= 0 ? "" : "群Id:" + mGroupId);
+        mUserId.setText(mGroupId <= 0 ? "" : getString(R.string.group_id_colon) + mGroupId);
         if (mGroupId <= 0) {
             return;
         }
@@ -141,7 +141,7 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("加入失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.failed_to_join));
                     }
                 });
     }

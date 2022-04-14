@@ -275,7 +275,7 @@ public class MineFragment extends BaseTitleFragment {
         container.addView(mDeviceList.build());
 
         // 微信解绑
-        mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent("解除微信绑定")
+        mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent(getString(R.string.unbind_wechat_account))
                 .setArrowVisible(false).setOnItemClickListener(v -> unBindWeChat());
         View viewBindWeChat = mUnBindWeChat.build();
         container.addView(viewBindWeChat);
@@ -377,9 +377,9 @@ public class MineFragment extends BaseTitleFragment {
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
         long userId = profile.userId();
         mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
-        mNickName.setText("昵称:" + (TextUtils.isEmpty(nickName) ? "请设置昵称" : nickName));
+        mNickName.setText(getString(R.string.nickname_colon) + (TextUtils.isEmpty(nickName) ? getString(R.string.please_set_a_nickname) : nickName));
         mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
-        mUserPubInfo.setText("个性签名:" + (TextUtils.isEmpty(publicInfo) ? "赶快去设置签名吧" : publicInfo));
+        mUserPubInfo.setText(getString(R.string.personalized_signature) + (TextUtils.isEmpty(publicInfo) ? getString(R.string.welcome_to_set_your_signature) : publicInfo));
         // push
         BMXUserProfile.MessageSetting setting = profile.messageSetting();
         boolean isPush = setting != null && setting.getMPushEnabled();
@@ -600,13 +600,13 @@ public class MineFragment extends BaseTitleFragment {
                     @Override
                     public void onResponse(Boolean result) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt(result != null && result ? "解除成功" : "解除失败");
+                        ToastUtil.showTextViewPrompt(result != null && result ? getString(R.string.dismissed_successfully) : getString(R.string.failed_to_dismiss));
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("解除失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.failed_to_dismiss));
                     }
                 });
 
@@ -615,18 +615,18 @@ public class MineFragment extends BaseTitleFragment {
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
                 dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt("解除失败");
+                ToastUtil.showTextViewPrompt(getString(R.string.failed_to_dismiss));
             }
         });
     }
 
     private void toastError(Throwable e) {
-        String error = e != null ? e.getMessage() : "网络异常";
+        String error = e != null ? e.getMessage() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 
     private void toastError(BMXErrorCode e) {
-        String error = e != null ? e.name() : "网络异常";
+        String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 }

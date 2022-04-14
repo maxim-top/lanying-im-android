@@ -85,7 +85,7 @@
                 android:id="@+id/tv_scan_qrcode_album"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="相册"
+                android:text="@string/photo_album"
                 android:layout_marginTop="@dimen/dimen_10"
                 android:singleLine="true"
                 android:textColor="@color/color_white"

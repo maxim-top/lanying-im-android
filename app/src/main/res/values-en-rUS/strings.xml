@@ -1,0 +1,413 @@
+<resources>
+    <string name="app_name">Maximtop IM</string>
+
+    <!--Tab-->
+    <string name="tab_chat">Chat</string>
+    <string name="tab_contact">Contact</string>
+    <string name="tab_mine">Settings</string>
+
+    <!--Chat-->
+    <string name="block_message">MaxIM</string>
+    <string name="recent_chat">Maximtop</string>
+    <string name="group">Group</string>
+    <string name="group_info">Group details(%s)</string>
+    <string name="choose_group_member">Select group members</string>
+    <string name="group_member">Group members</string>
+    <string name="group_id">Group ID</string>
+    <string name="group_owner_id">Group owner ID</string>
+    <string name="group_type">Group type</string>
+    <string name="group_type_public">Public group</string>
+    <string name="group_type_private">Private group</string>
+    <string name="group_type_chat_room">Chatroom</string>
+    <string name="group_qrcode">Group QR Code</string>
+    <string name="group_manager">Group management</string>
+    <string name="group_rename">Modify group name</string>
+    <string name="group_manager_list">Admin list</string>
+    <string name="group_name">Group name</string>
+    <string name="group_desc">Group description</string>
+    <string name="group_notice">Group announcement</string>
+    <string name="group_ext">Group extension info</string>
+    <string name="group_share">Group shared list</string>
+    <string name="group_read_mode">Group read messages</string>
+    <string name="group_quit">Delete and quit</string>
+    <string name="group_destroy">Dismiss group</string>
+    <string name="group_quit_notice">Sure to quit group?</string>
+    <string name="group_destroy_notice">Sure to dismiss group?</string>
+    <string name="group_setting">Group settings</string>
+    <string name="group_mute_msg">Block group messages</string>
+    <string name="group_show_msg">Receive and alert group messages</string>
+    <string name="group_invite_confirm">Confirm group chat invitation</string>
+    <string name="group_trans">Transfer of group owner</string>
+    <string name="group_black">Group blacklist</string>
+    <string name="group_ban">Banned group members</string>
+    <string name="group_all_ban">All members banned</string>
+    <string name="group_ban_time">Ban duration (min), empty for permanent ban</string>
+    <string name="group_ban_reason">Ban reason</string>
+    <string name="group_apply">Join group application</string>
+    <string name="group_notify_mode">Group message notification mode</string>
+    <string name="group_join_auth_mode">Join group approval mode</string>
+    <string name="group_invite_mode">Group invitation mode</string>
+    <string name="group_beInvite_mode">Group invited mode</string>
+    <string name="group_avatar">Group avatar</string>
+    <string name="group_my_name">My nickname in group</string>
+    <string name="group_share_info">Info of shared file</string>
+    <string name="group_add_members">Add group member</string>
+    <string name="group_remove_members">Remove group member</string>
+    <string name="setting">Settings</string>
+    <string name="choose_file">Select file</string>
+    <string name="chat_file_not_exit">File does not exist!</string>
+    <string name="chat_file_not_open">No application that can open this file</string>
+    <string name="chat_msg_copy">Copy</string>
+    <string name="chat_msg_relay">Forward</string>
+    <string name="chat_msg_revoke">Withdraw</string>
+    <string name="chat_msg_reSend">Resend</string>
+    <string name="chat_msg_ack">Mark as read</string>
+    <string name="chat_msg_unread">Mark as unread</string>
+    <string name="chat_clear_msg">Cleanup chat history</string>
+    <string name="chat_at_message">%s&#160;</string>
+
+    <!--群未读-->
+    <string name="group_read_list">Message receiver list</string>
+    <string name="readed_list">Read messages list</string>
+    <string name="unRead_list">Unread messages list</string>
+
+    <!--Common-->
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="search">Search</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="profile">Profile</string>
+    <string name="profile_phone">Phone number</string>
+    <string name="profile_public">Public info</string>
+    <string name="begin_chat">Start chat</string>
+    <string name="send">Send</string>
+    <string name="search_hint">Search</string>
+    <string name="verify_continue">Continue</string>
+    <string name="skip">Skip</string>
+
+    <!--Contact-->
+    <string name="contact_apply_notice">Friend application and notification</string>
+    <string name="contact_group">Group</string>
+    <string name="create_group">Create group</string>
+    <string name="choose_contact">Select contacts</string>
+    <string name="group_invite">Group notification</string>
+
+    <string name="pop_add_friend">add friend</string>
+    <string name="pop_create_group">Create group</string>
+    <string name="pop_scan">Scan</string>
+
+    <!--权限-->
+    <string name="permission_title">Permission application</string>
+    <string name="permission_setting">Go to settings</string>
+    <string name="permission_prompt">Enable permissions in settings to ensure proper use</string>
+    <string name="record_fail_check_permission">Failed to record, please check permissions</string>
+    <string name="camera_fail_check_permission">Failed to snap, please check permissions</string>
+    <string name="video_fail_check_permission">Failed to record video, please check permissions</string>
+    <string name="location_fail_check_permission">Failed to locate, please check permissions</string>
+    <string name="not_has_sd_permission">No local storage permission in phone</string>
+
+    <!--登录-->
+    <string name="login">Login</string>
+    <string name="login_by_pwd">Login with password</string>
+    <string name="register">Register</string>
+    <string name="login_user_name_hint">Username/Phone number</string>
+    <string name="login_user_phone_hint">Phone number</string>
+    <string name="login_user_verify_hint">Captcha</string>
+    <string name="login_user_id_hint">Please enter your user id</string>
+    <string name="login_user_pwd_hint">Enter your login password</string>
+    <string name="register_user_phone_hint">Please enter your phone number</string>
+    <string name="register_user_name_hint">Username</string>
+    <string name="register_user_verify_hint">Please enter captcha</string>
+    <string name="register_user_pwd_hint">Password</string>
+    <string name="quick_login">Quick login</string>
+    <string name="verify_login">Login with captcha</string>
+    <string name="bind_mobile">Bind phone number</string>
+    <string name="bind_new_mobile">Bind a new phone number</string>
+    <string name="bind_user">Bind existing account</string>
+    <string name="bind_register_user">Register and bind an account</string>
+    <string name="bind_not_user">No account, click to create</string>
+    <string name="bind_exit_user">Already have an account, bind it directly</string>
+    <string name="exit_user">The username already exists</string>
+    <string name="register_protocol1">Registration signifies acceptance of Agreement</string>
+    <string name="register_protocol2">User Services</string>
+    <string name="register_protocol3">and</string>
+    <string name="register_protocol4">Privacy Policy</string>
+    <string name="register_protocol_content1">Welcome to Maximtop!\n\n Please read carefully and fully understand the terms of the User Agreement and Privacy Policy, including but not limited to: In order to provide you with instant messaging, content sharing and other services, we need to collect your device information, operation logs and other personal information\n\n You can read</string>
+    <string name="register_protocol_content2">for more information. If you agree, please click "Agree" to accept our services.</string>
+
+    <string name="verify_pwd_hint">Enter your login password</string>
+    <string name="un_bind_wechat">Unbind WeChat account</string>
+    <string name="un_bind_wechat_tag">Please enter your password to verify when unbinding</string>
+    <string name="unbind_wechat_continue">Confirm to unbind</string>
+    <string name="verify_pwd_title">Verify password</string>
+    <string name="verify_captcha_title">Verify phone number</string>
+    <string name="verify_pwd_tag">Enter login password to verify your identity</string>
+    <string name="verify_captcha_tag">Enter bound phone number to verify your identity</string>
+
+    <!--设置-->
+    <string name="user_info">Personal Profile</string>
+    <string name="user_protocol">User Agreement</string>
+    <string name="version_info">Version Info</string>
+    <string name="quit_app">Logout</string>
+    <string name="receive_push_notice">Receive new message notification</string>
+    <string name="push_sound">Sound</string>
+    <string name="push_vibrate">Vibrate</string>
+    <string name="push_detail">Whether to push details</string>
+    <string name="push_name">Set push nickname</string>
+    <string name="auto_download_attachment">Whether to download thumbnail attachment automatically</string>
+    <string name="auto_accept_group_invite">Whether to receive group invitation automatically</string>
+    <string name="black_list">List of blacklists</string>
+    <string name="other_device_tips">Toast alert or not</string>
+    <string name="device_list">Multi-device list</string>
+    <string name="about_us">About us</string>
+    <string name="setting_user_name">Nickname</string>
+    <string name="setting_user_phone">Phone number</string>
+    <string name="setting_user_pwd">Modify password</string>
+    <string name="setting_user_wx">WeChat</string>
+    <string name="setting_user_public">Public info</string>
+    <string name="setting_roster_alias">Set alias</string>
+    <string name="setting_roster_ext">Set extension info</string>
+    <string name="setting_user_private">Private info</string>
+    <string name="setting_user_disturb">Set Do-Not-Disturb</string>
+    <string name="setting_account_manager">Switching accounts</string>
+    <string name="setting_add_friend_auth_mode">Friend verification type</string>
+    <string name="setting_add_friend_auth_question">Friend verification question</string>
+    <string name="add_friend_auth_open">Public</string>
+    <string name="add_friend_auth_approval">Need to agree</string>
+    <string name="add_friend_auth_answer">Need to answer question</string>
+    <string name="add_friend_auth_reject">Deny all</string>
+
+    <string name="change_phone_tag">Change bound phone number</string>
+    <string name="bind_phone_tag">You have bound a phone number%1s</string>
+    <string name="phone_verify_change">Use mobile captcha</string>
+    <string name="pwd_verify_change">Use password</string>
+
+    <string name="change_pwd_tag">Change password</string>
+
+    <string name="change_pwd_new_hint">Please enter a new password</string>
+    <string name="change_pwd_new_again_hint">Please enter the new password again</string>
+
+    <string name="log_info">Log info</string>
+
+    <string name="dns_config">DNS configuration</string>
+    <string name="dns_config_custom">Custom services</string>
+    <string name="dns_config_appId">AppID</string>
+    <string name="dns_config_server">IM Server</string>
+    <string name="dns_config_port">IM Port</string>
+    <string name="dns_config_rest_server">Rest Server</string>
+    <string name="dns_config_default">Default</string>
+
+    <string name="dns_change_custom_title">Sure to turn off custom services</string>
+    <string name="dns_change_appId_title">Modify AppID</string>
+    <string name="dns_change_server_title">Modify IM Server</string>
+    <string name="dns_change_port_title">Modify IM Port</string>
+    <string name="dns_change_rest_server_title">Modify Rest Server</string>
+    <string name="dns_change_custom_tips">Custom service not launched yet</string>
+    <string name="dns_change_save">Save</string>
+    <string name="dns_change_save_tip">Please complete the 3 pieces of info</string>
+
+    <!--群设置-->
+    <string name="group_notify_all">Everyone</string>
+    <string name="group_notify_admin_at">Group owner and @</string>
+    <string name="group_notify_none">Closed</string>
+    <string name="group_join_auth_open">Public</string>
+    <string name="group_join_auth_approval">Need to agree</string>
+    <string name="group_join_auth_reject">Deny all</string>
+    <string name="group_invite_open">Open</string>
+    <string name="group_invite_admin">Only group owner</string>
+    <string name="group_beInvite_open">Open</string>
+    <string name="group_beInvite_approval">Need to agree</string>
+    <string name="group_mute_none">No blocking</string>
+    <string name="group_mute_notification">Block local message notifications</string>
+    <string name="group_mute_chat">Mute messages</string>
+
+    <string name="my_qrcode">My QR Code</string>
+    <string name="contact_scan">Scan</string>
+    <string name="scan_open_flash">Touch to light up in dark environment</string>
+    <string name="scan_close_flash">Touch to close</string>
+    <string name="scan_notice">Put QR Code/Barcode in box</string>
+
+    <!--录制视频-->
+    <string name="tip_no_camera_or_reject">No camera or no camera permission</string>
+
+    <string name="channel_id">%1$s..channel_id_%2$d</string>
+    <!--im消息push-->
+    <string name="im_push_msg_action">%1$s.action.push.msg</string>
+    <string name="push_receiver_rec_msg_count">You have received %1$s messages</string>
+
+
+    <string name="about_us_desc">One-Click Multi-Cloud Architecture IM Cloud Services</string>
+    <string name="about_us_net_pre">Official Website&#8194;&#8194;</string>
+    <string name="about_us_net">https://www.maximtop.com</string>
+    <string name="about_us_phone_pre">Contact Business&#8194;&#8194;</string>
+    <string name="about_us_phone">400-666-0162</string>
+    <string name="about_us_company">copyright© 2019 Maximtop</string>
+
+
+    <string name="common_empty">There is nothing here~</string>
+    <string name="support_empty">To contact technical support, please swtich the AppID to “welovemaxim” after logging out</string>
+
+    <!--push设置-->
+    <string name="set_push">Push settings</string>
+    <string name="set_push_token">Push token</string>
+    <string name="set_push_cert">Push cert</string>
+    <string name="set_push_status">Push status</string>
+    <string name="set_push_start">Enable push</string>
+    <string name="set_push_alias">Push alias</string>
+    <string name="set_push_unbind">Unbind push</string>
+    <string name="set_push_switch">Push switch</string>
+    <string name="set_push_tags">Push Tag</string>
+    <string name="set_push_del_tags">Delete Tag</string>
+    <string name="set_push_add_tags">Add Tag</string>
+    <string name="set_push_clear_tags">Cleanup Tag</string>
+    <string name="set_push_badge">Push badge</string>
+    <string name="set_push_mode">Push Mode</string>
+    <string name="set_push_time">Push time</string>
+    <string name="set_push_silence_time">Silent time</string>
+    <string name="set_push_start_time">Start time</string>
+    <string name="set_push_end_time">End time</string>
+    <string name="set_push_run_background">Run in background</string>
+    <string name="set_push_del_notification">Delete notification</string>
+    <string name="set_push_clear_notification">Cleanup notification</string>
+    <string name="set_push_send_message">Send message</string>
+    <string name="set_push_msg_receiver">Receiver</string>
+    <string name="set_push_msg_content">Content</string>
+    <string name="set_push_message">Push message</string>
+
+    <string name="read">read</string>
+    <string name="unread">unread</string>
+    <string name="read_persons">Read persons:</string>
+    <string name="format_yyyy_mm_dd">yyyy-MM-dd</string>
+    <string name="hold_talk">Hold to talk</string>
+    <string name="bind_failed">Bind failed</string>
+    <string name="save_log">Save log</string>
+    <string name="failed_to_save">Failed to save</string>
+    <string name="not_available">Not available</string>
+    <string name="cannot_be_empty">Cannot be empty</string>
+    <string name="draft">[Draft]</string>
+    <string name="failed_to_create">Failed to create</string>
+    <string name="wechat_already_bound">This WeChat Account is already bound</string>
+    <string name="answer">Answer:</string>
+    <string name="failed_to_login">Failed to login</string>
+    <string name="other_party_typing">The other party is typing…</string>
+    <string name="qr_code_result">QR Code result</string>
+    <string name="return_to_root">Return to root...</string>
+    <string name="return_to_upper_level">Return to previous level…</string>
+    <string name="copy_successful">Copy successful</string>
+    <string name="welcome_to_set_your_signature">Welcome to set your signature</string>
+    <string name="personalized_signature">Personalized signature:</string>
+    <string name="failed_to_change">Failed to change</string>
+    <string name="announcement_title">Announcement title</string>
+    <string name="announcement_list">Announcement list</string>
+    <string name="announcement_content">Announcement content</string>
+    <string name="friend">Friends</string>
+    <string name="call_colon">Telephone:</string>
+    <string name="failed_to_get_token">Failed to get token</string>
+    <string name="failed_to_get_group_qr_code">Failed to get group QR Code</string>
+    <string name="failed_to_get_location">Failed to get location</string>
+    <string name="get_captcha_successfully">Get captcha successfully</string>
+    <string name="failed_to_get_captcha">Failed to get captcha</string>
+    <string name="failed_to_get_read_list">Failed to get read list</string>
+    <string name="join">Join</string>
+    <string name="join_successfully">Join successfully</string>
+    <string name="join_group_chat">Join group chat</string>
+    <string name="failed_to_join">Failed to join</string>
+    <string name="accept">Accept</string>
+    <string name="dismissed_successfully">Dismissed successfully</string>
+    <string name="failed_to_dismiss">Failed to dismiss</string>
+    <string name="unbind_wechat_account">Unbind WeChat Account</string>
+    <string name="ban_duration_min">Ban duration (min)</string>
+    <string name="reject">Reject</string>
+    <string name="reject_to_join_group">Reject to join group</string>
+    <string name="reason_for_rejection">Reason for rejection</string>
+    <string name="launching">Launching</string>
+    <string name="offline">Offline</string>
+    <string name="entered_passwords_differ">Entered passwords differ</string>
+    <string name="nickname_colon">Nickname:</string>
+    <string name="snap">Snap</string>
+    <string name="switch_appId_failed">Failed to switch appId</string>
+    <string name="cleanup_successfully">Cleanup successfully</string>
+    <string name="failed_to_cleanup">Failed to cleanup</string>
+    <string name="please_install_wechat">Please install WeChat</string>
+    <string name="please_set_a_nickname">Please set a nickname</string>
+    <string name="go_to_bind">Go to bind</string>
+    <string name="all_members">All members</string>
+    <string name="confirm_to_send">Confirm to send?</string>
+    <string name="group_id_colon">Group Id:</string>
+    <string name="group_chat_name_cannot_be_empty">Group chat name cannot be empty</string>
+    <string name="devicetoken_uploaded_successfully">deviceToken uploaded successfully</string>
+    <string name="devicetoken_uploading_failed">deviceToken uploading failed</string>
+    <string name="slide_up_to_cancel">Slide up to cancel</string>
+    <string name="device_serial_number">Device serial number:</string>
+    <string name="set_successfully">Set successfully</string>
+    <string name="set_answer">Set answer</string>
+    <string name="set_question">Set question</string>
+    <string name="public_or_not">Public or not</string>
+    <string name="chatroom_or_not">Chatroom or not</string>
+    <string name="video">Video</string>
+    <string name="video_recording_failed">Video recording failed</string>
+    <string name="video_message_error">Video message error</string>
+    <string name="authorization_failed">Authorization failed</string>
+    <string name="sd_card_empty">The selected SD card is empty!</string>
+    <string name="add">Add</string>
+    <string name="add_successful">Add successful</string>
+    <string name="add_admin">Add Admin</string>
+    <string name="add_friend">Add Friend</string>
+    <string name="add_failed">Add failed</string>
+    <string name="pieces">pcs</string>
+    <string name="agree">Agree</string>
+    <string name="image">[image]</string>
+    <string name="push_the_outgoing_message">Push the outgoing message</string>
+    <string name="network_error">Network error</string>
+    <string name="network_exception">Network exception</string>
+    <string name="location">Location</string>
+    <string name="unbound">Unbound</string>
+    <string name="no_card_inserted">No card inserted, not supported yet</string>
+    <string name="unprocessed">Unprocessed</string>
+    <string name="failed_to_recognize_qr_code_info">Failed to recognize QR Code info</string>
+    <string name="qr_code_not_recognized">QR Code not recognized, please try again</string>
+    <string name="no_group_found">No group found</string>
+    <string name="no_user_found">No user found</string>
+    <string name="unknown_message_b">[unknown message]</string>
+    <string name="unknown_message">Unknown message</string>
+    <string name="file">File</string>
+    <string name="file_has_been_copied_to">File has been copied to</string>
+    <string name="question">Question:</string>
+    <string name="question_or_answer_cannot_be_empty">Question or answer cannot be empty</string>
+    <string name="downloading">Downloading</string>
+    <string name="photo_album">Photo album</string>
+    <string name="message_notification">Message notification</string>
+    <string name="new_message">New message</string>
+    <string name="failed_to_change_password">Failed to change password</string>
+    <string name="remove">Remove</string>
+    <string name="remove_admin">Remove Admin</string>
+    <string name="bound">Bound</string>
+    <string name="saved_to_system_album">Saved to system album</string>
+    <string name="closed">Closed</string>
+    <string name="rejected">Rejected</string>
+    <string name="enabled">Enabled</string>
+    <string name="added">Added</string>
+    <string name="username_only_supports">Username only supports alphanumeric, underscore, and Chinese combinations, and cannot be pure numbers or start with maxim, mta</string>
+    <string name="someone_at_you">[someone @you]</string>
+    <string name="voice">[voice]</string>
+    <string name="voice_not_exist">Voice does not exist!</string>
+    <string name="not_available_for_now">Not available for now</string>
+    <string name="display_name">Display name</string>
+    <string name="photo_capture_failed">Photo capture failed</string>
+    <string name="support">Support</string>
+    <string name="recent_announcement">Recent announcement</string>
+    <string name="avatar">avatar</string>
+    <string name="switch_search_mode">Switch search mode</string>
+    <string name="input_username_searched">Input username being searched</string>
+    <string name="input_userid_searched">Input user ID being searched</string>
+    <string name="switch_login_mode">Switch login mode</string>
+    <string name="get_captcha">Get captcha</string>
+    <string name="go_to_login">I have an account, go to login</string>
+    <string name="confirm_join_group">Confirm to join this group?</string>
+    <string name="process">Process</string>
+    <string name="search_by_name">Search by name</string>
+    <string name="tap_snap_hold_video">Tap to snap and hold to record video</string>
+    <string name="input_message_keywords">Please input message keywords</string>
+    <string name="input_message_content">Please input message content</string>
+</resources>

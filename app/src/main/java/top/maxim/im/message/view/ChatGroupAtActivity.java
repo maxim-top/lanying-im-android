@@ -79,7 +79,7 @@ public class ChatGroupAtActivity extends ChatGroupListMemberActivity {
                 }
                 if (member.getMUid() == MessageConfig.MEMBER_ADD) {
                     atMap.clear();
-                    atMap.put("-1", "全部成员");
+                    atMap.put("-1", getString(R.string.all_members));
                     Intent intent = new Intent();
                     intent.putExtra(CHOOSE_DATA, (Serializable) atMap);
                     setResult(Activity.RESULT_OK, intent);
@@ -112,7 +112,7 @@ public class ChatGroupAtActivity extends ChatGroupListMemberActivity {
             int count = mAdapter.getItemCount();
             mAdapter.addList(members, count > 1 ? count - 1 : 0);
         } else {
-            BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, "全部成员", 0);
+            BMXGroup.Member add = new BMXGroup.Member(MessageConfig.MEMBER_ADD, getString(R.string.all_members), 0);
             members.add(add);
             mAdapter.replaceList(members);
         }

@@ -111,12 +111,12 @@ public class GroupSearchActivity extends BaseTitleActivity {
                             mAdapter.replaceList(groups);
                         } else {
                             mAdapter.removeAll();
-                            ToastUtil.showTextViewPrompt("未搜索到群组");
+                            ToastUtil.showTextViewPrompt(getString(R.string.no_group_found));
                         }
                     });
         } else {
             mAdapter.removeAll();
-            ToastUtil.showTextViewPrompt("未搜索到群组");
+            ToastUtil.showTextViewPrompt(getString(R.string.no_group_found));
         }
     }
 
@@ -144,7 +144,7 @@ public class GroupSearchActivity extends BaseTitleActivity {
             ShapeImageView avatar = holder.findViewById(R.id.contact_avatar);
             TextView title = holder.findViewById(R.id.contact_title);
             TextView add = holder.findViewById(R.id.add_contact);
-            add.setText("加入");
+            add.setText(getString(R.string.join));
             final BMXGroup item = getItem(position);
             if (item == null) {
                 return;
@@ -163,7 +163,7 @@ public class GroupSearchActivity extends BaseTitleActivity {
          * 输入框弹出
          */
         private void showJoinReason(final BMXGroup group) {
-            DialogUtils.getInstance().showEditDialog(GroupSearchActivity.this, "加入群聊",
+            DialogUtils.getInstance().showEditDialog(GroupSearchActivity.this, getString(R.string.join_group_chat),
                     getString(R.string.confirm), getString(R.string.cancel),
                     new CommonEditDialog.OnDialogListener() {
                         @Override
@@ -186,10 +186,10 @@ public class GroupSearchActivity extends BaseTitleActivity {
             GroupManager.getInstance().join(group, reason, bmxErrorCode -> {
                 dismissLoadingDialog();
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
-                    ToastUtil.showTextViewPrompt("加入成功");
+                    ToastUtil.showTextViewPrompt(getString(R.string.join_successfully));
                     finish();
                 } else {
-                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "加入失败";
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.failed_to_join);
                     ToastUtil.showTextViewPrompt(error);
                 }
             });

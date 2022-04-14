@@ -125,7 +125,7 @@ public class ChatGroupAdminActivity extends ChatGroupListMemberActivity {
         if (admin.isEmpty()) {
             return;
         }
-        DialogUtils.getInstance().showEditDialog(this, "移除管理员", getString(R.string.confirm),
+        DialogUtils.getInstance().showEditDialog(this, getString(R.string.remove_admin), getString(R.string.confirm),
                 getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
@@ -143,7 +143,7 @@ public class ChatGroupAdminActivity extends ChatGroupListMemberActivity {
         if (admin == null || admin.isEmpty()) {
             return;
         }
-        DialogUtils.getInstance().showEditDialog(this, "添加管理员", getString(R.string.confirm),
+        DialogUtils.getInstance().showEditDialog(this, getString(R.string.add_admin), getString(R.string.confirm),
                 getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {

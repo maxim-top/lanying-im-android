@@ -11,6 +11,7 @@ import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 
+import top.maxim.im.R;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ToastUtil;
@@ -63,7 +64,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
             default:
                 break;
         }
-        ToastUtil.showTextViewPrompt("授权失败");
+        ToastUtil.showTextViewPrompt(getString(R.string.authorization_failed));
         finish();
     }
 

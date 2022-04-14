@@ -111,32 +111,32 @@ public class SessionAdapter extends RecyclerWithHFAdapter<BMXConversation> {
             }
         }
         tvTitle.setText(TextUtils.isEmpty(name) ? "" : name);
-        time.setText(lastMsg != null ? TimeUtils.millis2String(lastMsg.serverTimestamp()) : "");
+        time.setText(lastMsg != null ? TimeUtils.millis2String(mContext, lastMsg.serverTimestamp()) : "");
         String draft = item == null ? "" : item.editMessage();
         if (!TextUtils.isEmpty(draft)) {
             // 有草稿
             SpannableStringBuilder spannable = new SpannableStringBuilder();
-            String draftText = "[草稿]";
+            String draftText = mContext.getString(R.string.draft);
             SpannableString spannableString = new SpannableString(draftText);
             spannableString.setSpan(new ForegroundColorSpan(Color.RED), 0, draftText.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             spannable.append(spannableString).append(draft);
             desc.setText(spannable);
         } else {
-            String msgDesc = ChatUtils.getInstance().getMessageDesc(lastMsg);
+            String msgDesc = ChatUtils.getInstance().getMessageDesc(mContext, lastMsg);
             if (lastMsg != null && lastMsg.isReceiveMsg() && lastMsg.config() != null) {
                 // 有@
                 try {
                     BMXMessageConfig config = lastMsg.config();
                     if (config.getMentionAll()) {
-                        msgDesc = "[有人@你]" + msgDesc;
+                        msgDesc = mContext.getString(R.string.someone_at_you) + msgDesc;
                     } else {
                         ListOfLongLong atList = config.getMentionList();
                         if (atList != null && !atList.isEmpty()) {
                             for (int i = 0; i < atList.size(); i++) {
                                 if (atList.get(
                                         i) == (SharePreferenceUtils.getInstance().getUserId())) {
-                                    msgDesc = "[有人@你]" + msgDesc;
+                                    msgDesc = mContext.getString(R.string.someone_at_you) + msgDesc;
                                     break;
                                 }
                             }

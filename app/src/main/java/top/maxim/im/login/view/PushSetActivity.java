@@ -374,16 +374,16 @@ public class PushSetActivity extends BaseTitleActivity {
         mSwitchPush.setCheckStatus(connectStatus == BMXConnectStatus.Connected);
 //         PushMode
         BMXPushService.PushSdkStatus pushStatus = PushManager.getInstance().status();
-        String status = "不可用";
+        String status = getString(R.string.not_available);
         if (pushStatus != null) {
             if (pushStatus == BMXPushService.PushSdkStatus.Started) {
-                status = "已开启";
+                status = getString(R.string.enabled);
             } else if (pushStatus == BMXPushService.PushSdkStatus.Starting) {
-                status = "开启中";
+                status = getString(R.string.launching);
             } else if (pushStatus == BMXPushService.PushSdkStatus.Stoped) {
-                status = "已关闭";
+                status = getString(R.string.closed);
             } else if (pushStatus == BMXPushService.PushSdkStatus.Offline) {
-                status = "离线";
+                status = getString(R.string.offline);
             }
         }
         mPushStatus.setEndContent(status);
@@ -892,7 +892,7 @@ public class PushSetActivity extends BaseTitleActivity {
     }
 
     private void toastError(BMXErrorCode e) {
-        String error = e != null ? e.name() : "网络异常";
+        String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 

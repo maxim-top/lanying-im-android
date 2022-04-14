@@ -48,7 +48,7 @@ public class ScanResultActivity extends BaseTitleActivity {
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
         builder.setBackIcon(R.drawable.header_back_icon, v -> finish());
-        builder.setTitle("二维码结果");
+        builder.setTitle(getString(R.string.qr_code_result));
         return builder.build();
     }
 
@@ -89,7 +89,7 @@ public class ScanResultActivity extends BaseTitleActivity {
             boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
             // 非二维码体验功能 如果未登录不能识别
             if (!isLogin) {
-                ToastUtil.showTextViewPrompt("未能识别二维码信息");
+                ToastUtil.showTextViewPrompt(getString(R.string.failed_to_recognize_qr_code_info));
                 finish();
                 return;
             }
@@ -108,7 +108,7 @@ public class ScanResultActivity extends BaseTitleActivity {
                 if (TextUtils.equals(action, QRCodeConfig.ACTION.UPLOAD_DEVICE_TOKEN)) {
                     dealConsoleUploadToken(source, action, info);
                 } else {
-                    ToastUtil.showTextViewPrompt("未能识别二维码信息");
+                    ToastUtil.showTextViewPrompt(getString(R.string.failed_to_recognize_qr_code_info));
                     finish();
                     return;
                 }
@@ -121,7 +121,7 @@ public class ScanResultActivity extends BaseTitleActivity {
                     // 二维码体验功能 app
                     dealConsoleApp(source, action, info);
                 } else {
-                    ToastUtil.showTextViewPrompt("未能识别二维码信息");
+                    ToastUtil.showTextViewPrompt(getString(R.string.failed_to_recognize_qr_code_info));
                     finish();
                     return;
                 }
@@ -314,8 +314,8 @@ public class ScanResultActivity extends BaseTitleActivity {
                                     public void onResponse(Boolean result) {
                                         dismissLoadingDialog();
                                         ToastUtil.showTextViewPrompt(
-                                                result != null && result ? "上传deviceToken成功"
-                                                        : "上传deviceToken失败");
+                                                result != null && result ? getString(R.string.devicetoken_uploaded_successfully)
+                                                        : getString(R.string.devicetoken_uploading_failed));
                                         finish();
                                     }
 
@@ -332,7 +332,7 @@ public class ScanResultActivity extends BaseTitleActivity {
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("获取token失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_token));
                         finish();
                     }
                 });

@@ -68,7 +68,7 @@ public class FileBrowserActivity extends ListActivity {
             pathList.add(file.getParent());
         }
         if (files == null) {
-            Toast.makeText(this, "所选SD卡为空！", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.sd_card_empty), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -118,7 +118,7 @@ public class FileBrowserActivity extends ListActivity {
                 fosto.write(bt, 0, c);
             }
 
-            Toast.makeText(AppContextUtils.getAppContext(), "文件已拷贝至" + toFile, Toast.LENGTH_SHORT)
+            Toast.makeText(AppContextUtils.getAppContext(), AppContextUtils.getAppContext().getString(R.string.file_has_been_copied_to) + toFile, Toast.LENGTH_SHORT)
                     .show();
 
         } catch (Exception ex) {

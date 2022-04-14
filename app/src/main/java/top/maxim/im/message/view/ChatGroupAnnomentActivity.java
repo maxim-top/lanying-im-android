@@ -98,7 +98,7 @@ public class ChatGroupAnnomentActivity extends BaseTitleActivity {
         ll.setOrientation(LinearLayout.VERTICAL);
 
         ItemLineArrow.Builder mChatGroupDesc = new ItemLineArrow.Builder(this)
-                .setStartContent("最近公告");
+                .setStartContent(getString(R.string.recent_announcement));
         ll.addView(mChatGroupDesc.build());
 
         // 分割线
@@ -116,7 +116,7 @@ public class ChatGroupAnnomentActivity extends BaseTitleActivity {
                 .setMarginLeft(ScreenUtils.dp2px(15));
         ll.addView(itemLine1.build());
 
-        ItemLineArrow.Builder list = new ItemLineArrow.Builder(this).setStartContent("公告列表");
+        ItemLineArrow.Builder list = new ItemLineArrow.Builder(this).setStartContent(getString(R.string.announcement_list));
         ll.addView(list.build());
         mAdapter.addHeaderView(ll);
     }
@@ -141,7 +141,7 @@ public class ChatGroupAnnomentActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.item_group_list_member, null);
         ShapeImageView icon = view.findViewById(R.id.img_icon);
         TextView tvName = view.findViewById(R.id.txt_name);
-        tvName.setText("添加");
+        tvName.setText(getString(R.string.add));
         icon.setImageResource(R.drawable.default_add_icon);
         CheckBox checkBox = view.findViewById(R.id.cb_choice);
         view.setOnClickListener(listener);
@@ -298,7 +298,7 @@ public class ChatGroupAnnomentActivity extends BaseTitleActivity {
         name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         name.setTextColor(getResources().getColor(R.color.color_black));
         name.setBackgroundColor(getResources().getColor(R.color.color_white));
-        name.setText("公告标题");
+        name.setText(getString(R.string.announcement_title));
         ll.addView(name, textP);
 
         final EditText editName = new EditText(this);
@@ -316,7 +316,7 @@ public class ChatGroupAnnomentActivity extends BaseTitleActivity {
         content.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         content.setTextColor(getResources().getColor(R.color.color_black));
         content.setBackgroundColor(getResources().getColor(R.color.color_white));
-        content.setText("公告内容");
+        content.setText(getString(R.string.announcement_content));
         ll.addView(content, textP);
 
         final EditText editContent = new EditText(this);
@@ -407,7 +407,7 @@ public class ChatGroupAnnomentActivity extends BaseTitleActivity {
     }
 
     private void toastError(BMXErrorCode e) {
-        String error = e != null ? e.name() : "网络异常";
+        String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 

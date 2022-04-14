@@ -287,7 +287,7 @@ public class ChooseFileActivity extends BaseTitleActivity {
             if (bean != null) {
                 cbChoose.setChecked(bean.getStatus() != FILE_UNSELECTED);
                 tvDocTitle.setText(bean.getDesc());
-                String time = TimeUtils.millis2String(bean.getCreateTime() * 1000);
+                String time = TimeUtils.millis2String(mContext, bean.getCreateTime() * 1000);
                 tvDocTime.setText(!TextUtils.isEmpty(time) ? time : "");
                 String size = Formatter.formatFileSize(mContext, bean.getSize());
                 tvDocSize.setText(size);

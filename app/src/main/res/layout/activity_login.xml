@@ -93,7 +93,7 @@
         android:layout_marginLeft="@dimen/dimen_48"
         android:layout_marginTop="@dimen/dimen_10"
         android:layout_marginRight="@dimen/dimen_48"
-        android:text="切换登陆模式"
+        android:text="@string/switch_login_mode"
         android:textColor="#007aff"
         android:textSize="@dimen/dimen_14"
         android:visibility="gone" />

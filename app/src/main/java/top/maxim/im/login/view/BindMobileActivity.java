@@ -183,9 +183,9 @@ public class BindMobileActivity extends BaseTitleActivity {
                 @Override
                 public void onResponse(Boolean result) {
                     if (result != null && result) {
-                        ToastUtil.showTextViewPrompt("获取验证码成功");
+                        ToastUtil.showTextViewPrompt(getString(R.string.get_captcha_successfully));
                     } else {
-                        ToastUtil.showTextViewPrompt("获取验证码失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_captcha));
                         mSendVerify.setEnabled(true);
                         mSendVerify.setVisibility(View.VISIBLE);
                         mVerifyCountDown.setText("");
@@ -197,7 +197,7 @@ public class BindMobileActivity extends BaseTitleActivity {
 
                 @Override
                 public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                    ToastUtil.showTextViewPrompt("获取验证码失败");
+                    ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_captcha));
                     mSendVerify.setEnabled(true);
                     mSendVerify.setVisibility(View.VISIBLE);
                     mVerifyCountDown.setText("");
@@ -241,7 +241,7 @@ public class BindMobileActivity extends BaseTitleActivity {
                                             RxBus.getInstance().send(intent);
                                             finish();
                                         } else {
-                                            ToastUtil.showTextViewPrompt("绑定失败");
+                                            ToastUtil.showTextViewPrompt(getString(R.string.bind_failed));
                                         }
                                     }
 
@@ -257,7 +257,7 @@ public class BindMobileActivity extends BaseTitleActivity {
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("绑定失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.bind_failed));
                     }
                 });
     }
@@ -281,7 +281,7 @@ public class BindMobileActivity extends BaseTitleActivity {
                                             RxBus.getInstance().send(intent);
                                             finish();
                                         } else {
-                                            ToastUtil.showTextViewPrompt("更换失败");
+                                            ToastUtil.showTextViewPrompt(getString(R.string.failed_to_change));
                                         }
                                     }
 
@@ -297,7 +297,7 @@ public class BindMobileActivity extends BaseTitleActivity {
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("绑定失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.bind_failed));
                     }
                 });
     }

@@ -302,7 +302,7 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
             mVoiceView.setVisibility(VISIBLE);
             mChatEditText.setVisibility(GONE);
             mVoiceView.setPressed(false);
-            mVoiceView.setText("按住说话");
+            mVoiceView.setText(getResources().getString(R.string.hold_talk));
             hidePanel();
         }
     }
@@ -389,7 +389,7 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
      */
     private void actionDown() {
         mVoiceView.setPressed(true);
-        mVoiceView.setText("上滑取消");
+        mVoiceView.setText(mVoiceView.getContext().getString(R.string.slide_up_to_cancel));
         startRecord();
     }
 
@@ -401,7 +401,7 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
             mVoiceView.postDelayed(rResetHint, 500);
         } else {
             mVoiceView.setPressed(false);
-            mVoiceView.setText("按住说话");
+            mVoiceView.setText(getResources().getString(R.string.hold_talk));
         }
         stopRecord();
     }
@@ -422,7 +422,7 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
         @Override
         public void run() {
             mVoiceView.setPressed(false);
-            mVoiceView.setText("按住说话");
+            mVoiceView.setText(getResources().getString(R.string.hold_talk));
         }
     };
 

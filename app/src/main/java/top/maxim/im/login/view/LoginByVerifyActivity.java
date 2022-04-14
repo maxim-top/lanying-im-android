@@ -146,7 +146,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
             if (!WXUtils.getInstance().wxSupported()) {
-                ToastUtil.showTextViewPrompt("请安装微信");
+                ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }
             initWXRxBus();
@@ -227,9 +227,9 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                 @Override
                 public void onResponse(Boolean result) {
                     if (result != null && result) {
-                        ToastUtil.showTextViewPrompt("获取验证码成功");
+                        ToastUtil.showTextViewPrompt(getString(R.string.get_captcha_successfully));
                     } else {
-                        ToastUtil.showTextViewPrompt("获取验证码失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_captcha));
                         mSendVerify.setEnabled(true);
                         mSendVerify.setVisibility(View.VISIBLE);
                         mVerifyCountDown.setText("");
@@ -242,7 +242,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
 
                 @Override
                 public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                    ToastUtil.showTextViewPrompt("获取验证码失败");
+                    ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_captcha));
                     mSendVerify.setEnabled(true);
                     mSendVerify.setVisibility(View.VISIBLE);
                     mVerifyCountDown.setText("");
@@ -289,7 +289,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                     public void onResponse(String result) {
                         dismissLoadingDialog();
                         if (TextUtils.isEmpty(result)) {
-                            ToastUtil.showTextViewPrompt("登录失败");
+                            ToastUtil.showTextViewPrompt(getString(R.string.failed_to_login));
                             return;
                         }
                         try {

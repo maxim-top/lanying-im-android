@@ -56,7 +56,7 @@ public class ChatGroupActivity extends ChatBaseActivity implements ChatGroupCont
         if (group == null) {
             return;
         }
-        DialogUtils.getInstance().showEditDialog(this, "加入群聊",
+        DialogUtils.getInstance().showEditDialog(this, getString(R.string.join_group_chat),
                 getString(R.string.confirm), getString(R.string.cancel),
                 new CommonEditDialog.OnDialogListener() {
                     @Override

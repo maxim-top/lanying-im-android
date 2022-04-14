@@ -153,7 +153,7 @@ public class AccountListActivity extends BaseTitleActivity {
                     @Override
                     public void onError(Throwable e) {
                         dismissLoadingDialog();
-                        String error = e != null ? e.getMessage() : "网络错误";
+                        String error = e != null ? e.getMessage() : getString(R.string.network_error);
                         ToastUtil.showTextViewPrompt(error);
                         bindData(null);
                     }
@@ -242,7 +242,7 @@ public class AccountListActivity extends BaseTitleActivity {
             }
             // 失败
             dismissLoadingDialog();
-            String error = bmxErrorCode == null || TextUtils.isEmpty(bmxErrorCode.name()) ? "网络错误"
+            String error = bmxErrorCode == null || TextUtils.isEmpty(bmxErrorCode.name()) ? getString(R.string.network_error)
                     : bmxErrorCode.name();
             ToastUtil.showTextViewPrompt(error);
         });

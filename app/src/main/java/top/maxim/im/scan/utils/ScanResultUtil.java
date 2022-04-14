@@ -5,6 +5,7 @@ package top.maxim.im.scan.utils;
 import android.app.Activity;
 import android.text.TextUtils;
 
+import top.maxim.im.R;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.scan.view.ScanResultActivity;
 
@@ -21,7 +22,7 @@ public class ScanResultUtil {
      */
     public void dealScanResult(Activity activity, String scanMessage) {
         if (TextUtils.isEmpty(scanMessage)) {
-            ToastUtil.showTextViewPrompt("未识别到二维码，请重试");
+            ToastUtil.showTextViewPrompt(activity.getString(R.string.qr_code_not_recognized));
             activity.finish();
             return;
         }

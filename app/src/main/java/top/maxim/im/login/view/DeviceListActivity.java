@@ -73,7 +73,7 @@ public class DeviceListActivity extends BaseTitleActivity {
                 init();
             } else {
                 dismissLoadingDialog();
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                 ToastUtil.showTextViewPrompt(error);
             }
         });
@@ -96,7 +96,7 @@ public class DeviceListActivity extends BaseTitleActivity {
                 deviceList = bmxDeviceList;
                 bindData();
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                 ToastUtil.showTextViewPrompt(error);
             }
         });
@@ -140,7 +140,7 @@ public class DeviceListActivity extends BaseTitleActivity {
             // 当前设备没有退出按钮
             boolean isCurrent = device.isCurrentDevice();
             quit.setVisibility(isCurrent ? View.GONE : View.VISIBLE);
-            tvDeviceSN.setText("设备序列号:" + device.deviceSN());
+            tvDeviceSN.setText(getString(R.string.device_serial_number) + device.deviceSN());
             tvDeviceAgent.setText(TextUtils.isEmpty(device.userAgent()) ? "" : device.userAgent());
         }
     }

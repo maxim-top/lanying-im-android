@@ -89,7 +89,7 @@ public class MaxIMPushService extends Service {
                 BMXMessage message = list.get(0);
                 if (message != null) {
                     String title = !TextUtils.isEmpty(message.senderName()) ? message.senderName() : getString(R.string.app_name);
-                    String content = ChatUtils.getInstance().getMessageDesc(message);
+                    String content = ChatUtils.getInstance().getMessageDesc(getApplicationContext(), message);
                     Intent intent = getPackageManager().getLaunchIntentForPackage(getApplication().getPackageName());
                     NotificationUtils.getInstance().showNotify(MsgConstants.ChannelImportance.PRIVATE, title, content, intent);
                 }

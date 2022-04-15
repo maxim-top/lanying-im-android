@@ -330,7 +330,7 @@
     <string name="return_to_root">返回根目录..</string>
     <string name="return_to_upper_level">返回上一层..</string>
     <string name="copy_successful">复制成功</string>
-    <string name="welcome_to_set_your_signature">赶快去设置签名吧</string>
+    <string name="welcome_to_set_your_signature">[赶快去设置签名吧]</string>
     <string name="personalized_signature">个性签名:</string>
     <string name="failed_to_change">更换失败</string>
     <string name="announcement_title">公告标题</string>
@@ -365,7 +365,7 @@
     <string name="cleanup_successfully">清除成功</string>
     <string name="failed_to_cleanup">清除失败</string>
     <string name="please_install_wechat">请安装微信</string>
-    <string name="please_set_a_nickname">请设置昵称</string>
+    <string name="please_set_a_nickname">[请设置昵称]</string>
     <string name="go_to_bind">去绑定</string>
     <string name="all_members">全部成员</string>
     <string name="confirm_to_send">确定发送?</string>

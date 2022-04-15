@@ -2,8 +2,8 @@
     <string name="app_name">Maximtop IM</string>
 
     <!--Tab-->
-    <string name="tab_chat">Chat</string>
-    <string name="tab_contact">Contact</string>
+    <string name="tab_chat">Chats</string>
+    <string name="tab_contact">Contacts</string>
     <string name="tab_mine">Settings</string>
 
     <!--Chat-->
@@ -88,7 +88,7 @@
 
     <!--Contact-->
     <string name="contact_apply_notice">Friend application and notification</string>
-    <string name="contact_group">Group</string>
+    <string name="contact_group">Groups</string>
     <string name="create_group">Create group</string>
     <string name="choose_contact">Select contacts</string>
     <string name="group_invite">Group notification</string>
@@ -130,7 +130,7 @@
     <string name="bind_exit_user">Already have an account, bind it directly</string>
     <string name="exit_user">The username already exists</string>
     <string name="register_protocol1">Registration signifies acceptance of Agreement</string>
-    <string name="register_protocol2">User Services</string>
+    <string name="register_protocol2">User Service protocol</string>
     <string name="register_protocol3">and</string>
     <string name="register_protocol4">Privacy Policy</string>
     <string name="register_protocol_content1">Welcome to Maximtop!\n\n Please read carefully and fully understand the terms of the User Agreement and Privacy Policy, including but not limited to: In order to provide you with instant messaging, content sharing and other services, we need to collect your device information, operation logs and other personal information\n\n You can read</string>
@@ -153,12 +153,12 @@
     <string name="receive_push_notice">Receive new message notification</string>
     <string name="push_sound">Sound</string>
     <string name="push_vibrate">Vibrate</string>
-    <string name="push_detail">Whether to push details</string>
+    <string name="push_detail">Display push details</string>
     <string name="push_name">Set push nickname</string>
-    <string name="auto_download_attachment">Whether to download thumbnail attachment automatically</string>
-    <string name="auto_accept_group_invite">Whether to receive group invitation automatically</string>
-    <string name="black_list">List of blacklists</string>
-    <string name="other_device_tips">Toast alert or not</string>
+    <string name="auto_download_attachment">Auto-download thumbnail attachment</string>
+    <string name="auto_accept_group_invite">Auto-accept group invitation</string>
+    <string name="black_list">Blacklist</string>
+    <string name="other_device_tips">Show notification toast</string>
     <string name="device_list">Multi-device list</string>
     <string name="about_us">About us</string>
     <string name="setting_user_name">Nickname</string>
@@ -295,8 +295,8 @@
     <string name="return_to_root">Return to root...</string>
     <string name="return_to_upper_level">Return to previous level…</string>
     <string name="copy_successful">Copy successful</string>
-    <string name="welcome_to_set_your_signature">Welcome to set your signature</string>
-    <string name="personalized_signature">Personalized signature:</string>
+    <string name="welcome_to_set_your_signature">[No mood]</string>
+    <string name="personalized_signature">Mood:</string>
     <string name="failed_to_change">Failed to change</string>
     <string name="announcement_title">Announcement title</string>
     <string name="announcement_list">Announcement list</string>
@@ -330,7 +330,7 @@
     <string name="cleanup_successfully">Cleanup successfully</string>
     <string name="failed_to_cleanup">Failed to cleanup</string>
     <string name="please_install_wechat">Please install WeChat</string>
-    <string name="please_set_a_nickname">Please set a nickname</string>
+    <string name="please_set_a_nickname">[No nickname]</string>
     <string name="go_to_bind">Go to bind</string>
     <string name="all_members">All members</string>
     <string name="confirm_to_send">Confirm to send?</string>
@@ -395,8 +395,8 @@
     <string name="not_available_for_now">Not available for now</string>
     <string name="display_name">Display name</string>
     <string name="photo_capture_failed">Photo capture failed</string>
-    <string name="support">Support</string>
-    <string name="recent_announcement">Recent announcement</string>
+    <string name="support">Supports</string>
+    <string name="recent_announcement">Recent <announcem></announcem>ent</string>
     <string name="avatar">avatar</string>
     <string name="switch_search_mode">Switch search mode</string>
     <string name="input_username_searched">Input username being searched</string>

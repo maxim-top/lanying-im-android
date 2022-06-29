@@ -62,7 +62,7 @@
     <style name="Theme.Splash" parent="AppTheme">
         <item name="windowNoTitle">true</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowBackground">@drawable/splash</item>
+        <item name="android:windowBackground" >@drawable/bg_splash</item>
         <item name="android:windowFullscreen">true</item>
     </style>
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">美信拓扑IM</string>
+    <string name="app_name">蓝莺IM</string>
 
     <!--Tab-->
     <string name="tab_chat">对话</string>
@@ -7,8 +7,8 @@
     <string name="tab_mine">设置</string>
 
     <!--Chat-->
-    <string name="block_message">MaxIM</string>
-    <string name="recent_chat">美信拓扑</string>
+    <string name="block_message">LanyingIM</string>
+    <string name="recent_chat">蓝莺IM</string>
     <string name="group">群组</string>
     <string name="group_info">群详情(%s)</string>
     <string name="choose_group_member">选择群成员</string>
@@ -133,7 +133,7 @@
     <string name="register_protocol2">用户服务</string>
     <string name="register_protocol3">及</string>
     <string name="register_protocol4">隐私政策</string>
-    <string name="register_protocol_content1">欢迎使用美信拓扑!\n\n请您务必审慎阅读,充分理解"用户协议"和"隐私政策"各条款,包括但不限于:为了向您提供即时通讯、内容分享等服务,我们需要收集您的设备信息、操作日志等个人信息\n\n您可阅读</string>
+    <string name="register_protocol_content1">欢迎使用蓝莺IM!\n\n请您务必审慎阅读,充分理解"用户协议"和"隐私政策"各条款,包括但不限于:为了向您提供即时通讯、内容分享等服务,我们需要收集您的设备信息、操作日志等个人信息\n\n您可阅读</string>
     <string name="register_protocol_content2">了解详细信息。如您同意,请点击"同意"开始接受我们的服务。</string>
 
     <string name="verify_pwd_hint">输入登录密码</string>
@@ -142,7 +142,7 @@
     <string name="unbind_wechat_continue">确认解绑</string>
     <string name="verify_pwd_title">验证密码</string>
     <string name="verify_captcha_title">验证手机号</string>
-    <string name="verify_pwd_tag">登录密码验证身份</string>
+        <string name="verify_pwd_tag">登录密码验证身份</string>
     <string name="verify_captcha_tag">已绑定手机号验证身份</string>
 
     <!--设置-->
@@ -237,12 +237,12 @@
     <string name="push_receiver_rec_msg_count">您收到了%1$s条消息</string>
 
 
-    <string name="about_us_desc">一键启用多云架构的即时通讯云服务</string>
+    <string name="about_us_desc">专业SDK，私有云按月付费</string>
     <string name="about_us_net_pre">官网&#8194;&#8194;</string>
     <string name="about_us_net">https://www.maximtop.com</string>
     <string name="about_us_phone_pre">联系商务&#8194;&#8194;</string>
     <string name="about_us_phone">400-666-0162</string>
-    <string name="about_us_company">copyright© 2019 美信拓扑</string>
+    <string name="about_us_company">copyright© 2022 美信拓扑</string>
 
 
     <string name="common_empty">这里什么都没有～</string>
@@ -336,8 +336,8 @@
     <string name="confirm_to_send">确定发送?</string>
     <string name="group_id_colon">群Id:</string>
     <string name="group_chat_name_cannot_be_empty">群聊名称不能为空</string>
-    <string name="devicetoken_uploaded_successfully">上传deviceToken成功</string>
-    <string name="devicetoken_uploading_failed">上传deviceToken失败</string>
+    <string name="devicetoken_uploaded_successfully">上传Device Token成功</string>
+    <string name="devicetoken_uploading_failed">上传Device Token失败</string>
     <string name="slide_up_to_cancel">上滑取消</string>
     <string name="device_serial_number">设备序列号:</string>
     <string name="set_successfully">设置成功</string>
@@ -410,4 +410,5 @@
     <string name="tap_snap_hold_video">轻点拍照，长按录像</string>
     <string name="input_message_keywords">请输入要搜索的聊天记录内容</string>
     <string name="input_message_content">请输入聊天内容</string>
+    <string name="record_tip">手指上移，取消发送</string>
 </resources>

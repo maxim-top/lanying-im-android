@@ -148,7 +148,7 @@ public class WelcomeActivity extends BaseTitleActivity {
      */
     private void showVideo() {
         boolean isFirst = SharePreferenceUtils.getInstance().getFirst();
-        if (!isFirst) {
+        if (true) {
             initJump();
             return;
         }

@@ -411,4 +411,8 @@
     <string name="input_message_keywords">请输入要搜索的聊天记录内容</string>
     <string name="input_message_content">请输入聊天内容</string>
     <string name="record_tip">手指上移，取消发送</string>
+    <string name="setting_language">语言</string>
+    <string name="language_setting">语言设置</string>
+    <string name="chinese">简体中文</string>
+    <string name="english">English</string>
 </resources>

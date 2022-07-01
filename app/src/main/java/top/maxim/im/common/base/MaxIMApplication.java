@@ -23,6 +23,7 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
@@ -58,33 +59,6 @@ public class MaxIMApplication extends Application {
         initUtils();
         initBMXSDK();
         Thread.setDefaultUncaughtExceptionHandler(restartHandler);
-        initLanguage();
-    }
-
-    private String getCountry() {
-
-        Locale locale;
-        //7.0以上和7.0以下获取系统语言方式
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            locale = LocaleList.getDefault().get(0);
-        } else {
-            locale = Locale.getDefault();
-        }
-        return locale.getCountry();
-    }
-
-    private void initLanguage() {
-        Resources resources = getResources();
-        DisplayMetrics dm = resources.getDisplayMetrics();
-        Configuration config = resources.getConfiguration();
-        if (getCountry().equals("TW")) {
-            config.locale = Locale.TAIWAN;
-        } else if (getCountry().equals("US")) {
-            config.locale = Locale.ENGLISH;
-        } else {
-            config.locale = Locale.CHINESE;
-        }
-        resources.updateConfiguration(config, dm);
     }
 
     public void restartApp() {

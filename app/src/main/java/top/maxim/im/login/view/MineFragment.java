@@ -36,6 +36,7 @@ import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
+import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.ShapeImageView;
@@ -77,6 +78,9 @@ public class MineFragment extends BaseTitleFragment {
 
     /* 接受新消息通知 */
     private ItemLineSwitch.Builder mSettingPush;
+
+    /* 应用内通知 */
+    private TextView mInAppNotification;
 
     /* 声音 */
     private ItemLineSwitch.Builder mPushSound;
@@ -167,6 +171,17 @@ public class MineFragment extends BaseTitleFragment {
         }
         LinearLayout container = view.findViewById(R.id.ll_mine_container);
 
+        // 账号管理
+        mAccountManger = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.setting_account_manager))
+                .setMarginTop(ScreenUtils.dp2px(10))
+                .setOnItemClickListener(v -> AccountListActivity.startAccountListActivity(getActivity()));
+        container.addView(mAccountManger.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 接受push
         mSettingPush = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.receive_push_notice))
@@ -178,14 +193,18 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(mSettingPush.build());
 
-        // 分割线
-//        ItemLine.Builder itemLine1 = new ItemLine.Builder(getActivity(), container)
-//                .setMarginLeft(ScreenUtils.dp2px(15));
-//        container.addView(itemLine1.build(), 1);
+        mInAppNotification = new TextView(getActivity());
+        mInAppNotification.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(5),
+                ScreenUtils.dp2px(15), ScreenUtils.dp2px(5));
+        mInAppNotification.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        mInAppNotification.setTextColor(getResources().getColor(R.color.color_black));
+        mInAppNotification.setText(getString(R.string.inapp_notification));
+        container.addView(mInAppNotification);
 
         // 声音
         mPushSound = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.push_sound))
+                .setMarginTop(1)
                 .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
                     @Override
                     public void onItemSwitch(View v, boolean curCheck) {
@@ -193,6 +212,10 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(mPushSoundView = mPushSound.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 振动
         mPushVibrate = new ItemLineSwitch.Builder(getActivity())
@@ -208,6 +231,7 @@ public class MineFragment extends BaseTitleFragment {
         // 是否推送详情
         mPushDetail = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.push_detail))
+                .setMarginTop(ScreenUtils.dp2px(20))
                 .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
                     @Override
                     public void onItemSwitch(View v, boolean curCheck) {
@@ -215,6 +239,10 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(mPushDetail.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 推送昵称
         mPushName = new ItemLineArrow.Builder(getActivity())
@@ -227,6 +255,10 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(mPushName.build());
 
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 是否自动下载附件
         autoDownloadAttachment = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.auto_download_attachment))
@@ -237,6 +269,10 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(autoDownloadAttachment.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 是否自动接收群邀请
         autoAcceptGroupInvite = new ItemLineSwitch.Builder(getActivity())
@@ -249,6 +285,10 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(autoAcceptGroupInvite.build());
 
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 黑名单列表
         mBlockList = new ItemLineArrow.Builder(getActivity())
                 .setStartContent(getString(R.string.black_list))
@@ -259,6 +299,10 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(mBlockList.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 是否多端提示
         otherDevTips = new ItemLineSwitch.Builder(getActivity())
@@ -271,6 +315,10 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(otherDevTips.build());
 
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 多设备列表
         mDeviceList = new ItemLineArrow.Builder(getActivity())
                 .setStartContent(getString(R.string.device_list))
@@ -281,6 +329,10 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(mDeviceList.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 微信解绑
         mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent(getString(R.string.unbind_wechat_account))
@@ -295,11 +347,19 @@ public class MineFragment extends BaseTitleFragment {
                 .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 1));
         container.addView(mProtocolTerms.build());
 
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 隐私政策
         mProtocolPrivacy = new ItemLineArrow.Builder(getActivity())
                 .setStartContent(getString(R.string.register_protocol4))
                 .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 0));
         container.addView(mProtocolPrivacy.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 语言
         mLanguage = new ItemLineArrow.Builder(getActivity())
@@ -307,12 +367,9 @@ public class MineFragment extends BaseTitleFragment {
                 .setOnItemClickListener(v -> showSetAddFriendAuthMode());
         container.addView(mLanguage.build());
 
-        // 账号管理
-        mAccountManger = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.setting_account_manager))
-                .setMarginTop(ScreenUtils.dp2px(10))
-                .setOnItemClickListener(v -> AccountListActivity.startAccountListActivity(getActivity()));
-        container.addView(mAccountManger.build(), 0);
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 关于我们
         mAboutUs = new ItemLineArrow.Builder(getActivity())

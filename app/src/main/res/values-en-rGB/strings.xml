@@ -415,4 +415,5 @@
     <string name="language_setting">Language Setting</string>
     <string name="chinese">简体中文</string>
     <string name="english">English</string>
+    <string name="inapp_notification">In-app Notifications</string>
 </resources>

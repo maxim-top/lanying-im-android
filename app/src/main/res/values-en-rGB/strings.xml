@@ -155,7 +155,7 @@
     <string name="push_vibrate">Vibrate</string>
     <string name="push_detail">Show Preview Text</string>
     <string name="push_name">Set Push Nickname</string>
-    <string name="auto_download_attachment">Download Thumbnail</string>
+    <string name="auto_download_attachment">Download Thumbnail and Audio</string>
     <string name="auto_accept_group_invite">Accept Group Invitation</string>
     <string name="black_list">Blacklist</string>
     <string name="other_device_tips">Show Notification Toast</string>
@@ -242,7 +242,7 @@
     <string name="about_us_net">https://www.lanyingim.com</string>
     <string name="about_us_phone_pre"></string>
     <string name="about_us_phone">400-666-0162</string>
-    <string name="about_us_company">copyright© 2022 Maximtop</string>
+    <string name="about_us_company">© 2022 Maximtop</string>
 
 
     <string name="common_empty">Nothing here~</string>

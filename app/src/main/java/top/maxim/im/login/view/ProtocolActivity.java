@@ -90,7 +90,9 @@ public class ProtocolActivity extends BaseTitleActivity {
         });
 
         showLoadingDialog(true);
-        mWebView.loadUrl(mProtocolType == 0 ? CommonConfig.PROTOCOL_PRIVACY_URL
-                : CommonConfig.PROTOCOL_TERMS_URL);
+        String protocol_privacy_url = getString(R.string.protocol_privacy);
+        String protocol_privacy_terms = getString(R.string.protocol_terms);
+        mWebView.loadUrl(mProtocolType == 0 ? protocol_privacy_url
+                : protocol_privacy_terms);
     }
 }

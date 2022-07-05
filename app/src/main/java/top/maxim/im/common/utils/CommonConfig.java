@@ -6,10 +6,6 @@ package top.maxim.im.common.utils;
  */
 public interface CommonConfig {
 
-    String PROTOCOL_PRIVACY_URL = "https://www.maximtop.com/privacy";
-
-    String PROTOCOL_TERMS_URL = "https://www.maximtop.com/terms/";
-
     String SOURCE_TO_WX = "sourceToWX";
 
     String SESSION_COUNT_ACTION = "sessionCountAction";

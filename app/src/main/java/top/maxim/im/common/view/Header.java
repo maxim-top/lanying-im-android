@@ -302,7 +302,8 @@ public class Header {
                 params.addRule(RelativeLayout.LEFT_OF, R.id.header_right_container);
                 mTitleView.setPadding(mBackContainer.getChildCount() > 0 ? ScreenUtils.dp2px(10)
                         : ScreenUtils.dp2px(19), 0, ScreenUtils.dp2px(10), 0);
-                mTitleView.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+                mTitleView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+                mTitleView.getPaint().setFakeBoldText(true);
                 mContainer.addView(mTitleView, params);
             }
 

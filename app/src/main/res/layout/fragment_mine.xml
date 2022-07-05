@@ -58,9 +58,10 @@
                             android:id="@+id/tv_user_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:maxLines="1"
                             android:textColor="@color/color_white"
                             android:textSize="@dimen/dimen_26"
+                            android:ellipsize="end"
+                            android:singleLine="true"
                             android:textStyle="bold" />
 
                         <ImageView
@@ -103,8 +104,8 @@
 
                 <top.maxim.im.common.view.ShapeImageView
                     android:id="@+id/iv_user_avatar"
-                    android:layout_width="@dimen/dimen_100"
-                    android:layout_height="@dimen/dimen_100"
+                    android:layout_width="@dimen/dimen_80"
+                    android:layout_height="@dimen/dimen_80"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginLeft="@dimen/dimen_20"

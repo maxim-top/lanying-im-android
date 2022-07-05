@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import com.gavin.view.flexible.FlexibleLayout;
 
+import java.util.Locale;
+
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
 import top.maxim.im.BuildConfig;
@@ -49,6 +51,7 @@ import top.maxim.im.net.HttpResponseCallback;
  */
 public class MineFragment extends BaseTitleFragment {
 
+    public static final int MAX_NAME_LENGTH = 16;
     private FlexibleLayout mFlexibleLayout;
 
     private ScrollView mScrollView;
@@ -289,21 +292,6 @@ public class MineFragment extends BaseTitleFragment {
         container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
                 .build());
 
-        // 黑名单列表
-        mBlockList = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.black_list))
-                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
-                    @Override
-                    public void onItemClick(View v) {
-                        BlockListActivity.startBlockActivity(getActivity());
-                    }
-                });
-        container.addView(mBlockList.build());
-
-        // 分割线
-        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
-                .build());
-
         // 是否多端提示
         otherDevTips = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.other_device_tips))
@@ -319,27 +307,20 @@ public class MineFragment extends BaseTitleFragment {
         container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
                 .build());
 
-        // 多设备列表
-        mDeviceList = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.device_list))
+        // 黑名单列表
+        mBlockList = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.black_list))
                 .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
-                        DeviceListActivity.startDeviceActivity(getActivity());
+                        BlockListActivity.startBlockActivity(getActivity());
                     }
                 });
-        container.addView(mDeviceList.build());
+        container.addView(mBlockList.build());
 
         // 分割线
         container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
                 .build());
-
-        // 微信解绑
-        mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent(getString(R.string.unbind_wechat_account))
-                .setArrowVisible(false).setOnItemClickListener(v -> unBindWeChat());
-        View viewBindWeChat = mUnBindWeChat.build();
-        container.addView(viewBindWeChat);
-        viewBindWeChat.setVisibility(View.GONE);
 
         // 用户服务
         mProtocolTerms = new ItemLineArrow.Builder(getActivity())
@@ -371,6 +352,28 @@ public class MineFragment extends BaseTitleFragment {
         container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
                 .build());
 
+        // 多设备列表
+        mDeviceList = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.device_list))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                        DeviceListActivity.startDeviceActivity(getActivity());
+                    }
+                });
+        container.addView(mDeviceList.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
+        // 微信解绑
+        mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent(getString(R.string.unbind_wechat_account))
+                .setArrowVisible(false).setOnItemClickListener(v -> unBindWeChat());
+        View viewBindWeChat = mUnBindWeChat.build();
+        container.addView(viewBindWeChat);
+        viewBindWeChat.setVisibility(View.GONE);
+
         // 关于我们
         mAboutUs = new ItemLineArrow.Builder(getActivity())
                 .setStartContent(getString(R.string.about_us))
@@ -382,6 +385,22 @@ public class MineFragment extends BaseTitleFragment {
 //                .setMarginLeft(ScreenUtils.dp2px(15));
 //        container.addView(itemLine0.build(), 1);
         return view;
+    }
+
+    private String getLanguage() {
+        Locale locale;
+        String language = SharePreferenceUtils.getInstance().getAppLanguage();
+        if (!language.isEmpty()){
+            return language;
+        }
+
+        //7.0以上和7.0以下获取系统语言方式
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locale = getResources().getConfiguration().getLocales().get(0);
+        } else {
+            locale = Locale.getDefault();
+        }
+        return locale.getLanguage();
     }
 
     /**
@@ -396,13 +415,22 @@ public class MineFragment extends BaseTitleFragment {
                 getString(R.string.chinese),
                 getString(R.string.english)
         };
+
+        int colorDef = getResources().getColor(R.color.color_black);
+        int colorSel = Color.RED;
+
+        String curLanguage = getString(R.string.chinese);
+        if (getLanguage().equals("en")) {
+            curLanguage = getString(R.string.english);
+        }
+
         final String[] selectContent = new String[1];
         for (final String s : array) {
             final TextView tv = new TextView(getActivity());
             tv.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
                     ScreenUtils.dp2px(15));
             tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-            tv.setTextColor(getResources().getColor(R.color.color_black));
+            tv.setTextColor(s.equals(curLanguage) ? colorSel : colorDef);
             tv.setBackgroundColor(getResources().getColor(R.color.color_white));
             tv.setText(s);
             tv.setOnClickListener(new View.OnClickListener() {
@@ -503,7 +531,11 @@ public class MineFragment extends BaseTitleFragment {
     }
 
     private void initUser(BMXUserProfile profile) {
+
         String name = profile.username();
+        if (name.length() > MAX_NAME_LENGTH){
+            name = name.substring(0,MAX_NAME_LENGTH) + "...";
+        }
         String nickName = profile.nickname();
         String publicInfo = profile.publicInfo();
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);

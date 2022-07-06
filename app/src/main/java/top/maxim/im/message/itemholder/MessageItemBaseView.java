@@ -223,8 +223,11 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
                 }
             });
         }
-        if (mUsetText != null) {
+        if (mUsetText != null && group) {
             mUsetText.setText(TextUtils.isEmpty(userName) ? "" : userName);
+        }
+        if (!group) {
+            mUsetText.setHeight(1);
         }
     }
 

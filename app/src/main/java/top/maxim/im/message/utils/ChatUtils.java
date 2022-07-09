@@ -201,10 +201,7 @@ public class ChatUtils {
         }
         // 对需要展示的view加入缓存 防止在页面频繁刷新 view复用的时候展示错乱
         String avatarUrl = "";
-        // 新增直接展示头像地址 不需下载
-        if (!TextUtils.isEmpty(profile.avatarUrl())) {
-            avatarUrl = profile.avatarUrl();
-        } else if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
+        if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
                 && new File(profile.avatarThumbnailPath()).exists()
                 && new File(profile.avatarThumbnailPath()).isFile()) {
             avatarUrl = "file://" + profile.avatarThumbnailPath();

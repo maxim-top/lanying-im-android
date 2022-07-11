@@ -58,7 +58,7 @@ public class MessageItemText extends MessageItemBaseView {
         }
         if (mMaxMessage.contentType() != BMXMessage.ContentType.Text) {
             // 非文本转为无法识别
-            mChatText.setText("未知消息");
+            mChatText.setText(mContext.getString(R.string.unknown_message));
             return;
         }
         mChatText.setText(TextUtils.isEmpty(mMaxMessage.content()) ? "" : mMaxMessage.content());

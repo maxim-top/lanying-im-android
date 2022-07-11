@@ -85,12 +85,12 @@ public class NotificationUtils {
 //                AppContextUtils.getPackageName(AppContextUtils.getAppContext()), notifyId);
         // 这里必须设置chanenelId,要不然该通知在8.0手机上，不能正常显示
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createChannelId(importance, channelId);
+            createChannelId(AppContextUtils.getAppContext(), importance, channelId);
         }
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 AppContextUtils.getAppContext(), channelId).setWhen(when).setAutoCancel(true)
                         .setContentTitle(title).setContentText(content)
-                        .setSmallIcon(R.drawable.bmx_icon144).setTicker(content);
+                        .setSmallIcon(R.drawable.bmx_icon).setTicker(content);
         if (bitmap == null) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.inPreferredConfig = Bitmap.Config.RGB_565;
@@ -99,7 +99,7 @@ public class NotificationUtils {
             opt.inJustDecodeBounds = false;
             opt.inSampleSize = 1;// 设置缩放比例
             bitmap = BitmapFactory.decodeResource(AppContextUtils.getAppContext().getResources(),
-                    R.drawable.bmx_icon144, opt);
+                    R.drawable.bmx_icon, opt);
         }
         builder.setLargeIcon(bitmap);
         PendingIntent pIntent = PendingIntent.getActivity(AppContextUtils.getAppContext(), notifyId,
@@ -112,15 +112,15 @@ public class NotificationUtils {
 
     @RequiresApi(Build.VERSION_CODES.O)
     public void createChannelId() {
-        createChannelId(MsgConstants.ChannelImportance.PUBLIC, AppContextUtils.getPackageName(AppContextUtils.getAppContext()));
+        createChannelId(AppContextUtils.getAppContext(), MsgConstants.ChannelImportance.PUBLIC, AppContextUtils.getPackageName(AppContextUtils.getAppContext()));
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private void createChannelId(int importance, String channelId) {
+    private void createChannelId(Context context, int importance, String channelId) {
         NotificationChannel channel = new NotificationChannel(channelId,
-                MsgConstants.NOTIFICATION_CHANNEL_PUBLIC,
+                context.getString(R.string.message_notification),
                 NotificationManager.IMPORTANCE_HIGH);
-        channel.setDescription(MsgConstants.NOTIFICATION_CHANNEL_PUBLIC);
+        channel.setDescription(context.getString(R.string.message_notification));
         channel.canShowBadge();
         channel.enableLights(true);
         channel.setShowBadge(true);

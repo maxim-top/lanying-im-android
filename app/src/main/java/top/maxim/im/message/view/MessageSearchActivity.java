@@ -290,8 +290,8 @@ public class MessageSearchActivity extends BaseTitleActivity {
             }
             ChatUtils.getInstance().showRosterAvatar(rosterItem, avatar, mConfig);
             tvTitle.setText(TextUtils.isEmpty(name) ? "" : name);
-            time.setText(TimeUtils.millis2String(message.serverTimestamp()));
-            String msgDesc = ChatUtils.getInstance().getMessageDesc(message);
+            time.setText(TimeUtils.millis2String(mContext, message.serverTimestamp()));
+            String msgDesc = ChatUtils.getInstance().getMessageDesc(mContext, message);
             desc.setText(!TextUtils.isEmpty(msgDesc) ? msgDesc : "");
         }
     }

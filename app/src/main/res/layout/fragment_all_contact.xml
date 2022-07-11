@@ -33,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_0.3"
             android:layout_alignParentBottom="true"
-            android:background="@color/color_E1E6EB"/>
+            android:background="@color/color_E1E6EB" />
     </RelativeLayout>
 
     <top.maxim.im.common.view.ViewPagerFixed

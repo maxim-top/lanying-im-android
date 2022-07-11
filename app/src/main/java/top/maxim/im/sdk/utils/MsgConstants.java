@@ -10,8 +10,6 @@ public interface MsgConstants {
      * 通知渠道号
      */
 
-    String NOTIFICATION_CHANNEL_PUBLIC = "消息通知";
-
     interface ChannelImportance {
         int PUBLIC = 1;
 

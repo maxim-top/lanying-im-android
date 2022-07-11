@@ -1,6 +1,7 @@
 
 package top.maxim.im.message.utils;
 
+import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.text.TextUtils;
@@ -25,6 +26,7 @@ import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.BMXVoiceAttachment;
 import im.floo.floolib.FileProgressListener;
+import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -119,35 +121,33 @@ public class ChatUtils {
     }
 
     /**
-     * 根据消息获取描述
-     * 
-     * @param message message
+     * 根据消息类型和内容获取描述
+     *
+     * @param context context
+     * @param type message type
+     * @param content message content
      * @return String
      */
-    public String getMessageDesc(BMXMessage message) {
-        if (message == null) {
-            return "";
-        }
-        BMXMessage.ContentType type = message.contentType();
+    private String getMessageDesc(Context context, BMXMessage.ContentType type, String content) {
         if (type == null) {
-            return "[未知消息]";
+            return "[" + context.getString(R.string.unknown_message) + "]";
         }
         String desc = "";
         if (type == BMXMessage.ContentType.Text) {
             // 文本
-            desc = message.content();
+            desc = content;
         } else if (type == BMXMessage.ContentType.Image) {
             // 图片
-            desc = "[图片]";
+            desc = "[" + context.getString(R.string.image) + "]";
         } else if (type == BMXMessage.ContentType.Video) {
-            desc = "[视频]";
+            desc = "[" + context.getString(R.string.video) + "]";
         } else if (type == BMXMessage.ContentType.Location) {
-            desc = "[位置]";
+            desc = "[" + context.getString(R.string.location) + "]";
         } else if (type == BMXMessage.ContentType.File) {
-            desc = "[文件]";
+            desc = "[" + context.getString(R.string.file) + "]";
         } else if (type == BMXMessage.ContentType.Voice) {
             // 语音
-            desc = "[语音]";
+            desc = "[" + context.getString(R.string.voice) + "]";
         }
         return desc;
     }
@@ -155,35 +155,33 @@ public class ChatUtils {
     /**
      * 根据消息获取描述
      *
+     * @param context context
      * @param message message
      * @return String
      */
-    public String getMessageDesc(MessageBean message) {
+    public String getMessageDesc(Context context, BMXMessage message) {
+        if (message == null) {
+            return "";
+        }
+        BMXMessage.ContentType type = message.contentType();
+        String content = message.content();
+        return getMessageDesc(context, type, content);
+    }
+
+    /**
+     * 根据消息获取描述
+     *
+     * @param context context
+     * @param message message
+     * @return String
+     */
+    public String getMessageDesc(Context context, MessageBean message) {
         if (message == null) {
             return "";
         }
         BMXMessage.ContentType type = message.getContentType();
-        if (type == null) {
-            return "[未知消息]";
-        }
-        String desc = "";
-        if (type == BMXMessage.ContentType.Text) {
-            // 文本
-            desc = message.getContent();
-        } else if (type == BMXMessage.ContentType.Image) {
-            // 图片
-            desc = "[图片]";
-        } else if (type == BMXMessage.ContentType.Video) {
-            desc = "[视频]";
-        } else if (type == BMXMessage.ContentType.Location) {
-            desc = "[位置]";
-        } else if (type == BMXMessage.ContentType.File) {
-            desc = "[文件]";
-        } else if (type == BMXMessage.ContentType.Voice) {
-            // 语音
-            desc = "[语音]";
-        }
-        return desc;
+        String content = message.getContent();
+        return getMessageDesc(context, type, content);
     }
 
     /**
@@ -203,10 +201,7 @@ public class ChatUtils {
         }
         // 对需要展示的view加入缓存 防止在页面频繁刷新 view复用的时候展示错乱
         String avatarUrl = "";
-        // 新增直接展示头像地址 不需下载
-        if (!TextUtils.isEmpty(profile.avatarUrl())) {
-            avatarUrl = profile.avatarUrl();
-        } else if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
+        if (!TextUtils.isEmpty(profile.avatarThumbnailPath())
                 && new File(profile.avatarThumbnailPath()).exists()
                 && new File(profile.avatarThumbnailPath()).isFile()) {
             avatarUrl = "file://" + profile.avatarThumbnailPath();

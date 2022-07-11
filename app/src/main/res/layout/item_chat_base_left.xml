@@ -23,36 +23,37 @@
         android:textSize="@dimen/dimen_13"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/message_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/message_time"
-        android:layout_alignParentLeft="true"
-        android:ellipsize="end"
-        android:layout_marginLeft="@dimen/dimen_5"
-        android:maxWidth="@dimen/dimen_250"
-        android:maxLines="1"
-        android:textColor="@color/color_black"
-        android:textSize="@dimen/dimen_12" />
-
 
     <top.maxim.im.common.view.ShapeImageView
         android:id="@+id/message_avatar"
-        android:layout_width="@dimen/dimen_36"
-        android:layout_height="@dimen/dimen_36"
-        android:layout_below="@id/message_name"
+        android:layout_width="@dimen/dimen_46"
+        android:layout_height="@dimen/dimen_46"
+        android:layout_below="@id/message_time"
         android:layout_alignParentLeft="true"
         android:layout_marginTop="@dimen/dimen_5"
         android:src="@drawable/default_avatar_icon"
         app:shape="circle" />
 
+    <TextView
+        android:id="@+id/message_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:layout_marginLeft="@dimen/dimen_10"
+        android:maxWidth="@dimen/dimen_250"
+        android:maxLines="1"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen_12"
+        android:layout_alignTop="@id/message_avatar"
+        android:layout_toRightOf="@id/message_avatar"/>
+
     <FrameLayout
         android:id="@+id/fl_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@id/message_avatar"
-        android:layout_marginLeft="@dimen/dimen_10"
+        android:layout_marginTop="@dimen/dimen_3"
+        android:layout_marginLeft="@dimen/dimen_5"
+        android:layout_below="@id/message_name"
         android:layout_toRightOf="@id/message_avatar" />
 
     <include

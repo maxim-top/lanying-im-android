@@ -12,6 +12,7 @@ import java.util.Map;
 
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXMessage;
+import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
@@ -152,9 +153,9 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                 mView.cancelLoading();
             }
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                ToastUtil.showTextViewPrompt("加入成功");
+                ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.join_successfully));
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "加入失败";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : mView.getContext().getString(R.string.failed_to_join);
                 ToastUtil.showTextViewPrompt(error);
                 ((Activity) mView.getContext()).finish();
             }
@@ -225,7 +226,7 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                 }
                 GroupAckActivity.openGroupAckActivity(mView.getContext(), mMemberIdList, readList);
             } else {
-                ToastUtil.showTextViewPrompt("获取已读列表失败");
+                ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.failed_to_get_read_list));
             }
         });
     }

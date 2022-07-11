@@ -55,12 +55,13 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:id="@+id/tv_user_name"
+                            android:id="@+id/tv_nick_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:maxLines="1"
                             android:textColor="@color/color_white"
-                            android:textSize="@dimen/dimen_26"
+                            android:textSize="@dimen/dimen_18"
+                            android:ellipsize="end"
+                            android:singleLine="true"
                             android:textStyle="bold" />
 
                         <ImageView
@@ -73,6 +74,15 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tv_user_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dimen_5"
+                        android:maxLines="1"
+                        android:textColor="@color/color_white"
+                        android:textSize="@dimen/dimen_12" />
+
+                    <TextView
                         android:id="@+id/tv_user_id"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -81,35 +91,26 @@
                         android:textColor="@color/color_white"
                         android:textSize="@dimen/dimen_12" />
 
-                    <TextView
-                        android:id="@+id/tv_nick_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dimen_5"
-                        android:maxLines="1"
-                        android:textColor="@color/color_white"
-                        android:textSize="@dimen/dimen_12" />
-
-                    <TextView
-                        android:id="@+id/tv_public_info"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dimen_5"
-                        android:maxLines="1"
-                        android:textColor="@color/color_white"
-                        android:textSize="@dimen/dimen_12" />
+<!--                    <TextView-->
+<!--                        android:id="@+id/tv_public_info"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="@dimen/dimen_5"-->
+<!--                        android:maxLines="1"-->
+<!--                        android:textColor="@color/color_white"-->
+<!--                        android:textSize="@dimen/dimen_12" />-->
 
                 </LinearLayout>
 
                 <top.maxim.im.common.view.ShapeImageView
                     android:id="@+id/iv_user_avatar"
-                    android:layout_width="@dimen/dimen_100"
-                    android:layout_height="@dimen/dimen_100"
+                    android:layout_width="@dimen/dimen_80"
+                    android:layout_height="@dimen/dimen_80"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginLeft="@dimen/dimen_20"
                     android:layout_marginTop="@dimen/dimen_55"
-                    android:layout_marginRight="@dimen/dimen_36"
+                    android:layout_marginRight="@dimen/dimen_16"
                     android:layout_marginBottom="-5dp"
                     android:src="@drawable/default_avatar_icon"
                     app:shape="circle" />

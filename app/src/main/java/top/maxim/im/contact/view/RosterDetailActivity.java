@@ -259,7 +259,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
         } else {
             mTvOpenChat.setVisibility(View.GONE);
             add.setVisibility(View.VISIBLE);
-            add.setText("添加");
+            add.setText(getString(R.string.add));
         }
 //        if (friend) {
 //            // 好友直接跳转单聊
@@ -276,7 +276,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
         }
         long userId = mRosterItem.rosterId();
         mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
-        mNickName.setText(TextUtils.isEmpty(nickName) ? "" : "昵称:" + nickName);
+        mNickName.setText(TextUtils.isEmpty(nickName) ? "" : getString(R.string.nickname_colon) + nickName);
         mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
         String publicInfo = mRosterItem.publicInfo();
         if (TextUtils.isEmpty(publicInfo)) {
@@ -372,7 +372,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
      * 输入框弹出
      */
     private void showAddReason(final long rosterId) {
-        DialogUtils.getInstance().showEditDialog(this, "添加好友", getString(R.string.confirm),
+        DialogUtils.getInstance().showEditDialog(this, getString(R.string.add_friend), getString(R.string.confirm),
                 getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
@@ -394,10 +394,10 @@ public class RosterDetailActivity extends BaseTitleActivity {
         RosterManager.getInstance().apply(rosterId, reason, bmxErrorCode -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                ToastUtil.showTextViewPrompt("添加成功");
+                ToastUtil.showTextViewPrompt(getString(R.string.add_successful));
                 initRoster();
             } else {
-                ToastUtil.showTextViewPrompt("添加失败");
+                ToastUtil.showTextViewPrompt(getString(R.string.add_failed));
             }
         });
     }

@@ -444,7 +444,7 @@ public class SettingUserActivity extends BaseTitleActivity {
                         return;
                     }
                     // 已被绑定
-                    ToastUtil.showTextViewPrompt("此微信已经被绑定");
+                    ToastUtil.showTextViewPrompt(getString(R.string.wechat_already_bound));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -452,7 +452,7 @@ public class SettingUserActivity extends BaseTitleActivity {
 
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                ToastUtil.showTextViewPrompt("绑定失败");
+                ToastUtil.showTextViewPrompt(getString(R.string.bind_failed));
             }
         });
     }
@@ -590,7 +590,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         mPhone = phone;
         if (TextUtils.isEmpty(phone)) {
             // 未绑定
-            mSetPhone.setEnableContent("去绑定");
+            mSetPhone.setEnableContent(getString(R.string.go_to_bind));
         } else {
             mSetPhone.setEndContent(phone);
         }
@@ -607,22 +607,22 @@ public class SettingUserActivity extends BaseTitleActivity {
                     public void onResponse(Boolean result) {
                         if (result != null && result) {
                             // 已绑定
-                            mBindWeChat.setEndContent("已绑定");
+                            mBindWeChat.setEndContent(getString(R.string.bound));
                         } else {
-                            mBindWeChat.setEnableContent("去绑定");
+                            mBindWeChat.setEnableContent(getString(R.string.go_to_bind));
                         }
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                        mBindWeChat.setEnableContent("去绑定");
+                        mBindWeChat.setEnableContent(getString(R.string.go_to_bind));
                     }
                 });
             }
 
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                mBindWeChat.setEndContent("未绑定");
+                mBindWeChat.setEndContent(getString(R.string.unbound));
             }
         });
     }
@@ -644,8 +644,8 @@ public class SettingUserActivity extends BaseTitleActivity {
     private void bindAddFriendAuthQuestion(BMXUserProfile.AuthQuestion authQuestion) {
         String question = authQuestion != null ? authQuestion.getMQuestion() : "";
         String answer = authQuestion != null ? authQuestion.getMAnswer() : "";
-        mTvQuestion.setText("问题:" + question);
-        mTvAnswer.setText("答案:" + answer);
+        mTvQuestion.setText(getString(R.string.question) + question);
+        mTvAnswer.setText(getString(R.string.answer) + answer);
     }
 
     @Override
@@ -787,7 +787,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         question.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         question.setTextColor(getResources().getColor(R.color.color_black));
         question.setBackgroundColor(getResources().getColor(R.color.color_white));
-        question.setText("设置问题");
+        question.setText(getString(R.string.set_question));
         ll.addView(question, textP);
 
         final EditText editQuestion = new EditText(this);
@@ -805,7 +805,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         answer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         answer.setTextColor(getResources().getColor(R.color.color_black));
         answer.setBackgroundColor(getResources().getColor(R.color.color_white));
-        answer.setText("设置答案");
+        answer.setText(getString(R.string.set_answer));
         ll.addView(answer, textP);
 
         final EditText editAnswer = new EditText(this);
@@ -841,7 +841,7 @@ public class SettingUserActivity extends BaseTitleActivity {
      */
     private void setAuthQuestion(final String question, final String answer) {
         if (TextUtils.isEmpty(question) || TextUtils.isEmpty(answer)) {
-            ToastUtil.showTextViewPrompt("问题或者答案不能为空");
+            ToastUtil.showTextViewPrompt(getString(R.string.question_or_answer_cannot_be_empty));
             return;
         }
         showLoadingDialog(true);
@@ -853,7 +853,7 @@ public class SettingUserActivity extends BaseTitleActivity {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 bindAddFriendAuthQuestion(authQuestion);
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_exception);
                 ToastUtil.showTextViewPrompt(error);
             }
         });
@@ -874,7 +874,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         BMXCallBack callBack = bmxErrorCode -> {
             dismissLoadingDialog();
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_exception);
                 ToastUtil.showTextViewPrompt(error);
                 return;
             }
@@ -1014,7 +1014,7 @@ public class SettingUserActivity extends BaseTitleActivity {
             dismissLoadingDialog();
             mIconPath = "";
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_exception);
                 ToastUtil.showTextViewPrompt(error);
             }
         });

@@ -152,14 +152,14 @@ public class RosterApplyActivity extends BaseTitleActivity {
                                             showList(null, "", upload);
                                         }
                                     } else {
-                                        String error = bmxErrorCode == null ? "网络错误" : bmxErrorCode.name();
+                                        String error = bmxErrorCode == null ? getString(R.string.network_error) : bmxErrorCode.name();
                                         ToastUtil.showTextViewPrompt(error);
                                         showList(null, "", upload);
                                     }
                                 });
                         return;
                     }
-                    String error = bmxErrorCode == null ? "网络错误" : bmxErrorCode.name();
+                    String error = bmxErrorCode == null ? getString(R.string.network_error) : bmxErrorCode.name();
                     ToastUtil.showTextViewPrompt(error);
                     showList(null, "", upload);
                 });
@@ -236,12 +236,12 @@ public class RosterApplyActivity extends BaseTitleActivity {
             String statusDesc = "";
             if (applicationStatus != null) {
                 if (applicationStatus == BMXRosterService.ApplicationStatus.Accepted) {
-                    statusDesc = "已添加";
+                    statusDesc = getString(R.string.added);
                     accept.setVisibility(View.INVISIBLE);
                 } else if (applicationStatus == BMXRosterService.ApplicationStatus.Pending) {
                     accept.setVisibility(View.VISIBLE);
                 } else if (applicationStatus == BMXRosterService.ApplicationStatus.Declined) {
-                    statusDesc = "已拒绝";
+                    statusDesc = getString(R.string.rejected);
                     accept.setVisibility(View.INVISIBLE);
                 } else {
                     accept.setVisibility(View.INVISIBLE);
@@ -272,7 +272,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
             accept.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
             accept.setTextColor(mContext.getResources().getColor(R.color.color_black));
             accept.setBackgroundColor(mContext.getResources().getColor(R.color.color_white));
-            accept.setText("接受");
+            accept.setText(getString(R.string.accept));
             accept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -288,7 +288,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
             decline.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
             decline.setTextColor(mContext.getResources().getColor(R.color.color_black));
             decline.setBackgroundColor(mContext.getResources().getColor(R.color.color_white));
-            decline.setText("拒绝");
+            decline.setText(getString(R.string.reject));
             decline.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -308,7 +308,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
                     initData("", false);
                 } else {
-                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                     ToastUtil.showTextViewPrompt(error);
                 }
             });
@@ -318,7 +318,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
          * 输入框弹出
          */
         private void showDeclineReason(final long rosterId) {
-            DialogUtils.getInstance().showEditDialog((Activity)mContext, "拒绝原因",
+            DialogUtils.getInstance().showEditDialog((Activity)mContext, getString(R.string.reason_for_rejection),
                     getString(R.string.confirm), getString(R.string.cancel),
                     new CommonEditDialog.OnDialogListener() {
                         @Override
@@ -343,7 +343,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
                     initData("", false);
                 } else {
-                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                     ToastUtil.showTextViewPrompt(error);
                 }
             });

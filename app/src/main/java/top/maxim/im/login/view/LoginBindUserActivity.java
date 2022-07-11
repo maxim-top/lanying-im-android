@@ -201,7 +201,7 @@ public class LoginBindUserActivity extends BaseTitleActivity {
      */
     private void register(String userName, String pwd) {
         if (TextUtils.isEmpty(userName) || TextUtils.isEmpty(pwd)) {
-            ToastUtil.showTextViewPrompt("不能为空");
+            ToastUtil.showTextViewPrompt(getString(R.string.cannot_be_empty));
             return;
         }
         UserManager.getInstance().signUpNewUser(userName, pwd, (bmxErrorCode, bmxUserProfile) -> {
@@ -237,13 +237,13 @@ public class LoginBindUserActivity extends BaseTitleActivity {
                     return;
                 }
                 dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt("绑定失败");
+                ToastUtil.showTextViewPrompt(getString(R.string.bind_failed));
             }
 
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
                 dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt("绑定失败");
+                ToastUtil.showTextViewPrompt(getString(R.string.bind_failed));
             }
         });
     }

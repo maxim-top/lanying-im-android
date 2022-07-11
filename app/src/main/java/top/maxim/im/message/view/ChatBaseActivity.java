@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -57,6 +58,7 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
     private View mRecordView;
 
     private ImageView mRecordMic;
+    private TextView mRecordTip;
 
     protected ChatBaseContract.Presenter mPresenter;
 
@@ -104,6 +106,7 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
         mRecordView = view.findViewById(R.id.record_voice_view);
         mRecordMic = view.findViewById(R.id.iv_record_mic);
         mChatViewHelper = new ChatViewHelper(this, mChatRecyclerView);
+        mRecordTip = view.findViewById(R.id.txt_record_tip);
         return view;
     }
 

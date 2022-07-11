@@ -141,7 +141,7 @@ public class BlockListActivity extends RosterChooseActivity {
                 mAdapter.notifyDataSetChanged();
                 init();
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                 ToastUtil.showTextViewPrompt(error);
             }
         });
@@ -157,7 +157,7 @@ public class BlockListActivity extends RosterChooseActivity {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 init();
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                 ToastUtil.showTextViewPrompt(error);
             }
         });

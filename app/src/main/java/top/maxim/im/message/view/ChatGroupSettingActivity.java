@@ -554,7 +554,8 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
         long currentTime = System.currentTimeMillis();
         if (banExpireTime > currentTime) {
             //判断是否当前在禁言
-            mGroupBan.setLeftText(getString(R.string.group_all_ban) + "(" + TimeUtils.millis2String(banExpireTime) + ")");
+            mGroupBan.setLeftText(getString(R.string.group_all_ban) + "(" +
+                    TimeUtils.millis2String(this, banExpireTime) + ")");
             mGroupBan.setCheckStatus(true);
         } else {
             mGroupBan.setLeftText(getString(R.string.group_all_ban));
@@ -566,7 +567,7 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
      * 全员禁言
      */
     private void banGroup(){
-        DialogUtils.getInstance().showEditDialog(this, "禁言持续时间(分钟)", getString(R.string.confirm),
+        DialogUtils.getInstance().showEditDialog(this, getString(R.string.ban_duration_min), getString(R.string.confirm),
                 getString(R.string.cancel), true, new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
@@ -617,12 +618,12 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
     }
 
     private void toastError(Throwable e) {
-        String error = e != null ? e.getMessage() : "网络异常";
+        String error = e != null ? e.getMessage() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 
     private void toastError(BMXErrorCode e) {
-        String error = e != null ? e.name() : "网络异常";
+        String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 }

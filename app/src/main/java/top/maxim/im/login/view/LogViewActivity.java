@@ -123,7 +123,7 @@ public class LogViewActivity extends BaseTitleActivity {
      * @return File
      */
     private String getLogPath() {
-        String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
+        String appPath = AppContextUtils.getAppContext().getExternalFilesDir(null).getPath();
         String appId = TextUtils.isEmpty(mAppId) ? SharePreferenceUtils.getInstance().getAppId() : mAppId;
         String path = appPath + "/data_dir/" + appId + "/flooLog/";
         return path;
@@ -176,7 +176,7 @@ public class LogViewActivity extends BaseTitleActivity {
         save.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
         save.setTextColor(getResources().getColor(R.color.color_black));
         save.setBackgroundColor((getResources().getColor(R.color.color_white)));
-        save.setText("保存日志");
+        save.setText(getString(R.string.save_log));
         save.setOnClickListener(v -> {
             //保存的路径
             String appId = SharePreferenceUtils.getInstance().getAppId();

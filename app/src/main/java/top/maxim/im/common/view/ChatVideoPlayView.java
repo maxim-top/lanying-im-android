@@ -172,7 +172,7 @@ public class ChatVideoPlayView extends FrameLayout implements View.OnClickListen
                 if (((Activity)getContext()).isFinishing()) {
                     return;
                 }
-                ToastUtil.showTextViewPrompt("视频信息错误");
+                ToastUtil.showTextViewPrompt(getContext().getString(R.string.video_message_error));
                 ((Activity)getContext()).finish();
             }
 

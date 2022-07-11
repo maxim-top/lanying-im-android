@@ -136,7 +136,7 @@ public class WelcomeActivity extends BaseTitleActivity {
                     LoginActivity.openLogin(WelcomeActivity.this);
                     finish();
                 } else {
-                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.switch_appId_failed);
                     ToastUtil.showTextViewPrompt(error);
                 }
             });
@@ -148,7 +148,7 @@ public class WelcomeActivity extends BaseTitleActivity {
      */
     private void showVideo() {
         boolean isFirst = SharePreferenceUtils.getInstance().getFirst();
-        if (!isFirst) {
+        if (true) {
             initJump();
             return;
         }
@@ -243,7 +243,7 @@ public class WelcomeActivity extends BaseTitleActivity {
         String finalRestServer = restServer;
         UserManager.getInstance().signInById(userId, pwd, bmxErrorCode -> {
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
-                ToastUtil.showTextViewPrompt("网络异常");
+                ToastUtil.showTextViewPrompt(getString(R.string.network_exception));
                 return;
             }
             // 登陆成功后 需要将userId存储SP 作为下次自动登陆
@@ -363,7 +363,7 @@ public class WelcomeActivity extends BaseTitleActivity {
         TextView tv = new TextView(this);
         tv.setMovementMethod(LinkMovementMethod.getInstance());
         tv.setText(builder);
-        DialogUtils.getInstance().showCustomDialog(this, tv, false, title.toString(), "同意", "暂不使用",
+        DialogUtils.getInstance().showCustomDialog(this, tv, false, title.toString(), getString(R.string.agree), getString(R.string.not_available_for_now),
                 new CommonCustomDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener() {

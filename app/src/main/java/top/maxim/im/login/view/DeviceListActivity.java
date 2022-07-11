@@ -6,7 +6,10 @@ import android.content.Intent;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,6 +27,7 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
 import top.maxim.im.common.view.recyclerview.RecyclerWithHFAdapter;
+import top.maxim.im.common.view.recyclerview.SwipeRecyclerViewHelper;
 
 /**
  * Description : 多设备列表 Created by Mango on 2018/11/06
@@ -32,9 +36,10 @@ public class DeviceListActivity extends BaseTitleActivity {
 
     private RecyclerView mRecycler;
 
-    private DeviceAdapter mAdapter;
+    private DeviceListAdapter mAdapter;
 
     private BMXDeviceList deviceList = new BMXDeviceList();
+    private List<BMXDevice> mDatas;
 
     public static void startDeviceActivity(Context context) {
         Intent intent = new Intent(context, DeviceListActivity.class);
@@ -56,12 +61,11 @@ public class DeviceListActivity extends BaseTitleActivity {
 
     @Override
     protected View onCreateView() {
+        init();
         View view = View.inflate(this, R.layout.fragment_contact, null);
         mRecycler = view.findViewById(R.id.contact_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mRecycler.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
-        mAdapter = new DeviceAdapter(this);
-        mRecycler.setAdapter(mAdapter);
         return view;
     }
 
@@ -73,7 +77,7 @@ public class DeviceListActivity extends BaseTitleActivity {
                 init();
             } else {
                 dismissLoadingDialog();
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                 ToastUtil.showTextViewPrompt(error);
             }
         });
@@ -82,10 +86,10 @@ public class DeviceListActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        init();
     }
 
     protected void init() {
+        mDatas = new ArrayList<>();
         if (deviceList != null && !deviceList.isEmpty()) {
             deviceList.clear();
         }
@@ -95,53 +99,111 @@ public class DeviceListActivity extends BaseTitleActivity {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 deviceList = bmxDeviceList;
                 bindData();
+                mAdapter = new DeviceListAdapter(this, mDatas);
+                mRecycler.setAdapter(mAdapter);
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                 ToastUtil.showTextViewPrompt(error);
             }
         });
     }
 
     private void bindData() {
-        List<BMXDevice> devices = new ArrayList<>();
         for (int i = 0; i < deviceList.size(); i++) {
-            devices.add(deviceList.get(i));
+            mDatas.add(deviceList.get(i));
         }
-        mAdapter.replaceList(devices);
     }
 
-    /**
-     * 展示设备adapter
-     */
-    protected class DeviceAdapter extends RecyclerWithHFAdapter<BMXDevice> {
+    public class DeviceListAdapter extends RecyclerView.Adapter<DeviceListAdapter.RemindViewHolder>
+            implements SwipeRecyclerViewHelper.Callback {
 
-        public DeviceAdapter(Context context) {
-            super(context);
+        private Context context;
+        private List<BMXDevice> mDatas = new ArrayList<BMXDevice>();
+
+        private RecyclerView mRecyclerView;
+
+        public DeviceListAdapter(Context context, List<BMXDevice> mDatas) {
+            this.context = context;
+            this.mDatas = mDatas;
         }
 
         @Override
-        protected int onCreateViewById(int viewType) {
-            return R.layout.item_device_view;
+        public DeviceListAdapter.RemindViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_device_view, parent, false);
+            return new DeviceListAdapter.RemindViewHolder(view);
+        }
+
+        /**
+         * 将recyclerView绑定Slide事件
+         *
+         * @param recyclerView
+         */
+        @Override
+        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+            super.onAttachedToRecyclerView(recyclerView);
+            mRecyclerView = recyclerView;
+            mRecyclerView.addOnItemTouchListener(new SwipeRecyclerViewHelper(mRecyclerView.getContext(), this));
         }
 
         @Override
-        protected void onBindHolder(BaseViewHolder holder, int position) {
-            TextView tvDeviceSN = holder.findViewById(R.id.tv_device_sn);
-            TextView tvDeviceAgent = holder.findViewById(R.id.tv_device_agent);
-            TextView quit = holder.findViewById(R.id.tv_quit);
+        public void onBindViewHolder(final DeviceListAdapter.RemindViewHolder holder, int position) {
+            TextView tvDeviceSN = holder.itemView.findViewById(R.id.tv_device_sn);
+            TextView tvDeviceAgent = holder.itemView.findViewById(R.id.tv_device_agent);
+            TextView quit = holder.itemView.findViewById(R.id.tv_quit);
 
-            final BMXDevice device = getItem(position);
+            final BMXDevice device = mDatas.get(holder.getAdapterPosition());
             if (device == null) {
                 return;
             }
+
             // 退出
             quit.setOnClickListener(v -> deleteDevice(device.deviceSN()));
-            long platform = device.platform();
             // 当前设备没有退出按钮
             boolean isCurrent = device.isCurrentDevice();
             quit.setVisibility(isCurrent ? View.GONE : View.VISIBLE);
-            tvDeviceSN.setText("设备序列号:" + device.deviceSN());
+
+            tvDeviceSN.setText(context.getString(R.string.device_serial_number) + device.deviceSN());
             tvDeviceAgent.setText(TextUtils.isEmpty(device.userAgent()) ? "" : device.userAgent());
         }
+
+        @Override
+        public int getItemCount() {
+            return mDatas.size();
+        }
+
+        /**
+         * 此方法用来计算水平方向移动的距离
+         *
+         * @param holder
+         * @return
+         */
+        @Override
+        public int getHorizontalRange(RecyclerView.ViewHolder holder) {
+            if (holder.itemView instanceof LinearLayout) {
+                return 250;
+            }
+            return 0;
+        }
+
+        @Override
+        public RecyclerView.ViewHolder getChildViewHolder(View childView) {
+            return mRecyclerView.getChildViewHolder(childView);
+        }
+
+        @Override
+        public View findTargetView(float x, float y) {
+            return mRecyclerView.findChildViewUnder(x, y);
+        }
+
+        /**
+         * 自定义的ViewHolder
+         */
+        public class RemindViewHolder extends RecyclerView.ViewHolder {
+
+            public RemindViewHolder(View itemView) {
+                super(itemView);
+            }
+        }
     }
+
 }

@@ -3,6 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+
     <ImageView
         android:id="@+id/iv_record_mic"
         android:layout_width="wrap_content"
@@ -10,5 +11,20 @@
         android:layout_centerInParent="true"
         android:layout_gravity="center_vertical"
         android:background="@drawable/voice_mic_1" />
+
+    <TextView
+        android:id="@+id/txt_record_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/iv_record_mic"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="14dp"
+        android:ellipsize="middle"
+        android:hint="Swipe up to Cancel"
+        android:text="@string/record_tip"
+        android:maxLines="2"
+        android:textColor="@color/color_white"
+        android:textStyle="bold"
+        android:textSize="@dimen/dimen_15" />
 
 </RelativeLayout>

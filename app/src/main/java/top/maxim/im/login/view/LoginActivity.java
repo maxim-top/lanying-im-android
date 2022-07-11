@@ -93,7 +93,7 @@ public class LoginActivity extends BaseTitleActivity {
 
     public static void openLogin(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
@@ -143,7 +143,7 @@ public class LoginActivity extends BaseTitleActivity {
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
             if (!WXUtils.getInstance().wxSupported()) {
-                ToastUtil.showTextViewPrompt("请安装微信");
+                ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }
             initWXRxBus();
@@ -253,7 +253,7 @@ public class LoginActivity extends BaseTitleActivity {
             final boolean isLoginById, final String changeAppId, String server, int port, String restServer) {
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pwd)) {
-            ToastUtil.showTextViewPrompt("不能为空");
+            ToastUtil.showTextViewPrompt(activity.getString(R.string.cannot_be_empty));
             return;
         }
         if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
@@ -311,7 +311,7 @@ public class LoginActivity extends BaseTitleActivity {
             if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
                 ((BaseTitleActivity)activity).dismissLoadingDialog();
             }
-            String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络异常";
+            String error = bmxErrorCode != null ? bmxErrorCode.name() : activity.getString(R.string.network_exception);
             ToastUtil.showTextViewPrompt(error);
         };
         boolean isChange = !TextUtils.isEmpty(changeAppId)
@@ -326,7 +326,7 @@ public class LoginActivity extends BaseTitleActivity {
                     if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
                         ((BaseTitleActivity)activity).dismissLoadingDialog();
                     }
-                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : activity.getString(R.string.switch_appId_failed);
                     ToastUtil.showTextViewPrompt(error);
                 }
             });
@@ -349,7 +349,7 @@ public class LoginActivity extends BaseTitleActivity {
 
     public static void wxChatLogin(final Activity activity, String openId) {
         if (TextUtils.isEmpty(openId)) {
-            ToastUtil.showTextViewPrompt("不能为空");
+            ToastUtil.showTextViewPrompt(activity.getString(R.string.cannot_be_empty));
             return;
         }
         if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {

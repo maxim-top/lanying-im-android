@@ -1,6 +1,8 @@
 
 package top.maxim.im.message.presenter;
 
+import static top.maxim.im.message.presenter.ChatBasePresenter.FunctionType.*;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
@@ -545,10 +547,31 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         mSubcription.add(subscription);
     }
 
+    enum FunctionType{
+        UNKNOWN,
+        PHOTOS,
+        SNAP,
+        VIDEO,
+        FILE,
+        LOCATION
+    }
+
     @Override
     public void onFunctionRequest(String functionType) {
-        switch (functionType) {
-            case "相册":
+        FunctionType type = UNKNOWN;
+        if (functionType.equals(mView.getContext().getString(R.string.snap))){
+            type = SNAP;
+        }else if (functionType.equals(mView.getContext().getString(R.string.video))){
+            type = VIDEO;
+        }else if (functionType.equals(mView.getContext().getString(R.string.file))){
+            type = FILE;
+        }else if (functionType.equals(mView.getContext().getString(R.string.location))){
+            type = LOCATION;
+        }else if (functionType.equals(mView.getContext().getString(R.string.photo_album))){
+            type = PHOTOS;
+        }
+        switch (type) {
+            case PHOTOS:
                 // 选择相册 需要SD卡读写权限
                 if (hasPermission(PermissionsConstant.READ_STORAGE,
                         PermissionsConstant.WRITE_STORAGE)) {
@@ -558,7 +581,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     requestPermissions(TYPE_PHOTO_PERMISSION, PermissionsConstant.READ_STORAGE);
                 }
                 break;
-            case "拍照":
+            case SNAP:
                 // 拍照 需要SD卡读写 拍照权限
                 if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.READ_STORAGE,
                         PermissionsConstant.WRITE_STORAGE)) {
@@ -567,7 +590,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     requestPermissions(TYPE_CAMERA_PERMISSION, PermissionsConstant.READ_STORAGE);
                 }
                 break;
-            case "视频":
+            case VIDEO:
                 // 视频需要SD卡读写 麦克风权限
                 if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.RECORD_AUDIO,
                         PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE)) {
@@ -577,7 +600,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     requestPermissions(TYPE_VIDEO_PERMISSION, PermissionsConstant.READ_STORAGE);
                 }
                 break;
-            case "文件":
+            case FILE:
                 // 文件 需要SD卡读写 拍照权限
                 if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.READ_STORAGE,
                         PermissionsConstant.WRITE_STORAGE)) {
@@ -586,7 +609,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     requestPermissions(TYPE_FILE_PERMISSION, PermissionsConstant.READ_STORAGE);
                 }
                 break;
-            case "位置":
+            case LOCATION:
                 if (mView != null) {
                     if (hasPermission(PermissionsConstant.FINE_LOCATION,
                             PermissionsConstant.COARSE_LOCATION)) {
@@ -608,7 +631,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             ToastUtil.showTextViewPrompt("文字不能为空!");
             return;
         }
-        BMXMessage bean = mSendUtils.sendTextMessage(mChatType, mMyUserId, mChatId, sendText,
+        BMXMessage bean = mSendUtils.sendTextMessage(mView.getContext(), mChatType, mMyUserId, mChatId, sendText,
                 getChatAtMembers(), myUserName);
         // 发送成功后需要清除@的对象缓存
         clearAtFeed();
@@ -829,7 +852,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }
         ClipData clip = ClipData.newPlainText("chat_text", text);
         clipboard.setPrimaryClip(clip);
-        ToastUtil.showTextViewPrompt("复制成功");
+        ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.copy_successful));
     }
 
     /**
@@ -970,7 +993,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             playVoice(voiceUrl, bean);
             return;
         }
-        ToastUtil.showTextViewPrompt("正在下载");
+        ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.downloading));
         BMXMessageAttachment.DownloadStatus status = body.downloadStatus();
         if (status == BMXMessageAttachment.DownloadStatus.Downloaing) {
             return;
@@ -1113,7 +1136,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 onFinish();
             }
         });
-        mVoicePlayHelper.startVoice(voicePath);
+        mVoicePlayHelper.startVoice(mView.getContext(), voicePath);
     }
 
     /**
@@ -1139,7 +1162,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             openFilePreView(filePath);
             return;
         }
-        ToastUtil.showTextViewPrompt("正在下载");
+        ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.downloading));
         BMXMessageAttachment.DownloadStatus status = body.downloadStatus();
         if (status == BMXMessageAttachment.DownloadStatus.Downloaing) {
             return;
@@ -1246,12 +1269,12 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }
         if (TextUtils.isEmpty(videoUrl)) {
             // 正在下载
-            ToastUtil.showTextViewPrompt("正在下载");
+            ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.downloading));
             return;
         }
         BMXMessageAttachment.DownloadStatus status = body.downloadStatus();
         if (status == BMXMessageAttachment.DownloadStatus.Downloaing) {
-            ToastUtil.showTextViewPrompt("正在下载");
+            ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.downloading));
             return;
         }
         VideoDetailActivity.openVideoDetail(mView.getContext(), videoUrl);
@@ -1296,7 +1319,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                                 .getStringExtra(PhotoRecorderActivity.EXTRA_VIDEO_PATH);
                         if (TextUtils.isEmpty(videoPath) || !new File(videoPath).exists()
                                 || new File(videoPath).length() <= 0) {
-                            ToastUtil.showTextViewPrompt("视频录制失败");
+                            ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.video_recording_failed));
                             return;
                         }
                         int videoDuration = data
@@ -1309,7 +1332,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         String picturePath = data
                                 .getStringExtra(PhotoRecorderActivity.EXTRA_CAMERA_PATH);
                         if (TextUtils.isEmpty(picturePath)) {
-                            ToastUtil.showTextViewPrompt("照片拍摄失败");
+                            ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.photo_capture_failed));
                             return;
                         }
                         File f = new File(picturePath);
@@ -1688,7 +1711,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         String provider = "";
         List<String> providers = manager.getProviders(true);
         if (providers == null) {
-            ToastUtil.showTextViewPrompt("未插卡,暂不支持");
+            ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.no_card_inserted));
             return;
         }
         if (providers.contains(LocationManager.NETWORK_PROVIDER)) {
@@ -1714,36 +1737,40 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     Geocoder geocoder = new Geocoder(mView.getContext(), Locale.CHINESE);
                     try {
                         List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                        Address address = addresses.get(0);
-                        // Address[addressLines=[0:"中国",1:"北京市海淀区",2:"华奥饭店公司写字间中关村创业大街"]latitude=39.980973,hasLongitude=true,longitude=116.301712]
-                        int maxLine = address.getMaxAddressLineIndex();
-                        if (maxLine >= 2) {
-                            add = address.getAddressLine(1) + address.getAddressLine(2);
-                        } else if (maxLine >= 1) {
-                            add = address.getAddressLine(0) + address.getAddressLine(1);
-                        } else if (maxLine >= 0) {
-                            add = address.getAddressLine(0);
-                        }
-                        if (!TextUtils.isEmpty(add)) {
-                            showSendLocationDialog(add, latitude, longitude);
-                        } else {
-                            ToastUtil.showTextViewPrompt("获取位置失败");
+                        if (!addresses.isEmpty()){
+                            Address address = addresses.get(0);
+                            // Address[addressLines=[0:"中国",1:"北京市海淀区",2:"华奥饭店公司写字间中关村创业大街"]latitude=39.980973,hasLongitude=true,longitude=116.301712]
+                            int maxLine = address.getMaxAddressLineIndex();
+                            if (maxLine >= 2) {
+                                add = address.getAddressLine(1) + address.getAddressLine(2);
+                            } else if (maxLine >= 1) {
+                                add = address.getAddressLine(0) + address.getAddressLine(1);
+                            } else if (maxLine >= 0) {
+                                add = address.getAddressLine(0);
+                            }
+                            if (!TextUtils.isEmpty(add)) {
+                                showSendLocationDialog(add, latitude, longitude);
+                            } else {
+                                ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.failed_to_get_location));
+                            }
+                        }else{
+                            ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.failed_to_get_location));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
-                        ToastUtil.showTextViewPrompt("获取位置失败");
+                        ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.failed_to_get_location));
                     }
                 } else {
-                    ToastUtil.showTextViewPrompt("未插卡,暂不支持");
+                    ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.no_card_inserted));
                 }
             }
         } else {
-            ToastUtil.showTextViewPrompt("未插卡,暂不支持");
+            ToastUtil.showTextViewPrompt(mView.getContext().getString(R.string.no_card_inserted));
         }
     }
 
     private void showSendLocationDialog(String address, double latitude, double longitude) {
-        DialogUtils.getInstance().showDialog((Activity)mView.getContext(), "确定发送?", address,
+        DialogUtils.getInstance().showDialog((Activity)mView.getContext(), ((Activity) mView.getContext()).getString(R.string.confirm_to_send), address,
                 new CommonDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener() {

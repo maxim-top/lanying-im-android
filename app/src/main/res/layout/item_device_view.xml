@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/list_selector"
-    android:orientation="vertical"
-    android:padding="@dimen/dimen_15">
+    android:layout_height="@dimen/dimen_60"
+    android:orientation="horizontal">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@drawable/list_selector"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/dimen_5"
+        android:paddingBottom="@dimen/dimen_5"
+        android:paddingLeft="@dimen/dimen_20">
 
-        <TextView
+    <TextView
             android:id="@+id/tv_device_sn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -18,20 +21,6 @@
             android:singleLine="true"
             android:textColor="@color/color_black"
             android:textSize="@dimen/dimen_18" />
-
-        <TextView
-            android:id="@+id/tv_quit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="@color/color_0079F4"
-            android:padding="@dimen/dimen_10"
-            android:textColor="@color/color_white"
-            android:text="@string/quit_app" />
-
-    </RelativeLayout>
 
     <TextView
         android:id="@+id/tv_device_agent"
@@ -42,4 +31,14 @@
         android:textColor="@color/color_black"
         android:textSize="@dimen/dimen_12" />
 
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_quit"
+        android:layout_width="@dimen/dimen_90"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="@color/color_FF475A"
+        android:textColor="@color/color_white"
+        android:text="@string/delete" />
 </LinearLayout>

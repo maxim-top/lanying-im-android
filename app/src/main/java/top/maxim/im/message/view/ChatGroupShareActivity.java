@@ -138,7 +138,7 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.item_group_list_member, null);
         ShapeImageView icon = view.findViewById(R.id.img_icon);
         TextView tvName = view.findViewById(R.id.txt_name);
-        tvName.setText("添加");
+        tvName.setText(getString(R.string.add));
         icon.setImageResource(R.drawable.default_add_icon);
         CheckBox checkBox = view.findViewById(R.id.cb_choice);
         view.setOnClickListener(listener);
@@ -351,7 +351,7 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
         name.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         name.setTextColor(getResources().getColor(R.color.color_black));
         name.setBackgroundColor(getResources().getColor(R.color.color_white));
-        name.setText("展示名称");
+        name.setText(getString(R.string.display_name));
         ll.addView(name, textP);
 
         final EditText editName = new EditText(this);
@@ -445,19 +445,19 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
             boolean isDownload = mDownload.containsKey(file);
             tvDocTitle.setText(file.getMDisplayName());
             if (isDownload) {
-                tvDocSize.setText("下载中");
+                tvDocSize.setText(getString(R.string.downloading));
             } else {
                 String size = Formatter.formatFileSize(mContext, file.getMSize());
                 tvDocSize.setText(size);
             }
-            String time = TimeUtils.millis2String(file.getMCreateTime());
+            String time = TimeUtils.millis2String(mContext, file.getMCreateTime());
             tvDocTime.setText(!TextUtils.isEmpty(time) ? time : "");
             ivDocIcon.setImageResource(R.drawable.chat_file_default_icon);
         }
     }
 
     private void toastError(BMXErrorCode e) {
-        String error = e != null ? e.name() : "网络异常";
+        String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 }

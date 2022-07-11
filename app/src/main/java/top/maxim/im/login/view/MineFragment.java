@@ -1,11 +1,14 @@
 
 package top.maxim.im.login.view;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,9 +18,12 @@ import android.widget.TextView;
 
 import com.gavin.view.flexible.FlexibleLayout;
 
+import java.util.Locale;
+
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
 import top.maxim.im.BuildConfig;
+import top.maxim.im.MainActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -27,10 +33,12 @@ import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
+import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.ShapeImageView;
@@ -42,6 +50,9 @@ import top.maxim.im.net.HttpResponseCallback;
  * Description : 我的 Created by Mango on 2018/11/06
  */
 public class MineFragment extends BaseTitleFragment {
+
+    public static final int MAX_NAME_LENGTH = 25;
+    public static final int MAX_NICKNAME_LENGTH = 12;
 
     private FlexibleLayout mFlexibleLayout;
 
@@ -59,7 +70,7 @@ public class MineFragment extends BaseTitleFragment {
 
     private TextView mNickName;
 
-    private TextView mUserPubInfo;
+//    private TextView mUserPubInfo;
 
     /* 退出登录 */
     private TextView mQuitView;
@@ -72,6 +83,9 @@ public class MineFragment extends BaseTitleFragment {
 
     /* 接受新消息通知 */
     private ItemLineSwitch.Builder mSettingPush;
+
+    /* 应用内通知 */
+    private TextView mInAppNotification;
 
     /* 声音 */
     private ItemLineSwitch.Builder mPushSound;
@@ -116,6 +130,9 @@ public class MineFragment extends BaseTitleFragment {
     /* 隐私政策 */
     private ItemLineArrow.Builder mProtocolPrivacy;
 
+    /* 语言 */
+    private ItemLineArrow.Builder mLanguage;
+
     /* app版本号 */
     private TextView mAppVersion;
 
@@ -142,7 +159,7 @@ public class MineFragment extends BaseTitleFragment {
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
         mUserName = view.findViewById(R.id.tv_user_name);
         mNickName = view.findViewById(R.id.tv_nick_name);
-        mUserPubInfo = view.findViewById(R.id.tv_public_info);
+//        mUserPubInfo = view.findViewById(R.id.tv_public_info);
         mUserId = view.findViewById(R.id.tv_user_id);
         mQuitView = view.findViewById(R.id.tv_quit_app);
         mAppVersion = view.findViewById(R.id.tv_version_app);
@@ -159,6 +176,17 @@ public class MineFragment extends BaseTitleFragment {
         }
         LinearLayout container = view.findViewById(R.id.ll_mine_container);
 
+        // 账号管理
+        mAccountManger = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.setting_account_manager))
+                .setMarginTop(ScreenUtils.dp2px(10))
+                .setOnItemClickListener(v -> AccountListActivity.startAccountListActivity(getActivity()));
+        container.addView(mAccountManger.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 接受push
         mSettingPush = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.receive_push_notice))
@@ -170,14 +198,18 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(mSettingPush.build());
 
-        // 分割线
-//        ItemLine.Builder itemLine1 = new ItemLine.Builder(getActivity(), container)
-//                .setMarginLeft(ScreenUtils.dp2px(15));
-//        container.addView(itemLine1.build(), 1);
+        mInAppNotification = new TextView(getActivity());
+        mInAppNotification.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(5),
+                ScreenUtils.dp2px(15), ScreenUtils.dp2px(5));
+        mInAppNotification.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        mInAppNotification.setTextColor(getResources().getColor(R.color.color_black));
+        mInAppNotification.setText(getString(R.string.inapp_notification));
+        container.addView(mInAppNotification);
 
         // 声音
         mPushSound = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.push_sound))
+                .setMarginTop(1)
                 .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
                     @Override
                     public void onItemSwitch(View v, boolean curCheck) {
@@ -185,6 +217,10 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(mPushSoundView = mPushSound.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 振动
         mPushVibrate = new ItemLineSwitch.Builder(getActivity())
@@ -200,6 +236,7 @@ public class MineFragment extends BaseTitleFragment {
         // 是否推送详情
         mPushDetail = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.push_detail))
+                .setMarginTop(ScreenUtils.dp2px(20))
                 .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
                     @Override
                     public void onItemSwitch(View v, boolean curCheck) {
@@ -207,6 +244,10 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(mPushDetail.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 推送昵称
         mPushName = new ItemLineArrow.Builder(getActivity())
@@ -219,6 +260,10 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(mPushName.build());
 
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 是否自动下载附件
         autoDownloadAttachment = new ItemLineSwitch.Builder(getActivity())
                 .setLeftText(getString(R.string.auto_download_attachment))
@@ -229,6 +274,10 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(autoDownloadAttachment.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 是否自动接收群邀请
         autoAcceptGroupInvite = new ItemLineSwitch.Builder(getActivity())
@@ -241,16 +290,9 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(autoAcceptGroupInvite.build());
 
-        // 黑名单列表
-        mBlockList = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.black_list))
-                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
-                    @Override
-                    public void onItemClick(View v) {
-                        BlockListActivity.startBlockActivity(getActivity());
-                    }
-                });
-        container.addView(mBlockList.build());
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
 
         // 是否多端提示
         otherDevTips = new ItemLineSwitch.Builder(getActivity())
@@ -263,6 +305,55 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(otherDevTips.build());
 
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
+        // 黑名单列表
+        mBlockList = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.black_list))
+                .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                        BlockListActivity.startBlockActivity(getActivity());
+                    }
+                });
+        container.addView(mBlockList.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
+        // 用户服务
+        mProtocolTerms = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.register_protocol2))
+                .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 1));
+        container.addView(mProtocolTerms.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
+        // 隐私政策
+        mProtocolPrivacy = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.register_protocol4))
+                .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 0));
+        container.addView(mProtocolPrivacy.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
+        // 语言
+        mLanguage = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.setting_language))
+                .setOnItemClickListener(v -> showSetAddFriendAuthMode());
+        container.addView(mLanguage.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 多设备列表
         mDeviceList = new ItemLineArrow.Builder(getActivity())
                 .setStartContent(getString(R.string.device_list))
@@ -274,8 +365,12 @@ public class MineFragment extends BaseTitleFragment {
                 });
         container.addView(mDeviceList.build());
 
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 微信解绑
-        mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent("解除微信绑定")
+        mUnBindWeChat = new ItemLineArrow.Builder(getActivity()).setStartContent(getString(R.string.unbind_wechat_account))
                 .setArrowVisible(false).setOnItemClickListener(v -> unBindWeChat());
         View viewBindWeChat = mUnBindWeChat.build();
         container.addView(viewBindWeChat);
@@ -287,30 +382,97 @@ public class MineFragment extends BaseTitleFragment {
                 .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
         container.addView(mAboutUs.build());
 
-        // 用户服务
-        mProtocolTerms = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.register_protocol2))
-                .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 1));
-        container.addView(mProtocolTerms.build());
-
-        // 隐私政策
-        mProtocolPrivacy = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.register_protocol4))
-                .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 0));
-        container.addView(mProtocolPrivacy.build());
-
-        // 账号管理
-        mAccountManger = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.setting_account_manager))
-                .setMarginTop(ScreenUtils.dp2px(10))
-                .setOnItemClickListener(v -> AccountListActivity.startAccountListActivity(getActivity()));
-        container.addView(mAccountManger.build(), 0);
-
 //        // 分割线
 //        ItemLine.Builder itemLine0 = new ItemLine.Builder(getActivity(), container)
 //                .setMarginLeft(ScreenUtils.dp2px(15));
 //        container.addView(itemLine0.build(), 1);
         return view;
+    }
+
+    private String getLanguage() {
+        Locale locale;
+        String language = SharePreferenceUtils.getInstance().getAppLanguage();
+        if (!language.isEmpty()){
+            return language;
+        }
+
+        //7.0以上和7.0以下获取系统语言方式
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locale = getResources().getConfiguration().getLocales().get(0);
+        } else {
+            locale = Locale.getDefault();
+        }
+        return locale.getLanguage();
+    }
+
+    /**
+     * 设置语言
+     */
+    private void showSetAddFriendAuthMode() {
+        final LinearLayout ll = new LinearLayout(getActivity());
+        ll.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        String[] array = new String[] {
+                getString(R.string.chinese),
+                getString(R.string.english)
+        };
+
+        int colorDef = getResources().getColor(R.color.color_black);
+        int colorSel = Color.RED;
+
+        String curLanguage = getString(R.string.chinese);
+        if (getLanguage().equals("en")) {
+            curLanguage = getString(R.string.english);
+        }
+
+        final String[] selectContent = new String[1];
+        for (final String s : array) {
+            final TextView tv = new TextView(getActivity());
+            tv.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                    ScreenUtils.dp2px(15));
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+            tv.setTextColor(s.equals(curLanguage) ? colorSel : colorDef);
+            tv.setBackgroundColor(getResources().getColor(R.color.color_white));
+            tv.setText(s);
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectContent[0] = s;
+                    for (int i = 0; i < ll.getChildCount(); i++) {
+                        TextView select = (TextView)ll.getChildAt(i);
+                        if (TextUtils.equals(select.getText().toString(), s)) {
+                            select.setTextColor(Color.RED);
+                        } else {
+                            select.setTextColor(getResources().getColor(R.color.color_black));
+                        }
+                    }
+                }
+            });
+            ll.addView(tv, params);
+        }
+        DialogUtils.getInstance().showCustomDialog(getActivity(), ll,
+                getString(R.string.language_setting), getString(R.string.confirm),
+                getString(R.string.cancel), new CommonCustomDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        String sel = selectContent[0];
+                        String language = "zh";
+                        if (sel.equals(getString(R.string.english))) {
+                            language = "en";
+                        }
+                        SharePreferenceUtils.getInstance().putAppLanguage(language);
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
     }
 
     @Override
@@ -371,15 +533,22 @@ public class MineFragment extends BaseTitleFragment {
     }
 
     private void initUser(BMXUserProfile profile) {
+
         String name = profile.username();
+        if (name.length() > MAX_NAME_LENGTH){
+            name = name.substring(0,MAX_NAME_LENGTH) + "...";
+        }
         String nickName = profile.nickname();
-        String publicInfo = profile.publicInfo();
+        if (nickName.length() > MAX_NICKNAME_LENGTH){
+            nickName = nickName.substring(0,MAX_NICKNAME_LENGTH) + "...";
+        }
+//        String publicInfo = profile.publicInfo();
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
         long userId = profile.userId();
-        mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
-        mNickName.setText("昵称:" + (TextUtils.isEmpty(nickName) ? "请设置昵称" : nickName));
+        mUserName.setText(TextUtils.isEmpty(name) ? "" : getString(R.string.username_colon)+ name);
+        mNickName.setText(TextUtils.isEmpty(nickName) ? getString(R.string.please_set_a_nickname) : nickName);
         mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
-        mUserPubInfo.setText("个性签名:" + (TextUtils.isEmpty(publicInfo) ? "赶快去设置签名吧" : publicInfo));
+//        mUserPubInfo.setText(getString(R.string.personalized_signature) + (TextUtils.isEmpty(publicInfo) ? getString(R.string.welcome_to_set_your_signature) : publicInfo));
         // push
         BMXUserProfile.MessageSetting setting = profile.messageSetting();
         boolean isPush = setting != null && setting.getMPushEnabled();
@@ -600,13 +769,13 @@ public class MineFragment extends BaseTitleFragment {
                     @Override
                     public void onResponse(Boolean result) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt(result != null && result ? "解除成功" : "解除失败");
+                        ToastUtil.showTextViewPrompt(result != null && result ? getString(R.string.dismissed_successfully) : getString(R.string.failed_to_dismiss));
                     }
 
                     @Override
                     public void onFailure(int errorCode, String errorMsg, Throwable t) {
                         dismissLoadingDialog();
-                        ToastUtil.showTextViewPrompt("解除失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.failed_to_dismiss));
                     }
                 });
 
@@ -615,18 +784,18 @@ public class MineFragment extends BaseTitleFragment {
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
                 dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt("解除失败");
+                ToastUtil.showTextViewPrompt(getString(R.string.failed_to_dismiss));
             }
         });
     }
 
     private void toastError(Throwable e) {
-        String error = e != null ? e.getMessage() : "网络异常";
+        String error = e != null ? e.getMessage() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 
     private void toastError(BMXErrorCode e) {
-        String error = e != null ? e.name() : "网络异常";
+        String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 }

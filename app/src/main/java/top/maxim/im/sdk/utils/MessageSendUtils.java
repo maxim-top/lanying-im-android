@@ -1,6 +1,7 @@
 
 package top.maxim.im.sdk.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import java.util.Map;
@@ -46,9 +47,9 @@ public final class MessageSendUtils {
      * @param text 文本
      * @return BMXMessage
      */
-    public BMXMessage sendTextMessage(BMXMessage.MessageType type, long from, long to,
+    public BMXMessage sendTextMessage(Context context, BMXMessage.MessageType type, long from, long to,
             String text) {
-        return sendTextMessage(type, from, to, text, null, null);
+        return sendTextMessage(context, type, from, to, text, null, null);
     }
 
     /**
@@ -60,8 +61,8 @@ public final class MessageSendUtils {
      * @param text 文本
      * @return BMXMessage
      */
-    public BMXMessage sendTextMessage(BMXMessage.MessageType type, long from, long to, String text,
-            Map<String, String> atMap, String senderName) {
+    public BMXMessage sendTextMessage(Context context, BMXMessage.MessageType type, long from, long to, String text,
+                                      Map<String, String> atMap, String senderName) {
         BMXMessage msg = BMXMessage.createMessage(from, to, type, to, text);
         if (msg == null) {
             return null;
@@ -70,7 +71,7 @@ public final class MessageSendUtils {
         if (atMap != null && !atMap.isEmpty()) {
             BMXMessageConfig config = BMXMessageConfig.createMessageConfig(false);
             config.setSenderNickname(senderName);
-            config.setPushMessage(ChatUtils.getInstance().getMessageDesc(msg));
+            config.setPushMessage(ChatUtils.getInstance().getMessageDesc(context, msg));
             // @对象的存储信息 包括全部成员或者部分成员
             if (atMap.containsKey("-1")) {
                 // @全部

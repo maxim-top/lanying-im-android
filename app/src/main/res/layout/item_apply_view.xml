@@ -36,7 +36,7 @@
                 android:background="@color/color_0079F4"
                 android:textColor="@color/color_white"
                 android:padding="@dimen/dimen_10"
-                android:text="处理" />
+                android:text="@string/process" />
 
             <TextView
                 android:id="@+id/apply_status"
@@ -50,7 +50,6 @@
                 android:textSize="@dimen/dimen_16" />
 
         </FrameLayout>
-
 
         <LinearLayout
             android:id="@+id/ll_apply"

@@ -102,7 +102,7 @@ public class GroupSearchActivity extends BaseTitleActivity {
         if (Pattern.matches("[0-9]+", search)) {
             showLoadingDialog(true);
             // 纯数字
-            GroupManager.getInstance().getGroupList(Long.valueOf(search), true,
+            GroupManager.getInstance().getGroupInfo(Long.valueOf(search), true,
                     (bmxErrorCode, bmxGroup) -> {
                         dismissLoadingDialog();
                         if (BaseManager.bmxFinish(bmxErrorCode)) {

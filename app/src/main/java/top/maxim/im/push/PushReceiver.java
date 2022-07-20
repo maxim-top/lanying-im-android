@@ -81,7 +81,7 @@ public class PushReceiver extends BroadcastReceiver {
                                             isPushDetail);
                                 });
                     } else if (type == BMXMessage.MessageType.Group) {
-                        GroupManager.getInstance().getGroupList(bean.getChatId(), false,
+                        GroupManager.getInstance().getGroupInfo(bean.getChatId(), false,
                                 (bmxErrorCode1, groupItem) -> {
                                     if (groupItem == null
                                             || groupItem.msgMuteMode() != null && groupItem

@@ -103,13 +103,13 @@ public class GroupQrcodeDetailActivity extends BaseTitleActivity {
             return;
         }
         showLoadingDialog(true);
-        GroupManager.getInstance().getGroupList(mGroupId, true, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupInfo(mGroupId, true, (bmxErrorCode, bmxGroup) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 RosterFetcher.getFetcher().putGroup(bmxGroup);
                 bindGroup(bmxGroup);
             } else {
-                GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode1, bmxGroup1) -> {
+                GroupManager.getInstance().getGroupInfo(mGroupId, false, (bmxErrorCode1, bmxGroup1) -> {
                     bindGroup(bmxGroup1);
                 });
             }

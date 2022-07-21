@@ -63,7 +63,7 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
         if (chatId <= 0) {
             return;
         }
-        GroupManager.getInstance().getGroupList(chatId, true, (bmxErrorCode, group) -> {
+        GroupManager.getInstance().getGroupInfo(chatId, true, (bmxErrorCode, group) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (group.groupType() == BMXGroup.GroupType.Chatroom) {
                     //如果是聊天室  需要判断自己是否在群内  不在需要弹出提示框 再次手动入群

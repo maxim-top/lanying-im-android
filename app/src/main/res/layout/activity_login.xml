@@ -72,7 +72,7 @@
             android:background="@null"
             android:gravity="center_vertical"
             android:hint="@string/login_user_name_hint"
-            android:inputType="textVisiblePassword"
+            android:inputType="text"
             android:maxLines="1"
             android:textColorHint="@color/color_666666"
             android:textSize="@dimen/dimen_14" />

@@ -2,6 +2,7 @@
 package top.maxim.im.message.view;
 
 import android.content.Intent;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
@@ -153,6 +154,12 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
     public void onStart() {
         super.onStart();
         loadSession();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadSession();
+            }
+        }, 2000);
     }
 
     private void loadSession() {

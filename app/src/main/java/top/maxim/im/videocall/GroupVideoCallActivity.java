@@ -187,7 +187,7 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
         mEngine.addRTCEngineListener(mListener = new BMXRTCEngineListener() {
 
             @Override
-            public void onJoinRoom(String info, String roomId, BMXErrorCode error) {
+            public void onJoinRoom(String info, long roomId, BMXErrorCode error) {
                 super.onJoinRoom(info, roomId, error);
                 if (BaseManager.bmxFinish(error)) {
                     mEngine.publish(BMXVideoMediaType.Camera, mHasVideo, true);
@@ -198,7 +198,7 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
             }
 
             @Override
-            public void onLeaveRoom(String info, String roomId, BMXErrorCode error, String reason) {
+            public void onLeaveRoom(String info, long roomId, BMXErrorCode error, String reason) {
                 super.onLeaveRoom(info, roomId, error, reason);
                 if (BaseManager.bmxFinish(error)) {
                     Log.e(TAG, "离开房间成功 roomId= " + roomId + "msg = " + reason);
@@ -208,18 +208,18 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
             }
 
             @Override
-            public void onReJoinRoom(String info, String roomId, BMXErrorCode error) {
+            public void onReJoinRoom(String info, long roomId, BMXErrorCode error) {
                 super.onReJoinRoom(info, roomId, error);
             }
 
             @Override
-            public void onMemberJoined(String roomId, long usedId) {
+            public void onMemberJoined(long roomId, long usedId) {
                 super.onMemberJoined(roomId, usedId);
                 Log.e(TAG, "远端用户加入 uid= " + usedId);
             }
 
             @Override
-            public void onMemberExited(String roomId, long usedId, String reason) {
+            public void onMemberExited(long roomId, long usedId, String reason) {
                 super.onMemberExited(roomId, usedId, reason);
                 Log.e(TAG, "远端用户离开 uid= " + usedId);
                 onRemoteLeave();
@@ -532,7 +532,7 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
     private void joinRoom() {
         BMXRoomAuth auth = new BMXRoomAuth();
         auth.setMUserId(mUserId);
-        auth.setMRoomId(mRoomId);
+        auth.setMRoomId(Long.parseLong(mRoomId));
         mEngine.joinRoom(auth);
     }
 

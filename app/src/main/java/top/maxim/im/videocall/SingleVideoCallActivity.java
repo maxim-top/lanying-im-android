@@ -119,27 +119,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         public void onReceive(BMXMessageList list) {
             super.onReceive(list);
             // 收到消息
-            //切换主线程
-            Observable.just("").subscribeOn(Schedulers.computation()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Subscriber<String>() {
-                        @Override
-                        public void onCompleted() {
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                        }
-
-                        @Override
-                        public void onNext(String s) {
-                            if (list != null && !list.isEmpty()) {
-                                for (int i = 0; i < list.size(); i++) {
-                                    BMXMessage message = list.get(i);
-                                    handleRTCMessage(message);
-                                }
-                            }
-                        }
-                    });
+            if (list != null && !list.isEmpty()) {
+                for (int i = 0; i < list.size(); i++) {
+                    BMXMessage message = list.get(i);
+                    handleRTCMessage(message);
+                }
+            }
         }
     };
 

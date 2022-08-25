@@ -32,7 +32,7 @@ public class BaseManager {
      * 配置环境
      */
     public static void initBMXSDK() {
-        String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
+        String appPath = AppContextUtils.getAppContext().getExternalFilesDir(null).getPath();
         File dataPath = new File(appPath + "/data_dir");
         File cachePath = new File(appPath + "/cache_dir");
         dataPath.mkdirs();

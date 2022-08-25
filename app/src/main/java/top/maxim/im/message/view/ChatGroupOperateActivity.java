@@ -240,7 +240,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
 
     private void initGroupInfo(final boolean syncMember) {
         showLoadingDialog(true);
-        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupInfo(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 if (bmxGroup != null) {

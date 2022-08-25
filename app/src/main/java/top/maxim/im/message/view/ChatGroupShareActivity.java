@@ -248,7 +248,7 @@ public class ChatGroupShareActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        GroupManager.getInstance().getGroupList(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupInfo(mGroupId, false, (bmxErrorCode, bmxGroup) -> {
             if (bmxGroup != null) {
                 mGroup = bmxGroup;
             }

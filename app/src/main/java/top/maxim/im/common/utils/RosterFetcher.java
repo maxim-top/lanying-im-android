@@ -100,7 +100,7 @@ public class RosterFetcher {
             putGroup(item);
             return item;
         }
-        GroupManager.getInstance().getGroupList(groupId, true, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupInfo(groupId, true, (bmxErrorCode, bmxGroup) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 putGroup(bmxGroup);
             }

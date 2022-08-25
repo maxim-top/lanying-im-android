@@ -61,8 +61,8 @@ public class GroupManager extends BaseManager {
     /**
      * 获取群信息
      **/
-    public void getGroupList(long groupId, boolean forceUpdate, BMXDataCallBack<BMXGroup> callBack) {
-        mService.getGroupList(groupId, forceUpdate, callBack);
+    public void getGroupInfo(long groupId, boolean forceUpdate, BMXDataCallBack<BMXGroup> callBack) {
+        mService.getGroupInfo(groupId, forceUpdate, callBack);
     }
 
     /**

@@ -101,7 +101,7 @@ public class GroupApplyActivity extends BaseTitleActivity {
 
     @Override
     protected void initDataForActivity() {
-        GroupManager.getInstance().getGroupList(mGroupId, true, (bmxErrorCode, bmxGroup) -> {
+        GroupManager.getInstance().getGroupInfo(mGroupId, true, (bmxErrorCode, bmxGroup) -> {
             if (bmxGroup != null) {
                 mGroup = bmxGroup;
             }

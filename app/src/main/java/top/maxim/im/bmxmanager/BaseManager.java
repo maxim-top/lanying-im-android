@@ -95,10 +95,21 @@ public class BaseManager {
         if (bmxClient == null || bmxClient.getSDKConfig() == null) {
             return;
         }
+        //Same config of dns enabled
+        if (bmxClient.getSDKConfig().getEnableDNS() && (TextUtils.isEmpty(server) || port <= 0 || TextUtils.isEmpty(restServer))){
+            return;
+        }
         BMXSDKConfig conf  = bmxClient.getSDKConfig();
+        BMXSDKConfig.HostConfig hostConfig = conf.getHostConfig();
+        //Same config of dns disabled
+        if (!bmxClient.getSDKConfig().getEnableDNS() &&
+                hostConfig.getImHost().equals(server) &&
+                hostConfig.getImPort() == port &&
+                hostConfig.getRestHost().equals(restServer)){
+            return;
+        }
         if (!TextUtils.isEmpty(server) && port > 0 && !TextUtils.isEmpty(restServer)) {
             // 三项数据都不为空才设置
-            BMXSDKConfig.HostConfig hostConfig = conf.getHostConfig();
             hostConfig.setImHost(server);
             hostConfig.setImPort(port);
             hostConfig.setRestHost(restServer);

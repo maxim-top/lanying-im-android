@@ -237,12 +237,12 @@
     <string name="push_receiver_rec_msg_count">您收到了%1$s条消息</string>
 
 
-    <string name="about_us_desc">一键启用多云架构的即时通讯云服务</string>
+    <string name="about_us_desc">构建新一代智能聊天APP\n用蓝莺IM专业SDK！</string>
     <string name="about_us_net_pre">官网&#8194;&#8194;</string>
     <string name="about_us_net">https://www.lanyingim.com</string>
     <string name="about_us_phone_pre">联系商务&#8194;&#8194;</string>
     <string name="about_us_phone">400-666-0162</string>
-    <string name="about_us_company">© 2022 美信拓扑</string>
+    <string name="about_us_company">© 2023 美信拓扑</string>
 
 
     <string name="common_empty">这里什么都没有～</string>
@@ -395,7 +395,7 @@
     <string name="not_available_for_now">暂不使用</string>
     <string name="display_name">展示名称</string>
     <string name="photo_capture_failed">照片拍摄失败</string>
-    <string name="support">支持</string>
+    <string name="support">客服</string>
     <string name="recent_announcement">最近公告</string>
     <string name="avatar">头像</string>
     <string name="switch_search_mode">切换搜索模式</string>

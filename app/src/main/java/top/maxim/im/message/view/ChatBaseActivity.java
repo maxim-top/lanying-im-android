@@ -84,7 +84,11 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
                 finish();
             }
         });
-        builder.setRightIcon(R.drawable.icon_more, new View.OnClickListener() {
+        int resId = -1;
+        if (mChatId > 0){
+            resId = R.drawable.icon_more;
+        }
+        builder.setRightIcon(resId, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onHeaderRightClick();
@@ -176,6 +180,9 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
 
     @Override
     protected void setViewListener() {
+        if (mChatId == 0){
+            mInputBar.setVisibility(View.GONE);
+        }
         mChatViewGroup.setInterceptTouchListener(new ChatViewGroup.InterceptTouchListener() {
             @Override
             public boolean setInterceptTouchListener(MotionEvent ev) {

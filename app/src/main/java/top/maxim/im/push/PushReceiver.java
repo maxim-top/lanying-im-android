@@ -65,7 +65,7 @@ public class PushReceiver extends BroadcastReceiver {
                         // 查询单聊免打扰
                         RosterManager.getInstance().getRosterList(bean.getChatId(), false,
                                 (bmxErrorCode1, rosterItem) -> {
-                                    if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                                    if (!BaseManager.bmxFinish(bmxErrorCode1)) {
                                         return;
                                     }
                                     if (rosterItem == null || rosterItem.isMuteNotification()) {

@@ -226,28 +226,28 @@ public class ChatUtils {
         if (imageView == null) {
             return;
         }
+        String avatarUrl = "";
         if (rosterItem == null) {
             mViewCache.remove(imageView.hashCode());
-            BMImageLoader.getInstance().display(imageView, "", config);
-            return;
-        }
-        // 对需要展示的view加入缓存 防止在页面频繁刷新 view复用的时候展示错乱
-        String avatarUrl = "";
-        // 新增直接展示头像地址 不需下载
-        if (!TextUtils.isEmpty(rosterItem.avatarThumbnailUrl())) {
-            avatarUrl = rosterItem.avatarThumbnailUrl();
-        } else if (!TextUtils.isEmpty(rosterItem.avatarUrl())) {
-            avatarUrl = rosterItem.avatarUrl();
-        } else if (!TextUtils.isEmpty(rosterItem.avatarThumbnailPath())
-                && new File(rosterItem.avatarThumbnailPath()).exists()
-                && new File(rosterItem.avatarThumbnailPath()).isFile()) {
-            avatarUrl = "file://" + rosterItem.avatarThumbnailPath();
-        } else if (!TextUtils.isEmpty(rosterItem.avatarPath())
-                && new File(rosterItem.avatarPath()).exists()
-                && new File(rosterItem.avatarPath()).isFile()) {
-            avatarUrl = "file://" + rosterItem.avatarPath();
+            avatarUrl = "drawable://" + R.drawable.bmx_icon;
         } else {
-            downloadUserAvatar(rosterItem, imageView, config);
+            // 对需要展示的view加入缓存 防止在页面频繁刷新 view复用的时候展示错乱
+            // 新增直接展示头像地址 不需下载
+            if (!TextUtils.isEmpty(rosterItem.avatarThumbnailUrl())) {
+                avatarUrl = rosterItem.avatarThumbnailUrl();
+            } else if (!TextUtils.isEmpty(rosterItem.avatarUrl())) {
+                avatarUrl = rosterItem.avatarUrl();
+            } else if (!TextUtils.isEmpty(rosterItem.avatarThumbnailPath())
+                    && new File(rosterItem.avatarThumbnailPath()).exists()
+                    && new File(rosterItem.avatarThumbnailPath()).isFile()) {
+                avatarUrl = "file://" + rosterItem.avatarThumbnailPath();
+            } else if (!TextUtils.isEmpty(rosterItem.avatarPath())
+                    && new File(rosterItem.avatarPath()).exists()
+                    && new File(rosterItem.avatarPath()).isFile()) {
+                avatarUrl = "file://" + rosterItem.avatarPath();
+            } else {
+                downloadUserAvatar(rosterItem, imageView, config);
+            }
         }
         BMImageLoader.getInstance().display(imageView, avatarUrl, config);
     }

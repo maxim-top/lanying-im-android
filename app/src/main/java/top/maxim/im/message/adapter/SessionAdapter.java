@@ -40,8 +40,11 @@ public class SessionAdapter extends RecyclerWithHFAdapter<BMXConversation> {
 
     private ImageRequestConfig mGroupConfig;
 
+    private Context mContext;
+
     public SessionAdapter(Context context) {
         super(context);
+        mContext = context;
         mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
                 .showImageForEmptyUri(R.drawable.default_avatar_icon)
                 .showImageOnFail(R.drawable.default_avatar_icon)
@@ -84,6 +87,9 @@ public class SessionAdapter extends RecyclerWithHFAdapter<BMXConversation> {
                 name = rosterItem.nickname();
             } else if (rosterItem != null) {
                 name = rosterItem.username();
+            }
+            if (item.conversationId() == 0){
+                name = mContext.getString(R.string.sys_msg);
             }
             ChatUtils.getInstance().showRosterAvatar(rosterItem, avatar, mConfig);
             isDisturb = rosterItem != null && rosterItem.isMuteNotification();

@@ -419,4 +419,5 @@
     <string name="protocol_privacy">https://www.lanyingim.com/en/privacy</string>
     <string name="protocol_terms">https://www.lanyingim.com/en/terms</string>
     <string name="username_colon">Username:</string>
+    <string name="sys_msg">System Notifications</string>
 </resources>

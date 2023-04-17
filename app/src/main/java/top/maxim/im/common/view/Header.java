@@ -160,6 +160,10 @@ public class Header {
         }
 
         public Builder setRightIcon(int resId, View.OnClickListener listener) {
+            if (resId == -1){
+                pHc.mRightIcon = null;
+                return this;
+            }
             ImageView rightIcon = new ImageView(mContext);
             rightIcon.setImageResource(resId);
             rightIcon.setOnClickListener(listener);

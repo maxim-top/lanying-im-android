@@ -95,21 +95,13 @@ public class WelcomeActivity extends BaseTitleActivity {
 
     private void initPermission(){
         NotificationUtils.getInstance().cancelAll();
-        if (checkPermission()) {
-            showProtocol();
-        } else {
-            requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
-        }
+        showProtocol();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         initPermission();
-    }
-
-    private boolean checkPermission() {
-        return hasPermission(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
     }
 
     private void initJump() {

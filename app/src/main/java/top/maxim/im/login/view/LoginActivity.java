@@ -39,6 +39,7 @@ import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.login.bean.DNSConfigEvent;
 import top.maxim.im.net.HttpResponseCallback;
@@ -128,6 +129,10 @@ public class LoginActivity extends BaseTitleActivity {
         return view;
     }
 
+    private boolean checkPermission() {
+        return hasPermission(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+    }
+
     @Override
     protected void setViewListener() {
         // 注册
@@ -138,6 +143,9 @@ public class LoginActivity extends BaseTitleActivity {
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
+            if (!checkPermission()) {
+                requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+            }
             login(this, name, pwd, mLoginByUserId, mChangeAppId);
         });
         // 微信登录

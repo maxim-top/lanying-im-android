@@ -420,4 +420,6 @@
     <string name="protocol_terms">https://www.lanyingim.com/en/terms</string>
     <string name="username_colon">Username:</string>
     <string name="sys_msg">System Notifications</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_text">After deleting your account, all your data will be erased and cannot be restored. Are you sure you want to delete it?</string>
 </resources>

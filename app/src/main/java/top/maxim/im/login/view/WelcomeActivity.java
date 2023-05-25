@@ -167,46 +167,6 @@ public class WelcomeActivity extends BaseTitleActivity {
         mVideoSplash.setPrepareVideoPath(R.raw.splash_video);
     }
 
-    @Override
-    public void onPermissionGranted(List<String> permissions) {
-        super.onPermissionGranted(permissions);
-        if (permissions == null || permissions.size() == 0) {
-            return;
-        }
-        for (String permission : permissions) {
-            switch (permission) {
-                case PermissionsConstant.READ_STORAGE:
-                    // SD权限
-                    showProtocol();
-                    break;
-                case PermissionsConstant.WRITE_STORAGE:
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    @Override
-    public void onPermissionDenied(List<String> permissions) {
-        super.onPermissionDenied(permissions);
-        if (permissions == null || permissions.size() == 0) {
-            return;
-        }
-        for (String permission : permissions) {
-            switch (permission) {
-                case PermissionsConstant.READ_STORAGE:
-                    // 读写SD权限拒绝
-                    CommonProvider.openAppPermission(this);
-                    break;
-                case PermissionsConstant.WRITE_STORAGE:
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
     /**
      * 自动登陆
      */

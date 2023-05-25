@@ -26,6 +26,9 @@ public class PushManager extends BaseManager {
     }
 
     private PushManager() {
+        if (bmxClient == null){
+            initBMXSDK();
+        }
         mService = bmxClient.getPushManager();
     }
 

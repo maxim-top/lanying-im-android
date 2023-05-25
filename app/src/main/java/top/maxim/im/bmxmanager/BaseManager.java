@@ -173,6 +173,9 @@ public class BaseManager {
     }
 
     public static BMXClient getBMXClient() {
+        if (bmxClient == null){
+            initBMXSDK();
+        }
         return bmxClient;
     }
 }

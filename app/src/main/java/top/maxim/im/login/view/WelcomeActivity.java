@@ -89,8 +89,6 @@ public class WelcomeActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        //启动网络监听
-        ConnectivityReceiver.start(getApplication());
         //听云
         AgentTask.get().init(AppContextUtils.getApplication());
     }
@@ -115,6 +113,9 @@ public class WelcomeActivity extends BaseTitleActivity {
     }
 
     private void initJump() {
+        //启动网络监听
+        ConnectivityReceiver.start(getApplication());
+
         boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
         long userId = SharePreferenceUtils.getInstance().getUserId();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();

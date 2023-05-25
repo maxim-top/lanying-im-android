@@ -39,6 +39,9 @@ public class GroupManager extends BaseManager {
     }
 
     private GroupManager() {
+        if (bmxClient == null){
+            initBMXSDK();
+        }
         mService = bmxClient.getGroupManager();
         mGroupService = bmxClient.getGroupService();
     }

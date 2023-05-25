@@ -57,7 +57,6 @@ public class MaxIMApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initUtils();
-        initBMXSDK();
         Thread.setDefaultUncaughtExceptionHandler(restartHandler);
     }
 
@@ -94,12 +93,4 @@ public class MaxIMApplication extends Application {
                 .diskCache(new UnlimitedDiskCache(cacheDir)).build();
         ImageLoader.getInstance().init(config);
     }
-
-    /**
-     * 初始化sdk
-     */
-    private void initBMXSDK() {
-        BaseManager.initBMXSDK();
-    }
-
 }

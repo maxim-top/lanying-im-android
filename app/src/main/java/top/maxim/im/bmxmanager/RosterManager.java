@@ -31,6 +31,9 @@ public class RosterManager extends BaseManager {
     }
 
     private RosterManager() {
+        if (bmxClient == null){
+            initBMXSDK();
+        }
         mService = bmxClient.getRosterManager();
         mRosterService = bmxClient.getRosterService();
     }

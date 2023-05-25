@@ -19,6 +19,8 @@ import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import im.floo.BMXCallBack;
 import rx.Subscriber;
 import rx.Subscription;
@@ -32,6 +34,7 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.bean.UserBean;
+import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.CommonUtils;
@@ -134,6 +137,47 @@ public class LoginActivity extends BaseTitleActivity {
     }
 
     @Override
+    public void onPermissionGranted(List<String> permissions) {
+        super.onPermissionGranted(permissions);
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        for (String permission : permissions) {
+            switch (permission) {
+                case PermissionsConstant.READ_STORAGE:
+                    String name = mInputName.getText().toString().trim();
+                    String pwd = mInputPwd.getText().toString().trim();
+                    login(this, name, pwd, mLoginByUserId, mChangeAppId);
+                    break;
+                case PermissionsConstant.WRITE_STORAGE:
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onPermissionDenied(List<String> permissions) {
+        super.onPermissionDenied(permissions);
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        for (String permission : permissions) {
+            switch (permission) {
+                case PermissionsConstant.READ_STORAGE:
+                    // 读写SD权限拒绝
+                    CommonProvider.openAppPermission(this);
+                    break;
+                case PermissionsConstant.WRITE_STORAGE:
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    @Override
     protected void setViewListener() {
         // 注册
         mRegister.setOnClickListener(v -> RegisterActivity.openRegister(LoginActivity.this));
@@ -145,8 +189,9 @@ public class LoginActivity extends BaseTitleActivity {
             String pwd = mInputPwd.getText().toString().trim();
             if (!checkPermission()) {
                 requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+            }else{
+                login(this, name, pwd, mLoginByUserId, mChangeAppId);
             }
-            login(this, name, pwd, mLoginByUserId, mChangeAppId);
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {

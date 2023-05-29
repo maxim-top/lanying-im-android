@@ -28,6 +28,9 @@ public class ChatManager extends BaseManager {
     }
 
     private ChatManager() {
+        if (bmxClient == null){
+            initBMXSDK();
+        }
         mService = bmxClient.getChatManager();
     }
 

@@ -55,7 +55,7 @@ public class PanelFuncView implements IPanel {
         location.resId = R.drawable.panel_normal_location;
         items.add(location);
         FuncItem videoCall = new FuncItem();
-        videoCall.text = "视频通话";
+        videoCall.text = mContext.getString(R.string.call_video);
         videoCall.resId = R.drawable.panel_normal_video;
         items.add(videoCall);
     }

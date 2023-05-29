@@ -561,7 +561,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         SNAP,
         VIDEO,
         FILE,
-        LOCATION
+        LOCATION,
+        CALL
     }
 
     @Override
@@ -577,6 +578,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             type = LOCATION;
         }else if (functionType.equals(mView.getContext().getString(R.string.photo_album))){
             type = PHOTOS;
+        }else if (functionType.equals(mView.getContext().getString(R.string.call_video))){
+            type = CALL;
         }
         switch (type) {
             case PHOTOS:
@@ -628,7 +631,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     }
                 }
                 break;
-            case "视频通话":
+            case CALL:
                 showVideoCallDialog();
                 break;
             default:

@@ -420,4 +420,6 @@
     <string name="protocol_terms">https://www.lanyingim.com/terms</string>
     <string name="username_colon">用户名：</string>
     <string name="sys_msg">系统通知</string>
+    <string name="delete_account">删除账号</string>
+    <string name="delete_account_text">账号删除后，您的所有数据都将擦除，不可恢复。确定要删除吗？</string>
 </resources>

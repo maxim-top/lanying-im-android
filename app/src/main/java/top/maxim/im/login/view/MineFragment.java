@@ -51,7 +51,9 @@ import top.maxim.im.net.HttpResponseCallback;
  */
 public class MineFragment extends BaseTitleFragment {
 
-    public static final int MAX_NAME_LENGTH = 16;
+    public static final int MAX_NAME_LENGTH = 25;
+    public static final int MAX_NICKNAME_LENGTH = 12;
+
     private FlexibleLayout mFlexibleLayout;
 
     private ScrollView mScrollView;
@@ -68,7 +70,7 @@ public class MineFragment extends BaseTitleFragment {
 
     private TextView mNickName;
 
-    private TextView mUserPubInfo;
+//    private TextView mUserPubInfo;
 
     /* 退出登录 */
     private TextView mQuitView;
@@ -157,7 +159,7 @@ public class MineFragment extends BaseTitleFragment {
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
         mUserName = view.findViewById(R.id.tv_user_name);
         mNickName = view.findViewById(R.id.tv_nick_name);
-        mUserPubInfo = view.findViewById(R.id.tv_public_info);
+//        mUserPubInfo = view.findViewById(R.id.tv_public_info);
         mUserId = view.findViewById(R.id.tv_user_id);
         mQuitView = view.findViewById(R.id.tv_quit_app);
         mAppVersion = view.findViewById(R.id.tv_version_app);
@@ -537,13 +539,16 @@ public class MineFragment extends BaseTitleFragment {
             name = name.substring(0,MAX_NAME_LENGTH) + "...";
         }
         String nickName = profile.nickname();
-        String publicInfo = profile.publicInfo();
+        if (nickName.length() > MAX_NICKNAME_LENGTH){
+            nickName = nickName.substring(0,MAX_NICKNAME_LENGTH) + "...";
+        }
+//        String publicInfo = profile.publicInfo();
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
         long userId = profile.userId();
-        mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
-        mNickName.setText(getString(R.string.nickname_colon) + (TextUtils.isEmpty(nickName) ? getString(R.string.please_set_a_nickname) : nickName));
+        mUserName.setText(TextUtils.isEmpty(name) ? "" : getString(R.string.username_colon)+ name);
+        mNickName.setText(TextUtils.isEmpty(nickName) ? getString(R.string.please_set_a_nickname) : nickName);
         mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
-        mUserPubInfo.setText(getString(R.string.personalized_signature) + (TextUtils.isEmpty(publicInfo) ? getString(R.string.welcome_to_set_your_signature) : publicInfo));
+//        mUserPubInfo.setText(getString(R.string.personalized_signature) + (TextUtils.isEmpty(publicInfo) ? getString(R.string.welcome_to_set_your_signature) : publicInfo));
         // push
         BMXUserProfile.MessageSetting setting = profile.messageSetting();
         boolean isPush = setting != null && setting.getMPushEnabled();

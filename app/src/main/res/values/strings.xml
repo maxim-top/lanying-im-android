@@ -453,4 +453,5 @@
     <string name="inapp_notification">应用内通知</string>
     <string name="protocol_privacy">https://www.lanyingim.com/privacy</string>
     <string name="protocol_terms">https://www.lanyingim.com/terms</string>
+    <string name="username_colon">用户名：</string>
 </resources>

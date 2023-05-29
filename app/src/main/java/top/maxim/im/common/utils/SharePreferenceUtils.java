@@ -45,6 +45,8 @@ public class SharePreferenceUtils {
 
     private static String DNS_CONFIG = "dnsConfig";
 
+    private static String APP_LANGUAGE = "appLanguage";
+
     private static volatile SharePreferenceUtils instance;
 
     private static SharedPreferences.Editor saveEditor;
@@ -248,6 +250,18 @@ public class SharePreferenceUtils {
     public String getDnsConfig() {
         if (saveInfo != null) {
             return saveInfo.getString(DNS_CONFIG, "");
+        }
+        return "";
+    }
+
+    public boolean putAppLanguage(String val) {
+        saveEditor.putString(APP_LANGUAGE, val);
+        return saveEditor.commit();
+    }
+
+    public String getAppLanguage() {
+        if (saveInfo != null) {
+            return saveInfo.getString(APP_LANGUAGE, "");
         }
         return "";
     }

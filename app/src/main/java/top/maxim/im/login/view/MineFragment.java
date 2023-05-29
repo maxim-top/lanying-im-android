@@ -1,11 +1,14 @@
 
 package top.maxim.im.login.view;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,6 +21,7 @@ import com.gavin.view.flexible.FlexibleLayout;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
 import top.maxim.im.BuildConfig;
+import top.maxim.im.MainActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -27,6 +31,7 @@ import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
@@ -115,6 +120,9 @@ public class MineFragment extends BaseTitleFragment {
 
     /* 隐私政策 */
     private ItemLineArrow.Builder mProtocolPrivacy;
+
+    /* 语言 */
+    private ItemLineArrow.Builder mLanguage;
 
     /* app版本号 */
     private TextView mAppVersion;
@@ -281,12 +289,6 @@ public class MineFragment extends BaseTitleFragment {
         container.addView(viewBindWeChat);
         viewBindWeChat.setVisibility(View.GONE);
 
-        // 关于我们
-        mAboutUs = new ItemLineArrow.Builder(getActivity())
-                .setStartContent(getString(R.string.about_us))
-                .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
-        container.addView(mAboutUs.build());
-
         // 用户服务
         mProtocolTerms = new ItemLineArrow.Builder(getActivity())
                 .setStartContent(getString(R.string.register_protocol2))
@@ -299,6 +301,12 @@ public class MineFragment extends BaseTitleFragment {
                 .setOnItemClickListener(v -> ProtocolActivity.openProtocol(getActivity(), 0));
         container.addView(mProtocolPrivacy.build());
 
+        // 语言
+        mLanguage = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.setting_language))
+                .setOnItemClickListener(v -> showSetAddFriendAuthMode());
+        container.addView(mLanguage.build());
+
         // 账号管理
         mAccountManger = new ItemLineArrow.Builder(getActivity())
                 .setStartContent(getString(R.string.setting_account_manager))
@@ -306,11 +314,78 @@ public class MineFragment extends BaseTitleFragment {
                 .setOnItemClickListener(v -> AccountListActivity.startAccountListActivity(getActivity()));
         container.addView(mAccountManger.build(), 0);
 
+        // 关于我们
+        mAboutUs = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.about_us))
+                .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
+        container.addView(mAboutUs.build());
+
 //        // 分割线
 //        ItemLine.Builder itemLine0 = new ItemLine.Builder(getActivity(), container)
 //                .setMarginLeft(ScreenUtils.dp2px(15));
 //        container.addView(itemLine0.build(), 1);
         return view;
+    }
+
+    /**
+     * 设置语言
+     */
+    private void showSetAddFriendAuthMode() {
+        final LinearLayout ll = new LinearLayout(getActivity());
+        ll.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        String[] array = new String[] {
+                getString(R.string.chinese),
+                getString(R.string.english)
+        };
+        final String[] selectContent = new String[1];
+        for (final String s : array) {
+            final TextView tv = new TextView(getActivity());
+            tv.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                    ScreenUtils.dp2px(15));
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+            tv.setTextColor(getResources().getColor(R.color.color_black));
+            tv.setBackgroundColor(getResources().getColor(R.color.color_white));
+            tv.setText(s);
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectContent[0] = s;
+                    for (int i = 0; i < ll.getChildCount(); i++) {
+                        TextView select = (TextView)ll.getChildAt(i);
+                        if (TextUtils.equals(select.getText().toString(), s)) {
+                            select.setTextColor(Color.RED);
+                        } else {
+                            select.setTextColor(getResources().getColor(R.color.color_black));
+                        }
+                    }
+                }
+            });
+            ll.addView(tv, params);
+        }
+        DialogUtils.getInstance().showCustomDialog(getActivity(), ll,
+                getString(R.string.language_setting), getString(R.string.confirm),
+                getString(R.string.cancel), new CommonCustomDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        String sel = selectContent[0];
+                        String language = "zh";
+                        if (sel.equals(getString(R.string.english))) {
+                            language = "en";
+                        }
+                        SharePreferenceUtils.getInstance().putAppLanguage(language);
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
     }
 
     @Override

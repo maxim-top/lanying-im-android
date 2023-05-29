@@ -85,7 +85,7 @@ public class AboutUsActivity extends BaseTitleActivity {
     protected void initDataForActivity() {
         // 获取app版本
         String versionName = BuildConfig.VERSION_NAME;
-        mAppVersion.setText("MaxIM Version:" + versionName);
+        mAppVersion.setText("Lanying IM Version:" + versionName);
         BMXClient client = BaseManager.getBMXClient();
         String sdkVersion = "";
         if (client != null && client.getSDKConfig() != null

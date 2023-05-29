@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">美信拓扑IM</string>
+    <string name="app_name">蓝莺IM</string>
 
     <!--Tab-->
     <string name="tab_chat">对话</string>
@@ -7,8 +7,8 @@
     <string name="tab_mine">设置</string>
 
     <!--Chat-->
-    <string name="block_message">MaxIM</string>
-    <string name="recent_chat">美信拓扑</string>
+    <string name="block_message">LanyingIM</string>
+    <string name="recent_chat">蓝莺IM</string>
     <string name="group">群组</string>
     <string name="group_info">群详情(%s)</string>
     <string name="choose_group_member">选择群成员</string>
@@ -134,7 +134,7 @@
     <string name="register_protocol2">用户服务</string>
     <string name="register_protocol3">及</string>
     <string name="register_protocol4">隐私政策</string>
-    <string name="register_protocol_content1">欢迎使用美信拓扑!\n\n请您务必审慎阅读,充分理解"用户协议"和"隐私政策"各条款,包括但不限于:为了向您提供即时通讯、内容分享等服务,我们需要收集您的设备信息、操作日志等个人信息\n\n您可阅读</string>
+    <string name="register_protocol_content1">欢迎使用蓝莺IM!\n\n请您务必审慎阅读,充分理解"用户协议"和"隐私政策"各条款,包括但不限于:为了向您提供即时通讯、内容分享等服务,我们需要收集您的设备信息、操作日志等个人信息\n\n您可阅读</string>
     <string name="register_protocol_content2">了解详细信息。如您同意,请点击"同意"开始接受我们的服务。</string>
 
     <string name="verify_pwd_hint">输入登录密码</string>
@@ -243,7 +243,7 @@
     <string name="about_us_net">https://www.maximtop.com</string>
     <string name="about_us_phone_pre">联系商务&#8194;&#8194;</string>
     <string name="about_us_phone">400-666-0162</string>
-    <string name="about_us_company">copyright© 2019 美信拓扑</string>
+    <string name="about_us_company">copyright© 2022 美信拓扑</string>
 
 
     <string name="common_empty">这里什么都没有～</string>
@@ -445,4 +445,5 @@
     <string name="tap_snap_hold_video">轻点拍照，长按录像</string>
     <string name="input_message_keywords">请输入要搜索的聊天记录内容</string>
     <string name="input_message_content">请输入聊天内容</string>
+    <string name="record_tip">手指上移，取消发送</string>
 </resources>

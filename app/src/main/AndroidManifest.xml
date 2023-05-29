@@ -73,9 +73,9 @@
     <application
         android:name=".common.base.MaxIMApplication"
         android:allowBackup="true"
-        android:icon="@drawable/bmx_icon144"
+        android:icon="@drawable/bmx_icon"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/bmx_icon144"
+        android:roundIcon="@drawable/bmx_icon"
         android:supportsRtl="true"
         android:theme="@style/ActivityAnimation"
         android:usesCleartextTraffic="true"
@@ -653,7 +653,7 @@
      See README(https://goo.gl/l4GJaQ) for more. -->
 <!--        <meta-data-->
 <!--            android:name="com.google.firebase.messaging.default_notification_icon"-->
-<!--            android:resource="@drawable/bmx_icon144" />-->
+<!--            android:resource="@drawable/bmx_icon" />-->
 <!--        &lt;!&ndash; Set color used with incoming notification messages. This is used when no color is set for the incoming-->
 <!--             notification message. See README(https://goo.gl/6BKBk7) for more. &ndash;&gt;-->
 <!--        <meta-data-->

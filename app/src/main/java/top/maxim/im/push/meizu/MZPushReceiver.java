@@ -65,6 +65,6 @@ public class MZPushReceiver extends MzPushMessageReceiver {
 
     @Override
     public void onUpdateNotificationBuilder(PushNotificationBuilder pushNotificationBuilder) {
-        pushNotificationBuilder.setStatusBarIcon(R.drawable.bmx_icon144);
+        pushNotificationBuilder.setStatusBarIcon(R.drawable.bmx_icon);
     }
 }

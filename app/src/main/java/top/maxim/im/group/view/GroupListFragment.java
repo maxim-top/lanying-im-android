@@ -161,7 +161,7 @@ public class GroupListFragment extends BaseTitleFragment {
             } else {
                 if (list.size() > 0) {
                     // 空的错误不提示
-                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                     ToastUtil.showTextViewPrompt(error);
                 }
                 GroupManager.getInstance().getGroupList(false, (bmxErrorCode1, bmxGroupList) -> {
@@ -221,7 +221,7 @@ public class GroupListFragment extends BaseTitleFragment {
         ll.addView(editDesc, editP);
 
         // 公开
-        final ItemLineSwitch.Builder isPublic = new ItemLineSwitch.Builder(getActivity()).setLeftText("是否公开")
+        final ItemLineSwitch.Builder isPublic = new ItemLineSwitch.Builder(getActivity()).setLeftText(getString(R.string.public_or_not))
                 .setMarginTop(ScreenUtils.dp2px(15))
                 .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
                     @Override
@@ -271,7 +271,7 @@ public class GroupListFragment extends BaseTitleFragment {
     private void createGroup(ListOfLongLong members, String name, String desc,
             boolean publicCheckStatus) {
         if (TextUtils.isEmpty(name)) {
-            ToastUtil.showTextViewPrompt("群聊名称不能为空");
+            ToastUtil.showTextViewPrompt(getString(R.string.group_chat_name_cannot_be_empty));
             return;
         }
         BMXGroupService.CreateGroupOptions options = new BMXGroupService.CreateGroupOptions(name,
@@ -284,7 +284,7 @@ public class GroupListFragment extends BaseTitleFragment {
                 ChatBaseActivity.startChatActivity(getActivity(), BMXMessage.MessageType.Group,
                         group.groupId());
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "创建失败";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.failed_to_create);
                 ToastUtil.showTextViewPrompt(error);
             }
         });

@@ -106,7 +106,6 @@
     <string name="video_fail_check_permission">录制视频失败，请检查权限</string>
     <string name="location_fail_check_permission">定位失败，请检查权限</string>
     <string name="not_has_sd_permission">没有手机存储权限</string>
-    <string name="video_call_fail_check_permission">音视频会话失败，请检查权限</string>
 
     <!--登录-->
     <string name="login">登录</string>
@@ -275,40 +274,6 @@
     <string name="set_push_msg_receiver">接收者</string>
     <string name="set_push_msg_content">内容</string>
     <string name="set_push_message">推送消息</string>
-
-    <!-- 音视频会话-->
-    <string name="call_video">视频通话</string>
-    <string name="call_audio">语音通话</string>
-    <string name="call_waiting_peer_accept">正在等待对方接受邀请...</string>
-    <string name="call_invited_audio">邀请你加入语音聊天...</string>
-    <string name="call_switch_audio">切到语音通话</string>
-    <string name="call_switch_camera">切换摄像头</string>
-    <string name="call_open_camera">打开摄像头</string>
-    <string name="call_close_camera">关闭摄像头</string>
-    <string name="call_hangup">挂断</string>
-    <string name="call_mute">麦克风已关</string>
-    <string name="call_un_mute">麦克风已开</string>
-    <string name="call_open_hand_free">扬声器已开</string>
-    <string name="call_close_hand_free">扬声器已关</string>
-    <string name="call_reject">拒绝</string>
-    <string name="call_answer">接听</string>
-    <string name="call_cancel">取消</string>
-    <string name="call_peer_busy">对方忙线中</string>
-    <string name="call_peer_hangup">对方挂断，通话结束"</string>
-    <string name="call_peer_not_answer">对方无应答</string>
-    <string name="call_suggest_call_later">对方手机可能不在身边，建议稍后再次尝试</string>
-    <string name="call_invited_num_notice">还有%1s人参与聊天</string>
-    <string name="call_speaker_on_tips">声音将从扬声器播放</string>
-    <string name="call_speaker_off_tips">声音将从听筒播放</string>
-
-    <!-- 音视频会话设置-->
-    <string name="config_rtc">音视频设置</string>
-    <string name="config_rtc_video_profile">分辨率</string>
-    <string name="config_rtc_camera">摄像头</string>
-    <string name="config_rtc_mic">麦克风</string>
-    <string name="config_rtc_speaker">扬声器</string>
-    <string name="config_rtc_auto_publish">自动发布</string>
-    <string name="config_rtc_auto_subscribe">自动订阅</string>
 
     <string name="read">已读</string>
     <string name="unread">未读</string>

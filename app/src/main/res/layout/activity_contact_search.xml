@@ -11,7 +11,7 @@
         android:paddingLeft="@dimen/dimen_15"
         android:paddingTop="@dimen/dimen_10"
         android:paddingRight="@dimen/dimen_15"
-        android:text="切换搜索模式"
+        android:text="@string/switch_search_mode"
         android:textColor="#007aff"
         android:textSize="@dimen/dimen_14" />
 
@@ -35,7 +35,7 @@
             android:imeOptions="actionSearch"
             android:singleLine="true"
             android:paddingLeft="@dimen/dimen_10"
-            android:hint="输入要查找的好友用户名" />
+            android:hint="@string/input_username_searched" />
     </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView

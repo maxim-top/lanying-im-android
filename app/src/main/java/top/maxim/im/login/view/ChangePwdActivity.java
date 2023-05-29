@@ -107,7 +107,7 @@ public class ChangePwdActivity extends BaseTitleActivity {
         String inputAgainPwd = mEtAgainPwd.getText().toString().trim();
         if (!TextUtils.equals(inputPwd, inputAgainPwd)) {
             // 不相等
-            ToastUtil.showTextViewPrompt("两次输入密码不一致");
+            ToastUtil.showTextViewPrompt(getString(R.string.entered_passwords_differ));
             return;
         }
         showLoadingDialog(true);
@@ -123,7 +123,7 @@ public class ChangePwdActivity extends BaseTitleActivity {
                         if (result != null && result) {
                             finish();
                         } else {
-                            ToastUtil.showTextViewPrompt("修改密码失败");
+                            ToastUtil.showTextViewPrompt(getString(R.string.failed_to_change_password));
                         }
                     }
 
@@ -139,7 +139,7 @@ public class ChangePwdActivity extends BaseTitleActivity {
             @Override
             public void onFailure(int errorCode, String errorMsg, Throwable t) {
                 dismissLoadingDialog();
-                ToastUtil.showTextViewPrompt("修改密码失败");
+                ToastUtil.showTextViewPrompt(getString(R.string.failed_to_change_password));
             }
         });
     }

@@ -35,23 +35,23 @@ public class PanelFuncView implements IPanel {
     public PanelFuncView(Context context) {
         mContext = context;
         FuncItem photo = new FuncItem();
-        photo.text = "相册";
+        photo.text = mContext.getString(R.string.photo_album);
         photo.resId = R.drawable.panel_normal_picture;
         items.add(photo);
         FuncItem picture = new FuncItem();
-        picture.text = "拍照";
+        picture.text = context.getString(R.string.snap);
         picture.resId = R.drawable.panel_normal_camera;
         items.add(picture);
         FuncItem video = new FuncItem();
-        video.text = "视频";
+        video.text = context.getString(R.string.video);
         video.resId = R.drawable.panel_normal_video;
         items.add(video);
         FuncItem file = new FuncItem();
-        file.text = "文件";
+        file.text = mContext.getString(R.string.file);
         file.resId = R.drawable.panel_normal_file;
         items.add(file);
         FuncItem location = new FuncItem();
-        location.text = "位置";
+        location.text = mContext.getString(R.string.location);
         location.resId = R.drawable.panel_normal_location;
         items.add(location);
         FuncItem videoCall = new FuncItem();

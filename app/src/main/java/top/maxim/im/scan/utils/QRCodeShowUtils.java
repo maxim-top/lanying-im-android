@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+import top.maxim.im.R;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.ScreenUtils;
@@ -258,7 +259,7 @@ public class QRCodeShowUtils {
         File file = new File(getPath());
         if (!file.exists()) {
             if (!file.mkdirs()) {
-                ToastUtil.showTextViewPrompt("保存失败");
+                ToastUtil.showTextViewPrompt(context.getString(R.string.failed_to_save));
                 return;
             }
         }
@@ -288,7 +289,7 @@ public class QRCodeShowUtils {
                 bitmap.recycle();
             }
         }
-        ToastUtil.showTextViewPrompt("已保存到系统相册");
+        ToastUtil.showTextViewPrompt(context.getString(R.string.saved_to_system_album));
         // 最后通知图库更新
         context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
                 Uri.parse("file://" + fileName.getAbsolutePath())));

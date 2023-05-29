@@ -57,7 +57,7 @@ public class ScannerPresenter implements ScannerContract.Presenter {
             return;
         }
         if (result == null || TextUtils.isEmpty(result.getText())) {
-            mView.showDialog("未识别到二维码，请重试", mView.getContext().getString(R.string.confirm));
+            mView.showDialog(mView.getContext().getString(R.string.qr_code_not_recognized), mView.getContext().getString(R.string.confirm));
             return;
         }
         String str = result.getText();

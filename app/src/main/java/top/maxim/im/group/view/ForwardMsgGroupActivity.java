@@ -57,7 +57,7 @@ public class ForwardMsgGroupActivity extends BaseTitleActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setTitle("转发");
+        builder.setTitle(getString(R.string.chat_msg_relay));
         builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,7 +111,7 @@ public class ForwardMsgGroupActivity extends BaseTitleActivity {
         GroupManager.getInstance().getGroupList(false, (bmxErrorCode, list) -> {
             dismissLoadingDialog();
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                 ToastUtil.showTextViewPrompt(error);
             }
             List<BMXGroup> groupList = new ArrayList<>();

@@ -113,7 +113,7 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
     @Override
     public void bindData(BMXMessage maXMessage) {
         mMaxMessage = maXMessage;
-        mTxtMessageTime.setText(TimeUtils.millis2String(maXMessage.serverTimestamp()));
+        mTxtMessageTime.setText(TimeUtils.millis2String(mContext, maXMessage.serverTimestamp()));
         showHead();
         bindData();
         showReadStatus();
@@ -243,12 +243,12 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
             // 单聊
             mTvReadStatus.setVisibility(View.VISIBLE);
             boolean isRead = mMaxMessage.isReadAcked();
-            mTvReadStatus.setText(isRead ? "已读" : "未读");
+            mTvReadStatus.setText(isRead ? getResources().getString(R.string.read) : getResources().getString(R.string.unread));
         } else if (mMaxMessage.type() == BMXMessage.MessageType.Group) {
             // 群聊
             mTvReadStatus.setVisibility(mShowReadAck ? View.VISIBLE : View.GONE);
             int readCount = mMaxMessage.groupAckCount();
-            mTvReadStatus.setText(readCount > 0 ? readCount + "人已读" : "0人已读");
+            mTvReadStatus.setText(getResources().getString(R.string.read_persons) + (readCount > 0 ? readCount : 0));
         } else {
             mTvReadStatus.setVisibility(View.GONE);
         }

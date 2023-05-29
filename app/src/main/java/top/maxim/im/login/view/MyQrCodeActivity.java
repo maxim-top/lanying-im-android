@@ -83,7 +83,7 @@ public class MyQrCodeActivity extends BaseTitleActivity {
                 ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
                 long userId = profile.userId();
                 mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
-                mNickName.setText(TextUtils.isEmpty(nickName) ? "" : "昵称:" + nickName);
+                mNickName.setText(TextUtils.isEmpty(nickName) ? "" : getString(R.string.nickname_colon) + nickName);
                 mUserId.setText(userId <= 0 ? "" : "BMXID:" + userId);
             }
         });

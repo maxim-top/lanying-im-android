@@ -95,7 +95,7 @@ public class AllContactFragment extends BaseTitleFragment {
                 mSupportFragment = new SupportFragment()
         };
         mTabTitles = new String[] {
-                "好友", "群组", "支持"
+                getString(R.string.friend), getString(R.string.contact_group), getString(R.string.support)
         };
         PagerAdapter pagerAdapter = new MyViewPagerAdapter(getChildFragmentManager());
         mViewPager.setAdapter(pagerAdapter);
@@ -336,7 +336,7 @@ public class AllContactFragment extends BaseTitleFragment {
 
         // 公开
         final ItemLineSwitch.Builder isPublic = new ItemLineSwitch.Builder(getActivity())
-                .setLeftText("是否公开").setMarginTop(ScreenUtils.dp2px(15))
+                .setLeftText(getString(R.string.public_or_not)).setMarginTop(ScreenUtils.dp2px(15))
                 .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
                     @Override
                     public void onItemSwitch(View v, boolean curCheck) {
@@ -347,7 +347,7 @@ public class AllContactFragment extends BaseTitleFragment {
 
         // 聊天室
         final ItemLineSwitch.Builder isChatRoom = new ItemLineSwitch.Builder(getActivity())
-                .setLeftText("是否是聊天室").setMarginTop(ScreenUtils.dp2px(15))
+                .setLeftText(getString(R.string.chatroom_or_not)).setMarginTop(ScreenUtils.dp2px(15))
                 .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
                     @Override
                     public void onItemSwitch(View v, boolean curCheck) {
@@ -381,7 +381,7 @@ public class AllContactFragment extends BaseTitleFragment {
     private void createGroup(ListOfLongLong members, String name, String desc,
             boolean publicCheckStatus, boolean chatRoomCheckStatus) {
         if (TextUtils.isEmpty(name)) {
-            ToastUtil.showTextViewPrompt("群聊名称不能为空");
+            ToastUtil.showTextViewPrompt(getString(R.string.group_chat_name_cannot_be_empty));
             return;
         }
         BMXGroupService.CreateGroupOptions options = new BMXGroupService.CreateGroupOptions(name,
@@ -397,7 +397,7 @@ public class AllContactFragment extends BaseTitleFragment {
                 ChatBaseActivity.startChatActivity(getActivity(), BMXMessage.MessageType.Group,
                         group.groupId());
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "创建失败";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.failed_to_create);
                 ToastUtil.showTextViewPrompt(error);
             }
         });

@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import top.maxim.im.R;
+
 /**
  * Description : 语音播放帮助类 Created by Mango on 2018/11/18.
  */
@@ -122,7 +124,7 @@ public class VoicePlayHelper {
                             // 切换听筒时候 系统切换速度过慢导致语音开头不完整 所以延时1.5s开始播放
                             if (mIsRegisterSensor) {
                                 // 只有注册了传感器之后在播放 防止在后台播放
-                                startVoice(mVoicePath);
+                                startVoice((Context) handler.getActivity().get(), mVoicePath);
                             }
                         }
                     }, 1500);
@@ -184,7 +186,7 @@ public class VoicePlayHelper {
      *
      * @param voicePath 语音文件路径
      */
-    public void startVoice(String voicePath) {
+    public void startVoice(Context context, String voicePath) {
         // 切换播放模式
         changePlayMode(mIsPhoneMode);
         mVoicePath = voicePath;
@@ -227,7 +229,7 @@ public class VoicePlayHelper {
                         }
                     }
                 } else {
-                    ToastUtil.showTextViewPrompt("语音不存在!");
+                    ToastUtil.showTextViewPrompt(context.getString(R.string.voice_not_exist));
                     // 语音不存在 返回播放完成
                     stopVoice();
                     if (onVoiceFinishListener != null) {

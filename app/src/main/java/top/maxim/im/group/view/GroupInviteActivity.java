@@ -119,7 +119,7 @@ public class GroupInviteActivity extends BaseTitleActivity {
                                             mEmptyView.setVisibility(View.VISIBLE);
                                         }
                                         if (!BaseManager.bmxFinish(bmxErrorCode1)) {
-                                            String error = bmxErrorCode1 == null ? "网络错误"
+                                            String error = bmxErrorCode1 == null ? getString(R.string.network_error)
                                                     : bmxErrorCode1.name();
                                             ToastUtil.showTextViewPrompt(error);
                                             mRecycler.setVisibility(View.GONE);
@@ -128,7 +128,7 @@ public class GroupInviteActivity extends BaseTitleActivity {
                                     });
                         }
                     } else {
-                        String error = bmxErrorCode == null ? "网络错误" : bmxErrorCode.name();
+                        String error = bmxErrorCode == null ? getString(R.string.network_error) : bmxErrorCode.name();
                         ToastUtil.showTextViewPrompt(error);
                         mRecycler.setVisibility(View.GONE);
                         mEmptyView.setVisibility(View.VISIBLE);
@@ -187,12 +187,12 @@ public class GroupInviteActivity extends BaseTitleActivity {
             String statusDesc = "";
             if (inviteStatus != null) {
                 if (inviteStatus == BMXGroup.InvitationStatus.Accepted) {
-                    statusDesc = "已添加";
+                    statusDesc = getString(R.string.added);
                     accept.setVisibility(View.INVISIBLE);
                 } else if (inviteStatus == BMXGroup.InvitationStatus.Pending) {
                     accept.setVisibility(View.VISIBLE);
                 } else if (inviteStatus == BMXGroup.InvitationStatus.Declined) {
-                    statusDesc = "已拒绝";
+                    statusDesc = getString(R.string.remove);
                     accept.setVisibility(View.INVISIBLE);
                 } else {
                     accept.setVisibility(View.INVISIBLE);
@@ -222,7 +222,7 @@ public class GroupInviteActivity extends BaseTitleActivity {
             accept.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
             accept.setTextColor(mContext.getResources().getColor(R.color.color_black));
             accept.setBackgroundColor(mContext.getResources().getColor(R.color.color_white));
-            accept.setText("接受");
+            accept.setText(getString(R.string.accept));
             accept.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -238,7 +238,7 @@ public class GroupInviteActivity extends BaseTitleActivity {
             decline.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
             decline.setTextColor(mContext.getResources().getColor(R.color.color_black));
             decline.setBackgroundColor(mContext.getResources().getColor(R.color.color_white));
-            decline.setText("拒绝");
+            decline.setText(getString(R.string.reject));
             decline.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -283,7 +283,7 @@ public class GroupInviteActivity extends BaseTitleActivity {
     }
 
     private void toastError(BMXErrorCode e) {
-        String error = e != null ? e.name() : "网络异常";
+        String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 }

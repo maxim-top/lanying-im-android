@@ -17,6 +17,10 @@ public class WeakHandler<T> extends Handler {
         this.mActivity = new WeakReference(t);
     }
 
+    public WeakReference<T> getActivity() {
+        return mActivity;
+    }
+
     @Override
     public final void handleMessage(Message msg) {
         super.handleMessage(msg);

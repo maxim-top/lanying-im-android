@@ -215,7 +215,7 @@ public class RegisterActivity extends BaseTitleActivity {
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
             if (!WXUtils.getInstance().wxSupported()) {
-                ToastUtil.showTextViewPrompt("请安装微信");
+                ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }
             initWXRxBus();
@@ -298,9 +298,9 @@ public class RegisterActivity extends BaseTitleActivity {
                 @Override
                 public void onResponse(Boolean result) {
                     if (result != null && result) {
-                        ToastUtil.showTextViewPrompt("获取验证码成功");
+                        ToastUtil.showTextViewPrompt(getString(R.string.get_captcha_successfully));
                     } else {
-                        ToastUtil.showTextViewPrompt("获取验证码失败");
+                        ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_captcha));
                         mSendVerify.setEnabled(true);
                         mSendVerify.setVisibility(View.VISIBLE);
                         mVerifyCountDown.setText("");
@@ -312,7 +312,7 @@ public class RegisterActivity extends BaseTitleActivity {
 
                 @Override
                 public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                    ToastUtil.showTextViewPrompt("获取验证码失败");
+                    ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_captcha));
                     mSendVerify.setEnabled(true);
                     mSendVerify.setVisibility(View.VISIBLE);
                     mVerifyCountDown.setText("");
@@ -370,7 +370,7 @@ public class RegisterActivity extends BaseTitleActivity {
         // || TextUtils.isEmpty(phone)
         // || TextUtils.isEmpty(verify)
         ) {
-            ToastUtil.showTextViewPrompt("不能为空");
+            ToastUtil.showTextViewPrompt(getString(R.string.cannot_be_empty));
             return;
         }
         // 注册时候获取 对其进行修改
@@ -413,7 +413,7 @@ public class RegisterActivity extends BaseTitleActivity {
                     realRegister(account, pwd);
                 } else {
                     // 失败
-                    String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
+                    String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.switch_appId_failed);
                     ToastUtil.showTextViewPrompt(error);
                 }
             });
@@ -434,9 +434,13 @@ public class RegisterActivity extends BaseTitleActivity {
                 finish();
             } else {
                 if (bmxErrorCode.swigValue() == BMXErrorCode.InvalidRequestParameter.swigValue()) {
-                    ToastUtil.showTextViewPrompt("用户名仅支持字母数字下划线中文组合，且不能是纯数字，不能以maxim、mta开头");
+                    ToastUtil.showTextViewPrompt(getString(R.string.username_only_supports));
+                } else if (bmxErrorCode.equals(BMXErrorCode.UserAlreadyExist)) {
+                    ToastUtil.showTextViewPrompt(getString(R.string.exit_user));
+                } else if (bmxErrorCode.equals(BMXErrorCode.ServerUnknownError)) {
+                    ToastUtil.showTextViewPrompt(getString(R.string.exit_user));
                 } else {
-                    ToastUtil.showTextViewPrompt("网络异常");
+                    ToastUtil.showTextViewPrompt(getString(R.string.network_exception));
                 }
             }
         });

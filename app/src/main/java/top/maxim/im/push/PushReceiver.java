@@ -104,7 +104,7 @@ public class PushReceiver extends BroadcastReceiver {
             return;
         }
         if (isPushDetail) {
-            showChatNotification(name, bean);
+            showChatNotification(context, name, bean);
         } else {
             hideDetailContentMsgNotification(context, bean);
         }
@@ -141,7 +141,7 @@ public class PushReceiver extends BroadcastReceiver {
     /**
      * 显示聊天的通知
      */
-    private void showChatNotification(String title, MessageBean bean) {
+    private void showChatNotification(Context context, String title, MessageBean bean) {
         if (bean == null) {
             return;
         }
@@ -158,12 +158,12 @@ public class PushReceiver extends BroadcastReceiver {
                             : 0;
                     StringBuilder content = new StringBuilder();
                     if (count > 1) {
-                        content.append("[").append(count).append("条]");
+                        content.append("[").append(count).append(context.getString(R.string.pieces)).append("]");
                     }
                     if (!TextUtils.isEmpty(title)) {
                         content.append(title).append(":");
                     }
-                    content.append(ChatUtils.getInstance().getMessageDesc(bean));
+                    content.append(ChatUtils.getInstance().getMessageDesc(context, bean));
                     Intent intent = new Intent();
                     if (bean.getType() == BMXMessage.MessageType.Single) {
                         intent.setClass(AppContextUtils.getAppContext(), ChatSingleActivity.class);
@@ -194,7 +194,7 @@ public class PushReceiver extends BroadcastReceiver {
             title = appLabel.toString();
         }
         if (TextUtils.isEmpty(title)) {
-            title = "新消息";
+            title = context.getString(R.string.new_message);
         }
         BMXConversation.Type type = null;
         if (bean.getType() == BMXMessage.MessageType.Single) {

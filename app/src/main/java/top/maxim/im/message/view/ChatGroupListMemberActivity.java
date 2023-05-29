@@ -389,12 +389,12 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
             }
             if (member.getMUid() == MessageConfig.MEMBER_ADD) {
                 String addName = member.getMGroupNickname();
-                tvName.setText(TextUtils.isEmpty(addName) ? "添加" : addName);
+                tvName.setText(TextUtils.isEmpty(addName) ? getString(R.string.add) : addName);
                 BMImageLoader.getInstance().display(icon,
                         "drawable://" + R.drawable.default_add_icon);
             } else if (member.getMUid() == MessageConfig.MEMBER_REMOVE) {
                 String removeName = member.getMGroupNickname();
-                tvName.setText(TextUtils.isEmpty(removeName) ? "移除" : removeName);
+                tvName.setText(TextUtils.isEmpty(removeName) ? getString(R.string.remove) : removeName);
                 BMImageLoader.getInstance().display(icon,
                         "drawable://" + R.drawable.default_remove_icon);
             } else {
@@ -416,7 +416,7 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
     }
 
     protected void toastError(BMXErrorCode e) {
-        String error = e != null ? e.name() : "网络异常";
+        String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 

@@ -3,7 +3,11 @@ package top.maxim.im.common.base;
 
 import android.app.Application;
 import android.content.Context;
-
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.Build;
+import android.util.DisplayMetrics;
+import android.os.LocaleList;
 import androidx.multidex.MultiDex;
 
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
@@ -13,6 +17,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 import java.io.File;
+import java.util.Locale;
 
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RTCManager;
@@ -58,6 +63,33 @@ public class MaxIMApplication extends Application {
         if (!BuildConfig.DEBUG) {
             Thread.setDefaultUncaughtExceptionHandler(restartHandler);
         }
+        initLanguage();
+    }
+
+    private String getCountry() {
+
+        Locale locale;
+        //7.0以上和7.0以下获取系统语言方式
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locale = LocaleList.getDefault().get(0);
+        } else {
+            locale = Locale.getDefault();
+        }
+        return locale.getCountry();
+    }
+
+    private void initLanguage() {
+        Resources resources = getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        Configuration config = resources.getConfiguration();
+        if (getCountry().equals("TW")) {
+            config.locale = Locale.TAIWAN;
+        } else if (getCountry().equals("US")) {
+            config.locale = Locale.ENGLISH;
+        } else {
+            config.locale = Locale.CHINESE;
+        }
+        resources.updateConfiguration(config, dm);
     }
 
     public void restartApp() {

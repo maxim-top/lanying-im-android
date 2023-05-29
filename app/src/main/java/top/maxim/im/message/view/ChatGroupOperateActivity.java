@@ -1036,11 +1036,11 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
             }
             long memberId = member.getMUid();
             if (memberId == MessageConfig.MEMBER_ADD) {
-                tvName.setText("添加");
+                tvName.setText(getString(R.string.add));
                 BMImageLoader.getInstance().display(icon,
                         "drawable://" + R.drawable.default_add_icon);
             } else if (memberId == MessageConfig.MEMBER_REMOVE) {
-                tvName.setText("移除");
+                tvName.setText(getString(R.string.remove));
                 BMImageLoader.getInstance().display(icon,
                         "drawable://" + R.drawable.default_remove_icon);
             } else {
@@ -1062,12 +1062,12 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     }
 
     private void toastError(Throwable e) {
-        String error = e != null ? e.getMessage() : "网络异常";
+        String error = e != null ? e.getMessage() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 
     private void toastError(BMXErrorCode e) {
-        String error = e != null ? e.name() : "网络异常";
+        String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
     }
 
@@ -1089,7 +1089,7 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
         }, bmxErrorCode -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                ToastUtil.showTextViewPrompt("设置成功");
+                ToastUtil.showTextViewPrompt(getString(R.string.set_successfully));
             } else {
                 toastError(bmxErrorCode);
             }

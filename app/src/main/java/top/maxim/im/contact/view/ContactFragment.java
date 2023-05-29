@@ -256,7 +256,7 @@ public class ContactFragment extends BaseTitleFragment {
             BMXDataCallBack<BMXRosterItemList> callBack = (bmxErrorCode1, itemList) -> {
                 RosterFetcher.getFetcher().putRosters(itemList);
                 if (!BaseManager.bmxFinish(bmxErrorCode1)) {
-                    String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";
+                    String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : getString(R.string.network_error);
                     ToastUtil.showTextViewPrompt(error);
                 }
                 List<BMXRosterItem> rosterItems = new ArrayList<>();
@@ -287,7 +287,7 @@ public class ContactFragment extends BaseTitleFragment {
                         RosterManager.getInstance().getRosterList(list1, true, callBack);
                     }
                 } else {
-                    String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";
+                    String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : getString(R.string.network_error);
                     ToastUtil.showTextViewPrompt(error);
                 }
             });

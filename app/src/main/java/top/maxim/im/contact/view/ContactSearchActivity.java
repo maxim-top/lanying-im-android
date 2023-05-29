@@ -101,10 +101,10 @@ public class ContactSearchActivity extends BaseTitleActivity {
             public void onClick(View v) {
                 if (mSearchByUserId) {
                     // id搜索
-                    mSearch.setHint("输入要查找的好友用户名");
+                    mSearch.setHint(getString(R.string.input_username_searched));
                     mSearch.setInputType(EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                 } else {
-                    mSearch.setHint("输入要查找的好友用户id");
+                    mSearch.setHint(getString(R.string.input_userid_searched));
                     mSearch.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
                 }
                 mSearchByUserId = !mSearchByUserId;
@@ -130,7 +130,7 @@ public class ContactSearchActivity extends BaseTitleActivity {
                 mAdapter.replaceList(mSearchs);
             } else {
                 mAdapter.removeAll();
-                ToastUtil.showTextViewPrompt("未搜索到用户");
+                ToastUtil.showTextViewPrompt(getString(R.string.no_user_found));
             }
         };
         if (mSearchByUserId && Pattern.matches("[0-9]+", search)) {
@@ -189,7 +189,7 @@ public class ContactSearchActivity extends BaseTitleActivity {
          * 输入框弹出
          */
         private void showAddReason(final long rosterId) {
-            DialogUtils.getInstance().showEditDialog(ContactSearchActivity.this, "添加好友",
+            DialogUtils.getInstance().showEditDialog(ContactSearchActivity.this, getString(R.string.add_friend),
                     getString(R.string.confirm), getString(R.string.cancel),
                     new CommonEditDialog.OnDialogListener() {
                         @Override
@@ -212,10 +212,10 @@ public class ContactSearchActivity extends BaseTitleActivity {
             RosterManager.getInstance().apply(rosterId, reason, bmxErrorCode -> {
                 dismissLoadingDialog();
                 if (BaseManager.bmxFinish(bmxErrorCode)) {
-                    ToastUtil.showTextViewPrompt("添加成功");
+                    ToastUtil.showTextViewPrompt(getString(R.string.add_successful));
                     finish();
                 } else {
-                    ToastUtil.showTextViewPrompt("添加失败");
+                    ToastUtil.showTextViewPrompt(getString(R.string.add_failed));
                 }
             });
         }

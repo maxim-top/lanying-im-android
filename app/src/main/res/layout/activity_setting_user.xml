@@ -25,7 +25,7 @@
                 android:layout_height="match_parent"
                 android:layout_centerVertical="true"
                 android:gravity="center_vertical"
-                android:text="头像"
+                android:text="@string/avatar"
                 android:textColor="@color/color_333333"
                 android:textSize="@dimen/dimen_16" />
 

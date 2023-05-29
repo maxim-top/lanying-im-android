@@ -57,7 +57,7 @@ public class ForwardMsgRosterActivity extends BaseTitleActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
-        builder.setTitle("转发");
+        builder.setTitle(getString(R.string.chat_msg_relay));
         builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,7 +146,7 @@ public class ForwardMsgRosterActivity extends BaseTitleActivity {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 RosterManager.getInstance().getRosterList(list, true, (bmxErrorCode1, itemList) -> {
                     if (!BaseManager.bmxFinish(bmxErrorCode1)) {
-                        String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : "网络错误";
+                        String error = bmxErrorCode1 != null ? bmxErrorCode1.name() : getString(R.string.network_error);
                         ToastUtil.showTextViewPrompt(error);
                     }
                     List<BMXRosterItem> rosterItems = new ArrayList<>();
@@ -156,7 +156,7 @@ public class ForwardMsgRosterActivity extends BaseTitleActivity {
                     mAdapter.replaceList(rosterItems);
                 });
             } else {
-                String error = bmxErrorCode != null ? bmxErrorCode.name() : "网络错误";
+                String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.network_error);
                 ToastUtil.showTextViewPrompt(error);
                 mAdapter.replaceList(null);
             }

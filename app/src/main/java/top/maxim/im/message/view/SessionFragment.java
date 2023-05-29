@@ -178,7 +178,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
             if (bmxConversationList != null && !bmxConversationList.isEmpty()) {
                 for (int i = 0; i < bmxConversationList.size(); i++) {
                     BMXConversation conversation = bmxConversationList.get(i);
-                    if (conversation != null && conversation.conversationId() > 0) {
+                    if (conversation != null) {
                         conversationList.add(conversation);
                     }
                 }

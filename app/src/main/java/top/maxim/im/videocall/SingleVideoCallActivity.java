@@ -719,6 +719,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      */
     private void leaveRoom() {
         mEngine.leaveRoom();
+        BMXVideoCanvas canvas = new BMXVideoCanvas();
+        BMXStream stream = new BMXStream();
+        stream.setMMediaType(BMXVideoMediaType.Camera);
+        canvas.setMStream(stream);
+        mEngine.stopPreview(canvas);
+
         if (mLocalView != null) {
             mLocalView.release();
             mLocalView = null;
@@ -727,6 +733,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             mRemoteView.release();
             mRemoteView = null;
         }
+        finish();
     }
 
     /**
@@ -868,8 +875,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         mHandler.removeAll();
         if (mEngine != null) {
             mEngine.removeRTCEngineListener(mListener);
+            mListener = null;
         }
         ChatManager.getInstance().removeChatListener(mChatListener);
+        mChatListener = null;
     }
 
     private class CallHandler extends WeakHandler<Activity> {
@@ -967,7 +976,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                     case "hangup":
                         //挂断
                         leaveRoom();
-                        finish();
                         break;
                     default:
                         break;

@@ -357,6 +357,7 @@
     <string name="add_failed">添加失败</string>
     <string name="pieces">条</string>
     <string name="agree">同意</string>
+    <string name="read_agree">我已阅读并同意</string>
     <string name="image">图片</string>
     <string name="push_the_outgoing_message">推送发出的消息</string>
     <string name="network_error">网络错误</string>

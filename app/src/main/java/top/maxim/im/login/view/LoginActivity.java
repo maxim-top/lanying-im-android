@@ -5,14 +5,24 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 
@@ -95,6 +105,10 @@ public class LoginActivity extends BaseTitleActivity {
 
     private CompositeSubscription mSubscription;
 
+    private TextView mTvRegisterProtocol;
+
+    private CheckBox mCheckBox;
+
     public static void openLogin(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -104,6 +118,48 @@ public class LoginActivity extends BaseTitleActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         return new Header.Builder(this, headerContainer).build();
+    }
+
+    private void buildProtocol() {
+        mTvRegisterProtocol.setMovementMethod(LinkMovementMethod.getInstance());
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append(getResources().getString(R.string.read_agree));
+        // 用户服务
+        SpannableString spannableString = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol2) + "》");
+        spannableString.setSpan(new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_4A90E2));
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(LoginActivity.this, 1);
+            }
+        }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString);
+        // 隐私政策
+        builder.append(getResources().getString(R.string.register_protocol3));
+        SpannableString spannableString1 = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol4) + "》");
+        spannableString1.setSpan(new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_4A90E2));
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(LoginActivity.this, 0);
+            }
+        }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString1);
+        mTvRegisterProtocol.setText(builder);
     }
 
     @Override
@@ -122,6 +178,10 @@ public class LoginActivity extends BaseTitleActivity {
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
         mSwitchLoginMode.setVisibility(View.GONE);
+        mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
+        mCheckBox = view.findViewById(R.id.cb_choice);
+
+        buildProtocol();
         // 三次点击打开日志
         ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_open_log), 3, () -> {
             // 跳转查看日志
@@ -177,6 +237,17 @@ public class LoginActivity extends BaseTitleActivity {
         }
     }
 
+    private void updateLoginButton() {
+        boolean isNameEmpty = TextUtils.isEmpty(mInputName.getText().toString().trim());
+        boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
+        boolean isAgree = mCheckBox.isChecked();
+        if (!isNameEmpty && !isPwdEmpty && isAgree) {
+            mLogin.setEnabled(true);
+        } else {
+            mLogin.setEnabled(false);
+        }
+    }
+
     @Override
     protected void setViewListener() {
         // 注册
@@ -202,6 +273,13 @@ public class LoginActivity extends BaseTitleActivity {
             initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN, mChangeAppId);
         });
+        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateLoginButton();
+            }
+        });
+
         // 扫一扫
         mIvScan.setOnClickListener(v -> ScannerActivity.openScan(this));
         mInputWatcher = new TextWatcher() {
@@ -217,13 +295,7 @@ public class LoginActivity extends BaseTitleActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                boolean isNameEmpty = TextUtils.isEmpty(mInputName.getText().toString().trim());
-                boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
-                if (!isNameEmpty && !isPwdEmpty) {
-                    mLogin.setEnabled(true);
-                } else {
-                    mLogin.setEnabled(false);
-                }
+                updateLoginButton();
             }
         };
         mInputName.addTextChangedListener(mInputWatcher);

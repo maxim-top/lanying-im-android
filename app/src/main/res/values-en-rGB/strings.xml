@@ -357,6 +357,7 @@
     <string name="add_failed">Add Failed</string>
     <string name="pieces"></string>
     <string name="agree">Agree</string>
+    <string name="read_agree">I have read and agree to</string>
     <string name="image">[image]</string>
     <string name="push_the_outgoing_message">Push Messages Sent</string>
     <string name="network_error">Network Error</string>

@@ -105,9 +105,6 @@ public class WelcomeActivity extends BaseTitleActivity {
     }
 
     private void initJump() {
-        //启动网络监听
-        ConnectivityReceiver.start(getApplication());
-
         boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
         long userId = SharePreferenceUtils.getInstance().getUserId();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();
@@ -199,6 +196,9 @@ public class WelcomeActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(getString(R.string.network_exception));
                 return;
             }
+            //启动网络监听
+            ConnectivityReceiver.start(AppContextUtils.getApplication());
+
             // 登陆成功后 需要将userId存储SP 作为下次自动登陆
             UserManager.getInstance().getProfile(false, (bmxErrorCode1, profile) -> {
                 if (BaseManager.bmxFinish(bmxErrorCode1) && profile != null

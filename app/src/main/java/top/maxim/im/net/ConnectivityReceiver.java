@@ -19,6 +19,7 @@ import top.maxim.im.common.utils.AppContextUtils;
 public class ConnectivityReceiver extends BroadcastReceiver {
 
     private static final String TAG = ConnectivityReceiver.class.getSimpleName();
+    private static Boolean started = false;
 
     public static void tryConnect() {
         final ConnectivityManager manager = (ConnectivityManager) AppContextUtils.getAppContext()
@@ -53,9 +54,12 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     }
 
     public static void start(Application application) {
-        ConnectivityReceiver mNetReceiver = new ConnectivityReceiver();
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        application.registerReceiver(mNetReceiver, filter);
+        if (!started){
+            ConnectivityReceiver mNetReceiver = new ConnectivityReceiver();
+            IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+            application.registerReceiver(mNetReceiver, filter);
+            started = true;
+        }
     }
 
     public static int getLinkNetType() {

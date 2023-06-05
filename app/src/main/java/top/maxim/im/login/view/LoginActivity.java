@@ -45,6 +45,7 @@ import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.common.provider.CommonProvider;
+import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.CommonUtils;
@@ -55,6 +56,7 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.login.bean.DNSConfigEvent;
+import top.maxim.im.net.ConnectivityReceiver;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
@@ -403,6 +405,9 @@ public class LoginActivity extends BaseTitleActivity {
         }
         BMXCallBack callBack = (bmxErrorCode) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
+                //启动网络监听
+                ConnectivityReceiver.start(AppContextUtils.getApplication());
+
                 // 登陆成功后 需要将userId存储SP 作为下次自动登陆
                 UserManager.getInstance().getProfile(true, (bmxErrorCode1, profile) -> {
                     TaskDispatcher.exec(() -> {

@@ -225,18 +225,9 @@ public class LoginActivity extends BaseTitleActivity {
         if (permissions == null || permissions.size() == 0) {
             return;
         }
-        for (String permission : permissions) {
-            switch (permission) {
-                case PermissionsConstant.READ_STORAGE:
-                    // 读写SD权限拒绝
-                    CommonProvider.openAppPermission(this);
-                    break;
-                case PermissionsConstant.WRITE_STORAGE:
-                    break;
-                default:
-                    break;
-            }
-        }
+        String name = mInputName.getText().toString().trim();
+        String pwd = mInputPwd.getText().toString().trim();
+        login(this, name, pwd, mLoginByUserId, mChangeAppId);
     }
 
     private void updateLoginButton() {

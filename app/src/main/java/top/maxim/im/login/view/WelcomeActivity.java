@@ -3,6 +3,7 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -58,6 +59,8 @@ public class WelcomeActivity extends BaseTitleActivity {
 
     private SplashVideoPlayView mVideoSplash;
 
+    private static Boolean mPermissionChecked;
+
     public static void openWelcome(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -99,9 +102,40 @@ public class WelcomeActivity extends BaseTitleActivity {
     }
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initPermission();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        initPermission();
+    }
+
+    private boolean checkPermission() {
+        return hasPermission(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+    }
+
+    @Override
+    public void onPermissionGranted(List<String> permissions) {
+        super.onPermissionGranted(permissions);
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        long userId = SharePreferenceUtils.getInstance().getUserId();
+        String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+        autoLogin(userId, pwd);
+    }
+
+    @Override
+    public void onPermissionDenied(List<String> permissions) {
+        super.onPermissionDenied(permissions);
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        long userId = SharePreferenceUtils.getInstance().getUserId();
+        String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+        autoLogin(userId, pwd);
     }
 
     private void initJump() {
@@ -109,7 +143,11 @@ public class WelcomeActivity extends BaseTitleActivity {
         long userId = SharePreferenceUtils.getInstance().getUserId();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();
         if (isLogin && userId > 0 && !TextUtils.isEmpty(pwd)) {
-            autoLogin(userId, pwd);
+            if (!checkPermission()) {
+                requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+            }else{
+                autoLogin(userId, pwd);
+            }
             return;
         }
         //没有登录 需要切换到默认appId 再进入登录页面

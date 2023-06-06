@@ -188,22 +188,41 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_register_protocol"
+    <LinearLayout
+        android:layout_marginTop="@dimen/dimen_15"
+        android:id="@+id/ll_register_protocol"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ll_et_user_verify"
+        android:layout_below="@id/ll_et_user_pwd"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dimen_24"
-        android:gravity="center"
-        android:textColor="@color/color_black"
-        android:textSize="@dimen/dimen_12" />
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:layout_marginTop="@dimen/dimen_3"
+            android:id="@+id/cb_choice"
+            android:layout_width="@dimen/dimen_15"
+            android:layout_height="@dimen/dimen_15"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/dimen_10"
+            android:background="@drawable/checkbox_style"
+            android:button="@null"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tv_register_protocol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen_12" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_register"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_50"
-        android:layout_below="@id/tv_register_protocol"
+        android:layout_below="@id/ll_register_protocol"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/dimen_10"
         android:background="@drawable/common_btn_corner_seleced_bg"

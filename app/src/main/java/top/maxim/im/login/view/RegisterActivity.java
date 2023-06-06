@@ -14,6 +14,8 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -97,6 +99,9 @@ public class RegisterActivity extends BaseTitleActivity {
 
     private boolean mCountDown;
 
+    private CheckBox mCheckBox;
+
+
     private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
 
         @Override
@@ -124,6 +129,18 @@ public class RegisterActivity extends BaseTitleActivity {
         return new Header.Builder(this, headerContainer).build();
     }
 
+    private void updateRegButton() {
+        boolean isNameEmpty = TextUtils.isEmpty(mInputName.getText().toString().trim());
+        boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
+        boolean isAgree = mCheckBox.isChecked();
+        if (!isNameEmpty && !isPwdEmpty && isAgree) {
+            mRegister.setEnabled(true);
+        } else {
+            mRegister.setEnabled(false);
+        }
+    }
+
+
     @Override
     protected View onCreateView() {
         hideHeader();
@@ -140,6 +157,7 @@ public class RegisterActivity extends BaseTitleActivity {
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
+        mCheckBox = view.findViewById(R.id.cb_choice);
         mWXContainer = view.findViewById(R.id.ll_wx_container);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         buildProtocol();
@@ -164,7 +182,7 @@ public class RegisterActivity extends BaseTitleActivity {
     private void buildProtocol() {
         mTvRegisterProtocol.setMovementMethod(LinkMovementMethod.getInstance());
         SpannableStringBuilder builder = new SpannableStringBuilder();
-        builder.append(getResources().getString(R.string.register_protocol1));
+        builder.append(getResources().getString(R.string.read_agree));
         // 用户服务
         SpannableString spannableString = new SpannableString(
                 "《" + getResources().getString(R.string.register_protocol2) + "》");
@@ -256,6 +274,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 } else {
                     mRegister.setEnabled(false);
                 }
+                updateRegButton();
             }
         };
         mInputName.addTextChangedListener(new TextWatcher() {
@@ -336,6 +355,12 @@ public class RegisterActivity extends BaseTitleActivity {
 //
 //                        }
 //                    });
+        });
+        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateRegButton();
+            }
         });
     }
 

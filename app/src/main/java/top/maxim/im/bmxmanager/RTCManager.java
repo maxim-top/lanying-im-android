@@ -5,6 +5,7 @@ import android.app.Application;
 
 import im.floo.floolib.BMXRTCEngine;
 import im.floo.floolib.BMXRTCService;
+import im.floo.floolib.BMXRTCServiceListener;
 import top.maxim.rtc.engine.MaxEngine;
 
 /**
@@ -35,5 +36,19 @@ public class RTCManager extends BaseManager {
 
     public BMXRTCEngine getRTCEngine(){
         return mService.getRTCEngine();
+    }
+
+    /**
+     * 添加监听者
+     **/
+    public void addRTCServiceListener(BMXRTCServiceListener listener) {
+        mService.addRTCServiceListener(listener);
+    }
+
+    /**
+     * 移除监听者
+     **/
+    public void removeRTCServiceListener(BMXRTCServiceListener listener) {
+        mService.removeRTCServiceListener(listener);
     }
 }

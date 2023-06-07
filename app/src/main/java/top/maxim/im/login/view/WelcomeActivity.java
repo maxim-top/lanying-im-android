@@ -301,9 +301,7 @@ public class WelcomeActivity extends BaseTitleActivity {
      */
     private void showProtocol() {
         boolean show = SharePreferenceUtils.getInstance().getProtocolDialogStatus();
-        //根据360等应用市场要求，将同意协议功能放在登录界面的复选框
-//        if (show) {
-        if (true) {
+        if (show) {
             showVideo();
             return;
         }

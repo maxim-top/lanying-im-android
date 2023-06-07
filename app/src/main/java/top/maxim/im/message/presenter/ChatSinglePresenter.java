@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.util.List;
 
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;
 import rx.Observable;
 import rx.Subscriber;
@@ -159,11 +160,6 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
     protected void handelVideoCall(boolean hasVideo) {
 //        BMXRRTCActivity.openVideoCall(mView.getContext());
         //发起音视频方  以自己的userId作为roomId
-        SingleVideoCallActivity.openVideoCall(mView.getContext(), mChatId, String.valueOf(mMyUserId), true, hasVideo ? MessageConfig.CallMode.CALL_VIDEO : MessageConfig.CallMode.CALL_AUDIO);
-    }
-
-    @Override
-    protected void receiveVideoCall(String roomId, List<Long> chatIds, boolean hasVideo) {
-        SingleVideoCallActivity.openVideoCall(mView.getContext(), chatIds.get(0), roomId, false, hasVideo ? MessageConfig.CallMode.CALL_VIDEO : MessageConfig.CallMode.CALL_AUDIO);
+        SingleVideoCallActivity.openVideoCall(mView.getContext(), mChatId, 0, true, hasVideo ? BMXMessageConfig.RTCCallType.VideoCall : BMXMessageConfig.RTCCallType.AudioCall, "");
     }
 }

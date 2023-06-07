@@ -66,12 +66,14 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private static final String TAG = "SingleVideoCallActivity";
 
-    public static void openVideoCall(Context context, long chatId, String roomId, boolean isInitiator, int callMode) {
+    public static void openVideoCall(Context context, long chatId, long roomId, boolean isInitiator,
+                                     BMXMessageConfig.RTCCallType callType, String pin) {
         Intent intent = new Intent(context, SingleVideoCallActivity.class);
         intent.putExtra(MessageConfig.CHAT_ID, chatId);
-        intent.putExtra(MessageConfig.CALL_MODE, callMode);
+        intent.putExtra(MessageConfig.CALL_TYPE, callType.swigValue());
         intent.putExtra(MessageConfig.RTC_ROOM_ID, roomId);
         intent.putExtra(MessageConfig.IS_INITIATOR, isInitiator);
+        intent.putExtra(MessageConfig.PIN, pin);
         context.startActivity(intent);
     }
 
@@ -87,7 +89,11 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private long mUserId;
 
-    private String mRoomId;
+    private long mRoomId;
+
+    private String mCallId;
+
+    private String mPin;
 
     //是否是发起者
     private boolean mIsInitiator;
@@ -95,7 +101,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private BMXRosterItem mRosterItem = new BMXRosterItem();
 
     //默认音频
-    private int mCallMode = MessageConfig.CallMode.CALL_AUDIO;
+    private BMXMessageConfig.RTCCallType mCallType = BMXMessageConfig.RTCCallType.AudioCall;
 
     private boolean mHasVideo = false;
 
@@ -191,12 +197,16 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         super.initDataFromFront(intent);
         if (intent != null) {
             mChatId = intent.getLongExtra(MessageConfig.CHAT_ID, 0);
-            mCallMode = intent.getIntExtra(MessageConfig.CALL_MODE, 0);
-            mRoomId = intent.getStringExtra(MessageConfig.RTC_ROOM_ID);
+            mCallType = BMXMessageConfig.RTCCallType.swigToEnum( intent.getIntExtra(MessageConfig.CALL_TYPE, 0));
+            mRoomId = intent.getLongExtra(MessageConfig.RTC_ROOM_ID, 0);
             mIsInitiator = intent.getBooleanExtra(MessageConfig.IS_INITIATOR, false);
+            mPin = intent.getStringExtra(MessageConfig.PIN);
         }
         mUserId = SharePreferenceUtils.getInstance().getUserId();
-        mHasVideo = mCallMode == MessageConfig.CallMode.CALL_VIDEO;
+        mHasVideo = mCallType == BMXMessageConfig.RTCCallType.VideoCall;
+        if (mIsInitiator){
+            mPin = UUID.randomUUID().toString();
+        }
     }
 
     private void initRtc() {
@@ -206,7 +216,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             @Override
             public void onJoinRoom(String info, long roomId, BMXErrorCode error) {
                 super.onJoinRoom(info, roomId, error);
-                mRoomId = String.valueOf(roomId);
+                mRoomId = roomId;
                 if (BaseManager.bmxFinish(error)) {
                     mEngine.publish(BMXVideoMediaType.Camera, mHasVideo, true);
                     Log.e(TAG, "加入房间成功 开启发布本地流, roomId= " + roomId + "msg = " + info);
@@ -710,7 +720,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private void joinRoom() {
         BMXRoomAuth auth = new BMXRoomAuth();
         auth.setMUserId(mUserId);
-        auth.setMRoomId(Long.parseLong(mRoomId));
+        auth.setMRoomId(mRoomId);
         mEngine.joinRoom(auth);
     }
 
@@ -788,7 +798,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         removeRemoteView();
         hideVideoPeerInfo();
         showAudioPeerInfo();
-        mCallMode = MessageConfig.CallMode.CALL_AUDIO;
+        mCallType = BMXMessageConfig.RTCCallType.AudioCall;
         mHasVideo = false;
         showControlView(mHasVideo);
     }

@@ -12,6 +12,7 @@ import java.util.Map;
 
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
@@ -259,7 +260,8 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
     }
 
     @Override
-    protected void receiveVideoCall(String roomId, List<Long> chatIds, boolean hasVideo) {
-        GroupVideoCallActivity.openVideoCall(mView.getContext(), (ArrayList<Long>) chatIds, roomId, false, MessageConfig.CallMode.CALL_AUDIO);
+    protected void receiveVideoCall(long roomId, List<Long> chatIds, boolean hasVideo) {
+        GroupVideoCallActivity.openVideoCall(mView.getContext(), (ArrayList<Long>) chatIds, roomId, false,
+                hasVideo? BMXMessageConfig.RTCCallType.VideoCall: BMXMessageConfig.RTCCallType.AudioCall);
     }
 }

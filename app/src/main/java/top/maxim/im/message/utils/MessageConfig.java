@@ -29,7 +29,7 @@ public interface MessageConfig {
     /**
      * 音视频类型
      */
-    String CALL_MODE = "call_mode";
+    String CALL_TYPE = "call_type";
 
     /**
      * roomId
@@ -40,6 +40,11 @@ public interface MessageConfig {
      * 是否发起者
      */
     String IS_INITIATOR = "isInitiator";
+
+    /**
+     * 是否发起者
+     */
+    String PIN = "pin";
 
     /**
      * 会话id列表

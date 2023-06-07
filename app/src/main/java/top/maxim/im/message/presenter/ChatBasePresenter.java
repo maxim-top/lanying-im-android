@@ -1953,6 +1953,6 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     /**
      * 收到音视频
      */
-    protected void receiveVideoCall(String roomId, List<Long> chatIds, boolean hasVideo) {
+    protected void receiveVideoCall(long roomId, List<Long> chatIds, boolean hasVideo) {
     }
 }

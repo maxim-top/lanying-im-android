@@ -23,6 +23,7 @@ import java.util.List;
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXRTCEngine;
 import im.floo.floolib.BMXRTCEngineListener;
@@ -56,10 +57,10 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
 
     private static final String TAG = "GroupVideoCallActivity";
 
-    public static void openVideoCall(Context context, ArrayList<Long> chatIds, String roomId, boolean isInitiator, int callMode) {
+    public static void openVideoCall(Context context, ArrayList<Long> chatIds, long roomId, boolean isInitiator, BMXMessageConfig.RTCCallType callType) {
         Intent intent = new Intent(context, GroupVideoCallActivity.class);
         intent.putExtra(MessageConfig.CHAT_IDS, (Serializable) chatIds);
-        intent.putExtra(MessageConfig.CALL_MODE, callMode);
+        intent.putExtra(MessageConfig.CALL_TYPE, callType);
         intent.putExtra(MessageConfig.RTC_ROOM_ID, roomId);
         intent.putExtra(MessageConfig.IS_INITIATOR, isInitiator);
         context.startActivity(intent);
@@ -78,10 +79,10 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
 
     private long mUserId;
 
-    private String mRoomId;
+    private long mRoomId;
 
     //默认音频
-    private int mCallMode = MessageConfig.CallMode.CALL_AUDIO;
+    private BMXMessageConfig.RTCCallType mCallType = BMXMessageConfig.RTCCallType.AudioCall;
 
     //是否是发起者
     private boolean mIsInitiator;
@@ -174,12 +175,12 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
         super.initDataFromFront(intent);
         if (intent != null) {
             mChatIds = (List<Long>) intent.getSerializableExtra(MessageConfig.CHAT_IDS);
-            mCallMode = intent.getIntExtra(MessageConfig.CALL_MODE, 0);
-            mRoomId = intent.getStringExtra(MessageConfig.RTC_ROOM_ID);
+            mCallType = BMXMessageConfig.RTCCallType.swigToEnum(intent.getIntExtra(MessageConfig.CALL_TYPE, 0));
+            mRoomId = intent.getLongExtra(MessageConfig.RTC_ROOM_ID, 0);
             mIsInitiator = intent.getBooleanExtra(MessageConfig.IS_INITIATOR, false);
         }
         mUserId = SharePreferenceUtils.getInstance().getUserId();
-        mHasVideo = mCallMode == MessageConfig.CallMode.CALL_VIDEO;
+        mHasVideo = mCallType == BMXMessageConfig.RTCCallType.VideoCall;
     }
 
     private void initRtc() {
@@ -532,7 +533,7 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
     private void joinRoom() {
         BMXRoomAuth auth = new BMXRoomAuth();
         auth.setMUserId(mUserId);
-        auth.setMRoomId(Long.parseLong(mRoomId));
+        auth.setMRoomId(mRoomId);
         mEngine.joinRoom(auth);
     }
 
@@ -582,7 +583,7 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
                 chatIds = chatIds + ",";
             }
             chatIds = chatIds.substring(chatIds.length() - 1);
-            sendRTCMessage("join", mRoomId + "_" + chatIds + "_" + mCallMode);
+//            sendRTCMessage("join", mRoomId + "_" + chatIds + "_" + mCallMode);
         }
     }
 
@@ -680,15 +681,6 @@ public class GroupVideoCallActivity extends BaseTitleActivity {
      * 发送RTC信息
      */
     private void sendRTCMessage(String config, String value){
-        String extension = "";
-        try {
-            JSONObject object = new JSONObject();
-            object.put("rtcKey", config);
-            object.put("rtcValue", value);
-            extension = object.toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        mSendUtils.sendInputStatusMessage(BMXMessage.MessageType.Group, SharePreferenceUtils.getInstance().getUserId(), Long.valueOf(mRoomId), extension);
+        //todo
     }
 }

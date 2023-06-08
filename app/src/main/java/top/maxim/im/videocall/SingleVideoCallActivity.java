@@ -391,25 +391,25 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     /**
      * 添加本地视频view
      */
-    private void addLocalView() {
+    private void addRemoteView() {
         ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_large);
         localParent.setVisibility(View.VISIBLE);
-        mLocalView = new RTCRenderView(this);
-        mLocalView.init();
-        localParent.addView(mLocalView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        mRemoteView = new RTCRenderView(this);
+        mRemoteView.init();
+        localParent.addView(mRemoteView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
     /**
      * 添加远端视频view
      */
-    private void addRemoteView() {
+    private void addLocalView() {
         ViewGroup remoteParent = mVideoContainer.findViewById(R.id.video_view_container_small);
         remoteParent.setVisibility(View.VISIBLE);
-        mRemoteView = new RTCRenderView(this);
-        mRemoteView.init();
-        mRemoteView.getSurfaceView().setZOrderMediaOverlay(true);
+        mLocalView = new RTCRenderView(this);
+        mLocalView.init();
+        mLocalView.getSurfaceView().setZOrderMediaOverlay(true);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        remoteParent.addView(mRemoteView, layoutParams);
+        remoteParent.addView(mLocalView, layoutParams);
     }
 
     /**
@@ -419,7 +419,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (mLocalView != null) {
             mLocalView.release();
         }
-        ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_large);
+        ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_small);
         localParent.removeAllViews();
     }
 
@@ -430,7 +430,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (mRemoteView != null) {
             mRemoteView.release();
         }
-        ViewGroup remoteParent = mVideoContainer.findViewById(R.id.video_view_container_small);
+        ViewGroup remoteParent = mVideoContainer.findViewById(R.id.video_view_container_large);
         remoteParent.removeAllViews();
     }
 
@@ -743,6 +743,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         BMXRoomAuth auth = new BMXRoomAuth();
         auth.setMUserId(mUserId);
         auth.setMRoomId(mRoomId);
+        auth.setMToken(mPin);
         mEngine.joinRoom(auth);
     }
 

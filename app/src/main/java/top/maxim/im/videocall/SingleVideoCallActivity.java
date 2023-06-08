@@ -19,23 +19,22 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.UUID;
 
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXMessageList;
 import im.floo.floolib.BMXRTCEngine;
 import im.floo.floolib.BMXRTCEngineListener;
+import im.floo.floolib.BMXRTCServiceListener;
 import im.floo.floolib.BMXRoomAuth;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXStream;
 import im.floo.floolib.BMXVideoCanvas;
 import im.floo.floolib.BMXVideoConfig;
 import im.floo.floolib.BMXVideoMediaType;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
@@ -66,7 +65,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private static final String TAG = "SingleVideoCallActivity";
 
-    public static void openVideoCall(Context context, long chatId, long roomId, boolean isInitiator,
+    public static void openVideoCall(Context context, long chatId, long roomId, String callId, boolean isInitiator,
                                      BMXMessageConfig.RTCCallType callType, String pin) {
         Intent intent = new Intent(context, SingleVideoCallActivity.class);
         intent.putExtra(MessageConfig.CHAT_ID, chatId);
@@ -74,6 +73,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         intent.putExtra(MessageConfig.RTC_ROOM_ID, roomId);
         intent.putExtra(MessageConfig.IS_INITIATOR, isInitiator);
         intent.putExtra(MessageConfig.PIN, pin);
+        intent.putExtra(MessageConfig.CALL_ID, callId);
         context.startActivity(intent);
     }
 
@@ -132,6 +132,26 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 }
             }
         }
+    };
+
+    private BMXRTCServiceListener mRTCListener = new BMXRTCServiceListener(){
+
+        public void onRTCCallMessageReceive(BMXMessage msg) {
+
+        }
+
+        public void onRTCPickupMessageReceive(BMXMessage msg) {
+            if (msg.config().getRTCCallId().equals(mCallId) && msg.fromId() == mUserId){
+                leaveRoom();
+            }
+        }
+
+        public void onRTCHangupMessageReceive(BMXMessage msg) {
+            if (msg.config().getRTCCallId().equals(mCallId)){
+                leaveRoom();
+            }
+        }
+
     };
 
     @Override
@@ -201,6 +221,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             mRoomId = intent.getLongExtra(MessageConfig.RTC_ROOM_ID, 0);
             mIsInitiator = intent.getBooleanExtra(MessageConfig.IS_INITIATOR, false);
             mPin = intent.getStringExtra(MessageConfig.PIN);
+            mCallId = intent.getStringExtra(MessageConfig.CALL_ID);
         }
         mUserId = SharePreferenceUtils.getInstance().getUserId();
         mHasVideo = mCallType == BMXMessageConfig.RTCCallType.VideoCall;
@@ -417,6 +438,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     protected void initDataForActivity() {
         super.initDataForActivity();
         ChatManager.getInstance().addChatListener(mChatListener);
+        RTCManager.getInstance().addRTCServiceListener(mRTCListener);
         initRoster();
     }
 
@@ -524,7 +546,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 处理无权限
      */
     private void deniedPermission(){
-        sendRTCMessage("hangup", "");
+        sendRTCHangupMessage();
         ToastUtil.showTextViewPrompt(
                 getString(R.string.video_call_fail_check_permission));
         finish();
@@ -751,13 +773,14 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      */
     public void onCallAnswer(View view) {
         joinRoom();
+        sendRTCPickupMessage();
     }
 
     /**
      * 挂断
      */
     public void onCallHangup(View view){
-        sendRTCMessage("hangup", "");
+        sendRTCHangupMessage();
         leaveRoom();
         finish();
     }
@@ -840,7 +863,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
         if (mIsInitiator) {
             //用户加入放入房间 发送给对方信息
-            sendRTCMessage("join", mRoomId + "_" + info.getMUserId() + "_" + mCallMode);
+            sendRTCCallMessage();
         }
     }
 
@@ -889,6 +912,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
         ChatManager.getInstance().removeChatListener(mChatListener);
         mChatListener = null;
+        RTCManager.getInstance().removeRTCServiceListener(mRTCListener);
+        mRTCListener = null;
     }
 
     private class CallHandler extends WeakHandler<Activity> {
@@ -958,6 +983,31 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             e.printStackTrace();
         }
         mSendUtils.sendInputStatusMessage(BMXMessage.MessageType.Single, SharePreferenceUtils.getInstance().getUserId(), mChatId, extension);
+    }
+
+    /**
+     * 发送呼叫信息
+     */
+    private void sendRTCCallMessage(){
+        mCallId = mSendUtils.sendRTCCallMessage(
+                mHasVideo? BMXMessageConfig.RTCCallType.VideoCall: BMXMessageConfig.RTCCallType.AudioCall,
+                mRoomId, mUserId, mChatId, mPin);
+    }
+
+    /**
+     * 发送接听信息
+     */
+    private void sendRTCPickupMessage(){
+        mCallId = mSendUtils.sendRTCPickupMessage(
+                mUserId, mChatId, mCallId);
+    }
+
+    /**
+     * 发送挂断信息
+     */
+    private void sendRTCHangupMessage(){
+        mCallId = mSendUtils.sendRTCHangupMessage(
+                mUserId, mChatId, mCallId);
     }
 
     /**

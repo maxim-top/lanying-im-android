@@ -39,6 +39,43 @@ public final class MessageSendUtils {
     }
 
     /**
+     * 发送呼叫消息
+     */
+    public String sendRTCCallMessage(BMXMessageConfig.RTCCallType type, long roomId, long from, long to,
+                                     String pin) {
+        BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
+        con.setRTCCallInfo(type, roomId, from, BMXMessageConfig.RTCRoomType.Broadcast, pin);
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        msg.setConfig(con);
+        handlerMessage(msg);
+        return con.getRTCCallId();
+    }
+
+    /**
+     * 发送接听消息
+     */
+    public String sendRTCPickupMessage(long from, long to, String callId) {
+        BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
+        con.setRTCPickupInfo(callId);
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        msg.setConfig(con);
+        handlerMessage(msg);
+        return con.getRTCCallId();
+    }
+
+    /**
+     * 发送挂断消息
+     */
+    public String sendRTCHangupMessage(long from, long to, String callId) {
+        BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
+        con.setRTCHangupInfo(callId);
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        msg.setConfig(con);
+        handlerMessage(msg);
+        return con.getRTCCallId();
+    }
+
+    /**
      * 发送文本消息
      *
      * @param type 消息类型

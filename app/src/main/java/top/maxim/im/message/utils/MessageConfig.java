@@ -47,6 +47,11 @@ public interface MessageConfig {
     String PIN = "pin";
 
     /**
+     * Call ID
+     */
+    String CALL_ID = "callId";
+
+    /**
      * 会话id列表
      */
     String CHAT_IDS = "chatIds";

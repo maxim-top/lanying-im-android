@@ -14,11 +14,13 @@ import android.widget.TextView;
 
 import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXUserProfile;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.utils.RosterFetcher;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TimeUtils;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
@@ -161,51 +163,59 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         if (mItemPos == ITEM_CENTER || mMaxMessage == null) {
             return;
         }
+        BMXUserProfile profile = RosterFetcher.getFetcher().getProfile();
+        if (profile == null){
+            return;
+        }
+
+        String myName = profile.nickname();
+        if (TextUtils.isEmpty(myName)) {
+            myName = profile.username();
+        }
+
+        long myId = profile.userId();
+        long callerId = mMaxMessage.fromId();
+
         String userName = null;
         boolean group = mMaxMessage.type() == BMXMessage.MessageType.Group;
-        if (mMaxMessage.isReceiveMsg()) {
-            BMXRosterItem item = RosterFetcher.getFetcher().getRoster(mMaxMessage.fromId());
-            if(group){
-                //如果是群  需要获取群成员名称
-                BMXGroup.Member member = GroupManager.getInstance().getMemberByDB(mMaxMessage.conversationId(), mMaxMessage.fromId());
-                if (item != null && !TextUtils.isEmpty(item.alias())) {
-                    userName = item.alias();
-                } else if (member != null && !TextUtils.isEmpty(member.getMGroupNickname())) {
-                    userName = member.getMGroupNickname();
-                } else if (item != null && !TextUtils.isEmpty(item.nickname())) {
-                    userName = item.nickname();
-                } else if (item != null) {
-                    userName = item.username();
-                }
-            } else{
-                if (item != null && !TextUtils.isEmpty(item.alias())) {
-                    userName = item.alias();
-                } else if (item != null && !TextUtils.isEmpty(item.nickname())) {
-                    userName = item.nickname();
-                } else if (item != null) {
-                    userName = item.username();
-                }
+        if (mMaxMessage.contentType().equals(BMXMessage.ContentType.RTC)){
+            BMXMessageConfig config = mMaxMessage.config();
+            if (config != null && config.getRTCAction().equals("hangup")){
+                callerId = config.getRTCInitiator();
             }
-            if (mIconView != null) {
-                ChatUtils.getInstance().showRosterAvatar(item, mIconView, ICON_CONFIG);
+        }
+        boolean isSenderOrCaller = myId == callerId;//消息发送者或者RTC挂断消息对应的通话呼叫方
+        if (!isSenderOrCaller) {
+            BMXRosterItem item = RosterFetcher.getFetcher().getRoster(callerId);
+            if (item != null){
+                userName = item.alias();
+                if(TextUtils.isEmpty(userName)){
+                    //如果是群  需要获取群成员名称
+                    if (group){
+                        BMXGroup.Member member = GroupManager.getInstance().getMemberByDB(mMaxMessage.conversationId(), callerId);
+                        if (member != null) {
+                            userName = member.getMGroupNickname();
+                        }
+                    }
+                    if (TextUtils.isEmpty(userName)) {
+                        userName = item.nickname();
+                        if (TextUtils.isEmpty(userName)) {
+                            userName = item.username();
+                        }
+                    }
+                }
+
+                if (mIconView != null) {
+                    ChatUtils.getInstance().showRosterAvatar(item, mIconView, ICON_CONFIG);
+                }
             }
         } else {
-            BMXUserProfile profile = RosterFetcher.getFetcher().getProfile();
+            userName = myName;
             if (group) {
                 //如果是群  需要获取群成员名称
-                BMXGroup.Member member = GroupManager.getInstance().getMemberByDB(mMaxMessage.conversationId(), mMaxMessage.fromId());
+                BMXGroup.Member member = GroupManager.getInstance().getMemberByDB(mMaxMessage.conversationId(), callerId);
                 if (member != null && !TextUtils.isEmpty(member.getMGroupNickname())) {
                     userName = member.getMGroupNickname();
-                } else if (profile != null && !TextUtils.isEmpty(profile.nickname())) {
-                    userName = profile.nickname();
-                } else if (profile != null) {
-                    userName = profile.username();
-                }
-            } else {
-                if (profile != null && !TextUtils.isEmpty(profile.nickname())) {
-                    userName = profile.nickname();
-                } else if (profile != null) {
-                    userName = profile.username();
                 }
             }
             if (mIconView != null) {
@@ -213,10 +223,11 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
             }
         }
         if (mIconView != null) {
+            long finalCallerId = callerId;
             mIconView.setOnClickListener(v -> {
-                if (mMaxMessage.isReceiveMsg()) {
+                if (!isSenderOrCaller) {
                     // 收到的消息进入roster详情
-                    RosterDetailActivity.openRosterDetail(mContext, mMaxMessage.fromId());
+                    RosterDetailActivity.openRosterDetail(mContext, finalCallerId);
                 } else {
                     // 自己的进入设置页面
                     SettingUserActivity.openSettingUser(mContext);

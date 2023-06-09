@@ -18,6 +18,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -95,6 +96,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private String mPin;
 
+    private long mPickupTimestamp;
+
     //是否是发起者
     private boolean mIsInitiator;
 
@@ -153,6 +156,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
 
     };
+
+    private long getTimeStamp(){
+        return new Date().getTime();
+    }
 
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
@@ -326,6 +333,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 super.onSubscribe(stream, info, error);
                 if (BaseManager.bmxFinish(error)) {
                     onRemoteJoin(stream);
+                    mPickupTimestamp = getTimeStamp();
                     Log.e(TAG, "订阅远端流成功 msg = " + info);
                 } else {
                     Log.e(TAG, "订阅远端流失败 msg = " + info);
@@ -1007,8 +1015,24 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 发送挂断信息
      */
     private void sendRTCHangupMessage(){
+        String content = "canceled";
+        if (!mIsInitiator){
+            content = "rejected";
+        } else{
+            if (false) {//todo mRingTimes == 0
+                content = "timeout";
+            }
+        }
+        long duration = 0;
+        if (mPickupTimestamp > 1){
+            duration = getTimeStamp() - mPickupTimestamp;
+        }
+        if (duration > 1){
+            content = String.valueOf(duration);
+        }
+
         mCallId = mSendUtils.sendRTCHangupMessage(
-                mUserId, mChatId, mCallId);
+                mUserId, mChatId, mCallId, content);
     }
 
     /**

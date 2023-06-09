@@ -66,10 +66,10 @@ public final class MessageSendUtils {
     /**
      * 发送挂断消息
      */
-    public String sendRTCHangupMessage(long from, long to, String callId) {
+    public String sendRTCHangupMessage(long from, long to, String callId, String content) {
         BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
         con.setRTCHangupInfo(callId);
-        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, content);
         msg.setConfig(con);
         handlerMessage(msg);
         return con.getRTCCallId();

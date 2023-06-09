@@ -4,12 +4,16 @@ package top.maxim.im.message.adapter;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
 import java.util.Map;
 
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.message.interfaces.ChatActionListener;
 import top.maxim.im.message.itemholder.BaseChatHolder;
 import top.maxim.im.message.itemholder.IItemChatFactory;
@@ -76,7 +80,17 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
             return;
         }
         holder.showChatExtra(isShowTime(position), showReadAck);
-        holder.setData(mBeans.get(position));
+        BMXMessage bean = mBeans.get(position);
+        BMXMessageConfig config = bean.config();
+        if (config != null){
+            String action = config.getRTCAction();
+            if (action != null && !action.equals("hangup")){
+                RecyclerView.LayoutParams param = new RecyclerView.LayoutParams(1, 1);
+                holder.itemView.setLayoutParams(param);
+            }
+        }
+
+        holder.setData(bean);
     }
 
     @Override
@@ -127,6 +141,10 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
             // 语音
             factory = new MessageItemAudio(mContext, mActionListener,
                     isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
+        } else if (type == BMXMessage.ContentType.RTC.swigValue()) {
+            // RTC
+            factory = new MessageItemText(mContext, mActionListener,
+                    isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
         }
         if (factory == null) {
             // 无法识别的类型转为文本
@@ -147,6 +165,19 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
             return -1;
         }
         boolean isMySend = !bean.isReceiveMsg();
+        if (bean.contentType().equals(BMXMessage.ContentType.RTC)){
+            BMXMessageConfig config = bean.config();
+            if (config != null && config.getRTCAction().equals("hangup")){
+                String content = bean.content();
+                if (content.equals("rejected")){
+                    isMySend = !isMySend;
+                } else if (!content.equals("canceled")){
+                    if (config.getRTCInitiator() != bean.fromId()){
+                        isMySend = !isMySend;
+                    }
+                }
+            }
+        }
         int viewType = MsgBodyHelper.getContentBodyClass(bean.contentType().swigValue()) != null
                 ? bean.contentType().swigValue()
                 : -1;

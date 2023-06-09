@@ -22,6 +22,7 @@ import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXImageAttachment;
 import im.floo.floolib.BMXLocationAttachment;
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXUserProfile;
 import im.floo.floolib.BMXVoiceAttachment;
@@ -128,7 +129,7 @@ public class ChatUtils {
      * @param content message content
      * @return String
      */
-    private String getMessageDesc(Context context, BMXMessage.ContentType type, String content) {
+    private String getMessageDesc(Context context, BMXMessage.ContentType type, String content, boolean isReceiveMsg) {
         if (type == null) {
             return "[" + context.getString(R.string.unknown_message) + "]";
         }
@@ -148,6 +149,29 @@ public class ChatUtils {
         } else if (type == BMXMessage.ContentType.Voice) {
             // 语音
             desc = "[" + context.getString(R.string.voice) + "]";
+        } else if (type == BMXMessage.ContentType.RTC) {
+            if (content.equals("rejected")){
+                if (isReceiveMsg){
+                    content = "通话已被对方拒绝";
+                } else {
+                    content = "通话已拒绝";
+                }
+            } else if (content.equals("canceled")){
+                if (isReceiveMsg){
+                    content = "通话已被对方取消";
+                } else {
+                    content = "通话已取消";
+                }
+            } else {
+                try {
+                    long sec = Long.valueOf(content)/1000;
+                    content = String.format("通话时长：%02d:%02d",sec/60, sec%60);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            // 语音
+            desc = content;
         }
         return desc;
     }
@@ -165,7 +189,7 @@ public class ChatUtils {
         }
         BMXMessage.ContentType type = message.contentType();
         String content = message.content();
-        return getMessageDesc(context, type, content);
+        return getMessageDesc(context, type, content, message.isReceiveMsg());
     }
 
     /**
@@ -181,7 +205,7 @@ public class ChatUtils {
         }
         BMXMessage.ContentType type = message.getContentType();
         String content = message.getContent();
-        return getMessageDesc(context, type, content);
+        return getMessageDesc(context, type, content, message.isReceiveMsg());
     }
 
     /**

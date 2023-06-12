@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
@@ -68,13 +69,14 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private static final String TAG = "SingleVideoCallActivity";
 
     public static void openVideoCall(Context context, long chatId, long roomId, String callId, boolean isInitiator,
-                                     BMXMessageConfig.RTCCallType callType, String pin) {
+                                     BMXMessageConfig.RTCCallType callType, String pin, long msgId) {
         Intent intent = new Intent(context, SingleVideoCallActivity.class);
         intent.putExtra(MessageConfig.CHAT_ID, chatId);
         intent.putExtra(MessageConfig.CALL_TYPE, callType.swigValue());
         intent.putExtra(MessageConfig.RTC_ROOM_ID, roomId);
         intent.putExtra(MessageConfig.IS_INITIATOR, isInitiator);
         intent.putExtra(MessageConfig.PIN, pin);
+        intent.putExtra(MessageConfig.MESSAGE_ID, msgId);
         intent.putExtra(MessageConfig.CALL_ID, callId);
         context.startActivity(intent);
     }
@@ -96,6 +98,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private String mCallId;
 
     private String mPin;
+
+    private long mMsgId;
 
     private long mPickupTimestamp;
 
@@ -147,16 +151,37 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         public void onRTCPickupMessageReceive(BMXMessage msg) {
             if (msg.config().getRTCCallId().equals(mCallId) && msg.fromId() == mUserId){
                 leaveRoom();
+                ackMessage(msg);
             }
         }
 
         public void onRTCHangupMessageReceive(BMXMessage msg) {
-            if (msg.config().getRTCCallId().equals(mCallId)){
+            long otherId = mEngine.otherId;
+            if (msg.config().getRTCCallId().equals(mCallId) &&
+                    (msg.fromId()==otherId
+                    || msg.content().equals("busy")
+                    || msg.content().equals("rejected")
+                    || !mEngine.isOnCall)){
                 leaveRoom();
+                ackMessage(msg);
             }
         }
 
     };
+
+    private void ackMessage(BMXMessage msg){
+        ChatManager.getInstance().ackMessage(msg);
+    }
+
+    private void ackMessage(long msgId){
+        BMXDataCallBack<BMXMessage> callBack = new BMXDataCallBack<BMXMessage>() {
+            @Override
+            public void onResult(BMXErrorCode code, BMXMessage data) {
+                ChatManager.getInstance().ackMessage(data);
+            }
+        };
+        ChatManager.getInstance().getMessage(msgId,callBack);
+    }
 
     private long getTimeStamp(){
         return new Date().getTime();
@@ -229,6 +254,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             mRoomId = intent.getLongExtra(MessageConfig.RTC_ROOM_ID, 0);
             mIsInitiator = intent.getBooleanExtra(MessageConfig.IS_INITIATOR, false);
             mPin = intent.getStringExtra(MessageConfig.PIN);
+            mMsgId = intent.getLongExtra(MessageConfig.MESSAGE_ID, 0);
             mCallId = intent.getStringExtra(MessageConfig.CALL_ID);
         }
         mUserId = SharePreferenceUtils.getInstance().getUserId();
@@ -795,6 +821,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     public void onCallHangup(View view){
         sendRTCHangupMessage();
         leaveRoom();
+        if (mPickupTimestamp < 1){
+            ackMessage(mMsgId);
+        }
         finish();
     }
 
@@ -1013,6 +1042,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private void sendRTCPickupMessage(){
         mCallId = mSendUtils.sendRTCPickupMessage(
                 mUserId, mChatId, mCallId);
+        ackMessage(mMsgId);
     }
 
     /**

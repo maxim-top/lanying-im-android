@@ -42,9 +42,14 @@ public interface MessageConfig {
     String IS_INITIATOR = "isInitiator";
 
     /**
-     * 是否发起者
+     * 房间密码
      */
     String PIN = "pin";
+
+    /**
+     * 当前通话发起呼叫时的消息的ID
+     */
+    String MESSAGE_ID = "messageId";
 
     /**
      * Call ID

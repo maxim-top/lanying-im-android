@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -404,7 +405,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         localParent.setVisibility(View.VISIBLE);
         mRemoteView = new RTCRenderView(this);
         mRemoteView.init();
-        localParent.addView(mRemoteView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.gravity = Gravity.CENTER;
+        localParent.addView(mRemoteView, layoutParams);
     }
 
     /**
@@ -416,7 +419,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         mLocalView = new RTCRenderView(this);
         mLocalView.init();
         mLocalView.getSurfaceView().setZOrderMediaOverlay(true);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
         remoteParent.addView(mLocalView, layoutParams);
     }
 

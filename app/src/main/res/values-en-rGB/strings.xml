@@ -422,4 +422,12 @@
     <string name="sys_msg">System Notifications</string>
     <string name="delete_account">Delete Account</string>
     <string name="delete_account_text">After deleting your account, all your data will be erased and cannot be restored. Are you sure you want to delete it?</string>
+    <string name="call_be_declined">Call rejected by callee</string>
+    <string name="call_declined">Call rejected</string>
+    <string name="call_be_canceled">Call canceled by caller</string>
+    <string name="call_canceled">Call canceled</string>
+    <string name="call_not_responding">Not responding</string>
+    <string name="callee_not_responding">Callee not responding</string>
+    <string name="callee_busy">Callee is busy</string>
+    <string name="call_busy">Call is busy</string>
 </resources>

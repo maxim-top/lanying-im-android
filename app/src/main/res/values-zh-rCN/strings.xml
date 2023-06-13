@@ -422,4 +422,12 @@
     <string name="sys_msg">系统通知</string>
     <string name="delete_account">删除账号</string>
     <string name="delete_account_text">账号删除后，您的所有数据都将擦除，不可恢复。确定要删除吗？</string>
+    <string name="call_be_declined">通话已被对方拒绝</string>
+    <string name="call_declined">通话已拒绝</string>
+    <string name="call_be_canceled">通话已被对方取消</string>
+    <string name="call_canceled">通话已取消</string>
+    <string name="call_not_responding">未应答</string>
+    <string name="callee_not_responding">对方未应答</string>
+    <string name="callee_busy">对方忙</string>
+    <string name="call_busy">忙线未接听</string>
 </resources>

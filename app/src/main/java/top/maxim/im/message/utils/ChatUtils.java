@@ -152,15 +152,27 @@ public class ChatUtils {
         } else if (type == BMXMessage.ContentType.RTC) {
             if (content.equals("rejected")){
                 if (isReceiveMsg){
-                    content = "通话已被对方拒绝";
+                    content = context.getString(R.string.call_be_declined);
                 } else {
-                    content = "通话已拒绝";
+                    content = context.getString(R.string.call_declined);
                 }
             } else if (content.equals("canceled")){
                 if (isReceiveMsg){
-                    content = "通话已被对方取消";
+                    content = context.getString(R.string.call_be_canceled);
                 } else {
-                    content = "通话已取消";
+                    content = context.getString(R.string.call_canceled);
+                }
+            } else if (content.equals("timeout")){
+                if (isReceiveMsg){
+                    content = context.getString(R.string.call_not_responding);
+                } else {
+                    content = context.getString(R.string.callee_not_responding);
+                }
+            } else if (content.equals("busy")){
+                if (isReceiveMsg){
+                    content = context.getString(R.string.callee_busy);
+                } else {
+                    content = context.getString(R.string.call_busy);
                 }
             } else {
                 try {

@@ -122,6 +122,12 @@ public class MessageDispatcher {
 
     };
 
+    private void replyBusy(String callId, long myID, long chatId){
+        new MessageSendUtils().sendRTCHangupMessage(
+                myID, chatId, callId, "busy");
+
+    }
+
     private BMXChatServiceListener mChatListener = new BMXChatServiceListener() {
 
         @Override

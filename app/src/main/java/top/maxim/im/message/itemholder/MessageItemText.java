@@ -71,15 +71,27 @@ public class MessageItemText extends MessageItemBaseView {
                 if (action.equals("hangup")){
                     if (content.equals("rejected")){
                         if (mMaxMessage.isReceiveMsg()){
-                            content = "通话已被对方拒绝";
+                            content = getResources().getString(R.string.call_be_declined);
                         } else {
-                            content = "通话已拒绝";
+                            content = getResources().getString(R.string.call_declined);
                         }
                     } else if (content.equals("canceled")){
                         if (mMaxMessage.isReceiveMsg()){
-                            content = "通话已被对方取消";
+                            content = getResources().getString(R.string.call_be_canceled);
                         } else {
-                            content = "通话已取消";
+                            content = getResources().getString(R.string.call_canceled);
+                        }
+                    } else if (content.equals("timeout")){
+                        if (mMaxMessage.isReceiveMsg()){
+                            content = getResources().getString(R.string.call_not_responding);
+                        } else {
+                            content = getResources().getString(R.string.callee_not_responding);
+                        }
+                    } else if (content.equals("busy")){
+                        if (mMaxMessage.isReceiveMsg()){
+                            content = getResources().getString(R.string.callee_busy);
+                        } else {
+                            content = getResources().getString(R.string.call_busy);
                         }
                     } else {
                         try {

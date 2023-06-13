@@ -53,7 +53,7 @@ public class CallRingtoneManager {
     /**
      * 停止响铃
      */
-    void stopRinging() {
+    public void stopRinging() {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.setVolume(0.7f, 0.7f);
             mediaPlayer.stop();
@@ -63,7 +63,7 @@ public class CallRingtoneManager {
     /**
      * 释放
      */
-    void release() {
+    public void release() {
         if (audioManager != null) {
             audioManager.setMode(AudioManager.MODE_NORMAL);
             audioManager.setMicrophoneMute(false);

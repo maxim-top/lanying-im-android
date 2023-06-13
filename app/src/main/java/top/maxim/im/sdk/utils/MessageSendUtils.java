@@ -54,25 +54,23 @@ public final class MessageSendUtils {
     /**
      * 发送接听消息
      */
-    public String sendRTCPickupMessage(long from, long to, String callId) {
+    public void sendRTCPickupMessage(long from, long to, String callId) {
         BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
         con.setRTCPickupInfo(callId);
         BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
         msg.setConfig(con);
         handlerMessage(msg);
-        return con.getRTCCallId();
     }
 
     /**
      * 发送挂断消息
      */
-    public String sendRTCHangupMessage(long from, long to, String callId, String content) {
+    public void sendRTCHangupMessage(long from, long to, String callId, String content) {
         BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
         con.setRTCHangupInfo(callId);
         BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, content);
         msg.setConfig(con);
         handlerMessage(msg);
-        return con.getRTCCallId();
     }
 
     /**

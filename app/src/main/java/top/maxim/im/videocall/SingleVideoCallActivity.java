@@ -21,6 +21,8 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 import im.floo.BMXDataCallBack;
@@ -57,6 +59,7 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.sdk.utils.MessageSendUtils;
+import top.maxim.im.videocall.utils.CallRingtoneManager;
 import top.maxim.im.videocall.utils.EngineConfig;
 import top.maxim.rtc.view.BMXRtcRenderView;
 import top.maxim.rtc.view.RTCRenderView;
@@ -129,6 +132,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private MessageSendUtils mSendUtils;
 
+    private CallRingtoneManager mCallRingtoneManager;
+
+    private Timer mRingToneTimer;
+
     private BMXChatServiceListener mChatListener = new BMXChatServiceListener(){
         @Override
         public void onReceive(BMXMessageList list) {
@@ -162,6 +169,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                     (msg.fromId()==otherId
                     || msg.content().equals("busy")
                     || msg.content().equals("rejected")
+                    || msg.content().equals("canceled")
+                    || msg.content().equals("timeout")
                     || !mEngine.isOnCall)){
                 leaveRoom();
                 ackMessage(msg);
@@ -207,6 +216,23 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         mAudioContainer = view.findViewById(R.id.layout_audio_container);
         mHandler = new CallHandler(this);
         mSendUtils = new MessageSendUtils();
+        mCallRingtoneManager = new CallRingtoneManager(this);
+        mCallRingtoneManager.ringing(!mIsInitiator);
+
+        if (mIsInitiator){
+            TimerTask task = new TimerTask() {
+                public void run() {
+                    sendRTCHangupMessage("timeout");
+                    leaveRoom();
+                    mCallRingtoneManager.stopRinging();
+                    finish();
+                }
+            };
+            mRingToneTimer = new Timer();
+            long delay = 10*1000;
+            mRingToneTimer.schedule(task, delay);
+        }
+
         return view;
     }
 
@@ -805,6 +831,11 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             mRemoteView.release();
             mRemoteView = null;
         }
+        mCallRingtoneManager.stopRinging();
+        if (mIsInitiator){
+            mRingToneTimer.cancel();
+        }
+        mCallRingtoneManager.release();
         finish();
     }
 
@@ -814,6 +845,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     public void onCallAnswer(View view) {
         joinRoom();
         sendRTCPickupMessage();
+        mCallRingtoneManager.stopRinging();
+        if (mIsInitiator){
+            mRingToneTimer.cancel();
+        }
     }
 
     /**
@@ -824,6 +859,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         leaveRoom();
         if (mPickupTimestamp < 1){
             ackMessage(mMsgId);
+        }
+        mCallRingtoneManager.stopRinging();
+        if (mIsInitiator){
+            mRingToneTimer.cancel();
         }
         finish();
     }
@@ -916,6 +955,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private void onRemoteJoin(BMXStream info) {
         if(info == null){
             return;
+        }
+        mCallRingtoneManager.stopRinging();
+        if (mIsInitiator){
+            mRingToneTimer.cancel();
         }
         boolean hasVideo = info.getMEnableVideo();
         boolean hasAudio = info.getMEnableAudio();
@@ -1041,9 +1084,17 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 发送接听信息
      */
     private void sendRTCPickupMessage(){
-        mCallId = mSendUtils.sendRTCPickupMessage(
+        mSendUtils.sendRTCPickupMessage(
                 mUserId, mChatId, mCallId);
         ackMessage(mMsgId);
+    }
+
+    /**
+     * 发送挂断信息
+     */
+    private void sendRTCHangupMessage(String content){
+        mSendUtils.sendRTCHangupMessage(
+                mUserId, mChatId, mCallId, content);
     }
 
     /**
@@ -1053,11 +1104,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         String content = "canceled";
         if (!mIsInitiator){
             content = "rejected";
-        } else{
-            if (false) {//todo mRingTimes == 0
-                content = "timeout";
-            }
         }
+
         long duration = 0;
         if (mPickupTimestamp > 1){
             duration = getTimeStamp() - mPickupTimestamp;
@@ -1066,7 +1114,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             content = String.valueOf(duration);
         }
 
-        mCallId = mSendUtils.sendRTCHangupMessage(
+        mSendUtils.sendRTCHangupMessage(
                 mUserId, mChatId, mCallId, content);
     }
 

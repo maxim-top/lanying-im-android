@@ -79,6 +79,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         intent.putExtra(MessageConfig.MESSAGE_ID, msgId);
         intent.putExtra(MessageConfig.CALL_ID, callId);
         context.startActivity(intent);
+        RTCManager.getInstance().getRTCEngine().isOnCall = true;
     }
 
     private ViewGroup mVideoContainer;

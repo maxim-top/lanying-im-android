@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,24 +70,47 @@ public class MessageDispatcher {
 
     private Set<String> mHungupCalls = new HashSet<>();
 
+    private void ackMessage(BMXMessage msg){
+        ChatManager.getInstance().ackMessage(msg);
+    }
+
     private BMXRTCServiceListener mRTCListener = new BMXRTCServiceListener(){
 
         public void onRTCCallMessageReceive(BMXMessage msg) {
-            String callId = msg.config().getRTCCallId();
-            if (mHungupCalls.contains(callId)){
-                mHungupCalls.remove(callId);
-                return;
-            }
-            long roomId = msg.config().getRTCRoomId();
-            long chatId = msg.config().getRTCInitiator();
-            String pin = msg.config().getRTCPin();
-            if(mActivityRef != null && mActivityRef.get() != null){
-                Context context = mActivityRef.get();
-                if (msg.type() == BMXMessage.MessageType.Single) {
-                    SingleVideoCallActivity.openVideoCall(context, chatId, roomId, callId,false, msg.config().getRTCCallType(), pin);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    String callId = msg.config().getRTCCallId();
+                    if (mHungupCalls.contains(callId)){
+                        mHungupCalls.remove(callId);
+                        ackMessage(msg);
+                        return;
+                    }
+                    long roomId = msg.config().getRTCRoomId();
+                    long chatId = msg.config().getRTCInitiator();
+                    long myId = SharePreferenceUtils.getInstance().getUserId();
+                    if (myId == chatId){
+                        return;
+                    }
+                    if (RTCManager.getInstance().getRTCEngine().isOnCall){
+                        replyBusy(callId, myId, chatId);
+                        return;
+                    }
+                    String pin = msg.config().getRTCPin();
+                    if(mActivityRef != null && mActivityRef.get() != null){
+                        Context context = mActivityRef.get();
+                        if (msg.type() == BMXMessage.MessageType.Single) {
+                            SingleVideoCallActivity.openVideoCall(context, chatId, roomId, callId,
+                                    false, msg.config().getRTCCallType(), pin, msg.msgId());
+                        }
+                    }
                 }
-            }
-
+            }, "onRTCCallMessageReceive").start();
         }
 
         public void onRTCPickupMessageReceive(BMXMessage msg) {

@@ -467,12 +467,15 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             layoutParams.width = getPixelsFromDp(120);
             layoutParams.height = getPixelsFromDp(212);
             smallViewGroup.setLayoutParams(layoutParams);
+            mLocalView.setScalingType(BMXRtcRenderView.ScalingType.SCALE_ASPECT_FILL);
         }
 
         ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_large);
         localParent.setVisibility(View.VISIBLE);
         mRemoteView = new RTCRenderView(this);
         mRemoteView.init();
+        mRemoteView.setScalingType(BMXRtcRenderView.ScalingType.SCALE_ASPECT_FILL);
+
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity = Gravity.CENTER;
         localParent.addView(mRemoteView, layoutParams);
@@ -494,6 +497,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         smallViewGroup.setVisibility(View.VISIBLE);
         mLocalView = new RTCRenderView(this);
         mLocalView.init();
+        mLocalView.setScalingType(BMXRtcRenderView.ScalingType.SCALE_ASPECT_FILL);
         mLocalView.getSurfaceView().setZOrderMediaOverlay(true);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);

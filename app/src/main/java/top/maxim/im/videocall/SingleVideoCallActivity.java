@@ -902,7 +902,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      */
     public void onSwitchAudio(View view) {
         switchAudio();
-        sendRTCMessage("mute_video", "");
+        sendRTCMessage("switch_audio");
     }
 
     /**
@@ -922,13 +922,15 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         canvas.setMStream(stream);
         mEngine.stopPreview(canvas);
         mEngine.muteLocalVideo(BMXVideoMediaType.Camera, true);
-        removeLocalView();
-        removeRemoteView();
-        hideVideoPeerInfo();
-        showAudioPeerInfo();
+        runOnUiThread(() -> {
+            removeLocalView();
+            removeRemoteView();
+            hideVideoPeerInfo();
+            showAudioPeerInfo();
+            showControlView(mHasVideo);
+        });
         mCallType = BMXMessageConfig.RTCCallType.AudioCall;
         mHasVideo = false;
-        showControlView(mHasVideo);
     }
 
     /**
@@ -1081,17 +1083,16 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     /**
      * 发送RTC信息
      */
-    private void sendRTCMessage(String config, String value){
+    private void sendRTCMessage(String cmd){
         String extension = "";
         try {
             JSONObject object = new JSONObject();
-            object.put("rtcKey", config);
-            object.put("rtcValue", value);
+            object.put("rtc_cmd", cmd);
             extension = object.toString();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        mSendUtils.sendInputStatusMessage(BMXMessage.MessageType.Single, SharePreferenceUtils.getInstance().getUserId(), mChatId, extension);
+        mSendUtils.sendRTCMessage(mUserId, mChatId, extension);
     }
 
     /**
@@ -1148,25 +1149,19 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (message == null) {
             return;
         }
-        if (message.contentType() == BMXMessage.ContentType.Text
+        if (message.contentType() == BMXMessage.ContentType.RTC
                 && !TextUtils.isEmpty(message.extension())) {
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject(message.extension());
-                if(!jsonObject.has("rtcKey")){
+                if(!jsonObject.has("rtc_cmd")){
                     return;
                 }
-                String key = jsonObject.getString("rtcKey");
-                switch (key){
-                    case "mute_video":
-                        //切换语音通话
+                String cmd = jsonObject.getString("rtc_cmd");
+                switch (cmd){
+                    case "switch_audio":
+                        //切换为语音通话
                         switchAudio();
-                        break;
-                    case "mute_audio":
-                        break;
-                    case "hangup":
-                        //挂断
-                        leaveRoom();
                         break;
                     default:
                         break;

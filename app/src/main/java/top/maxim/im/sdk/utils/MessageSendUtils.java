@@ -39,6 +39,16 @@ public final class MessageSendUtils {
     }
 
     /**
+     * 发送RTC消息
+     */
+    public void sendRTCMessage(long from, long to,
+                                     String ext) {
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        msg.setExtension(ext);
+        handlerMessage(msg);
+    }
+
+    /**
      * 发送呼叫消息
      */
     public String sendRTCCallMessage(BMXMessageConfig.RTCCallType type, long roomId, long from, long to,

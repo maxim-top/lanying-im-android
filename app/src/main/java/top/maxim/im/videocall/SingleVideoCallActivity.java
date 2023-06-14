@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -229,7 +230,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 }
             };
             mRingToneTimer = new Timer();
-            long delay = 10*1000;
+            long delay = 30*1000;
             mRingToneTimer.schedule(task, delay);
         }
 
@@ -450,10 +451,24 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
     }
 
+    private int getPixelsFromDp(int i){
+        DisplayMetrics metrics =new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        return(i * metrics.densityDpi) / DisplayMetrics.DENSITY_DEFAULT;
+    }
+
     /**
      * 添加本地视频view
      */
     private void addRemoteView() {
+        if (mLocalView != null){
+            ViewGroup smallViewGroup = mVideoContainer.findViewById(R.id.video_view_container_small);
+            ViewGroup.LayoutParams layoutParams = smallViewGroup.getLayoutParams();
+            layoutParams.width = getPixelsFromDp(120);
+            layoutParams.height = getPixelsFromDp(212);
+            smallViewGroup.setLayoutParams(layoutParams);
+        }
+
         ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_large);
         localParent.setVisibility(View.VISIBLE);
         mRemoteView = new RTCRenderView(this);
@@ -467,14 +482,22 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 添加远端视频view
      */
     private void addLocalView() {
-        ViewGroup remoteParent = mVideoContainer.findViewById(R.id.video_view_container_small);
-        remoteParent.setVisibility(View.VISIBLE);
+        ViewGroup smallViewGroup = mVideoContainer.findViewById(R.id.video_view_container_small);
+
+        if (mRemoteView == null){
+            ViewGroup.LayoutParams layoutParams = smallViewGroup.getLayoutParams();
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+            smallViewGroup.setLayoutParams(layoutParams);
+        }
+
+        smallViewGroup.setVisibility(View.VISIBLE);
         mLocalView = new RTCRenderView(this);
         mLocalView.init();
         mLocalView.getSurfaceView().setZOrderMediaOverlay(true);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT);
-        remoteParent.addView(mLocalView, layoutParams);
+        layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
+        smallViewGroup.addView(mLocalView, layoutParams);
     }
 
     /**

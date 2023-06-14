@@ -371,6 +371,33 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     }
 
     @Override
+    public void updateChatData() {
+        if (mConversation == null) {
+            return;
+        }
+        //拉取最近一条消息
+        ChatManager.getInstance().retrieveHistoryMessages(mConversation, 0,
+                1, (bmxErrorCode, messageList) -> {
+                    if (BaseManager.bmxFinish(bmxErrorCode)) {
+                        if (!messageList.isEmpty()) {
+                            List<BMXMessage> messages = new ArrayList<>();
+                            for (int i = 0; i < messageList.size(); i++) {
+                                BMXMessage msg = messageList.get(i);
+                                if (msg.contentType().equals(BMXMessage.ContentType.RTC) &&
+                                        msg.config().getRTCAction().equals("hangup") &&
+                                        msg.fromId() == mMyUserId){
+                                    messages.add(msg);
+                                }
+                            }
+                            if (mView != null) {
+                                mView.receiveChatMessage(messages);
+                            }
+                        }
+                    }
+                });
+    }
+
+    @Override
     public void getPullDownChatMessages(final long msgId, final int offset) {
         if (mConversation == null || msgId < 0) {
             return;

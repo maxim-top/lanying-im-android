@@ -113,12 +113,12 @@
     <string name="register">Register</string>
     <string name="login_user_name_hint">Username/Phone Number</string>
     <string name="login_user_phone_hint">Phone Number</string>
-    <string name="login_user_verify_hint">Captcha</string>
+    <string name="login_user_verify_hint">Code</string>
     <string name="login_user_id_hint">Please enter your user id</string>
     <string name="login_user_pwd_hint">Password</string>
     <string name="register_user_phone_hint">Please enter your phone number</string>
     <string name="register_user_name_hint">Username</string>
-    <string name="register_user_verify_hint">Please enter captcha</string>
+    <string name="register_user_verify_hint">Please enter the code</string>
     <string name="register_user_pwd_hint">Password</string>
     <string name="quick_login">Quick Login</string>
     <string name="verify_login">Login Via Mobile Number</string>
@@ -180,7 +180,7 @@
 
     <string name="change_phone_tag">Bind a New Phone Number</string>
     <string name="bind_phone_tag">You have bound a phone number %1s</string>
-    <string name="phone_verify_change">Use Mobile Captcha</string>
+    <string name="phone_verify_change">Use SMS Code</string>
     <string name="pwd_verify_change">Use Password</string>
 
     <string name="change_pwd_tag">Change Password</string>
@@ -306,8 +306,8 @@
     <string name="failed_to_get_token">Failed to Get Token</string>
     <string name="failed_to_get_group_qr_code">Failed to Get Group QR Code</string>
     <string name="failed_to_get_location">Failed to Get Location</string>
-    <string name="get_captcha_successfully">Get Captcha Successfully</string>
-    <string name="failed_to_get_captcha">Failed to Get Captcha</string>
+    <string name="get_captcha_successfully">Get Code Successfully</string>
+    <string name="failed_to_get_captcha">Failed to Get Code</string>
     <string name="failed_to_get_read_list">Failed to Get Read List</string>
     <string name="join">Join</string>
     <string name="join_successfully">Join Successfully</string>
@@ -403,7 +403,7 @@
     <string name="input_username_searched">Input User Name</string>
     <string name="input_userid_searched">Input User ID</string>
     <string name="switch_login_mode">Change Login Mode</string>
-    <string name="get_captcha">Get Captcha</string>
+    <string name="get_captcha">Get Code</string>
     <string name="go_to_login">I have an account, go to login</string>
     <string name="confirm_join_group">Join this group?</string>
     <string name="process">Process</string>

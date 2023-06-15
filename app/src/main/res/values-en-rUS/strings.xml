@@ -431,4 +431,5 @@
     <string name="callee_not_responding">Callee not responding</string>
     <string name="callee_busy">Callee is busy</string>
     <string name="call_busy">Call is busy</string>
+    <string name="check_first">Please click to check "I have read and agree to 'User Services' and 'Privacy Policy'"</string>
 </resources>

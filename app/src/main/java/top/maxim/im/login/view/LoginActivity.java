@@ -263,6 +263,11 @@ public class LoginActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }
+            boolean isAgree = mCheckBox.isChecked();
+            if (!isAgree){
+                ToastUtil.showTextViewPrompt(getString(R.string.check_first));
+                return;
+            }
             initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN, mChangeAppId);
         });

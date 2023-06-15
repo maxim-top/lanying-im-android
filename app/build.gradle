@@ -16,8 +16,8 @@ android {
         applicationId "top.maxim.im"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 2000000001
-        versionName "v3.4.3"
+        versionCode 2000000002
+        versionName "v4.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "100565061",
@@ -47,7 +47,7 @@ android {
         ndk {
             // 设置支持的SO库架构
 //            abiFilters 'armeabi' ,'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
-            abiFilters 'armeabi-v7a'
+            abiFilters 'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
         }
         multiDexEnabled true
     }
@@ -74,13 +74,11 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    repositories {
-        flatDir {
-            dirs project(':floo-rtc-android').file('libs')   // aar目录
-//            dirs project(':floo-rtc-ucloud').file('libs')   // aar目录
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
         }
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -100,7 +98,7 @@ dependencies {
     implementation 'com.squareup.okio:okio:1.12.0'
 //    implementation 'com.aliyun.dpa:oss-android-sdk:+'
 //    implementation 'com.google.code.gson:gson:2.7'
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.?ar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     testImplementation 'junit:junit:4.12'
@@ -120,7 +118,6 @@ dependencies {
     //UIL
 
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_3.6.0.20221220',ext:'aar')
 
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")

@@ -1,5 +1,1 @@
 include ':app'
-include ':floo-rtc-android'
-project(':floo-rtc-android').projectDir = new File('../floo-rtc-android/floo-rtc-android')
-//include ':floo-rtc-ucloud'
-//project(':floo-rtc-ucloud').projectDir = new File('../floo-rtc-ucloud-android/floo-rtc-ucloud')

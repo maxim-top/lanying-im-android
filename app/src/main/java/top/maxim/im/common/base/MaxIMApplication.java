@@ -27,7 +27,7 @@ import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
-import top.maxim.rtc.BuildConfig;
+import top.maxim.im.BuildConfig;
 
 /**
  * Description : application Created by Mango on 2018/11/5.

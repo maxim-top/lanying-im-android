@@ -964,11 +964,13 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         boolean hasVideo = info.getMEnableVideo();
         boolean hasAudio = info.getMEnableAudio();
         if (mHasVideo) {
-            addLocalView();
-            BMXVideoCanvas canvas = new BMXVideoCanvas();
-            canvas.setMView(mLocalView.getObtainView());
-            canvas.setMStream(info);
-            mEngine.startPreview(canvas);
+            runOnUiThread(() -> {
+                addLocalView();
+                BMXVideoCanvas canvas = new BMXVideoCanvas();
+                canvas.setMView(mLocalView.getObtainView());
+                canvas.setMStream(info);
+                mEngine.startPreview(canvas);
+            });
         } else {
 
         }
@@ -991,20 +993,22 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
         boolean hasVideo = info.getMEnableVideo();
         boolean hasAudio = info.getMEnableAudio();
-        hideInitiatorView();
-        hideRecipientView();
-        showControlView(mHasVideo);
-        if (mHasVideo) {
-            addRemoteView();
-            BMXVideoCanvas canvas = new BMXVideoCanvas();
-            canvas.setMView(mRemoteView.getObtainView());
-            canvas.setMUserId(info.getMUserId());
-            canvas.setMStream(info);
-            mEngine.startRemoteView(canvas);
-            hideVideoPeerInfo();
-        } else {
+        runOnUiThread(() -> {
+            hideInitiatorView();
+            hideRecipientView();
+            showControlView(mHasVideo);
+            if (mHasVideo) {
+                addRemoteView();
+                BMXVideoCanvas canvas = new BMXVideoCanvas();
+                canvas.setMView(mRemoteView.getObtainView());
+                canvas.setMUserId(info.getMUserId());
+                canvas.setMStream(info);
+                mEngine.startRemoteView(canvas);
+                hideVideoPeerInfo();
+            } else {
 
-        }
+            }
+        });
         mHandler.removeAll();
     }
 

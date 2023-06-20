@@ -223,7 +223,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (mIsInitiator){
             TimerTask task = new TimerTask() {
                 public void run() {
-                    sendRTCHangupMessage("timeout");
+                    mSendUtils.sendRTCHangupMessage(
+                            mUserId, mChatId, mCallId, "timeout",
+                            "{\"loc-key\":\"callee_not_responding\"}");
                     leaveRoom();
                     mCallRingtoneManager.stopRinging();
                     finish();
@@ -1124,18 +1126,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     /**
      * 发送挂断信息
      */
-    private void sendRTCHangupMessage(String content){
-        mSendUtils.sendRTCHangupMessage(
-                mUserId, mChatId, mCallId, content);
-    }
-
-    /**
-     * 发送挂断信息
-     */
     private void sendRTCHangupMessage(){
         String content = "canceled";
+        String iosConfig = "{\"loc-key\":\"call_canceled_by_caller\"}";
         if (!mIsInitiator){
             content = "rejected";
+            iosConfig = "{\"loc-key\":\"call_rejected_by_callee\"}";
         }
 
         long duration = 0;
@@ -1144,10 +1140,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
         if (duration > 1){
             content = String.valueOf(duration);
+            long sec = duration/1000;
+            iosConfig = String.format("{\"loc-key\":\"call_duration\",\"loc-args\":[\"%d\",\"%d\"]}",sec/60, sec%60);
         }
 
         mSendUtils.sendRTCHangupMessage(
-                mUserId, mChatId, mCallId, content);
+                mUserId, mChatId, mCallId, content, iosConfig);
     }
 
     /**

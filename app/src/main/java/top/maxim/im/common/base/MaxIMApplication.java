@@ -20,7 +20,7 @@ import java.io.File;
 import java.util.Locale;
 
 import top.maxim.im.bmxmanager.BaseManager;
-import top.maxim.im.bmxmanager.RTCManager;
+import top.maxim.rtc.RTCManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
@@ -137,7 +137,7 @@ public class MaxIMApplication extends Application {
      * 初始化Rtc
      */
     private void initRtc(){
-        RTCManager.getInstance().init(this);
+        RTCManager.getInstance().init(this, BaseManager.getBMXClient());
     }
 
 }

@@ -13,9 +13,6 @@ import android.widget.RelativeLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +33,7 @@ import im.floo.floolib.ListOfLongLong;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
-import top.maxim.im.bmxmanager.RTCManager;
+import top.maxim.rtc.RTCManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.RosterFetcher;

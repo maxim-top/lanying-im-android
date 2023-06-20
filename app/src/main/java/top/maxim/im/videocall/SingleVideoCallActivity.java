@@ -44,7 +44,7 @@ import im.floo.floolib.BMXVideoMediaType;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
-import top.maxim.im.bmxmanager.RTCManager;
+import top.maxim.rtc.RTCManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.RosterFetcher;

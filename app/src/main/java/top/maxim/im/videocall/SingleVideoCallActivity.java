@@ -119,7 +119,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private boolean mHasVideo = false;
 
     //扬声器
-//    private boolean mSpeaker = EngineConfig.SWITCH_SPEAKER;
     private boolean mSpeaker = true;
 
     //麦克风
@@ -442,12 +441,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             BMXVideoConfig config = new BMXVideoConfig();
             config.setProfile(EngineConfig.VIDEO_PROFILE);
             mEngine.setVideoProfile(config);
-//            mEngine.setAudioProfile(true);//视频默认开启扬声器
-//            mEngine.setAudioOnlyMode(false);
-        } else {
-//            mEngine.setAudioProfile(mSpeaker);
-//            mEngine.setAudioOnlyMode(true);
         }
+
         if (mIsInitiator) {
             joinRoom();
         }
@@ -945,7 +940,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     public void onSwitchSpeakerInitiator(View view) {
         ViewGroup parent = findViewById(R.id.ll_initiate_control);
         changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));
-//        mEngine.setAudioProfile(mSpeaker);
         ToastUtil.showTextViewPrompt(mSpeaker ? R.string.call_speaker_on_tips : R.string.call_speaker_off_tips);
     }
 
@@ -955,7 +949,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     public void onSwitchSpeakerCalling(View view) {
         ViewGroup parent = findViewById(R.id.ll_in_call_control);
         changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));
-//        mEngine.setAudioProfile(mSpeaker);
         ToastUtil.showTextViewPrompt(mSpeaker ? R.string.call_speaker_on_tips : R.string.call_speaker_off_tips);
     }
 
@@ -963,8 +956,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if(info == null){
             return;
         }
-        boolean hasVideo = info.getMEnableVideo();
-        boolean hasAudio = info.getMEnableAudio();
         if (mHasVideo) {
             runOnUiThread(() -> {
                 addLocalView();
@@ -993,8 +984,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (mIsInitiator){
             mRingToneTimer.cancel();
         }
-        boolean hasVideo = info.getMEnableVideo();
-        boolean hasAudio = info.getMEnableAudio();
         runOnUiThread(() -> {
             hideInitiatorView();
             hideRecipientView();

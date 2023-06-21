@@ -472,15 +472,15 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             mLocalView.setScalingType(BMXRtcRenderView.ScalingType.SCALE_ASPECT_FILL);
         }
 
-        ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_large);
-        localParent.setVisibility(View.VISIBLE);
+        ViewGroup largeViewGroup = mVideoContainer.findViewById(R.id.video_view_container_large);
+        largeViewGroup.setVisibility(View.VISIBLE);
         mRemoteView = new RTCRenderView(this);
         mRemoteView.init();
         mRemoteView.setScalingType(BMXRtcRenderView.ScalingType.SCALE_ASPECT_FILL);
 
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity = Gravity.CENTER;
-        localParent.addView(mRemoteView, layoutParams);
+        largeViewGroup.addView(mRemoteView, layoutParams);
     }
 
     /**
@@ -513,8 +513,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (mLocalView != null) {
             mLocalView.release();
         }
-        ViewGroup localParent = mVideoContainer.findViewById(R.id.video_view_container_small);
-        localParent.removeAllViews();
+        ViewGroup smallViewGroup = mVideoContainer.findViewById(R.id.video_view_container_small);
+        smallViewGroup.removeAllViews();
     }
 
     /**
@@ -524,8 +524,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (mRemoteView != null) {
             mRemoteView.release();
         }
-        ViewGroup remoteParent = mVideoContainer.findViewById(R.id.video_view_container_large);
-        remoteParent.removeAllViews();
+        ViewGroup largeViewGroup = mVideoContainer.findViewById(R.id.video_view_container_large);
+        largeViewGroup.removeAllViews();
     }
 
     @Override

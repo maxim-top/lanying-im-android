@@ -136,7 +136,7 @@ public class ChatUtils {
         String desc = "";
         if (type == BMXMessage.ContentType.Text) {
             // 文本
-            desc = content;
+            desc = content.replaceAll("\n.*", "");
         } else if (type == BMXMessage.ContentType.Image) {
             // 图片
             desc = "[" + context.getString(R.string.image) + "]";

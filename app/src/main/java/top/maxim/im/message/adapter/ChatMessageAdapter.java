@@ -84,7 +84,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
         BMXMessageConfig config = bean.config();
         if (config != null){
             String action = config.getRTCAction();
-            if (action != null && !action.equals("hangup")){
+            if (action != null && action.length() != 0 && !action.equals("hangup")){
                 RecyclerView.LayoutParams param = new RecyclerView.LayoutParams(1, 1);
                 holder.itemView.setLayoutParams(param);
             }

@@ -55,7 +55,7 @@ public final class MessageSendUtils {
                                      String pin) {
         BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
         con.setRTCCallInfo(type, roomId, from, BMXMessageConfig.RTCRoomType.Broadcast, pin);
-        con.setIOSConfig("{\"mutable_content\":true,\"loc-key\":\"call_in\"}");
+        con.setPushMessageLocKey("call_in");
         BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
         msg.setConfig(con);
         msg.setExtension("{\"rtc\":\"call\"}");
@@ -77,9 +77,13 @@ public final class MessageSendUtils {
     /**
      * 发送挂断消息
      */
-    public void sendRTCHangupMessage(long from, long to, String callId, String content, String iosConfig) {
+    public void sendRTCHangupMessage(long from, long to, String callId, String content, String pushMessageLocKey, String pushMessageLocArgs) {
         BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
         con.setRTCHangupInfo(callId);
+        con.setPushMessageLocKey(pushMessageLocKey);
+        if (pushMessageLocArgs.length() > 0){
+            con.setPushMessageLocArgs(pushMessageLocArgs);
+        }
         BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, content);
         msg.setConfig(con);
         handlerMessage(msg);

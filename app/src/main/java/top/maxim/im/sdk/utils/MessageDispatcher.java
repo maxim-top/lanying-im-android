@@ -124,7 +124,7 @@ public class MessageDispatcher {
 
     private void replyBusy(String callId, long myID, long chatId){
         new MessageSendUtils().sendRTCHangupMessage(
-                myID, chatId, callId, "busy", "{\"loc-key\":\"callee_busy\"}");
+                myID, chatId, callId, "busy", "callee_busy","");
 
     }
 

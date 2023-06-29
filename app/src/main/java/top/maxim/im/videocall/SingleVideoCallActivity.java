@@ -224,7 +224,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 public void run() {
                     mSendUtils.sendRTCHangupMessage(
                             mUserId, mChatId, mCallId, "timeout",
-                            "{\"loc-key\":\"callee_not_responding\"}");
+                            "callee_not_responding","");
                     leaveRoom();
                     mCallRingtoneManager.stopRinging();
                     finish();
@@ -1117,10 +1117,11 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      */
     private void sendRTCHangupMessage(){
         String content = "canceled";
-        String iosConfig = "{\"loc-key\":\"call_canceled_by_caller\"}";
+        String pushMessageLocKey = "call_canceled_by_caller";
+        String pushMessageLocArgs = "";
         if (!mIsInitiator){
             content = "rejected";
-            iosConfig = "{\"loc-key\":\"call_rejected_by_callee\"}";
+            pushMessageLocKey = "call_rejected_by_callee";
         }
 
         long duration = 0;
@@ -1130,11 +1131,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (duration > 1){
             content = String.valueOf(duration);
             long sec = duration/1000;
-            iosConfig = String.format("{\"loc-key\":\"call_duration\",\"loc-args\":[\"%d\",\"%d\"]}",sec/60, sec%60);
+            pushMessageLocKey = "call_duration";
+            pushMessageLocArgs = String.format("[%d,%d]",sec/60, sec%60);
         }
 
         mSendUtils.sendRTCHangupMessage(
-                mUserId, mChatId, mCallId, content, iosConfig);
+                mUserId, mChatId, mCallId, content, pushMessageLocKey, pushMessageLocArgs);
     }
 
     /**

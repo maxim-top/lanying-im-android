@@ -19,7 +19,7 @@
             android:layout_height="@dimen/dimen_50"
             android:onClick="onCallMuteMic"
             android:scaleType="fitCenter"
-            android:src="@drawable/icon_call_mute_status_open" />
+            android:src="@drawable/icon_call_mic_on" />
 
         <TextView
             android:id="@+id/tv_audio_mic"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dimen_3"
             android:gravity="center"
-            android:text="@string/call_mute"
+            android:text="@string/call_mic_on"
             android:textColor="@color/color_white" />
     </LinearLayout>
 

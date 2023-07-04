@@ -275,6 +275,41 @@
     <string name="set_push_msg_content">Content</string>
     <string name="set_push_message">Push Message</string>
 
+    <!-- 音视频会话-->
+    <string name="call_video">Video Call</string>
+    <string name="call_audio">Voice Call</string>
+    <string name="call_waiting_peer_accept">Awaiting response...</string>
+    <string name="call_invited_audio">invites you to a call...</string>
+    <string name="call_switch_audio">Switch to an audio call</string>
+    <string name="call_switch_camera">Switch cameras</string>
+    <string name="call_open_camera">Open camera</string>
+    <string name="call_close_camera">Close camera</string>
+    <string name="call_hangup">Hangup</string>
+    <string name="call_mic_off">Mic of</string>
+    <string name="call_mic_on">Mic on</string>
+    <string name="call_camera_off">Camera off</string>
+    <string name="call_camera_on">Camera on</string>
+    <string name="call_open_hand_free">Speaker on</string>
+    <string name="call_close_hand_free">Speaker off</string>
+    <string name="call_reject">Decline</string>
+    <string name="call_answer">Pickup</string>
+    <string name="call_cancel">Cancel</string>
+    <string name="call_peer_busy">Callee busy</string>
+    <string name="call_peer_hangup">Hanguped"</string>
+    <string name="call_peer_not_answer">Callee not responding</string>
+    <string name="call_suggest_call_later">Unable to connect, call again later</string>
+    <string name="call_invited_num_notice">%1s participants in the meeting</string>
+    <string name="call_speaker_on_tips">Sound output device switched to speaker</string>
+    <string name="call_speaker_off_tips">Sound output device switched to receiver</string>
+
+    <!-- 音视频会话设置-->
+    <string name="config_rtc">AV config</string>
+    <string name="config_rtc_video_profile">resolution</string>
+    <string name="config_rtc_camera">Camera</string>
+    <string name="config_rtc_mic">Mic</string>
+    <string name="config_rtc_speaker">Speaker</string>
+    <string name="config_rtc_auto_publish">Auto-publish</string>
+    <string name="config_rtc_auto_subscribe">Auto-subscribe</string>
     <string name="read">Read</string>
     <string name="unread">Unread</string>
     <string name="read_persons">Read Persons:</string>

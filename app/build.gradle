@@ -14,7 +14,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "top.maxim.im"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 2000000002
         versionName "4.0.1"

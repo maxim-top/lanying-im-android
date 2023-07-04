@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.AudioDeviceInfo;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Message;
 import android.text.TextUtils;
@@ -119,10 +121,13 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     private boolean mHasVideo = false;
 
     //扬声器
-    private boolean mSpeaker = true;
+    private boolean mSpeaker = false;
 
     //麦克风
     private boolean mMic = true;
+
+    //摄像头
+    private boolean mCamera = true;
 
     private CallHandler mHandler;
 
@@ -307,6 +312,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 } else {
                     Log.e(TAG, "加入房间失败 roomId= " + roomId + "msg = " + info);
                 }
+                switchSpeakerCalling();
             }
 
             @Override
@@ -813,15 +819,28 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (textView != null) {
             textView.setText(mSpeaker ? R.string.call_open_hand_free : R.string.call_close_hand_free);
         }
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setSpeakerphoneOn(mSpeaker);
+        audioManager.setMode(mSpeaker?AudioManager.MODE_NORMAL:AudioManager.MODE_IN_COMMUNICATION);
     }
 
     private void changeMic(boolean enable, ImageView imageView, TextView textView) {
         mMic = enable;
         if (imageView != null) {
-            imageView.setImageResource(mMic ? R.drawable.icon_call_mute_status_open : R.drawable.icon_call_mute_status_close);
+            imageView.setImageResource(mMic ? R.drawable.icon_call_mic_on : R.drawable.icon_call_mic_off);
         }
         if (textView != null) {
-            textView.setText(mMic ? R.string.call_mute : R.string.call_un_mute);
+            textView.setText(mMic ? R.string.call_mic_on : R.string.call_mic_off);
+        }
+    }
+
+    private void changeCamera(boolean enable, ImageView imageView, TextView textView) {
+        mCamera = enable;
+        if (imageView != null) {
+            imageView.setImageResource(mCamera ? R.drawable.icon_call_camera : R.drawable.icon_call_camera_off);
+        }
+        if (textView != null) {
+            textView.setText(mCamera ? R.string.call_camera_on: R.string.call_camera_off);
         }
     }
 
@@ -911,9 +930,23 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * @param view
      */
     public void onCallMuteMic(View view){
-        ViewGroup parent = findViewById(R.id.ll_in_call_control);
+        int callControlId = R.id.layout_calling_audio;
+        if (mHasVideo){
+            callControlId = R.id.layout_calling_video;
+        }
+        ViewGroup parent = findViewById(callControlId);
         changeMic(!mMic, parent.findViewById(R.id.iv_audio_mic), parent.findViewById(R.id.tv_audio_mic));
         mEngine.muteLocalAudio(mMic);
+    }
+
+    /**
+     * 开关摄像头
+     * @param view
+     */
+    public void onCallCamera(View view){
+        ViewGroup parent = findViewById(R.id.layout_calling_video);
+        changeCamera(!mCamera, parent.findViewById(R.id.iv_camera), parent.findViewById(R.id.tv_camera));
+        mEngine.muteLocalVideo(BMXVideoMediaType.Camera, mCamera);
     }
 
     private void switchAudio(){
@@ -943,12 +976,19 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         ToastUtil.showTextViewPrompt(mSpeaker ? R.string.call_speaker_on_tips : R.string.call_speaker_off_tips);
     }
 
+    private void switchSpeakerCalling(){
+        int callControlId = R.id.layout_calling_audio;
+        if (mHasVideo){
+            callControlId = R.id.layout_calling_video;
+        }
+        ViewGroup parent = findViewById(callControlId);
+        changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));
+    }
     /**
      * 切换扬声器
      */
     public void onSwitchSpeakerCalling(View view) {
-        ViewGroup parent = findViewById(R.id.ll_in_call_control);
-        changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));
+        switchSpeakerCalling();
         ToastUtil.showTextViewPrompt(mSpeaker ? R.string.call_speaker_on_tips : R.string.call_speaker_off_tips);
     }
 

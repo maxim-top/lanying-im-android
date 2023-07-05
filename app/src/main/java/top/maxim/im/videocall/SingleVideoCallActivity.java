@@ -312,7 +312,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 } else {
                     Log.e(TAG, "加入房间失败 roomId= " + roomId + "msg = " + info);
                 }
-                switchSpeakerCalling();
             }
 
             @Override
@@ -796,10 +795,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (hasVideo) {
             inCallVideoView.setVisibility(View.VISIBLE);
             inCallAudioView.setVisibility(View.GONE);
+            changeCamera(mCamera, inCallVideoView.findViewById(R.id.iv_camera), inCallVideoView.findViewById(R.id.tv_camera));
         } else {
             inCallVideoView.setVisibility(View.GONE);
             inCallAudioView.setVisibility(View.VISIBLE);
             changeSpeaker(mSpeaker, inCallAudioView.findViewById(R.id.iv_audio_speaker), inCallAudioView.findViewById(R.id.tv_audio_speaker));
+            changeMic(mMic, inCallAudioView.findViewById(R.id.iv_audio_mic), inCallAudioView.findViewById(R.id.tv_audio_mic));
         }
     }
 
@@ -934,6 +935,20 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         if (mHasVideo){
             callControlId = R.id.layout_calling_video;
         }
+        ViewGroup vgInitiator = findViewById(R.id.ll_initiate_control);
+        ViewGroup vgRecipient = findViewById(R.id.ll_recipient_control);
+
+        if (vgInitiator.getVisibility()==View.VISIBLE){
+            callControlId = R.id.layout_initiator_audio;
+            if (mHasVideo){
+                callControlId = R.id.layout_initiator_video;
+            }
+        } else if (vgRecipient.getVisibility()==View.VISIBLE) {
+            callControlId = R.id.layout_recipient_audio;
+            if (mHasVideo){
+                callControlId = R.id.layout_recipient_video;
+            }
+        }
         ViewGroup parent = findViewById(callControlId);
         changeMic(!mMic, parent.findViewById(R.id.iv_audio_mic), parent.findViewById(R.id.tv_audio_mic));
         mEngine.muteLocalAudio(mMic);
@@ -944,7 +959,25 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * @param view
      */
     public void onCallCamera(View view){
-        ViewGroup parent = findViewById(R.id.layout_calling_video);
+        int callControlId = R.id.layout_calling_audio;
+        if (mHasVideo){
+            callControlId = R.id.layout_calling_video;
+        }
+        ViewGroup vgInitiator = findViewById(R.id.ll_initiate_control);
+        ViewGroup vgRecipient = findViewById(R.id.ll_recipient_control);
+
+        if (vgInitiator.getVisibility()==View.VISIBLE){
+            callControlId = R.id.layout_initiator_audio;
+            if (mHasVideo){
+                callControlId = R.id.layout_initiator_video;
+            }
+        } else if (vgRecipient.getVisibility()==View.VISIBLE) {
+            callControlId = R.id.layout_recipient_audio;
+            if (mHasVideo){
+                callControlId = R.id.layout_recipient_video;
+            }
+        }
+        ViewGroup parent = findViewById(callControlId);
         changeCamera(!mCamera, parent.findViewById(R.id.iv_camera), parent.findViewById(R.id.tv_camera));
         mEngine.muteLocalVideo(BMXVideoMediaType.Camera, mCamera);
     }
@@ -971,7 +1004,25 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 切换扬声器
      */
     public void onSwitchSpeakerInitiator(View view) {
-        ViewGroup parent = findViewById(R.id.ll_initiate_control);
+        int callControlId = R.id.layout_calling_audio;
+        if (mHasVideo){
+            callControlId = R.id.layout_calling_video;
+        }
+        ViewGroup vgInitiator = findViewById(R.id.ll_initiate_control);
+        ViewGroup vgRecipient = findViewById(R.id.ll_recipient_control);
+
+        if (vgInitiator.getVisibility()==View.VISIBLE){
+            callControlId = R.id.layout_initiator_audio;
+            if (mHasVideo){
+                callControlId = R.id.layout_initiator_video;
+            }
+        } else if (vgRecipient.getVisibility()==View.VISIBLE) {
+            callControlId = R.id.layout_recipient_audio;
+            if (mHasVideo){
+                callControlId = R.id.layout_recipient_video;
+            }
+        }
+        ViewGroup parent = findViewById(callControlId);
         changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));
         ToastUtil.showTextViewPrompt(mSpeaker ? R.string.call_speaker_on_tips : R.string.call_speaker_off_tips);
     }
@@ -980,6 +1031,20 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         int callControlId = R.id.layout_calling_audio;
         if (mHasVideo){
             callControlId = R.id.layout_calling_video;
+        }
+        ViewGroup vgInitiator = findViewById(R.id.ll_initiate_control);
+        ViewGroup vgRecipient = findViewById(R.id.ll_recipient_control);
+
+        if (vgInitiator.getVisibility()==View.VISIBLE){
+            callControlId = R.id.layout_initiator_audio;
+            if (mHasVideo){
+                callControlId = R.id.layout_initiator_video;
+            }
+        } else if (vgRecipient.getVisibility()==View.VISIBLE) {
+            callControlId = R.id.layout_recipient_audio;
+            if (mHasVideo){
+                callControlId = R.id.layout_recipient_video;
+            }
         }
         ViewGroup parent = findViewById(callControlId);
         changeSpeaker(!mSpeaker, parent.findViewById(R.id.iv_audio_speaker), parent.findViewById(R.id.tv_audio_speaker));

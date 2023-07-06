@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="horizontal"
-        android:padding="@dimen/dimen_8">
+        android:paddingTop="@dimen/dimen_25">
 
         <LinearLayout
             android:layout_width="@dimen/dimen_0"

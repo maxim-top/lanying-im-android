@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import im.floo.BMXCallBack;
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
@@ -34,6 +35,7 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.view.ChatSingleActivity;
+import top.maxim.im.videocall.SingleVideoCallActivity;
 
 /**
  * Description : 详情 Created by Mango on 2018/11/21.
@@ -68,6 +70,10 @@ public class RosterDetailActivity extends BaseTitleActivity {
 
     /* 开始聊天 */
     private TextView mTvOpenChat;
+    /* 视频通话 */
+    private TextView mTvVideoCall;
+    /* 语音通话 */
+    private TextView mTvVoiceCall;
 
     private long mRosterId;
 
@@ -204,6 +210,57 @@ public class RosterDetailActivity extends BaseTitleActivity {
         params.rightMargin = ScreenUtils.dp2px(15);
         mTvOpenChat.setLayoutParams(params);
         container.addView(mTvOpenChat);
+
+        // 视频通话
+        mTvVideoCall = new TextView(this);
+        mTvVideoCall.setTextColor(getResources().getColor(R.color.color_black));
+        mTvVideoCall.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        mTvVideoCall.setGravity(Gravity.CENTER);
+        mTvVideoCall.setText(getString(R.string.call_video));
+        mTvVideoCall.setBackgroundResource(R.drawable.common_yellow_btn_corner_bg);
+        mTvVideoCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SingleVideoCallActivity.openVideoCall(RosterDetailActivity.this, mRosterId,
+                        0, "",true, BMXMessageConfig.RTCCallType.VideoCall,
+                        "", 0);
+                finish();
+            }
+        });
+        LinearLayout.LayoutParams paramsVideoCall = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.dp2px(44));
+        paramsVideoCall.topMargin = ScreenUtils.dp2px(30);
+        paramsVideoCall.bottomMargin = ScreenUtils.dp2px(5);
+        paramsVideoCall.leftMargin = ScreenUtils.dp2px(15);
+        paramsVideoCall.rightMargin = ScreenUtils.dp2px(15);
+        mTvVideoCall.setLayoutParams(paramsVideoCall);
+        container.addView(mTvVideoCall);
+
+        // 语音通话
+        mTvVoiceCall = new TextView(this);
+        mTvVoiceCall.setTextColor(getResources().getColor(R.color.color_black));
+        mTvVoiceCall.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        mTvVoiceCall.setGravity(Gravity.CENTER);
+        mTvVoiceCall.setText(getString(R.string.call_audio));
+        mTvVoiceCall.setBackgroundResource(R.drawable.common_yellow_btn_corner_bg);
+        mTvVoiceCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SingleVideoCallActivity.openVideoCall(RosterDetailActivity.this, mRosterId,
+                        0, "",true, BMXMessageConfig.RTCCallType.AudioCall,
+                        "", 0);
+                finish();
+            }
+        });
+        LinearLayout.LayoutParams paramsVoiceCall = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.dp2px(44));
+        paramsVoiceCall.topMargin = ScreenUtils.dp2px(30);
+        paramsVoiceCall.bottomMargin = ScreenUtils.dp2px(5);
+        paramsVoiceCall.leftMargin = ScreenUtils.dp2px(15);
+        paramsVoiceCall.rightMargin = ScreenUtils.dp2px(15);
+        mTvVoiceCall.setLayoutParams(paramsVoiceCall);
+        container.addView(mTvVoiceCall);
+
         return view;
     }
 

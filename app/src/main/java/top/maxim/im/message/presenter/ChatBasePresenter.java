@@ -589,7 +589,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         VIDEO,
         FILE,
         LOCATION,
-        CALL
+        VIDEO_CALL,
+        VOICE_CALL
     }
 
     @Override
@@ -606,7 +607,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }else if (functionType.equals(mView.getContext().getString(R.string.photo_album))){
             type = PHOTOS;
         }else if (functionType.equals(mView.getContext().getString(R.string.call_video))){
-            type = CALL;
+            type = VIDEO_CALL;
+        }else if (functionType.equals(mView.getContext().getString(R.string.call_audio))){
+            type = VOICE_CALL;
         }
         switch (type) {
             case PHOTOS:
@@ -658,8 +661,24 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     }
                 }
                 break;
-            case CALL:
-                showVideoCallDialog();
+            case VIDEO_CALL:
+                // 视频需要摄像头 麦克风权限
+                if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.RECORD_AUDIO)) {
+                    handelVideoCall(true);
+                } else {
+                    // 如果没有权限 首先请求SD读权限
+                    requestPermissions(TYPE_VIDEO_CALL_PERMISSION, PermissionsConstant.CAMERA);
+                }
+
+                break;
+            case VOICE_CALL:
+                // 音频需要麦克风权限
+                if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
+                    handelVideoCall(false);
+                } else {
+                    // 如果没有权限 首先请求SD读权限
+                    requestPermissions(TYPE_AUDIO_CALL_PERMISSION, PermissionsConstant.RECORD_AUDIO);
+                }
                 break;
             default:
                 break;

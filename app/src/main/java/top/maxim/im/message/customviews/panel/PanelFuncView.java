@@ -58,6 +58,10 @@ public class PanelFuncView implements IPanel {
         videoCall.text = mContext.getString(R.string.call_video);
         videoCall.resId = R.drawable.panel_normal_video;
         items.add(videoCall);
+        FuncItem voiceCall = new FuncItem();
+        voiceCall.text = mContext.getString(R.string.call_audio);
+        voiceCall.resId = R.drawable.panel_normal_voice;
+        items.add(voiceCall);
     }
 
     @Override

@@ -141,6 +141,10 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private Timer mRingToneTimer;
 
+    private Timer mDurationTimer;
+
+    private long mDuration;
+
     private BMXChatServiceListener mChatListener = new BMXChatServiceListener(){
         @Override
         public void onReceive(BMXMessageList list) {
@@ -706,6 +710,37 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         peerInfo.setVisibility(View.GONE);
     }
 
+    private void showDuration() {
+        View con = mAudioContainer;
+        if (mHasVideo){
+            con = mVideoContainer;
+        }
+        TextView tvDuration = con.findViewById(R.id.tv_duration);
+        tvDuration.setVisibility(View.VISIBLE);
+        mDurationTimer = new Timer();
+        mDuration = 0;
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                mDuration++;
+                runOnUiThread(() -> {
+                    tvDuration.setText(String.format("%02d:%02d", mDuration/60, mDuration%60));
+                });
+            }
+        };
+        mDurationTimer.schedule(task, 0, 1000);
+
+    }
+
+    private void hideDuration() {
+        TextView nameText = mAudioContainer.findViewById(R.id.tv_duration);
+        nameText.setVisibility(View.GONE);
+        if (mDurationTimer!=null){
+            mDurationTimer.cancel();
+            mDurationTimer = null;
+        }
+    }
+
     /**
      * 展示音频发起者信息
      */
@@ -1093,6 +1128,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             hideInitiatorView();
             hideRecipientView();
             showControlView(mHasVideo);
+            showDuration();
             if (mHasVideo) {
                 addRemoteView();
                 BMXVideoCanvas canvas = new BMXVideoCanvas();
@@ -1120,6 +1156,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        hideDuration();
         mHandler.removeAll();
         if (mEngine != null) {
             mEngine.removeRTCEngineListener(mListener);

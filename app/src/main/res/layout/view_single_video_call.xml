@@ -20,6 +20,18 @@
         android:layout_gravity="right"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/tv_duration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textColor="@color/color_white"
+        android:textSize="@dimen/dimen_18"
+        android:layout_gravity="top|left"
+        android:text="sdf"
+        android:paddingTop="@dimen/dimen_50"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:id="@+id/container_video_peer_info"
         android:layout_width="match_parent"

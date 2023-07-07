@@ -92,6 +92,9 @@ import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.utils.RefreshChatActivityEvent;
 import top.maxim.im.message.utils.VoicePlayManager;
+import top.maxim.im.message.view.ChatBaseActivity;
+import top.maxim.im.message.view.ChatGroupActivity;
+import top.maxim.im.message.view.ChatSingleActivity;
 import top.maxim.im.message.view.ChooseFileActivity;
 import top.maxim.im.message.view.PhotoDetailActivity;
 import top.maxim.im.message.view.VideoDetailActivity;
@@ -103,6 +106,7 @@ import top.maxim.im.sdk.utils.MessageSendUtils;
 public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     private static final String TAG = ChatBasePresenter.class.getSimpleName();
+    public static final long REPORT_ID = 6855234888912L;
 
     /* 相机 */
     private final int CAMERA_REQUEST = 1000;
@@ -330,6 +334,11 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     public void initChatData(final long msgId) {
         if (mConversation == null) {
             return;
+        }
+        if (mChatId == REPORT_ID){
+            if (mView != null) {
+                mView.setControlBarText("被举报人昵称(选填)：\n\n被举报人用户ID（必填）：\n\n举报事由（必填）：");
+            }
         }
         //拉取历史消息
         ChatManager.getInstance().retrieveHistoryMessages(mConversation, msgId,
@@ -591,6 +600,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         LOCATION,
         VIDEO_CALL,
         VOICE_CALL
+        REPORT
     }
 
     @Override
@@ -610,6 +620,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             type = VIDEO_CALL;
         }else if (functionType.equals(mView.getContext().getString(R.string.call_audio))){
             type = VOICE_CALL;
+        }else if (functionType.equals(mView.getContext().getString(R.string.report))){
+            type = REPORT;
         }
         switch (type) {
             case PHOTOS:
@@ -678,6 +690,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 } else {
                     // 如果没有权限 首先请求SD读权限
                     requestPermissions(TYPE_AUDIO_CALL_PERMISSION, PermissionsConstant.RECORD_AUDIO);
+            case REPORT:
+                if (mView != null) {
+                    ChatBaseActivity.startChatActivity(mView.getContext(), BMXMessage.MessageType.Single, REPORT_ID);
                 }
                 break;
             default:

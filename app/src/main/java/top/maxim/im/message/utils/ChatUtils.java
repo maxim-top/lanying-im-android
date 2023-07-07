@@ -174,7 +174,7 @@ public class ChatUtils {
                 } else {
                     content = context.getString(R.string.call_busy);
                 }
-            } else {
+            } else if(content.length()>0) {
                 try {
                     long sec = Long.valueOf(content)/1000;
                     content = String.format("通话时长：%02d:%02d",sec/60, sec%60);

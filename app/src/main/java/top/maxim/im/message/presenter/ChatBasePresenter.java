@@ -599,7 +599,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         FILE,
         LOCATION,
         VIDEO_CALL,
-        VOICE_CALL
+        VOICE_CALL,
         REPORT
     }
 
@@ -690,6 +690,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 } else {
                     // 如果没有权限 首先请求SD读权限
                     requestPermissions(TYPE_AUDIO_CALL_PERMISSION, PermissionsConstant.RECORD_AUDIO);
+                }
             case REPORT:
                 if (mView != null) {
                     ChatBaseActivity.startChatActivity(mView.getContext(), BMXMessage.MessageType.Single, REPORT_ID);

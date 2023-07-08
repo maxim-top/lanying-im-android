@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_black">
+
+    <!--视频-->
+    <include
+        android:id="@+id/layout_video_container"
+        layout="@layout/view_single_video_call" />
+
+    <!--音频-->
+    <include
+        android:id="@+id/layout_audio_container"
+        layout="@layout/view_single_audio_call"
+        android:visibility="gone" />
+
+    <!--发起-->
+    <FrameLayout
+        android:id="@+id/ll_initiate_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone">
+
+        <include
+            android:id="@+id/layout_initiator_video"
+            layout="@layout/view_single_initiator_call_video"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/layout_initiator_audio"
+            layout="@layout/view_single_initiator_call_audio"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!--接收-->
+    <FrameLayout
+        android:id="@+id/ll_recipient_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone">
+
+        <include
+            android:id="@+id/layout_recipient_video"
+            layout="@layout/view_single_recipient_call_video"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/layout_recipient_audio"
+            layout="@layout/view_single_recipient_call_audio"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <!--进行中-->
+    <FrameLayout
+        android:id="@+id/ll_in_call_control"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone">
+
+        <include
+            android:id="@+id/layout_calling_video"
+            layout="@layout/view_single_calling_video"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/layout_calling_audio"
+            layout="@layout/view_single_calling_audio"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+</FrameLayout>

@@ -118,9 +118,8 @@ public class BaseManager {
         } else {
             conf.setEnableDNS(true);
         }
-        bmxClient = BMXClient.create(conf);
     }
-    
+
     public static String getPushId() {
         Context context = AppContextUtils.getAppContext();
         if (context == null) {
@@ -173,6 +172,9 @@ public class BaseManager {
     }
 
     public static BMXClient getBMXClient() {
+        if (bmxClient == null){
+            initBMXSDK();
+        }
         return bmxClient;
     }
 }

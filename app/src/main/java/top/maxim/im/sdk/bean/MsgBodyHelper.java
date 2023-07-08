@@ -20,6 +20,7 @@ public final class MsgBodyHelper {
         sType2ClzMap.put(BMXMessage.ContentType.File.swigValue(), BMXMessage.ContentType.File);
         sType2ClzMap.put(BMXMessage.ContentType.Location.swigValue(),
                 BMXMessage.ContentType.Location);
+        sType2ClzMap.put(BMXMessage.ContentType.RTC.swigValue(), BMXMessage.ContentType.RTC);
     }
 
 

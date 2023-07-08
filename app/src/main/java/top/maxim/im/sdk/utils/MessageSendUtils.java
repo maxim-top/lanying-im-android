@@ -39,6 +39,57 @@ public final class MessageSendUtils {
     }
 
     /**
+     * 发送自定义RTC消息
+     */
+    public void sendRTCMessage(long from, long to,
+                                     String ext) {
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        msg.setExtension(ext);
+        handlerMessage(msg);
+    }
+
+    /**
+     * 发送呼叫消息
+     */
+    public String sendRTCCallMessage(BMXMessageConfig.RTCCallType type, long roomId, long from, long to,
+                                     String pin) {
+        BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
+        con.setRTCCallInfo(type, roomId, from, BMXMessageConfig.RTCRoomType.Broadcast, pin);
+        con.setPushMessageLocKey("call_in");
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        msg.setConfig(con);
+        msg.setExtension("{\"rtc\":\"call\"}");
+        handlerMessage(msg);
+        return con.getRTCCallId();
+    }
+
+    /**
+     * 发送接听消息
+     */
+    public void sendRTCPickupMessage(long from, long to, String callId) {
+        BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
+        con.setRTCPickupInfo(callId);
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        msg.setConfig(con);
+        handlerMessage(msg);
+    }
+
+    /**
+     * 发送挂断消息
+     */
+    public void sendRTCHangupMessage(long from, long to, String callId, String content, String pushMessageLocKey, String pushMessageLocArgs) {
+        BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
+        con.setRTCHangupInfo(callId);
+        con.setPushMessageLocKey(pushMessageLocKey);
+        if (pushMessageLocArgs.length() > 0){
+            con.setPushMessageLocArgs(pushMessageLocArgs);
+        }
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, content);
+        msg.setConfig(con);
+        handlerMessage(msg);
+    }
+
+    /**
      * 发送文本消息
      *
      * @param type 消息类型

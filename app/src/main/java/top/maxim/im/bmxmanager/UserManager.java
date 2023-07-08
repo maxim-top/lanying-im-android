@@ -31,6 +31,9 @@ public class UserManager extends BaseManager {
     }
 
     private UserManager() {
+        if (bmxClient == null){
+            initBMXSDK();
+        }
         mService = bmxClient.getUserManager();
         mUserService = bmxClient.getUserService();
     }

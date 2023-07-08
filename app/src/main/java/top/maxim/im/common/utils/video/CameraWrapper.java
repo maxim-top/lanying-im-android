@@ -121,7 +121,11 @@ public class CameraWrapper {
     public void release() {
         handler.removeCallbacks(runnable);
         if (camera != null) {
-            camera.cancelAutoFocus();
+            try {
+                camera.cancelAutoFocus();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
             camera.stopPreview();
             camera.setPreviewCallback(null);
             camera.release();

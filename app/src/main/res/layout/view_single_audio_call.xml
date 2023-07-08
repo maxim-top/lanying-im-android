@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/container_audio_peer_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/dimen_50">
+
+        <TextView
+            android:id="@+id/tv_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/dimen_18"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tv_audio_peer_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/dimen_33" />
+
+        <top.maxim.im.common.view.ShapeImageView
+            android:id="@+id/iv_audio_peer_avatar"
+            android:layout_width="@dimen/dimen_110"
+            android:layout_height="@dimen/dimen_110"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dimen_44" />
+
+        <TextView
+            android:id="@+id/tv_audio_peer_notice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="@dimen/dimen_10"
+            android:layout_marginTop="@dimen/dimen_20"
+            android:gravity="center"
+            android:text="@string/call_waiting_peer_accept"
+            android:textColor="@color/color_white"
+            android:textSize="@dimen/dimen_18"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</FrameLayout>

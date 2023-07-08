@@ -3,6 +3,7 @@ package top.maxim.im.login.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -58,6 +59,8 @@ public class WelcomeActivity extends BaseTitleActivity {
 
     private SplashVideoPlayView mVideoSplash;
 
+    private static Boolean mPermissionChecked;
+
     public static void openWelcome(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -89,29 +92,50 @@ public class WelcomeActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
-        //启动网络监听
-        ConnectivityReceiver.start(getApplication());
         //听云
         AgentTask.get().init(AppContextUtils.getApplication());
     }
 
     private void initPermission(){
         NotificationUtils.getInstance().cancelAll();
-        if (checkPermission()) {
-            showProtocol();
-        } else {
-            requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
-        }
+        showProtocol();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initPermission();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initPermission();
     }
 
     private boolean checkPermission() {
         return hasPermission(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+    }
+
+    @Override
+    public void onPermissionGranted(List<String> permissions) {
+        super.onPermissionGranted(permissions);
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        long userId = SharePreferenceUtils.getInstance().getUserId();
+        String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+        autoLogin(userId, pwd);
+    }
+
+    @Override
+    public void onPermissionDenied(List<String> permissions) {
+        super.onPermissionDenied(permissions);
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        long userId = SharePreferenceUtils.getInstance().getUserId();
+        String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+        autoLogin(userId, pwd);
     }
 
     private void initJump() {
@@ -119,7 +143,11 @@ public class WelcomeActivity extends BaseTitleActivity {
         long userId = SharePreferenceUtils.getInstance().getUserId();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();
         if (isLogin && userId > 0 && !TextUtils.isEmpty(pwd)) {
-            autoLogin(userId, pwd);
+            if (!checkPermission()) {
+                requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+            }else{
+                autoLogin(userId, pwd);
+            }
             return;
         }
         //没有登录 需要切换到默认appId 再进入登录页面
@@ -174,46 +202,6 @@ public class WelcomeActivity extends BaseTitleActivity {
         mVideoSplash.setPrepareVideoPath(R.raw.splash_video);
     }
 
-    @Override
-    public void onPermissionGranted(List<String> permissions) {
-        super.onPermissionGranted(permissions);
-        if (permissions == null || permissions.size() == 0) {
-            return;
-        }
-        for (String permission : permissions) {
-            switch (permission) {
-                case PermissionsConstant.READ_STORAGE:
-                    // SD权限
-                    showProtocol();
-                    break;
-                case PermissionsConstant.WRITE_STORAGE:
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    @Override
-    public void onPermissionDenied(List<String> permissions) {
-        super.onPermissionDenied(permissions);
-        if (permissions == null || permissions.size() == 0) {
-            return;
-        }
-        for (String permission : permissions) {
-            switch (permission) {
-                case PermissionsConstant.READ_STORAGE:
-                    // 读写SD权限拒绝
-                    CommonProvider.openAppPermission(this);
-                    break;
-                case PermissionsConstant.WRITE_STORAGE:
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
     /**
      * 自动登陆
      */
@@ -246,6 +234,9 @@ public class WelcomeActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(getString(R.string.network_exception));
                 return;
             }
+            //启动网络监听
+            ConnectivityReceiver.start(AppContextUtils.getApplication());
+
             // 登陆成功后 需要将userId存储SP 作为下次自动登陆
             UserManager.getInstance().getProfile(false, (bmxErrorCode1, profile) -> {
                 if (BaseManager.bmxFinish(bmxErrorCode1) && profile != null

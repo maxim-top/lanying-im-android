@@ -5,19 +5,31 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 import im.floo.BMXCallBack;
 import rx.Subscriber;
@@ -32,6 +44,8 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.bean.UserBean;
+import top.maxim.im.common.provider.CommonProvider;
+import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.CommonUtils;
@@ -39,8 +53,10 @@ import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.login.bean.DNSConfigEvent;
+import top.maxim.im.net.ConnectivityReceiver;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
@@ -91,6 +107,10 @@ public class LoginActivity extends BaseTitleActivity {
 
     private CompositeSubscription mSubscription;
 
+    private TextView mTvRegisterProtocol;
+
+    private CheckBox mCheckBox;
+
     public static void openLogin(Context context) {
         Intent intent = new Intent(context, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -100,6 +120,48 @@ public class LoginActivity extends BaseTitleActivity {
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         return new Header.Builder(this, headerContainer).build();
+    }
+
+    private void buildProtocol() {
+        mTvRegisterProtocol.setMovementMethod(LinkMovementMethod.getInstance());
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append(getResources().getString(R.string.read_agree));
+        // 用户服务
+        SpannableString spannableString = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol2) + "》");
+        spannableString.setSpan(new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_4A90E2));
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(LoginActivity.this, 1);
+            }
+        }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString);
+        // 隐私政策
+        builder.append(getResources().getString(R.string.register_protocol3));
+        SpannableString spannableString1 = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol4) + "》");
+        spannableString1.setSpan(new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_4A90E2));
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(LoginActivity.this, 0);
+            }
+        }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString1);
+        mTvRegisterProtocol.setText(builder);
     }
 
     @Override
@@ -118,6 +180,10 @@ public class LoginActivity extends BaseTitleActivity {
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
         mSwitchLoginMode.setVisibility(View.GONE);
+        mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
+        mCheckBox = view.findViewById(R.id.cb_choice);
+
+        buildProtocol();
         // 三次点击打开日志
         ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_open_log), 3, () -> {
             // 跳转查看日志
@@ -126,6 +192,53 @@ public class LoginActivity extends BaseTitleActivity {
         
         initRxBus();
         return view;
+    }
+
+    private boolean checkPermission() {
+        return hasPermission(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+    }
+
+    @Override
+    public void onPermissionGranted(List<String> permissions) {
+        super.onPermissionGranted(permissions);
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        for (String permission : permissions) {
+            switch (permission) {
+                case PermissionsConstant.READ_STORAGE:
+                    String name = mInputName.getText().toString().trim();
+                    String pwd = mInputPwd.getText().toString().trim();
+                    login(this, name, pwd, mLoginByUserId, mChangeAppId);
+                    break;
+                case PermissionsConstant.WRITE_STORAGE:
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void onPermissionDenied(List<String> permissions) {
+        super.onPermissionDenied(permissions);
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        String name = mInputName.getText().toString().trim();
+        String pwd = mInputPwd.getText().toString().trim();
+        login(this, name, pwd, mLoginByUserId, mChangeAppId);
+    }
+
+    private void updateLoginButton() {
+        boolean isNameEmpty = TextUtils.isEmpty(mInputName.getText().toString().trim());
+        boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
+        boolean isAgree = mCheckBox.isChecked();
+        if (!isNameEmpty && !isPwdEmpty && isAgree) {
+            mLogin.setEnabled(true);
+        } else {
+            mLogin.setEnabled(false);
+        }
     }
 
     @Override
@@ -138,7 +251,11 @@ public class LoginActivity extends BaseTitleActivity {
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
-            login(this, name, pwd, mLoginByUserId, mChangeAppId);
+            if (!checkPermission()) {
+                requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+            }else{
+                login(this, name, pwd, mLoginByUserId, mChangeAppId);
+            }
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
@@ -146,9 +263,21 @@ public class LoginActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }
+            boolean isAgree = mCheckBox.isChecked();
+            if (!isAgree){
+                ToastUtil.showTextViewPrompt(getString(R.string.check_first));
+                return;
+            }
             initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN, mChangeAppId);
         });
+        mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateLoginButton();
+            }
+        });
+
         // 扫一扫
         mIvScan.setOnClickListener(v -> ScannerActivity.openScan(this));
         mInputWatcher = new TextWatcher() {
@@ -164,13 +293,7 @@ public class LoginActivity extends BaseTitleActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                boolean isNameEmpty = TextUtils.isEmpty(mInputName.getText().toString().trim());
-                boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
-                if (!isNameEmpty && !isPwdEmpty) {
-                    mLogin.setEnabled(true);
-                } else {
-                    mLogin.setEnabled(false);
-                }
+                updateLoginButton();
             }
         };
         mInputName.addTextChangedListener(mInputWatcher);
@@ -278,6 +401,9 @@ public class LoginActivity extends BaseTitleActivity {
         }
         BMXCallBack callBack = (bmxErrorCode) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
+                //启动网络监听
+                ConnectivityReceiver.start(AppContextUtils.getApplication());
+
                 // 登陆成功后 需要将userId存储SP 作为下次自动登陆
                 UserManager.getInstance().getProfile(true, (bmxErrorCode1, profile) -> {
                     TaskDispatcher.exec(() -> {

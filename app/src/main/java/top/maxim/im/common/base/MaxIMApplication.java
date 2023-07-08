@@ -20,13 +20,14 @@ import java.io.File;
 import java.util.Locale;
 
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.rtc.RTCManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
-import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
+import top.maxim.im.BuildConfig;
 
 /**
  * Description : application Created by Mango on 2018/11/5.
@@ -58,7 +59,37 @@ public class MaxIMApplication extends Application {
         super.onCreate();
         initUtils();
         initBMXSDK();
-        Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+        initRtc();
+        if (!BuildConfig.DEBUG) {
+            Thread.setDefaultUncaughtExceptionHandler(restartHandler);
+        }
+        initLanguage();
+    }
+
+    private String getCountry() {
+
+        Locale locale;
+        //7.0以上和7.0以下获取系统语言方式
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locale = LocaleList.getDefault().get(0);
+        } else {
+            locale = Locale.getDefault();
+        }
+        return locale.getCountry();
+    }
+
+    private void initLanguage() {
+        Resources resources = getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        Configuration config = resources.getConfiguration();
+        if (getCountry().equals("TW")) {
+            config.locale = Locale.TAIWAN;
+        } else if (getCountry().equals("US")) {
+            config.locale = Locale.ENGLISH;
+        } else {
+            config.locale = Locale.CHINESE;
+        }
+        resources.updateConfiguration(config, dm);
     }
 
     public void restartApp() {
@@ -100,6 +131,13 @@ public class MaxIMApplication extends Application {
      */
     private void initBMXSDK() {
         BaseManager.initBMXSDK();
+    }
+
+    /**
+     * 初始化Rtc
+     */
+    private void initRtc(){
+        RTCManager.getInstance().init(this, BaseManager.getBMXClient());
     }
 
 }

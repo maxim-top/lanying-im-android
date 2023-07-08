@@ -20,6 +20,7 @@ import com.gavin.view.flexible.FlexibleLayout;
 
 import java.util.Locale;
 
+import im.floo.floolib.BMXClient;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXUserProfile;
 import top.maxim.im.BuildConfig;
@@ -34,6 +35,7 @@ import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
+import top.maxim.im.common.utils.dialog.CommonDialog;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
@@ -132,6 +134,9 @@ public class MineFragment extends BaseTitleFragment {
 
     /* 语言 */
     private ItemLineArrow.Builder mLanguage;
+
+    /* 删除账号 */
+    private ItemLineArrow.Builder mDeleteAccount;
 
     /* app版本号 */
     private TextView mAppVersion;
@@ -382,6 +387,16 @@ public class MineFragment extends BaseTitleFragment {
                 .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
         container.addView(mAboutUs.build());
 
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
+        // 删除账号
+        mDeleteAccount = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.delete_account))
+                .setOnItemClickListener(v -> showDeleteAccountDialog());
+        container.addView(mDeleteAccount.build());
+
 //        // 分割线
 //        ItemLine.Builder itemLine0 = new ItemLine.Builder(getActivity(), container)
 //                .setMarginLeft(ScreenUtils.dp2px(15));
@@ -403,6 +418,27 @@ public class MineFragment extends BaseTitleFragment {
             locale = Locale.getDefault();
         }
         return locale.getLanguage();
+    }
+
+    private void showDeleteAccountDialog(){
+        // 关闭需要弹出提示
+        DialogUtils.getInstance().showDialog(getActivity(),
+                getString(R.string.delete_account),
+                getString(R.string.delete_account_text),
+                new CommonDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        BMXClient client = BaseManager.getBMXClient();
+                        BMXErrorCode errorCode = client.deleteAccount(SharePreferenceUtils.getInstance().getUserPwd());
+                        if (errorCode == BMXErrorCode.NoError){
+                            logout();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+                    }
+                });
     }
 
     /**

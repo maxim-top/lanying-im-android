@@ -5,7 +5,10 @@ import android.text.TextUtils;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;
 import rx.Observable;
 import rx.Subscriber;
@@ -18,6 +21,7 @@ import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatSingleContract;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.videocall.SingleVideoCallActivity;
 
 /**
  * Description : 单聊presenter Created by Mango on 2018/11/11.
@@ -150,5 +154,12 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
     @Override
     public void sendInputStatus(String extension) {
         mSendUtils.sendInputStatusMessage(mChatType, mMyUserId, mChatId, extension);
+    }
+
+    @Override
+    protected void handelVideoCall(boolean hasVideo) {
+//        BMXRRTCActivity.openVideoCall(mView.getContext());
+        //发起音视频方  以自己的userId作为roomId
+        SingleVideoCallActivity.openVideoCall(mView.getContext(), mChatId, 0, "",true, hasVideo ? BMXMessageConfig.RTCCallType.VideoCall : BMXMessageConfig.RTCCallType.AudioCall, "", 0);
     }
 }

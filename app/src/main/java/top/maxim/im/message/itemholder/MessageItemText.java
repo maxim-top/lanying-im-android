@@ -9,7 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageConfig;
 import top.maxim.im.R;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.message.interfaces.ChatActionListener;
 
 /**
@@ -56,11 +58,52 @@ public class MessageItemText extends MessageItemBaseView {
             mChatText.setText("");
             return;
         }
-        if (mMaxMessage.contentType() != BMXMessage.ContentType.Text) {
+        if (mMaxMessage.contentType() != BMXMessage.ContentType.Text && mMaxMessage.contentType() != BMXMessage.ContentType.RTC) {
             // 非文本转为无法识别
             mChatText.setText(mContext.getString(R.string.unknown_message));
             return;
         }
-        mChatText.setText(TextUtils.isEmpty(mMaxMessage.content()) ? "" : mMaxMessage.content());
+        String content = TextUtils.isEmpty(mMaxMessage.content()) ? "" : mMaxMessage.content();
+        BMXMessageConfig config = mMaxMessage.config();
+        if (config != null){
+            String action = config.getRTCAction();
+            if (action != null){
+                if (action.equals("hangup")){
+                    if (content.equals("rejected")){
+                        if (mMaxMessage.isReceiveMsg()){
+                            content = getResources().getString(R.string.call_be_declined);
+                        } else {
+                            content = getResources().getString(R.string.call_declined);
+                        }
+                    } else if (content.equals("canceled")){
+                        if (mMaxMessage.isReceiveMsg()){
+                            content = getResources().getString(R.string.call_be_canceled);
+                        } else {
+                            content = getResources().getString(R.string.call_canceled);
+                        }
+                    } else if (content.equals("timeout")){
+                        if (mMaxMessage.isReceiveMsg()){
+                            content = getResources().getString(R.string.call_not_responding);
+                        } else {
+                            content = getResources().getString(R.string.callee_not_responding);
+                        }
+                    } else if (content.equals("busy")){
+                        if (mMaxMessage.isReceiveMsg()){
+                            content = getResources().getString(R.string.callee_busy);
+                        } else {
+                            content = getResources().getString(R.string.call_busy);
+                        }
+                    } else {
+                        try {
+                            long sec = Long.valueOf(content)/1000;
+                            content = String.format("通话时长：%02d:%02d",sec/60, sec%60);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        mChatText.setText(content);
     }
 }

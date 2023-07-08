@@ -5,18 +5,22 @@ apply plugin: 'newlens'
 //google service
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.huawei.agconnect'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-parcelize'
+//apply plugin: 'com.kezong.fat-aar'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "top.maxim.im"
-        minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 23041716
-        versionName "v3.4.1"
+        minSdkVersion 23
+        targetSdkVersion 29
+        versionCode 2000000003
+        versionName "4.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
-                "HUAWEI_APPID"   : "100565061",
+                "HUAWEI_APPID"   : "108316071",
                 "XIAOMI_APPID"   : "2882303761517923338",
                 "XIAOMI_APP_KEY" : "5221792385338",
                 "MEIZU_APPID"    : "117965",
@@ -24,22 +28,26 @@ android {
 
                 "OPPO_APPID"     : "30006831",
                 "OPPO_APP_KEY"   : "5060fd43f996444ab0e5e5c8dba57ffd",
-                "OPPO_APP_SECRET" : "17046a6edd9f4be1a87c3badb2e9b755",
+                "OPPO_APP_SECRET": "17046a6edd9f4be1a87c3badb2e9b755",
 
                 "VIVO_APPID"     : "100122979",
                 "VIVO_APP_KEY"   : "20e9451070bbb5de77f16a31c4d61f94",
-                "VIVO_APP_SECRET" : "86a3152b-68b1-4c3a-ac1c-047f4ed34fcf",
+                "VIVO_APP_SECRET": "86a3152b-68b1-4c3a-ac1c-047f4ed34fcf",
 
-                "WEIXIN_APPID" : "wxf0f8e197ecfb0925",
-                "BUGLY_APPID"  : "ae2c13667e",
-                "BUGLY_APP_KEY": "6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc",
+                "WEIXIN_APPID"   : "wxf0f8e197ecfb0925",
+                "BUGLY_APPID"    : "ae2c13667e",
+                "BUGLY_APP_KEY"  : "6e86dab1-eeb0-4b3f-b1ea-b4259280e4dc",
 
-                "AGENT_APP_KEY": "9bf09e3791fa4a1ca9d0c6dbbfa4d759"
+                "AGENT_APP_KEY"  : "9bf09e3791fa4a1ca9d0c6dbbfa4d759",
+
+                "RTC_APP_ID"     : "urtc-gzfrt5ch",
+                "RTC_APP_KEY"    : "bdc8c2ef728b18f3938ac716e7a8e364"
         ]
 
         ndk {
             // 设置支持的SO库架构
-            abiFilters 'armeabi' ,'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
+//            abiFilters 'armeabi' ,'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
+            abiFilters 'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
         }
         multiDexEnabled true
     }
@@ -66,15 +74,21 @@ android {
             signingConfig signingConfigs.release
         }
     }
-    repositories {
-        flatDir {
-            dirs 'libs'   // aar目录
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
         }
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+    android.applicationVariants.all{ variant ->
+        variant.outputs.all{
+            def createTime = new Date().format("YYYYMMdd", TimeZone.getTimeZone("GMT+08:00"))
+            def fileName = "lanying-im-android-${defaultConfig.versionName}-${createTime}.apk"
+            outputFileName = fileName
+        }
     }
 }
 
@@ -88,10 +102,11 @@ newlensExt{
 }
 
 dependencies {
+    implementation 'org.webrtc:google-webrtc:1.0.30039'
     implementation 'com.squareup.okio:okio:1.12.0'
-    implementation 'com.aliyun.dpa:oss-android-sdk:+'
-    implementation 'com.google.code.gson:gson:2.7'
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+//    implementation 'com.aliyun.dpa:oss-android-sdk:+'
+//    implementation 'com.google.code.gson:gson:2.7'
+    implementation fileTree(dir: 'libs', include: ['*.?ar'])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     testImplementation 'junit:junit:4.12'
@@ -109,8 +124,8 @@ dependencies {
     implementation 'io.reactivex:rxjava:1.3.0'
 
     //UIL
+
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    implementation(name:'floo-android_3.6.0.20221220',ext:'aar')
 
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
@@ -132,7 +147,7 @@ dependencies {
     //华为push
     implementation "com.huawei.hms:push:5.0.4.302"
     //魅族push
-    implementation 'com.meizu.flyme.internet:push-internal:3.8.1'
+    implementation 'com.meizu.flyme.internet:push-internal:4.0.4'
 
     implementation 'com.google.code.gson:gson:2.8.5'
     //微信
@@ -156,4 +171,5 @@ dependencies {
 //    implementation 'com.google.firebase:firebase-messaging:21.0.1'
 //    implementation 'com.google.firebase:firebase-analytics:18.0.1'
 
+//    api project(':floo-rtc-ucloud')
 }

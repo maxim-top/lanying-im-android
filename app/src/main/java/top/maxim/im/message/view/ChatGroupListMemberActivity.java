@@ -87,11 +87,6 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
         context.startActivityForResult(intent, requestCode);
     }
 
-    public static void startGroupMemberListActivity(Activity context, long groupId,
-            int requestCode) {
-        startGroupMemberListActivity(context, groupId, false, requestCode);
-    }
-
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);

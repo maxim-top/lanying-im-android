@@ -1,12 +1,18 @@
 
 package top.maxim.im.sdk.utils;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.text.TextUtils;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXConnectStatus;
@@ -16,6 +22,7 @@ import im.floo.floolib.BMXGroupList;
 import im.floo.floolib.BMXGroupServiceListener;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageList;
+import im.floo.floolib.BMXRTCServiceListener;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXRosterServiceListener;
 import im.floo.floolib.BMXUserProfile;
@@ -30,6 +37,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
+import top.maxim.rtc.RTCManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.utils.AppContextUtils;
@@ -41,6 +49,7 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.videocall.SingleVideoCallActivity;
 
 /**
  * Description : 消息分发 Created by mango on 2018/12/20.
@@ -50,6 +59,73 @@ public class MessageDispatcher {
     private static MessageDispatcher sDispatcher = new MessageDispatcher();
 
     private List<BMXChatServiceListener> mListener = new ArrayList<>();
+
+    private SoftReference<Activity> mActivityRef;
+
+    private Set<String> mHungupCalls = new HashSet<>();
+
+    private void ackMessage(BMXMessage msg){
+        ChatManager.getInstance().ackMessage(msg);
+    }
+
+    private BMXRTCServiceListener mRTCListener = new BMXRTCServiceListener(){
+
+        public void onRTCCallMessageReceive(BMXMessage msg) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        //暂停以处理稍后收到的对应通话的挂断消息（mHungupCalls），
+                        // 这样可以避免弹出已结束的通话
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    String callId = msg.config().getRTCCallId();
+                    if (mHungupCalls.contains(callId)){
+                        mHungupCalls.remove(callId);
+                        ackMessage(msg);
+                        return;
+                    }
+                    long roomId = msg.config().getRTCRoomId();
+                    long chatId = msg.config().getRTCInitiator();
+                    long myId = SharePreferenceUtils.getInstance().getUserId();
+                    if (myId == chatId){
+                        return;
+                    }
+                    //如果已在通话中，则发送忙线消息给对方
+                    if (RTCManager.getInstance().getRTCEngine().isOnCall){
+                        replyBusy(callId, myId, chatId);
+                        return;
+                    }
+                    String pin = msg.config().getRTCPin();
+                    if(mActivityRef != null && mActivityRef.get() != null){
+                        Context context = mActivityRef.get();
+                        if (msg.type() == BMXMessage.MessageType.Single) {
+                            //打开通话界面（呼入中）
+                            SingleVideoCallActivity.openVideoCall(context, chatId, roomId, callId,
+                                    false, msg.config().getRTCCallType(), pin, msg.msgId());
+                        }
+                    }
+                }
+            }, "onRTCCallMessageReceive").start();
+        }
+
+        public void onRTCPickupMessageReceive(BMXMessage msg) {
+        }
+
+        public void onRTCHangupMessageReceive(BMXMessage msg) {
+            RTCManager.getInstance().getRTCEngine().isOnCall = false;
+            mHungupCalls.add(msg.config().getRTCCallId());
+        }
+
+    };
+
+    private void replyBusy(String callId, long myID, long chatId){
+        new MessageSendUtils().sendRTCHangupMessage(
+                myID, chatId, callId, "busy", "callee_busy","");
+
+    }
 
     private BMXChatServiceListener mChatListener = new BMXChatServiceListener() {
 
@@ -415,9 +491,46 @@ public class MessageDispatcher {
 
     public void initialize() {
         ChatManager.getInstance().addChatListener(mChatListener);
+        RTCManager.getInstance().addRTCServiceListener(mRTCListener);
         RosterManager.getInstance().addRosterListener(mRosterListener);
         UserManager.getInstance().addUserListener(mUserListener);
         GroupManager.getInstance().addGroupListener(mGroupListener);
+        AppContextUtils.getApplication().registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+            }
+
+            @Override
+            public void onActivityStarted(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityResumed(Activity activity) {
+                mActivityRef = new SoftReference<>(activity);
+            }
+
+            @Override
+            public void onActivityPaused(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivityStopped(Activity activity) {
+
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+            }
+
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+
+            }
+        });
     }
 
     private void toastListener(String content) {

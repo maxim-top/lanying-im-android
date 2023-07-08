@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_black">
+
+    <FrameLayout
+        android:id="@+id/container_video_call"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!--发起-->
+        <include
+            android:id="@+id/layout_group_initiator_container"
+            layout="@layout/view_group_initiator_call"
+            android:visibility="gone" />
+
+        <!--接收-->
+        <include
+            android:id="@+id/layout_group_recipient_container"
+            layout="@layout/view_group_recipient_call"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+</RelativeLayout>

@@ -113,6 +113,13 @@ public class RosterManager extends BaseManager {
     }
 
     /**
+     * 添加好友
+     **/
+    public void apply(long rosterId, String reason, String authAnswer, BMXCallBack callBack) {
+        mService.apply(rosterId, reason, authAnswer, callBack);
+    }
+
+    /**
      * 删除好友
      **/
     public void remove(long rosterId, BMXCallBack callBack) {

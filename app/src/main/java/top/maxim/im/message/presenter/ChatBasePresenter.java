@@ -691,6 +691,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     // 如果没有权限 首先请求SD读权限
                     requestPermissions(TYPE_AUDIO_CALL_PERMISSION, PermissionsConstant.RECORD_AUDIO);
                 }
+                break;
             case REPORT:
                 if (mView != null) {
                     ChatBaseActivity.startChatActivity(mView.getContext(), BMXMessage.MessageType.Single, REPORT_ID);

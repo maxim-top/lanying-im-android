@@ -58,8 +58,6 @@ public class MaxIMApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initUtils();
-        initBMXSDK();
-        initRtc();
         if (!BuildConfig.DEBUG) {
             Thread.setDefaultUncaughtExceptionHandler(restartHandler);
         }
@@ -125,19 +123,4 @@ public class MaxIMApplication extends Application {
                 .diskCache(new UnlimitedDiskCache(cacheDir)).build();
         ImageLoader.getInstance().init(config);
     }
-
-    /**
-     * 初始化sdk
-     */
-    private void initBMXSDK() {
-        BaseManager.initBMXSDK();
-    }
-
-    /**
-     * 初始化Rtc
-     */
-    private void initRtc(){
-        RTCManager.getInstance().init(this, BaseManager.getBMXClient());
-    }
-
 }

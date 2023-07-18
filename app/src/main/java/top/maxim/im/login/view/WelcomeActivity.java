@@ -52,6 +52,7 @@ import top.maxim.im.net.ConnectivityReceiver;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.sdk.utils.MessageDispatcher;
+import top.maxim.rtc.RTCManager;
 
 public class WelcomeActivity extends BaseTitleActivity {
 
@@ -139,6 +140,7 @@ public class WelcomeActivity extends BaseTitleActivity {
     }
 
     private void initJump() {
+        RTCManager.getInstance().init(AppContextUtils.getApplication(), BaseManager.getBMXClient());
         boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
         long userId = SharePreferenceUtils.getInstance().getUserId();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();

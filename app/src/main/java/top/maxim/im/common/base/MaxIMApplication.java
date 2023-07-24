@@ -2,6 +2,8 @@
 package top.maxim.im.common.base;
 
 import android.app.Application;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -19,6 +21,7 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import java.io.File;
 import java.util.Locale;
 
+import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.rtc.RTCManager;
 import top.maxim.im.common.utils.AppContextUtils;
@@ -90,7 +93,23 @@ public class MaxIMApplication extends Application {
         resources.updateConfiguration(config, dm);
     }
 
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("109568", name, importance);
+            channel.setDescription("sdf desc");
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
     public void restartApp() {
+        createNotificationChannel();
         WelcomeActivity.openWelcome(getApplicationContext());
         android.os.Process.killProcess(android.os.Process.myPid());
     }

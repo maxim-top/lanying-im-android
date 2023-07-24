@@ -468,4 +468,5 @@
     <string name="call_busy">Call is busy</string>
     <string name="check_first">Please click to check "I have read and agree to 'User Services' and 'Privacy Policy'"</string>
     <string name="report">Report</string>
+    <string name="channel_name">IM</string>
 </resources>

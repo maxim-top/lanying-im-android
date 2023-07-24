@@ -251,11 +251,7 @@ public class LoginActivity extends BaseTitleActivity {
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
-            if (!checkPermission()) {
-                requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
-            }else{
-                login(this, name, pwd, mLoginByUserId, mChangeAppId);
-            }
+            login(this, name, pwd, mLoginByUserId, mChangeAppId);
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {

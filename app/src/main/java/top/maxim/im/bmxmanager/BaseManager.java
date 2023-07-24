@@ -30,16 +30,7 @@ public class BaseManager {
     }
 
     private static String getFilesPath( Context context ){
-        String filePath ;
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
-                || !Environment.isExternalStorageRemovable()) {
-                //外部存储可用
-                filePath = context.getExternalFilesDir(null).getPath();
-        }else {
-                //外部存储不可用
-                filePath = context.getFilesDir().getPath() ;
-        }
-        return filePath ;
+        return context.getFilesDir().getPath() ;
     }
 
     /**

@@ -1,8 +1,11 @@
 
 package top.maxim.im.login.view;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,9 +16,17 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.core.content.FileProvider;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -26,6 +37,7 @@ import top.maxim.im.R;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -163,6 +175,50 @@ public class LogViewActivity extends BaseTitleActivity {
         return sb.toString();
     }
 
+    /**
+     * 文件分享
+     *
+     * @param path 路径
+     */
+    private void shareFile(String path) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Uri uri = null;
+        Context context = this;
+        if (context == null) {
+            return;
+        }
+        File file = new File(path);
+        if (TextUtils.isEmpty(path) || !file.exists()) {
+            ToastUtil.showTextViewPrompt(
+                    context.getResources().getString(R.string.chat_file_not_exit));
+            return;
+        }
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                uri = FileProvider.getUriForFile(context,
+                        context.getPackageName() + ".fileProvider", file);
+            } else {
+                uri = Uri.fromFile(file);
+            }
+        } catch (Exception e) {
+            ToastUtil.showTextViewPrompt(
+                    context.getResources().getString(R.string.chat_file_not_exit));
+            return;
+        }
+
+        intent.setType("application/octet-stream");
+        intent.putExtra(Intent.EXTRA_STREAM, uri);
+        ComponentName componentName = intent.resolveActivity(context.getPackageManager());
+        if (componentName != null) {
+            context.startActivity(intent);
+        } else {
+            ToastUtil.showTextViewPrompt(
+                    context.getResources().getString(R.string.chat_file_not_open));
+        }
+    }
+
     private void showSaveLog() {
         final CustomDialog dialog = new CustomDialog();
         LinearLayout ll = new LinearLayout(this);
@@ -188,6 +244,28 @@ public class LogViewActivity extends BaseTitleActivity {
             dialog.dismiss();
         });
         ll.addView(save, params);
+
+        // 分享
+        TextView tvShare = new TextView(this);
+        tvShare.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(10), ScreenUtils.dp2px(15), 0);
+        tvShare.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        tvShare.setTextColor(getResources().getColor(R.color.color_black));
+        tvShare.setBackgroundColor((getResources().getColor(R.color.color_white)));
+        tvShare.setText(getString(R.string.send));
+        tvShare.setOnClickListener(v -> {
+            String appPath = AppContextUtils.getAppContext().getFilesDir().getPath();
+            String dataPath = appPath + "/data_dir/";
+            String zipPath = appPath + "/data_dir_" + new Date().getTime() + ".zip";
+            try {
+                CommonUtils.getInstance().zipFolder(dataPath, zipPath);
+                shareFile(zipPath);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            dialog.dismiss();
+        });
+        ll.addView(tvShare, params);
+
 
         dialog.setCustomView(ll);
         dialog.showDialog(this);

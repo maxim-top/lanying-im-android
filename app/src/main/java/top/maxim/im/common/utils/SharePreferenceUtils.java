@@ -4,6 +4,9 @@ package top.maxim.im.common.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.util.ArraySet;
+
+import java.util.Set;
 
 import top.maxim.im.scan.config.ScanConfigs;
 
@@ -36,6 +39,8 @@ public class SharePreferenceUtils {
     private static String CUSTOM_DNS = "customDns";
 
     private static String APP_ID = "app_id";
+
+    private static String APP_ID_HISTORY = "app_id_history";
 
     private static String IS_FIRST = "isFirst";
 
@@ -176,7 +181,15 @@ public class SharePreferenceUtils {
     }
 
     public boolean putAppId(String appId) {
+        if (TextUtils.isEmpty(appId)){
+            return false;
+        }
         saveEditor.putString(APP_ID, appId);
+        Set<String> appIds = saveInfo.getStringSet(APP_ID_HISTORY, new ArraySet<>());
+        if (!appIds.contains(appId)){
+            appIds.add(appId);
+            saveEditor.putStringSet(APP_ID_HISTORY, appIds);
+        }
         return saveEditor.commit();
     }
 
@@ -186,6 +199,19 @@ public class SharePreferenceUtils {
             return TextUtils.isEmpty(appId) ? ScanConfigs.CODE_APP_ID : appId;
         }
         return ScanConfigs.CODE_APP_ID;
+    }
+
+    public Set<String> getAppIdHistory() {
+        if (saveInfo != null) {
+            Set<String> appIds = saveInfo.getStringSet(APP_ID_HISTORY, new ArraySet<>());
+            if (appIds.size() == 0){
+                appIds.add(ScanConfigs.CODE_APP_ID);
+                saveEditor.putStringSet(APP_ID_HISTORY, appIds);
+                saveEditor.commit();
+            }
+            return appIds;
+        }
+        return new ArraySet<>();
     }
 
     /**

@@ -208,26 +208,13 @@ public class ScanResultActivity extends BaseTitleActivity {
             e.printStackTrace();
         }
         if (!TextUtils.isEmpty(appId)) {
-//            isUploadToken = true;
-//            showLoadingDialog(true);
-//            String finalAppId = appId;
             SharePreferenceUtils.getInstance().putAppId(appId);
             UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {
                 dismissLoadingDialog();
-//                if (BaseManager.bmxFinish(bmxErrorCode)) {
-//                    SharePreferenceUtils.getInstance().putAppId(finalAppId);
-//                } else {
-//                    ToastUtil.showTextViewPrompt("切换AppId失败");
-//                }
-//                LoginActivity.openLogin(this);
-//                finish();
             });
-            LoginActivity.openLogin(this);
-            finish();
-        } else {
-            LoginActivity.openLogin(this);
-            finish();
         }
+        LoginActivity.openLogin(this);
+        finish();
     }
 
     /**
@@ -248,26 +235,12 @@ public class ScanResultActivity extends BaseTitleActivity {
             e.printStackTrace();
         }
         if (!TextUtils.isEmpty(appId)) {
-//            isUploadToken = true;
-//            showLoadingDialog(true);
-//            String finalAppId = appId;
             SharePreferenceUtils.getInstance().putAppId(appId);
             UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {
-//                dismissLoadingDialog();
-//                if (BaseManager.bmxFinish(bmxErrorCode)) {
-//                    SharePreferenceUtils.getInstance().putAppId(finalAppId);
-//                } else {
-//                    ToastUtil.showTextViewPrompt("切换AppId失败");
-//                }
-//                LoginActivity.openLogin(this);
-//                finish();
             });
-            LoginActivity.openLogin(this);
-            finish();
-        } else {
-            LoginActivity.openLogin(this);
-            finish();
         }
+        LoginActivity.openLogin(this);
+        finish();
     }
 
     /**

@@ -5,12 +5,18 @@ import android.text.TextUtils;
 
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.push.PushClientMgr;
@@ -117,5 +123,39 @@ public class CommonUtils {
             });
         }
         return beans;
+    }
+
+    public static void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
+        ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFilePath));
+        addFolderToZip("", sourceFolderPath, zipOutputStream);
+        zipOutputStream.close();
+    }
+
+    private static void addFileToZip(String path, String srcFile, ZipOutputStream zipOutputStream) throws IOException {
+        File folder = new File(srcFile);
+        if (folder.isDirectory()) {
+            addFolderToZip(path, srcFile, zipOutputStream);
+        } else {
+            byte[] buffer = new byte[1024];
+            FileInputStream fileInputStream = new FileInputStream(srcFile);
+            zipOutputStream.putNextEntry(new ZipEntry(path + "/" + folder.getName()));
+            int length;
+            while ((length = fileInputStream.read(buffer)) > 0) {
+                zipOutputStream.write(buffer, 0, length);
+            }
+            zipOutputStream.closeEntry();
+            fileInputStream.close();
+        }
+    }
+
+    private static void addFolderToZip(String path, String srcFolder, ZipOutputStream zipOutputStream) throws IOException {
+        File folder = new File(srcFolder);
+        for (String fileName : folder.list()) {
+            if (path.equals("")) {
+                addFileToZip(folder.getName(), srcFolder + "/" + fileName, zipOutputStream);
+            } else {
+                addFileToZip(path + "/" + folder.getName(), srcFolder + "/" + fileName, zipOutputStream);
+            }
+        }
     }
 }

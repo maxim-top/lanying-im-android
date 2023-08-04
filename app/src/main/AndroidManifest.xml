@@ -92,6 +92,11 @@
             </intent-filter>
         </activity>
 
+        <!--AppID-->
+        <activity
+            android:name=".login.view.AppIdActivity"
+            android:screenOrientation="portrait"></activity>
+
         <!--登陆-->
         <activity
             android:name=".login.view.LoginActivity"

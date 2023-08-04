@@ -470,4 +470,7 @@
     <string name="call_busy">忙线未接听</string>
     <string name="check_first">请先点击勾选“我已阅读并同意《用户服务》及《隐私政策》”</string>
     <string name="report">举报</string>
+    <string name="channel_name">聊天消息</string>
+    <string name="app_id">请输入App ID或从蓝莺IM后台扫描二维码：</string>
+    <string name="what_is_app_id"><a href="https://www.baidu.com">什么是App ID?</a></string>
 </resources>

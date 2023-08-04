@@ -7,10 +7,13 @@ import android.graphics.Bitmap;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -24,12 +27,15 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
+import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseRecyclerAdapter;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
@@ -177,7 +183,7 @@ public class ContactSearchActivity extends BaseTitleActivity {
             add.setVisibility(myId == item.rosterId() || friend ? View.GONE : View.VISIBLE);
             add.setOnClickListener(v -> {
                 long rosterId = item.rosterId();
-                showAddReason(rosterId);
+                showAddReason(rosterId, item.authQuestion());
             });
 
             String name = item.username();
@@ -188,36 +194,91 @@ public class ContactSearchActivity extends BaseTitleActivity {
         /**
          * 输入框弹出
          */
-        private void showAddReason(final long rosterId) {
-            DialogUtils.getInstance().showEditDialog(ContactSearchActivity.this, getString(R.string.add_friend),
-                    getString(R.string.confirm), getString(R.string.cancel),
-                    new CommonEditDialog.OnDialogListener() {
-                        @Override
-                        public void onConfirmListener(String content) {
-                            addRoster(rosterId, content);
-                        }
+        private void showAddReason(final long rosterId, String authQuestion) {
+            if (authQuestion.length()>0){
+                final LinearLayout ll = new LinearLayout(ContactSearchActivity.this);
+                ll.setOrientation(LinearLayout.VERTICAL);
+                LinearLayout.LayoutParams textP = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams editP = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                editP.setMargins(ScreenUtils.dp2px(10), ScreenUtils.dp2px(5), ScreenUtils.dp2px(10),
+                        ScreenUtils.dp2px(5));
 
-                        @Override
-                        public void onCancelListener() {
+                TextView tvAuthQuestion = new TextView(ContactSearchActivity.this);
+                tvAuthQuestion.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                        ScreenUtils.dp2px(15));
+                tvAuthQuestion.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+                tvAuthQuestion.setTextColor(getResources().getColor(R.color.color_black));
+                tvAuthQuestion.setBackgroundColor(getResources().getColor(R.color.color_white));
+                tvAuthQuestion.setText(authQuestion);
+                ll.addView(tvAuthQuestion, textP);
 
-                        }
-                    });
+                final EditText etAnswer = new EditText(ContactSearchActivity.this);
+                etAnswer.setBackgroundResource(R.drawable.common_edit_corner_bg);
+                etAnswer.setPadding(ScreenUtils.dp2px(5), 0, ScreenUtils.dp2px(5), 0);
+                etAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+                etAnswer.setTextColor(getResources().getColor(R.color.color_black));
+                etAnswer.setMinHeight(ScreenUtils.dp2px(40));
+                ll.addView(etAnswer, editP);
+
+                DialogUtils.getInstance().showCustomDialog(ContactSearchActivity.this, ll,
+                        getString(R.string.add_friend_auth_answer), getString(R.string.confirm),
+                        getString(R.string.cancel), new CommonCustomDialog.OnDialogListener() {
+                            @Override
+                            public void onConfirmListener() {
+                                String answer = etAnswer.getEditableText().toString().trim();
+                                addRoster(rosterId, "", answer);
+                            }
+
+                            @Override
+                            public void onCancelListener() {
+
+                            }
+                        });
+            } else {
+                DialogUtils.getInstance().showEditDialog(ContactSearchActivity.this, getString(R.string.add_friend),
+                        getString(R.string.confirm), getString(R.string.cancel),
+                        new CommonEditDialog.OnDialogListener() {
+                            @Override
+                            public void onConfirmListener(String content) {
+                                addRoster(rosterId, content, "");
+                            }
+
+                            @Override
+                            public void onCancelListener() {
+
+                            }
+                        });
+            }
         }
 
-        private void addRoster(long rosterId, final String reason) {
+        private void addRoster(long rosterId, final String reason, final String authAnswer) {
             if (rosterId <= 0) {
                 return;
             }
             showLoadingDialog(true);
-            RosterManager.getInstance().apply(rosterId, reason, bmxErrorCode -> {
-                dismissLoadingDialog();
-                if (BaseManager.bmxFinish(bmxErrorCode)) {
-                    ToastUtil.showTextViewPrompt(getString(R.string.add_successful));
-                    finish();
-                } else {
-                    ToastUtil.showTextViewPrompt(getString(R.string.add_failed));
-                }
-            });
+            if (authAnswer.length() > 0){
+                RosterManager.getInstance().apply(rosterId, "", authAnswer, bmxErrorCode -> {
+                    dismissLoadingDialog();
+                    if (BaseManager.bmxFinish(bmxErrorCode)) {
+                        ToastUtil.showTextViewPrompt(getString(R.string.add_successful));
+                        finish();
+                    } else {
+                        ToastUtil.showTextViewPrompt(getString(R.string.add_failed));
+                    }
+                });
+            } else {
+                RosterManager.getInstance().apply(rosterId, reason, bmxErrorCode -> {
+                    dismissLoadingDialog();
+                    if (BaseManager.bmxFinish(bmxErrorCode)) {
+                        ToastUtil.showTextViewPrompt(getString(R.string.add_successful));
+                        finish();
+                    } else {
+                        ToastUtil.showTextViewPrompt(getString(R.string.add_failed));
+                    }
+                });
+            }
         }
     }
 }

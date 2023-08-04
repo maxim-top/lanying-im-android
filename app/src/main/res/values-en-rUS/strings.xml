@@ -106,6 +106,7 @@
     <string name="video_fail_check_permission">Failed to record video, please check permissions</string>
     <string name="location_fail_check_permission">Failed to locate, please check permissions</string>
     <string name="not_has_sd_permission">No local storage permission on the phone</string>
+    <string name="video_call_fail_check_permission">Call failed to be established, please check the permissions</string>
 
     <!--登录-->
     <string name="login">Login</string>
@@ -468,4 +469,7 @@
     <string name="call_busy">Call is busy</string>
     <string name="check_first">Please click to check "I have read and agree to 'User Services' and 'Privacy Policy'"</string>
     <string name="report">Report</string>
+    <string name="channel_name">IM</string>
+    <string name="app_id">Input your app ID or scan the QR code on Lanying IM console</string>
+    <string name="what_is_app_id"><a href="https://www.baidu.com">What is App ID?</a></string>
 </resources>

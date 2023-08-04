@@ -16,8 +16,8 @@ android {
         applicationId "top.maxim.im"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 2000000003
-        versionName "4.0.2"
+        versionCode 2000000005
+        versionName "4.0.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "108316071",
@@ -126,6 +126,7 @@ dependencies {
     //UIL
 
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+//    implementation project(':floo-android')
 
     //vivo push
     implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
@@ -170,6 +171,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 //    implementation 'com.google.firebase:firebase-messaging:21.0.1'
 //    implementation 'com.google.firebase:firebase-analytics:18.0.1'
-
-//    api project(':floo-rtc-ucloud')
+//    api project(':floo-rtc-ucloud-android')
+//    api project(':floo-rtc-android')
 }

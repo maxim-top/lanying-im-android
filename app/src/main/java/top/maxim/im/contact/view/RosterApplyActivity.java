@@ -138,30 +138,32 @@ public class RosterApplyActivity extends BaseTitleActivity {
                         for (int i = 0; i < list.size(); i++) {
                             listOfLongLong.add(list.get(i).getMRosterId());
                         }
-                        RosterManager.getInstance().getRosterList(listOfLongLong, true,
-                                (bmxErrorCode1, itemList) -> {
-                                    RosterFetcher.getFetcher().putRosters(itemList);
-                                    if (BaseManager.bmxFinish(bmxErrorCode1)) {
-                                        if (list != null && !list.isEmpty()) {
-                                            List<BMXRosterService.Application> applications = new ArrayList<>();
-                                            for (int i = 0; i < list.size(); i++) {
-                                                applications.add(list.get(i));
+                        if (listOfLongLong.size() > 0){
+                            RosterManager.getInstance().getRosterList(listOfLongLong, true,
+                                    (bmxErrorCode1, itemList) -> {
+                                        RosterFetcher.getFetcher().putRosters(itemList);
+                                        if (BaseManager.bmxFinish(bmxErrorCode1)) {
+                                            if (list != null && !list.isEmpty()) {
+                                                List<BMXRosterService.Application> applications = new ArrayList<>();
+                                                for (int i = 0; i < list.size(); i++) {
+                                                    applications.add(list.get(i));
+                                                }
+                                                showList(applications, ap.cursor(), upload);
+                                            } else {
+                                                showList(null, "", upload);
                                             }
-                                            showList(applications, ap.cursor(), upload);
                                         } else {
+                                            String error = bmxErrorCode1 == null ? getString(R.string.network_error) : bmxErrorCode1.name();
+                                            ToastUtil.showTextViewPrompt(error);
                                             showList(null, "", upload);
                                         }
-                                    } else {
-                                        String error = bmxErrorCode == null ? getString(R.string.network_error) : bmxErrorCode.name();
-                                        ToastUtil.showTextViewPrompt(error);
-                                        showList(null, "", upload);
-                                    }
-                                });
-                        return;
+                                    });
+                        }
+                    }else{
+                        String error = bmxErrorCode == null ? getString(R.string.network_error) : bmxErrorCode.name();
+                        ToastUtil.showTextViewPrompt(error);
+                        showList(null, "", upload);
                     }
-                    String error = bmxErrorCode == null ? getString(R.string.network_error) : bmxErrorCode.name();
-                    ToastUtil.showTextViewPrompt(error);
-                    showList(null, "", upload);
                 });
     }
 

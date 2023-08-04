@@ -36,7 +36,6 @@ import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.bean.UserBean;
-import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.AgentTask;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.CommonUtils;
@@ -52,6 +51,7 @@ import top.maxim.im.net.ConnectivityReceiver;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.sdk.utils.MessageDispatcher;
+import top.maxim.rtc.RTCManager;
 
 public class WelcomeActivity extends BaseTitleActivity {
 
@@ -139,6 +139,7 @@ public class WelcomeActivity extends BaseTitleActivity {
     }
 
     private void initJump() {
+        RTCManager.getInstance().init(AppContextUtils.getApplication(), BaseManager.getBMXClient());
         boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
         long userId = SharePreferenceUtils.getInstance().getUserId();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();
@@ -150,25 +151,8 @@ public class WelcomeActivity extends BaseTitleActivity {
             }
             return;
         }
-        //没有登录 需要切换到默认appId 再进入登录页面
-        String oldAppId = SharePreferenceUtils.getInstance().getAppId();
-        if (TextUtils.equals(oldAppId, ScanConfigs.CODE_APP_ID)) {
-            // 已经是默认的 直接进入
-            LoginActivity.openLogin(WelcomeActivity.this);
-            finish();
-        } else {
-            // 还原为默认的appId
-            UserManager.getInstance().changeAppId(ScanConfigs.CODE_APP_ID, bmxErrorCode -> {
-                if (BaseManager.bmxFinish(bmxErrorCode)) {
-                    SharePreferenceUtils.getInstance().putAppId("");
-                    LoginActivity.openLogin(WelcomeActivity.this);
-                    finish();
-                } else {
-                    String error = bmxErrorCode != null ? bmxErrorCode.name() : getString(R.string.switch_appId_failed);
-                    ToastUtil.showTextViewPrompt(error);
-                }
-            });
-        }
+        AppIdActivity.open(WelcomeActivity.this);
+        finish();
     }
 
     /**

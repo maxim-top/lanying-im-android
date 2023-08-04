@@ -17,7 +17,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 29
         versionCode 2000000005
-        versionName "4.0.4"
+        versionName "4.0.4.ucloud"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "108316071",

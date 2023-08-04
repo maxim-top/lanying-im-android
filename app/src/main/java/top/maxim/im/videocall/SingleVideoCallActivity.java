@@ -1100,7 +1100,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             runOnUiThread(() -> {
                 addLocalView();
                 BMXVideoCanvas canvas = new BMXVideoCanvas();
-                canvas.setMView(mLocalView.getObtainView());
+                canvas.setMView(mLocalView);
                 canvas.setMStream(info);
                 mEngine.startPreview(canvas);
             });
@@ -1132,7 +1132,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             if (mHasVideo) {
                 addRemoteView();
                 BMXVideoCanvas canvas = new BMXVideoCanvas();
-                canvas.setMView(mRemoteView.getObtainView());
+                canvas.setMView(mRemoteView);
                 canvas.setMUserId(info.getMUserId());
                 canvas.setMStream(info);
                 mEngine.startRemoteView(canvas);

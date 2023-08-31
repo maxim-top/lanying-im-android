@@ -19,4 +19,8 @@ public interface IItemChatFactory extends IItemFactory<BMXMessage> {
      * view移出window
      */
     void onViewDetach();
+    /**
+     * view被回收
+     */
+    void onViewRecycled();
 }

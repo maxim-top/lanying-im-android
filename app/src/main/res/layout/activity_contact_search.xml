@@ -4,17 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_switch_search_mode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/dimen_15"
-        android:paddingTop="@dimen/dimen_10"
-        android:paddingRight="@dimen/dimen_15"
-        android:text="@string/switch_search_mode"
-        android:textColor="#007aff"
-        android:textSize="@dimen/dimen_14" />
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

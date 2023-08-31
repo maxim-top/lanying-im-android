@@ -46,7 +46,7 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
 
     protected ChatViewGroup mChatViewGroup;
 
-    private ChatRecyclerView mChatRecyclerView;
+    protected ChatRecyclerView mChatRecyclerView;
 
     private ChatRecyclerScrollListener mScrollListener;
 

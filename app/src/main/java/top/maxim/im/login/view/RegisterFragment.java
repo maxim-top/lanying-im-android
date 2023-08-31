@@ -31,11 +31,14 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
+import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
+import top.maxim.im.common.base.BaseSwitchActivity;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -50,7 +53,7 @@ import top.maxim.im.wxapi.WXUtils;
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
  */
-public class RegisterActivity extends BaseTitleActivity {
+public class RegisterFragment extends BaseTitleFragment {
 
     /* 关闭 */
     private TextView mClose;
@@ -124,13 +127,13 @@ public class RegisterActivity extends BaseTitleActivity {
     };
 
     public static void openRegister(Context context) {
-        Intent intent = new Intent(context, RegisterActivity.class);
+        Intent intent = new Intent(context, RegisterFragment.class);
         context.startActivity(intent);
     }
 
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
-        return new Header.Builder(this, headerContainer).build();
+        return new Header.Builder(getActivity(), headerContainer).build();
     }
 
     private void updateRegButton() {
@@ -148,7 +151,7 @@ public class RegisterActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         hideHeader();
-        View view = View.inflate(this, R.layout.activity_register, null);
+        View view = View.inflate(getActivity(), R.layout.activity_register, null);
         mClose = view.findViewById(R.id.tv_register_close);
         mInputName = view.findViewById(R.id.et_user_name);
         mInputPwd = view.findViewById(R.id.et_user_pwd);
@@ -162,7 +165,7 @@ public class RegisterActivity extends BaseTitleActivity {
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
         mCheckBox = view.findViewById(R.id.cb_choice);
-        mWXContainer = view.findViewById(R.id.ll_wx_container);
+        mWXContainer = view.findViewById(R.id.iv_wx_login);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
         buildProtocol();
@@ -181,6 +184,10 @@ public class RegisterActivity extends BaseTitleActivity {
             mWXContainer.setVisibility(View.GONE);
         } else {
             mWXContainer.setVisibility(View.VISIBLE);
+        }
+        boolean agreeChecked = SharePreferenceUtils.getInstance().getAgreeChecked();
+        if (agreeChecked){
+            mCheckBox.setChecked(true);
         }
     }
 
@@ -201,7 +208,7 @@ public class RegisterActivity extends BaseTitleActivity {
 
             @Override
             public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtocol(RegisterActivity.this, 1);
+                ProtocolActivity.openProtocol(getActivity(), 1);
             }
         }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString);
@@ -219,7 +226,7 @@ public class RegisterActivity extends BaseTitleActivity {
 
             @Override
             public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtocol(RegisterActivity.this, 0);
+                ProtocolActivity.openProtocol(getActivity(), 0);
             }
         }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString1);
@@ -228,17 +235,23 @@ public class RegisterActivity extends BaseTitleActivity {
 
     @Override
     protected void setViewListener() {
+        BaseSwitchActivity activity = (BaseSwitchActivity)getActivity();
         // 关闭
         mClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                activity.switchFragment(LoginRegisterActivity.LOGIN_REGISTER_INDEX.LOGIN_BY_VERIFY.ordinal());
             }
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
             if (!WXUtils.getInstance().wxSupported()) {
                 ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
+                return;
+            }
+            boolean isAgree = mCheckBox.isChecked();
+            if (!isAgree){
+                ToastUtil.showTextViewPrompt(getString(R.string.check_first));
                 return;
             }
             initWXRxBus();
@@ -251,7 +264,7 @@ public class RegisterActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(getString(R.string.check_first));
                 return;
             }
-            ScannerActivity.openScan(this);
+            ScannerActivity.openScan(getActivity());
         });
         // 注册
         mRegister.setOnClickListener(new View.OnClickListener() {
@@ -355,25 +368,13 @@ public class RegisterActivity extends BaseTitleActivity {
         });
         // 修改appId
         mIvChangeAppId.setOnClickListener(v -> {
-            DNSConfigActivity.startDNSConfigActivity(this);
-//            DialogUtils.getInstance().showEditDialog(this,
-//                    "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
-//                    new CommonEditDialog.OnDialogListener() {
-//                        @Override
-//                        public void onConfirmListener(String content) {
-//                            LoginActivity.changeAppId(RegisterActivity.this, content);
-//                        }
-//
-//                        @Override
-//                        public void onCancelListener() {
-//
-//                        }
-//                    });
+            DNSConfigActivity.startDNSConfigActivity(getActivity());
         });
         mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateRegButton();
+                SharePreferenceUtils.getInstance().putAgreeChecked(isChecked);
             }
         });
     }
@@ -383,24 +384,6 @@ public class RegisterActivity extends BaseTitleActivity {
      */
     private void checkName(String userName, String pwd) {
         register(userName, pwd);
-//        AppManager.getInstance().checkName(userName, new HttpResponseCallback<Boolean>() {
-//            @Override
-//            public void onResponse(Boolean result) {
-//                if (result == null || !result) {
-//                    // 不可用
-//                    ToastUtil.showTextViewPrompt("账号已被注册");
-//                    return;
-//                }
-//                // 校验成功 注册
-//                register(userName, pwd);
-//            }
-//
-//            @Override
-//            public void onFailure(int errorCode, String errorMsg, Throwable t) {
-//                dismissLoadingDialog();
-//                ToastUtil.showTextViewPrompt(errorMsg);
-//            }
-//        });
     }
 
     private void register(final String account, final String pwd) {
@@ -467,10 +450,10 @@ public class RegisterActivity extends BaseTitleActivity {
         UserManager.getInstance().signUpNewUser(account, pwd, (bmxErrorCode, bmxUserProfile) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
-                RegisterBindMobileActivity.openRegisterBindMobile(RegisterActivity.this,
+                RegisterBindMobileActivity.openRegisterBindMobile(getActivity(),
                         mInputName.getEditableText().toString().trim(),
                         mInputPwd.getEditableText().toString().trim(), mChangeAppId);
-                finish();
+                getActivity().finish();
             } else {
                 if (bmxErrorCode.swigValue() == BMXErrorCode.InvalidRequestParameter.swigValue()) {
                     ToastUtil.showTextViewPrompt(getString(R.string.username_only_supports));
@@ -522,7 +505,7 @@ public class RegisterActivity extends BaseTitleActivity {
                             mSubscription.unsubscribe();
                         }
                         String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
-                        LoginActivity.wxChatLogin(RegisterActivity.this, openId);
+                        LoginFragment.wxChatLogin(getActivity(), openId);
                     }
                 });
         mSubscription.add(wxLogin);
@@ -564,11 +547,11 @@ public class RegisterActivity extends BaseTitleActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
         if (mSubscription != null) {
             mSubscription.unsubscribe();
             mSubscription = null;
         }
+        super.onDestroyView();
     }
 }

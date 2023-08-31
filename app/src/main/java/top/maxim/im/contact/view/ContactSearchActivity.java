@@ -48,15 +48,10 @@ import top.maxim.im.message.utils.ChatUtils;
 public class ContactSearchActivity extends BaseTitleActivity {
 
     private RecyclerView mRecycler;
-    
-    private TextView mSwicthSearchMode;
 
     private EditText mSearch;
 
     private SearchAdapter mAdapter;
-
-    /* 是否是id搜索 */
-    private boolean mSearchByUserId = false;
 
     public static void openRosterSearch(Context context) {
         Intent intent = new Intent(context, ContactSearchActivity.class);
@@ -80,7 +75,6 @@ public class ContactSearchActivity extends BaseTitleActivity {
     protected View onCreateView() {
         View view = View.inflate(this, R.layout.activity_contact_search, null);
         mSearch = view.findViewById(R.id.search_contact);
-        mSwicthSearchMode = view.findViewById(R.id.tv_switch_search_mode);
         mRecycler = view.findViewById(R.id.contact_recycler);
         mRecycler.setLayoutManager(new LinearLayoutManager(this));
         mRecycler.addItemDecoration(new DividerItemDecoration(this, R.color.guide_divider));
@@ -99,21 +93,6 @@ public class ContactSearchActivity extends BaseTitleActivity {
                     return true;
                 }
                 return false;
-            }
-        });
-        // 切换搜索模式
-        mSwicthSearchMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSearchByUserId) {
-                    // id搜索
-                    mSearch.setHint(getString(R.string.input_username_searched));
-                    mSearch.setInputType(EditorInfo.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                } else {
-                    mSearch.setHint(getString(R.string.input_userid_searched));
-                    mSearch.setInputType(EditorInfo.TYPE_CLASS_NUMBER);
-                }
-                mSearchByUserId = !mSearchByUserId;
             }
         });
     }
@@ -139,7 +118,7 @@ public class ContactSearchActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(getString(R.string.no_user_found));
             }
         };
-        if (mSearchByUserId && Pattern.matches("[0-9]+", search)) {
+        if (Pattern.matches("[0-9]+", search)) {
             // 纯数字
             RosterManager.getInstance().getRosterList(Long.valueOf(search), true, callBack);
         } else {

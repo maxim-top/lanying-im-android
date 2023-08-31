@@ -37,14 +37,16 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
+import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.MainActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
+import top.maxim.im.common.base.BaseSwitchActivity;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.bean.UserBean;
-import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
@@ -66,7 +68,7 @@ import top.maxim.im.wxapi.WXUtils;
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
  */
-public class LoginActivity extends BaseTitleActivity {
+public class LoginFragment extends BaseTitleFragment {
 
     /* 账号 */
     private EditText mInputName;
@@ -111,19 +113,15 @@ public class LoginActivity extends BaseTitleActivity {
 
     private CheckBox mCheckBox;
 
-    public static void openLogin(Context context, boolean clearTask) {
-        Intent intent = new Intent(context, LoginActivity.class);
-        int flag = Intent.FLAG_ACTIVITY_NEW_TASK;
-        if (clearTask){
-            flag |= Intent.FLAG_ACTIVITY_CLEAR_TASK;
-        }
-        intent.addFlags(flag);
+    public static void openLogin(Context context) {
+        Intent intent = new Intent(context, LoginFragment.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
-        return new Header.Builder(this, headerContainer).build();
+        return new Header.Builder(getActivity(), headerContainer).build();
     }
 
     private void buildProtocol() {
@@ -143,7 +141,7 @@ public class LoginActivity extends BaseTitleActivity {
 
             @Override
             public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtocol(LoginActivity.this, 1);
+                ProtocolActivity.openProtocol(getActivity(), 1);
             }
         }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString);
@@ -161,7 +159,7 @@ public class LoginActivity extends BaseTitleActivity {
 
             @Override
             public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtocol(LoginActivity.this, 0);
+                ProtocolActivity.openProtocol(getActivity(), 0);
             }
         }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString1);
@@ -171,13 +169,13 @@ public class LoginActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         hideHeader();
-        View view = View.inflate(this, R.layout.activity_login, null);
+        View view = View.inflate(getActivity(), R.layout.activity_login, null);
         mInputName = view.findViewById(R.id.et_user_name);
         mInputPwd = view.findViewById(R.id.et_user_pwd);
         mLogin = view.findViewById(R.id.tv_login);
         mRegister = view.findViewById(R.id.tv_register);
         mVerifyLogin = view.findViewById(R.id.tv_verify);
-        mWXContainer = view.findViewById(R.id.ll_wx_container);
+        mWXContainer = view.findViewById(R.id.iv_wx_login);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
@@ -191,7 +189,7 @@ public class LoginActivity extends BaseTitleActivity {
         // 三次点击打开日志
         ClickTimeUtils.setClickTimes(view.findViewById(R.id.tv_open_log), 3, () -> {
             // 跳转查看日志
-            LogViewActivity.openLogView(this, mChangeAppId);
+            LogViewActivity.openLogView(getActivity(), mChangeAppId);
         });
         
         initRxBus();
@@ -213,7 +211,7 @@ public class LoginActivity extends BaseTitleActivity {
                 case PermissionsConstant.READ_STORAGE:
                     String name = mInputName.getText().toString().trim();
                     String pwd = mInputPwd.getText().toString().trim();
-                    login(this, name, pwd, mLoginByUserId, mChangeAppId);
+                    login(getActivity(), name, pwd, mLoginByUserId, mChangeAppId);
                     break;
                 case PermissionsConstant.WRITE_STORAGE:
                     break;
@@ -231,7 +229,7 @@ public class LoginActivity extends BaseTitleActivity {
         }
         String name = mInputName.getText().toString().trim();
         String pwd = mInputPwd.getText().toString().trim();
-        login(this, name, pwd, mLoginByUserId, mChangeAppId);
+        login(getActivity(), name, pwd, mLoginByUserId, mChangeAppId);
     }
 
     private void updateLoginButton() {
@@ -247,15 +245,18 @@ public class LoginActivity extends BaseTitleActivity {
 
     @Override
     protected void setViewListener() {
+        BaseSwitchActivity activity = (BaseSwitchActivity)getActivity();
         // 注册
-        mRegister.setOnClickListener(v -> RegisterActivity.openRegister(LoginActivity.this));
+        mRegister.setOnClickListener(v -> {
+            activity.switchFragment(LoginRegisterActivity.LOGIN_REGISTER_INDEX.REGISTER.ordinal());
+        });
         // 验证码登录
-        mVerifyLogin.setOnClickListener(v -> finish());
+        mVerifyLogin.setOnClickListener(v -> activity.switchFragment(LoginRegisterActivity.LOGIN_REGISTER_INDEX.LOGIN_BY_VERIFY.ordinal()));
         // 登陆
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
             String pwd = mInputPwd.getText().toString().trim();
-            login(this, name, pwd, mLoginByUserId, mChangeAppId);
+            login(getActivity(), name, pwd, mLoginByUserId, mChangeAppId);
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
@@ -275,6 +276,7 @@ public class LoginActivity extends BaseTitleActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateLoginButton();
+                SharePreferenceUtils.getInstance().putAgreeChecked(isChecked);
             }
         });
 
@@ -285,7 +287,7 @@ public class LoginActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(getString(R.string.check_first));
                 return;
             }
-            ScannerActivity.openScan(this);
+            ScannerActivity.openScan(getActivity());
         });
         mInputWatcher = new TextWatcher() {
             @Override
@@ -320,20 +322,7 @@ public class LoginActivity extends BaseTitleActivity {
 
         // 修改appId
         mIvChangeAppId.setOnClickListener(v -> {
-            DNSConfigActivity.startDNSConfigActivity(this);
-//            DialogUtils.getInstance().showEditDialog(this,
-//                    "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
-//                    new CommonEditDialog.OnDialogListener() {
-//                        @Override
-//                        public void onConfirmListener(String content) {
-//                            changeAppId(LoginActivity.this, content);
-//                        }
-//
-//                        @Override
-//                        public void onCancelListener() {
-//
-//                        }
-//                    });
+            DNSConfigActivity.startDNSConfigActivity(getActivity());
         });
     }
 
@@ -360,6 +349,15 @@ public class LoginActivity extends BaseTitleActivity {
             mWXContainer.setVisibility(View.GONE);
         } else {
             mWXContainer.setVisibility(View.VISIBLE);
+        }
+        boolean agreeChecked = SharePreferenceUtils.getInstance().getAgreeChecked();
+        if (agreeChecked){
+            mCheckBox.setChecked(true);
+        }
+        String name = mInputName.getText().toString().trim();
+        String pwd = mInputPwd.getText().toString().trim();
+        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd) && agreeChecked){
+            login(getActivity(), name, pwd, mLoginByUserId, mChangeAppId);
         }
     }
 
@@ -414,6 +412,7 @@ public class LoginActivity extends BaseTitleActivity {
         }
         BMXCallBack callBack = (bmxErrorCode) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
+                SharePreferenceUtils.getInstance().putAppIdHistory();
                 //启动网络监听
                 ConnectivityReceiver.start(AppContextUtils.getApplication());
 
@@ -478,10 +477,6 @@ public class LoginActivity extends BaseTitleActivity {
         if (isLoginById) {
             UserManager.getInstance().signInById(Long.valueOf(name), pwd, callBack);
         } else {
-            // if (Pattern.matches("0?(13|14|15|17|18|19)[0-9]{9}", s)) {
-            // // 手机号
-            // return UserManager.getInstance().signInByPhone(s, pwd);
-            // }
             UserManager.getInstance().signInByName(name, pwd, callBack);
         }
     }
@@ -555,26 +550,6 @@ public class LoginActivity extends BaseTitleActivity {
         intent.setAction(CommonConfig.CHANGE_APP_ID_ACTION);
         intent.putExtra(CommonConfig.CHANGE_APP_ID, appId);
         RxBus.getInstance().send(intent);
-//        if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-//            ((BaseTitleActivity)activity).showLoadingDialog(true);
-//        }
-//        String finalAppId = appId;
-//        UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {
-//            if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
-//                ((BaseTitleActivity)activity).dismissLoadingDialog();
-//            }
-//            if (BaseManager.bmxFinish(bmxErrorCode)) {
-//                SharePreferenceUtils.getInstance().putAppId(finalAppId);
-//                ToastUtil.showTextViewPrompt("切换appId成功");
-//                Intent intent = new Intent();
-//                intent.setAction(CommonConfig.CHANGE_APP_ID_ACTION);
-//                intent.putExtra(CommonConfig.CHANGE_APP_ID, finalAppId);
-//                RxBus.getInstance().send(intent);
-//            } else {
-//                String error = bmxErrorCode != null ? bmxErrorCode.name() : "切换appId失败";
-//                ToastUtil.showTextViewPrompt(error);
-//            }
-//        });
     }
 
     private void initWXRxBus() {
@@ -604,7 +579,7 @@ public class LoginActivity extends BaseTitleActivity {
                             mSubscription.unsubscribe();
                         }
                         String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
-                        wxChatLogin(LoginActivity.this, openId);
+                        wxChatLogin(getActivity(), openId);
                     }
                 });
         mSubscription.add(wxLogin);
@@ -646,11 +621,12 @@ public class LoginActivity extends BaseTitleActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
         if (mSubscription != null) {
             mSubscription.unsubscribe();
             mSubscription = null;
         }
+        super.onDestroyView();
     }
+
 }

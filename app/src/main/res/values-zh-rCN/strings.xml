@@ -193,14 +193,15 @@
 
     <string name="dns_config">配置</string>
     <string name="dns_config_custom">自定义服务</string>
-    <string name="dns_config_appId">AppID</string>
+    <string name="dns_config_appId">App ID</string>
+    <string name="dns_config_appId_colon">App ID：</string>
     <string name="dns_config_server">IM Server</string>
     <string name="dns_config_port">IM Port</string>
     <string name="dns_config_rest_server">Rest Server</string>
     <string name="dns_config_default">默认</string>
 
     <string name="dns_change_custom_title">您确认要关闭自定义服务吗</string>
-    <string name="dns_change_appId_title">修改AppID</string>
+    <string name="dns_change_appId_title">修改App ID</string>
     <string name="dns_change_server_title">修改IM Server</string>
     <string name="dns_change_port_title">修改IM Port</string>
     <string name="dns_change_rest_server_title">修改Rest Server</string>
@@ -246,8 +247,8 @@
     <string name="about_us_company">© 2023 美信拓扑</string>
 
 
-    <string name="common_empty">这里什么都没有～</string>
-    <string name="support_empty">如果想联系技术支持,请退出后,将APPID切换成"welovemaxim"</string>
+    <string name="common_empty">你没有聊天会话，可以在联系人页面右上角搜索用户ID来添加好友</string>
+    <string name="support_empty">如果想联系技术支持,请退出后,将App ID切换成"welovemaxim"</string>
 
     <!--push设置-->
     <string name="set_push">推送设置</string>
@@ -363,7 +364,7 @@
     <string name="entered_passwords_differ">两次输入密码不一致</string>
     <string name="nickname_colon">昵称:</string>
     <string name="snap">拍照</string>
-    <string name="switch_appId_failed">切换appId失败</string>
+    <string name="switch_appId_failed">切换App ID失败</string>
     <string name="cleanup_successfully">清除成功</string>
     <string name="failed_to_cleanup">清除失败</string>
     <string name="please_install_wechat">请安装微信</string>
@@ -437,7 +438,7 @@
     <string name="recent_announcement">最近公告</string>
     <string name="avatar">头像</string>
     <string name="switch_search_mode">切换搜索模式</string>
-    <string name="input_username_searched">输入要查找的好友用户名</string>
+    <string name="input_username_searched">输入要查找的好友用户名或ID</string>
     <string name="input_userid_searched">输入要查找的好友用户ID</string>
     <string name="switch_login_mode">切换登陆模式</string>
     <string name="get_captcha">获取验证码</string>
@@ -471,6 +472,10 @@
     <string name="check_first">请先点击勾选“我已阅读并同意《用户服务》及《隐私政策》”</string>
     <string name="report">举报</string>
     <string name="channel_name">聊天消息</string>
-    <string name="app_id">请输入App ID或从蓝莺IM后台扫描二维码：</string>
-    <string name="what_is_app_id"><a href="https://www.baidu.com">什么是App ID?</a></string>
+    <string name="app_id">请输入App ID</string>
+    <string name="what_is_app_id">什么是App ID?</string>
+    <string name="what_is_app_id_url">https://docs.lanyingim.com/faq/what-is-app-id.html</string>
+    <string name="new_app_id_scaned">扫描成功，成功切换App ID为：</string>
+    <string name="scan_login">扫码登录</string>
+    <string name="logout_for_new">确定要登出当前账号以登录新账号？</string>
 </resources>

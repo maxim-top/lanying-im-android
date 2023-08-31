@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.rtc.RTCManager;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.FileConfig;
@@ -65,6 +66,7 @@ public class MaxIMApplication extends Application {
             Thread.setDefaultUncaughtExceptionHandler(restartHandler);
         }
         initLanguage();
+        SharePreferenceUtils.getInstance().putAgreeChecked(false);
     }
 
     private String getCountry() {

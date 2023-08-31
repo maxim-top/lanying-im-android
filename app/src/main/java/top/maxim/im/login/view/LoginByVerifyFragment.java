@@ -31,9 +31,12 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
+import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
+import top.maxim.im.common.base.BaseSwitchActivity;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -47,7 +50,7 @@ import top.maxim.im.wxapi.WXUtils;
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
  */
-public class LoginByVerifyActivity extends BaseTitleActivity {
+public class LoginByVerifyFragment extends BaseTitleFragment {
 
     /* 账号 */
     private EditText mInputName;
@@ -111,13 +114,13 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     };
 
     public static void openLogin(Context context) {
-        Intent intent = new Intent(context, LoginByVerifyActivity.class);
+        Intent intent = new Intent(context, LoginByVerifyFragment.class);
         context.startActivity(intent);
     }
 
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
-        return new Header.Builder(this, headerContainer).build();
+        return new Header.Builder(getActivity(), headerContainer).build();
     }
 
     private void buildProtocol() {
@@ -137,7 +140,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
 
             @Override
             public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtocol(LoginByVerifyActivity.this, 1);
+                ProtocolActivity.openProtocol(getActivity(), 1);
             }
         }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString);
@@ -155,7 +158,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
 
             @Override
             public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtocol(LoginByVerifyActivity.this, 0);
+                ProtocolActivity.openProtocol(getActivity(), 0);
             }
         }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         builder.append(spannableString1);
@@ -165,7 +168,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     @Override
     protected View onCreateView() {
         hideHeader();
-        View view = View.inflate(this, R.layout.activity_login_verify, null);
+        View view = View.inflate(getActivity(), R.layout.activity_login_verify, null);
         mInputName = view.findViewById(R.id.et_user_phone);
         mInputPwd = view.findViewById(R.id.et_user_verify);
         mLogin = view.findViewById(R.id.tv_login);
@@ -174,7 +177,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
         mSendVerify.setEnabled(false);
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
         mRegister = view.findViewById(R.id.tv_register);
-        mWXContainer = view.findViewById(R.id.ll_wx_container);
+        mWXContainer = view.findViewById(R.id.iv_wx_login);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
@@ -200,12 +203,14 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
 
     @Override
     protected void setViewListener() {
+        BaseSwitchActivity activity = (BaseSwitchActivity)getActivity();
         // 注册
-        mRegister
-                .setOnClickListener(v -> RegisterActivity.openRegister(LoginByVerifyActivity.this));
+        mRegister.setOnClickListener(v -> {
+            activity.switchFragment(LoginRegisterActivity.LOGIN_REGISTER_INDEX.REGISTER.ordinal());
+        });
         // 密码登录
         mVerifyLogin.setOnClickListener(v -> {
-            LoginActivity.openLogin(LoginByVerifyActivity.this, false);
+            activity.switchFragment(LoginRegisterActivity.LOGIN_REGISTER_INDEX.LOGIN_BY_USERNAME.ordinal());
         });
         // 登陆
         mLogin.setOnClickListener(v -> {
@@ -234,7 +239,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(getString(R.string.check_first));
                 return;
             }
-            ScannerActivity.openScan(this);
+            ScannerActivity.openScan(getActivity());
         });
         mInputWatcher = new TextWatcher() {
             @Override
@@ -276,26 +281,14 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 updateLoginButton();
+                SharePreferenceUtils.getInstance().putAgreeChecked(isChecked);
             }
         });
 
         mInputPwd.addTextChangedListener(mInputWatcher);
         // 修改appId
         mIvChangeAppId.setOnClickListener(v -> {
-            DNSConfigActivity.startDNSConfigActivity(this);
-//            DialogUtils.getInstance().showEditDialog(this,
-//                    "修改AppId", getString(R.string.confirm), getString(R.string.cancel),
-//                    new CommonEditDialog.OnDialogListener() {
-//                        @Override
-//                        public void onConfirmListener(String content) {
-//                            LoginActivity.changeAppId(LoginByVerifyActivity.this, content);
-//                        }
-//
-//                        @Override
-//                        public void onCancelListener() {
-//
-//                        }
-//                    });
+            DNSConfigActivity.startDNSConfigActivity(getActivity());
         });
         // 发送验证码
         mSendVerify.setOnClickListener(v -> {
@@ -313,9 +306,6 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                         mVerifyCountDown.setText("");
                         timer.cancel();
                     }
-//                    mSendVerify.setEnabled(true);
-//                    mVerifyCountDown.setText("");
-//                    timer.cancel();
                 }
 
                 @Override
@@ -344,18 +334,16 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     protected void initDataForActivity() {
         super.initDataForActivity();
         // 判断当前是否是扫码登陆
-        String scanUserName = ScanConfigs.CODE_USER_NAME;
-        if (!TextUtils.isEmpty(scanUserName)) {
-            mInputName.setText(scanUserName);
-            ScanConfigs.CODE_USER_NAME = "";
-        }
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText(appId);
         if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
-            mChangeAppId = appId;
             mWXContainer.setVisibility(View.GONE);
         } else {
             mWXContainer.setVisibility(View.VISIBLE);
+        }
+        boolean agreeChecked = SharePreferenceUtils.getInstance().getAgreeChecked();
+        if (agreeChecked){
+            mCheckBox.setChecked(true);
         }
     }
 
@@ -374,15 +362,18 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                             JSONObject jsonObject = new JSONObject(result);
                             if (!jsonObject.has("username") || !jsonObject.has("password")) {
                                 // 没有用户名 密码 需要跳转绑定用户页面
-                                LoginBindUserActivity.openLoginBindUser(LoginByVerifyActivity.this, mobile,
-                                        captcha, mChangeAppId);
-                                finish();
+                                if (jsonObject.has("sign")){
+                                    String sign = jsonObject.getString("sign");
+                                    LoginBindUserActivity.openLoginBindUserWithSign(getActivity(), mobile,
+                                            sign, mChangeAppId);
+                                }
+                                getActivity().finish();
                                 return;
                             }
                             // 直接登录
                             String username = jsonObject.getString("username");
                             String password = jsonObject.getString("password");
-                            LoginActivity.login(LoginByVerifyActivity.this, username, password,
+                            LoginFragment.login(getActivity(), username, password,
                                     false, mChangeAppId);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -424,7 +415,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
                             mSubscription.unsubscribe();
                         }
                         String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
-                        LoginActivity.wxChatLogin(LoginByVerifyActivity.this, openId);
+                        LoginFragment.wxChatLogin(getActivity(), openId);
                     }
                 });
         mSubscription.add(wxLogin);
@@ -466,11 +457,11 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
         if (mSubscription != null) {
             mSubscription.unsubscribe();
             mSubscription = null;
         }
+        super.onDestroyView();
     }
 }

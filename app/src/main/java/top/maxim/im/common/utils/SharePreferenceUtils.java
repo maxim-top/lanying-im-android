@@ -22,6 +22,8 @@ public class SharePreferenceUtils {
 
     private static String USER_ID = "user_id";
 
+    private static String AGREE_CHECKED = "agree_checked";//是否选中"我已阅读并同意《用户服务》及《隐私政策》"
+
     private static String USER_NAME = "user_name";
 
     private static String USER_PWD = "user_pwd";
@@ -80,6 +82,18 @@ public class SharePreferenceUtils {
     public boolean getLoginStatus() {
         if (saveInfo != null) {
             return saveInfo.getBoolean(IS_LOGIN, false);
+        }
+        return false;
+    }
+
+    public boolean putAgreeChecked(boolean agreeChecked) {
+        saveEditor.putBoolean(AGREE_CHECKED, agreeChecked);
+        return saveEditor.commit();
+    }
+
+    public boolean getAgreeChecked() {
+        if (saveInfo != null) {
+            return saveInfo.getBoolean(AGREE_CHECKED, false);
         }
         return false;
     }
@@ -185,11 +199,6 @@ public class SharePreferenceUtils {
             return false;
         }
         saveEditor.putString(APP_ID, appId);
-        Set<String> appIds = saveInfo.getStringSet(APP_ID_HISTORY, new ArraySet<>());
-        if (!appIds.contains(appId)){
-            appIds.add(appId);
-            saveEditor.putStringSet(APP_ID_HISTORY, appIds);
-        }
         return saveEditor.commit();
     }
 
@@ -201,17 +210,34 @@ public class SharePreferenceUtils {
         return ScanConfigs.CODE_APP_ID;
     }
 
+    public boolean putAppIdHistory() {
+        if (saveInfo != null) {
+            String appId = saveInfo.getString(APP_ID, ScanConfigs.CODE_APP_ID);
+            Set<String> appIds = saveInfo.getStringSet(APP_ID_HISTORY, new ArraySet<>());
+            if (!appIds.contains(appId)){
+                appIds.add(appId);
+                saveEditor.putStringSet(APP_ID_HISTORY, appIds);
+                return saveEditor.commit();
+            }
+        }
+        return false;
+    }
+
     public Set<String> getAppIdHistory() {
         if (saveInfo != null) {
             Set<String> appIds = saveInfo.getStringSet(APP_ID_HISTORY, new ArraySet<>());
-            if (appIds.size() == 0){
-                appIds.add(ScanConfigs.CODE_APP_ID);
-                saveEditor.putStringSet(APP_ID_HISTORY, appIds);
-                saveEditor.commit();
-            }
+            appIds.add(ScanConfigs.CODE_APP_ID);
             return appIds;
         }
         return new ArraySet<>();
+    }
+
+    public boolean clearAppIdHistory() {
+        if (saveEditor != null) {
+            saveEditor.putStringSet(APP_ID_HISTORY, new ArraySet<>());
+            return saveEditor.commit();
+        }
+        return false;
     }
 
     /**

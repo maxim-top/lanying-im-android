@@ -12,17 +12,23 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
+import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.contact.view.RosterDetailActivity;
 import top.maxim.im.group.view.GroupQrcodeDetailActivity;
 import top.maxim.im.login.view.LoginActivity;
 import top.maxim.im.login.view.SettingUserActivity;
+import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.utils.QRCodeConfig;
@@ -108,9 +114,30 @@ public class ScanResultActivity extends BaseTitleActivity {
                 if (TextUtils.equals(action, QRCodeConfig.ACTION.UPLOAD_DEVICE_TOKEN)) {
                     dealConsoleUploadToken(source, action, info);
                 } else {
-                    ToastUtil.showTextViewPrompt(getString(R.string.failed_to_recognize_qr_code_info));
-                    finish();
-                    return;
+                    final String finalSource = source;
+                    final String finalAction = action;
+                    final String finalInfo = info;
+                    //是否切换App ID重新登录
+                    DialogUtils.getInstance().showDialog(this,
+                            getString(R.string.scan_login),
+                            getString(R.string.logout_for_new),
+                            new CommonDialog.OnDialogListener() {
+                                @Override
+                                public void onConfirmListener() {
+                                    if (TextUtils.equals(finalAction, QRCodeConfig.ACTION.LOGIN)) {
+                                        dealConsoleLogin(finalSource, finalAction, finalInfo);
+                                    } else if (TextUtils.equals(finalAction, QRCodeConfig.ACTION.APP)) {
+                                        // 二维码体验功能 app
+                                        dealConsoleApp(finalSource, finalAction, finalInfo);
+                                    }
+                                    finish();
+                                }
+
+                                @Override
+                                public void onCancelListener() {
+                                    finish();
+                                }
+                            });
                 }
             } else {
                 // 如果未登录 可以识别上传login app
@@ -123,7 +150,6 @@ public class ScanResultActivity extends BaseTitleActivity {
                 } else {
                     ToastUtil.showTextViewPrompt(getString(R.string.failed_to_recognize_qr_code_info));
                     finish();
-                    return;
                 }
             }
         }
@@ -183,6 +209,16 @@ public class ScanResultActivity extends BaseTitleActivity {
         finish();
     }
 
+    void logout() {
+        showLoadingDialog(true);
+        UserManager.getInstance().signOut((bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (BaseManager.bmxFinish(bmxErrorCode)) {
+                CommonUtils.getInstance().logout();
+            }
+        }));
+    }
+
     /**
      * 处理二维码体验功能 登陆
      */
@@ -204,16 +240,21 @@ public class ScanResultActivity extends BaseTitleActivity {
             if (jsonObject.has("username")) {
                 ScanConfigs.CODE_USER_NAME = jsonObject.getString("username");
             }
+            if (jsonObject.has("password")) {
+                ScanConfigs.CODE_PASSWORD = jsonObject.getString("password");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         if (!TextUtils.isEmpty(appId)) {
             SharePreferenceUtils.getInstance().putAppId(appId);
+            ToastUtil.showTextViewPrompt(getString(R.string.new_app_id_scaned)+appId);
             UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {
                 dismissLoadingDialog();
             });
         }
-        LoginActivity.openLogin(this);
+        logout();
+        LoginRegisterActivity.openLoginRegister(this, true);
         finish();
     }
 
@@ -235,11 +276,13 @@ public class ScanResultActivity extends BaseTitleActivity {
             e.printStackTrace();
         }
         if (!TextUtils.isEmpty(appId)) {
+            ToastUtil.showTextViewPrompt(getString(R.string.new_app_id_scaned)+appId);
             SharePreferenceUtils.getInstance().putAppId(appId);
             UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {
             });
         }
-        LoginActivity.openLogin(this);
+        logout();
+        LoginRegisterActivity.openLoginRegister(this, true);
         finish();
     }
 

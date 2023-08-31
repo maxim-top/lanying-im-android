@@ -171,6 +171,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Main"></activity>
 
+        <!--登录注册-->
+        <activity
+            android:name=".LoginRegisterActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"></activity>
+
         <!--单聊页面-->
         <activity
             android:name=".message.view.ChatSingleActivity"

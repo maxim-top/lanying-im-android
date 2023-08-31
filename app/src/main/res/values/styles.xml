@@ -17,10 +17,10 @@
     </style>
 
     <style name="activity_animation">
-        <item name="android:activityOpenEnterAnimation">@anim/activity_open_enter</item>
-        <item name="android:activityOpenExitAnimation">@anim/activity_open_exit</item>
-        <item name="android:activityCloseEnterAnimation">@anim/out_left_in</item>
-        <item name="android:activityCloseExitAnimation">@anim/out_left_out</item>
+        <item name="android:activityOpenEnterAnimation">@anim/out_left_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/out_left_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/activity_close_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_close_exit</item>
         <item name="android:taskOpenEnterAnimation">@null</item>
         <item name="android:taskOpenExitAnimation">@null</item>
         <item name="android:taskCloseEnterAnimation">@null</item>

@@ -2,7 +2,13 @@
 package top.maxim.im.message.view;
 
 import android.content.Context;
+import android.os.Bundle;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,6 +18,7 @@ import top.maxim.im.message.contract.ChatSingleContract;
 import top.maxim.im.message.customviews.MessageInputBar;
 import top.maxim.im.message.presenter.ChatSinglePresenter;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.message.utils.MessageEvent;
 
 /**
  * Description : 单聊activity Created by Mango on 2018/11/06.
@@ -23,6 +30,29 @@ public class ChatSingleActivity extends ChatBaseActivity implements ChatSingleCo
     @Override
     protected void onHeaderRightClick() {
         RosterDetailActivity.openRosterDetail(this, mChatId);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(MessageEvent messageEvent) {
+        if (messageEvent.getMessage().equals("scroll-to-bottom")){
+            LinearLayoutManager llm = (LinearLayoutManager) mChatRecyclerView.getLayoutManager();
+            int pos = mChatViewHelper.getLastVisiblePosition();
+            llm.scrollToPositionWithOffset(pos,-100000);
+        }
     }
 
     @Override

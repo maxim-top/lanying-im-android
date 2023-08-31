@@ -268,7 +268,7 @@ public class AccountListActivity extends BaseTitleActivity {
                 appId = ScanConfigs.CODE_APP_ID;
             }
             // 有数据 直接登录
-            LoginActivity.login(AccountListActivity.this, userName, pwd, false,
+            LoginFragment.login(AccountListActivity.this, userName, pwd, false,
                     appId, server, port, restServer);
         } else {
             dismissLoadingDialog();

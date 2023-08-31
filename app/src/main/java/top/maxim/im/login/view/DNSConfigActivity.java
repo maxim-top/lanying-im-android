@@ -317,7 +317,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
             BaseManager.changeDNS("", 0, "");
             ScanConfigs.DNS_CONFIG = "";
         }
-        LoginActivity.changeAppId(this, mAppId);
+        LoginFragment.changeAppId(this, mAppId);
         finish();
     }
 }

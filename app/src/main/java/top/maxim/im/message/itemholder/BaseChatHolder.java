@@ -35,4 +35,13 @@ public class BaseChatHolder extends BaseHolder {
             ((IItemChatFactory)mFactory).onViewDetach();
         }
     }
+
+    /**
+     * view被回收
+     */
+    public void onViewRecycled() {
+        if (mFactory != null) {
+            ((IItemChatFactory)mFactory).onViewRecycled();
+        }
+    }
 }

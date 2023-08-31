@@ -105,6 +105,12 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
         holder.onViewDetach();
     }
 
+    @Override
+    public void onViewRecycled(@NonNull BaseChatHolder holder) {
+        super.onViewRecycled(holder);
+        holder.onViewRecycled();
+    }
+
     /**
      * 根据类型获取holder
      *

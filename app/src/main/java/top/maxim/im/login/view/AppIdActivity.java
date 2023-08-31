@@ -1,66 +1,41 @@
 
 package top.maxim.im.login.view;
 
-import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.os.Build;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.view.Window;
+import android.view.WindowManager;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
-import im.floo.BMXCallBack;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
-import top.maxim.im.MainActivity;
+import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
-import top.maxim.im.bmxmanager.AppManager;
-import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
-import top.maxim.im.common.bean.UserBean;
-import top.maxim.im.common.utils.AppContextUtils;
-import top.maxim.im.common.utils.CommonConfig;
-import top.maxim.im.common.utils.CommonUtils;
-import top.maxim.im.common.utils.FileConfig;
-import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
-import top.maxim.im.common.utils.TaskDispatcher;
-import top.maxim.im.common.utils.ToastUtil;
-import top.maxim.im.common.utils.dialog.CustomDialog;
+import top.maxim.im.common.utils.dialog.DropDownMenu;
 import top.maxim.im.common.view.Header;
-import top.maxim.im.filebrowser.FileBrowserActivity;
-import top.maxim.im.login.bean.DNSConfigEvent;
-import top.maxim.im.net.ConnectivityReceiver;
-import top.maxim.im.net.HttpResponseCallback;
-import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
-import top.maxim.im.sdk.utils.MessageDispatcher;
-import top.maxim.im.wxapi.WXUtils;
 
 /**
  * Description : App ID 输入.
@@ -76,7 +51,14 @@ public class AppIdActivity extends BaseTitleActivity {
     /* 扫一扫 */
     private ImageView mIvScan;
 
+    /* what is app id */
+    private ImageView mIvHelp;
+
     private ImageView mIvAppIdHistory;
+
+    private ImageView mIvClear;
+
+    private View mVUnderline;
 
     /* 输入监听 */
     private TextWatcher mInputWatcher;
@@ -85,6 +67,17 @@ public class AppIdActivity extends BaseTitleActivity {
         Intent intent = new Intent(context, AppIdActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void setStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Window window = getWindow();
+            int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
+            systemUiVisibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            window.setStatusBarColor(Color.TRANSPARENT);
+            window.getDecorView().setSystemUiVisibility(systemUiVisibility | View.SYSTEM_UI_FLAG_VISIBLE);
+        }
     }
 
     @Override
@@ -99,9 +92,10 @@ public class AppIdActivity extends BaseTitleActivity {
         mAppId = view.findViewById(R.id.et_app_id);
         mContinue = view.findViewById(R.id.tv_continue);
         mIvScan = view.findViewById(R.id.iv_scan);
+        mIvHelp = view.findViewById(R.id.iv_help);
+        mIvClear = view.findViewById(R.id.iv_clear);
         mIvAppIdHistory = view.findViewById(R.id.iv_app_id_history);
-        TextView whatIs = view.findViewById(R.id.tv_what_is);
-        whatIs.setMovementMethod(LinkMovementMethod.getInstance());
+        mVUnderline = view.findViewById(R.id.v_underline);
         return view;
     }
 
@@ -122,7 +116,7 @@ public class AppIdActivity extends BaseTitleActivity {
             if (!TextUtils.isEmpty(appId)){
                 SharePreferenceUtils.getInstance().putAppId(appId);
                 UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {});
-                LoginActivity.openLogin(AppIdActivity.this);
+                LoginRegisterActivity.openLoginRegister(AppIdActivity.this, false);
             }
         });
 
@@ -135,6 +129,7 @@ public class AppIdActivity extends BaseTitleActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mIvClear.setVisibility(s.length()>0?View.VISIBLE:View.GONE);
             }
 
             @Override
@@ -146,10 +141,46 @@ public class AppIdActivity extends BaseTitleActivity {
         mIvAppIdHistory.setOnClickListener(v -> {
             showAppIdHistory();
         });
+        mIvHelp.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(AppIdActivity.this);
+            LayoutInflater inflater = LayoutInflater.from(AppIdActivity.this);
+            View view = inflater.inflate(R.layout.activity_what_is_app_id, null);
+            WebView mWebView = view.findViewById(R.id.webview);
+            final Dialog dlg = builder.create();
+            dlg.show();
+
+            WindowManager.LayoutParams params = dlg.getWindow().getAttributes();
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            params.height = ScreenUtils.dp2px(500);
+            dlg.getWindow().setAttributes(params);
+            dlg.getWindow().setContentView(view);
+            mWebView.setWebViewClient(new WebViewClient() {
+
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    super.onPageFinished(view, url);
+                    dismissLoadingDialog();
+                }
+            });
+            showLoadingDialog(true);
+            mWebView.loadUrl(getString(R.string.what_is_app_id_url));
+        });
+        mIvClear.setOnClickListener(v -> {
+            mAppId.setText("");
+        });
+    }
+
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 
     private void showAppIdHistory() {
-        final CustomDialog dialog = new CustomDialog();
+        final DropDownMenu dialog = new DropDownMenu();
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -158,10 +189,9 @@ public class AppIdActivity extends BaseTitleActivity {
         Set<String> appIdHistory = SharePreferenceUtils.getInstance().getAppIdHistory();
         for (String appId: appIdHistory) {
             TextView tvAppId = new TextView(this);
-            tvAppId.setPadding(ScreenUtils.dp2px(15), 0, ScreenUtils.dp2px(15), ScreenUtils.dp2px(8));
+            tvAppId.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(6), ScreenUtils.dp2px(15), ScreenUtils.dp2px(8));
             tvAppId.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
             tvAppId.setTextColor(getResources().getColor(R.color.color_black));
-            tvAppId.setBackgroundColor((getResources().getColor(R.color.color_white)));
             tvAppId.setText(appId);
             tvAppId.setOnClickListener(v -> {
                 mAppId.setText(appId);
@@ -169,8 +199,26 @@ public class AppIdActivity extends BaseTitleActivity {
             });
             ll.addView(tvAppId, params);
         }
+        TextView tvClear = new TextView(this);
+        tvClear.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(6), ScreenUtils.dp2px(15), ScreenUtils.dp2px(8));
+        tvClear.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        tvClear.setTextColor(getResources().getColor(R.color.color_0079F4));
+        tvClear.setText("清除记录");
+        tvClear.setOnClickListener(v -> {
+            SharePreferenceUtils.getInstance().clearAppIdHistory();
+            dialog.dismiss();
+        });
+        ll.addView(tvClear, params);
+
 
         dialog.setCustomView(ll);
+
+        int[] locationOfUnderline = {-1, -1};
+        mVUnderline.getLocationInWindow(locationOfUnderline);
+        int left = locationOfUnderline[0];
+        int top = locationOfUnderline[1]-getStatusBarHeight(this);
+        int width = mVUnderline.getWidth();
+        dialog.setViewPosition(new Point(left,top), width, -1);
         dialog.showDialog(this);
     }
 

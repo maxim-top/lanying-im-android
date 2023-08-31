@@ -336,4 +336,9 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
     public void onViewDetach() {
 
     }
+
+    @Override
+    public void onViewRecycled() {
+
+    }
 }

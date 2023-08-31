@@ -252,6 +252,6 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
     }
 
     private void login() {
-        LoginActivity.login(this, userName, userPwd, false, mAppId);
+        LoginFragment.login(this, userName, userPwd, false, mAppId);
     }
 }

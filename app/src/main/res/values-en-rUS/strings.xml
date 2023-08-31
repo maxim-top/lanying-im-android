@@ -193,14 +193,15 @@
 
     <string name="dns_config">DNS Setting</string>
     <string name="dns_config_custom">Manual Servers</string>
-    <string name="dns_config_appId">AppID</string>
+    <string name="dns_config_appId">App ID</string>
+    <string name="dns_config_appId_colon">App ID:</string>
     <string name="dns_config_server">IM Server</string>
     <string name="dns_config_port">IM Port</string>
     <string name="dns_config_rest_server">Rest Server</string>
     <string name="dns_config_default">Default</string>
 
     <string name="dns_change_custom_title">Sure to turn off manual servers</string>
-    <string name="dns_change_appId_title">Modify AppID</string>
+    <string name="dns_change_appId_title">Modify App ID</string>
     <string name="dns_change_server_title">Modify IM Server</string>
     <string name="dns_change_port_title">Modify IM Port</string>
     <string name="dns_change_rest_server_title">Modify Rest Server</string>
@@ -246,8 +247,8 @@
     <string name="about_us_company">© 2023 Maximtop</string>
 
 
-    <string name="common_empty">Nothing here~</string>
-    <string name="support_empty">To contact technical support, please switch the AppID to “welovemaxim” after logging out</string>
+    <string name="common_empty">No conversation here, you can search the user ID in the upper right corner of the contacts page to add friends</string>
+    <string name="support_empty">To contact technical support, please switch the App ID to “welovemaxim” after logging out</string>
 
     <!--push设置-->
     <string name="set_push">Push Settings</string>
@@ -362,7 +363,7 @@
     <string name="entered_passwords_differ">Entered Passwords are Different</string>
     <string name="nickname_colon">Nickname:</string>
     <string name="snap">Snap</string>
-    <string name="switch_appId_failed">Failed to Switch AppId</string>
+    <string name="switch_appId_failed">Failed to Switch App ID</string>
     <string name="cleanup_successfully">Cleanup Successfully</string>
     <string name="failed_to_cleanup">Failed to Cleanup</string>
     <string name="please_install_wechat">Please Install WeChat</string>
@@ -436,7 +437,7 @@
     <string name="recent_announcement">Recent Announcements</string>
     <string name="avatar">Avatar</string>
     <string name="switch_search_mode">Change Search Mode</string>
-    <string name="input_username_searched">Input User Name</string>
+    <string name="input_username_searched">Input User Name or User ID</string>
     <string name="input_userid_searched">Input User ID</string>
     <string name="switch_login_mode">Change Login Mode</string>
     <string name="get_captcha">Get Code</string>
@@ -470,6 +471,10 @@
     <string name="check_first">Please click to check "I have read and agree to 'User Services' and 'Privacy Policy'"</string>
     <string name="report">Report</string>
     <string name="channel_name">IM</string>
-    <string name="app_id">Input your app ID or scan the QR code on Lanying IM console</string>
-    <string name="what_is_app_id"><a href="https://www.baidu.com">What is App ID?</a></string>
+    <string name="app_id">Input your app ID</string>
+    <string name="what_is_app_id">What is App ID?</string>
+    <string name="what_is_app_id_url">https://docs.lanyingim.com/faq/what-is-app-id.html</string>
+    <string name="new_app_id_scaned">QR code scanned successfully, App ID switched to:</string>
+    <string name="scan_login">Scan to login</string>
+    <string name="logout_for_new">Sure to logout and login to a new account?</string>
 </resources>

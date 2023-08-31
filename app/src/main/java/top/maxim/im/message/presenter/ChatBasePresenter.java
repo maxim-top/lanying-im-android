@@ -252,6 +252,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 for (int i = 0; i < list.size(); i++) {
                     BMXMessage message = list.get(i);
                     if (message != null && isCurrentSession(message) && filterMessage(message)) {
+                        message.setExtension("{\"typeWriter\":1}");
                         // 当前会话
                         messages.add(message);
                     }
@@ -1976,7 +1977,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject(message.extension());
-                if (jsonObject.has(MessageConfig.INPUT_STATUS)) {
+                if (jsonObject.has(MessageConfig.INPUT_STATUS) && message.fromId() != mMyUserId) {
                     handelInputStatus(message.extension());
                 }
                 //TODO

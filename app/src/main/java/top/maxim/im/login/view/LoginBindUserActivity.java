@@ -31,6 +31,8 @@ public class LoginBindUserActivity extends BaseTitleActivity {
 
     public static String LOGIN_CAPTCHA = "loginCaptcha";
 
+    public static String LOGIN_SIGN = "loginSign";
+
     public static String LOGIN_APP_ID = "loginAppId";
 
     /* 微信返回code */
@@ -41,6 +43,9 @@ public class LoginBindUserActivity extends BaseTitleActivity {
 
     /* 验证码 */
     private String mCaptcha;
+
+    /* sign */
+    private String mSign;
 
     /* appId */
     private String mAppId;
@@ -77,6 +82,14 @@ public class LoginBindUserActivity extends BaseTitleActivity {
         Intent intent = new Intent(context, LoginBindUserActivity.class);
         intent.putExtra(LOGIN_MOBILE, mobile);
         intent.putExtra(LOGIN_CAPTCHA, captcha);
+        intent.putExtra(LOGIN_APP_ID, appId);
+        context.startActivity(intent);
+    }
+
+    public static void openLoginBindUserWithSign(Context context, String mobile, String sign, String appId) {
+        Intent intent = new Intent(context, LoginBindUserActivity.class);
+        intent.putExtra(LOGIN_MOBILE, mobile);
+        intent.putExtra(LOGIN_SIGN, sign);
         intent.putExtra(LOGIN_APP_ID, appId);
         context.startActivity(intent);
     }
@@ -151,6 +164,7 @@ public class LoginBindUserActivity extends BaseTitleActivity {
             mOpenId = intent.getStringExtra(LOGIN_OPEN_ID);
             mMobile = intent.getStringExtra(LOGIN_MOBILE);
             mCaptcha = intent.getStringExtra(LOGIN_CAPTCHA);
+            mSign = intent.getStringExtra(LOGIN_SIGN);
             mAppId = intent.getStringExtra(LOGIN_APP_ID);
         }
     }
@@ -236,6 +250,11 @@ public class LoginBindUserActivity extends BaseTitleActivity {
                     bindMobile(result, name, pwd);
                     return;
                 }
+                if (!TextUtils.isEmpty(mMobile) && !TextUtils.isEmpty(mSign)) {
+                    // 绑定手机
+                    bindMobileWithSign(result, name, pwd);
+                    return;
+                }
                 dismissLoadingDialog();
                 ToastUtil.showTextViewPrompt(getString(R.string.bind_failed));
             }
@@ -264,7 +283,7 @@ public class LoginBindUserActivity extends BaseTitleActivity {
             }
         });
         // 微信绑定完也直接登录
-        LoginActivity.login(LoginBindUserActivity.this, name, pwd, false, mAppId);
+        LoginFragment.login(LoginBindUserActivity.this, name, pwd, false, mAppId);
         // BindMobileActivity.openBindMobile(BindUserActivity.this, name, pwd, mAppId);
         // finish();
     }
@@ -285,7 +304,25 @@ public class LoginBindUserActivity extends BaseTitleActivity {
                         ToastUtil.showTextViewPrompt(errorMsg);
                     }
                 });
-        LoginActivity.login(LoginBindUserActivity.this, name, pwd, false, mAppId);
+        LoginFragment.login(LoginBindUserActivity.this, name, pwd, false, mAppId);
+    }
+    /**
+     * 绑定手机号
+     */
+    public void bindMobileWithSign(String token, String name, String pwd) {
+        // 绑定和登陆没有依赖
+        AppManager.getInstance().mobileBindBySign(token, mMobile, mSign,
+                new HttpResponseCallback<Boolean>() {
+                    @Override
+                    public void onResponse(Boolean result) {
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        ToastUtil.showTextViewPrompt(errorMsg);
+                    }
+                });
+        LoginFragment.login(LoginBindUserActivity.this, name, pwd, false, mAppId);
     }
 
 }

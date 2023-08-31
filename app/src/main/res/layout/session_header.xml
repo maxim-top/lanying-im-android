@@ -43,7 +43,7 @@
                 android:layout_height="@dimen/dimen_30"
                 android:layout_marginLeft="@dimen/dimen_16"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/scan_icon"/>
+                android:src="@drawable/scan_icon_black"/>
         </LinearLayout>
 
     </RelativeLayout>

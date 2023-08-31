@@ -22,6 +22,9 @@ public class ScanConfigs {
     /* 扫码登陆userName */
     public static String CODE_USER_NAME;
 
+    /* 扫码登陆password */
+    public static String CODE_PASSWORD;
+
     /* 自定义dns配置 */
     public static String DNS_CONFIG;
 

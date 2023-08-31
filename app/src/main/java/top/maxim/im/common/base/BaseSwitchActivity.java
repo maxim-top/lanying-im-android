@@ -16,6 +16,7 @@ import java.util.List;
 
 import top.maxim.im.R;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.view.Header;
 
 /**
@@ -23,6 +24,7 @@ import top.maxim.im.common.view.Header;
  */
 public abstract class BaseSwitchActivity extends BaseTitleActivity {
 
+    public static final int CAMERA_DISTANCE = 6000;
     protected BaseFragment mCurrentFragment;
 
     private int mCurrentIndex = -1;
@@ -35,15 +37,21 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
 
     private List<TabSwitchView> mTabSwitch;
 
+    public boolean mUseCardFlipAnim; //使用卡片翻转动效
+
     @Override
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         return new Header.Builder(this, headerContainer).build();
     }
 
+    protected View getView(){
+        return View.inflate(this, R.layout.activity_main, null);
+    }
+
     @Override
     protected View onCreateView() {
         hideHeader();
-        View view = View.inflate(this, R.layout.activity_main, null);
+        View view = getView();
         mContainer = (RelativeLayout)view.findViewById(R.id.container);
         mTabLayout = ((LinearLayout)view.findViewById(R.id.ll_switch_tab));
         mFragmentCache = new SparseArray();
@@ -71,7 +79,9 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT);
             params.weight = 1;
             params.gravity = Gravity.CENTER;
-            mTabLayout.addView((mTabSwitch.get(i)).mSwitchView, params);
+            if (mTabLayout != null){
+                mTabLayout.addView((mTabSwitch.get(i)).mSwitchView, params);
+            }
         }
     }
 
@@ -84,21 +94,42 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
         switchFragment(mCurrentIndex);
     }
 
+    public void setCurrentIndex(int index){
+        mCurrentIndex = index;
+    }
+
     /**
      * 切换fragment
      * 
      * @param index 索引
      */
-    protected void switchFragment(int index) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if (mCurrentFragment != null) {
-            transaction.hide(mCurrentFragment);
-        }
+    public void switchFragment(int index) {
         if (index < 0 || index > mFragmentCache.size()) {
             index = 0;
         }
         mCurrentIndex = index;
-        mCurrentFragment = mFragmentCache.get(mCurrentIndex);
+        BaseFragment newFragment = mFragmentCache.get(mCurrentIndex);
+        int distance = ScreenUtils.dp2px(CAMERA_DISTANCE);
+        if (newFragment != null){
+            View newView = newFragment.getView();
+            if (newView != null){
+                newView.setCameraDistance(distance);
+            }
+        }
+        if (mCurrentFragment != null){
+            View currentView = mCurrentFragment.getView();
+            if (currentView != null){
+                currentView.setCameraDistance(distance);
+            }
+        }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (mUseCardFlipAnim && mCurrentFragment != null && mCurrentFragment.isAdded()) {
+            transaction.setCustomAnimations(R.anim.flip_in, R.anim.flip_out);
+        }
+        if (mCurrentFragment != null) {
+            transaction.hide(mCurrentFragment);
+        }
+        mCurrentFragment = newFragment;
         if (mCurrentFragment == null) {
             return;
         }
@@ -138,6 +169,10 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
                 int index) {
             if (baseFragment != null && index > -1) {
                 mFragmentCache.put(index, baseFragment);
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.add(R.id.fl_main, baseFragment, baseFragment.getClass().getName());
+                transaction.hide(baseFragment);
+                transaction.commit();
             }
             mDrawable = drawable;
             mResString = resString;
@@ -147,8 +182,12 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
             mTvTab = mSwitchView.findViewById(R.id.tv_switch_tab);
             mTvCount = mSwitchView.findViewById(R.id.tab_unread_num);
             mTvCount.setVisibility(View.GONE);
-            mTvTab.setText(getString(mResString));
-            mIvTab.setImageResource(mDrawable);
+            if (mResString > -1){
+                mTvTab.setText(getString(mResString));
+            }
+            if (mDrawable > -1){
+                mIvTab.setImageResource(mDrawable);
+            }
             mSwitchView.setOnClickListener(this);
         }
 

@@ -28,13 +28,15 @@ public class CommonEditDialog extends BaseDialog implements View.OnClickListener
 
     public static final String DIALOG_TITLE = "dialogTitle";
 
+    public static final String DIALOG_CONTENT = "dialogContent";
+
     public static final String DIALOG_CONFIRM = "dialogConfirm";
 
     public static final String DIALOG_CANCEL = "dialogCancel";
 
     public static final String DIALOG_INPUT_NUMBER = "dialogInputNumber";
     
-    private String mDialogTitle, mConfirm, mCancel;
+    private String mDialogTitle, mDialogContent, mConfirm, mCancel;
     
     private boolean mInputNumber = false;
     
@@ -63,6 +65,7 @@ public class CommonEditDialog extends BaseDialog implements View.OnClickListener
             return;
         }
         mDialogTitle = bundle.getString(DIALOG_TITLE);
+        mDialogContent = bundle.getString(DIALOG_CONTENT);
         mConfirm = bundle.getString(DIALOG_CONFIRM);
         mCancel = bundle.getString(DIALOG_CANCEL);
         mInputNumber = bundle.getBoolean(DIALOG_INPUT_NUMBER, false);
@@ -76,6 +79,7 @@ public class CommonEditDialog extends BaseDialog implements View.OnClickListener
 
     private void bindView() {
         mTvTitle.setText(!TextUtils.isEmpty(mDialogTitle) ? mDialogTitle : "");
+        mTvContent.setText(!TextUtils.isEmpty(mDialogContent) ? mDialogContent : "");
         if (!TextUtils.isEmpty(mConfirm)) {
             mTvConfirm.setText(mConfirm);
         } else {

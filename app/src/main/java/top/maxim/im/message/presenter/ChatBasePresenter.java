@@ -1,6 +1,7 @@
 
 package top.maxim.im.message.presenter;
 
+import static top.maxim.im.common.utils.AppContextUtils.getApplication;
 import static top.maxim.im.message.presenter.ChatBasePresenter.FunctionType.*;
 
 import android.Manifest;
@@ -62,6 +63,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.UserManager;
+import top.maxim.im.common.base.MaxIMApplication;
 import top.maxim.im.common.base.PermissionActivity;
 import top.maxim.im.common.bean.FileBean;
 import top.maxim.im.common.bean.MessageBean;
@@ -99,6 +101,8 @@ import top.maxim.im.message.view.ChooseFileActivity;
 import top.maxim.im.message.view.PhotoDetailActivity;
 import top.maxim.im.message.view.VideoDetailActivity;
 import top.maxim.im.sdk.utils.MessageSendUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Description : 聊天基类presenter Created by Mango on 2018/11/11
@@ -252,7 +256,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 for (int i = 0; i < list.size(); i++) {
                     BMXMessage message = list.get(i);
                     if (message != null && isCurrentSession(message) && filterMessage(message)) {
-                        message.setExtension("{\"typeWriter\":1}");
+                        ((MaxIMApplication) getApplication()).typeWriterMsgId = message.msgId();
                         // 当前会话
                         messages.add(message);
                     }
@@ -377,33 +381,6 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                                     }
                                 }
                             });
-                });
-    }
-
-    @Override
-    public void updateChatData() {
-        if (mConversation == null) {
-            return;
-        }
-        //拉取最近一条消息
-        ChatManager.getInstance().retrieveHistoryMessages(mConversation, 0,
-                1, (bmxErrorCode, messageList) -> {
-                    if (BaseManager.bmxFinish(bmxErrorCode)) {
-                        if (!messageList.isEmpty()) {
-                            List<BMXMessage> messages = new ArrayList<>();
-                            for (int i = 0; i < messageList.size(); i++) {
-                                BMXMessage msg = messageList.get(i);
-                                if (msg.contentType().equals(BMXMessage.ContentType.RTC) &&
-                                        msg.config().getRTCAction().equals("hangup") &&
-                                        msg.fromId() == mMyUserId){
-                                    messages.add(msg);
-                                }
-                            }
-                            if (mView != null) {
-                                mView.receiveChatMessage(messages);
-                            }
-                        }
-                    }
                 });
     }
 
@@ -1997,7 +1974,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            return false;
+            if (jsonObject.has(MessageConfig.INPUT_STATUS)) {
+                return false;
+            }
         }
         return true;
     }

@@ -77,9 +77,9 @@ public final class MessageSendUtils {
     /**
      * 发送挂断消息
      */
-    public void sendRTCHangupMessage(long from, long to, String callId, String content, String pushMessageLocKey, String pushMessageLocArgs) {
+    public void sendRTCHangupMessage(long from, long to, String callId, String content, String pushMessageLocKey, String pushMessageLocArgs, boolean peerDrop) {
         BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
-        con.setRTCHangupInfo(callId);
+        con.setRTCHangupInfo(callId, peerDrop);
         con.setPushMessageLocKey(pushMessageLocKey);
         if (pushMessageLocArgs.length() > 0){
             con.setPushMessageLocArgs(pushMessageLocArgs);

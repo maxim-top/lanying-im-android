@@ -214,8 +214,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginLeft="@dimen/dimen_16"
                     android:layout_marginRight="@dimen/dimen_16"
-                    android:src="@drawable/icon_we"
-                    android:visibility="gone" />
+                    android:src="@drawable/icon_we" />
 
                 <ImageView
                     android:id="@+id/iv_scan"

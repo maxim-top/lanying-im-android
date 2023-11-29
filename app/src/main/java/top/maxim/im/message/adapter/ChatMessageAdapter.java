@@ -84,7 +84,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
         BMXMessageConfig config = bean.config();
         if (config != null){
             String action = config.getRTCAction();
-            if (action != null && action.length() != 0 && !action.equals("hangup")){
+            if (action != null && action.length() != 0 && !action.equals("record")){
                 RecyclerView.LayoutParams param = new RecyclerView.LayoutParams(1, 1);
                 holder.itemView.setLayoutParams(param);
             }
@@ -171,19 +171,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
             return -1;
         }
         boolean isMySend = !bean.isReceiveMsg();
-        if (bean.contentType().equals(BMXMessage.ContentType.RTC)){
-            BMXMessageConfig config = bean.config();
-            if (config != null && config.getRTCAction().equals("hangup")){
-                String content = bean.content();
-                if (content.equals("rejected")){
-                    isMySend = !isMySend;
-                } else if (!content.equals("canceled")){
-                    if (config.getRTCInitiator() != bean.fromId()){
-                        isMySend = !isMySend;
-                    }
-                }
-            }
-        }
         int viewType = MsgBodyHelper.getContentBodyClass(bean.contentType().swigValue()) != null
                 ? bean.contentType().swigValue()
                 : -1;

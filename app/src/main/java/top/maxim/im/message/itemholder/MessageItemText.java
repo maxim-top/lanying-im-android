@@ -1,15 +1,16 @@
 
 package top.maxim.im.message.itemholder;
 
+import static top.maxim.im.common.utils.AppContextUtils.getApplication;
+
 import android.content.Context;
 import androidx.annotation.NonNull;
 
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.text.Spannable;
-import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.style.ImageSpan;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,15 +24,21 @@ import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import im.floo.BMXDataCallBack;
+import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageConfig;
+import io.noties.markwon.AbstractMarkwonPlugin;
+import io.noties.markwon.LinkResolverDef;
 import io.noties.markwon.Markwon;
+import io.noties.markwon.MarkwonConfiguration;
 import io.noties.markwon.image.AsyncDrawable;
 import io.noties.markwon.image.glide.GlideImagesPlugin;
+import io.noties.markwon.linkify.LinkifyPlugin;
 import top.maxim.im.R;
-import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.bmxmanager.ChatManager;
+import top.maxim.im.common.base.MaxIMApplication;
 import top.maxim.im.message.interfaces.ChatActionListener;
-import top.maxim.im.message.utils.ChatAttachmentManager;
 import top.maxim.im.message.utils.MessageEvent;
 
 /**
@@ -46,37 +53,78 @@ public class MessageItemText extends MessageItemBaseView {
     private int mIndex = 0;
     private int mDelay = 40; // 延迟的时间间隔（毫秒）
     private int mStep = 1; //打字机步长，每次增加字符数
-    private boolean mIsTypeWriter = false; //是否开启打字机效果
+    private int mWaitTimes = 0; //等待后续部分的次数
+    public static final int MAX_WAIT_TIMES = 500;
+    private void clearTypeWriterMsgId(BMXMessage message){
+        if (message.msgId() == ((MaxIMApplication) getApplication()).typeWriterMsgId){
+            ((MaxIMApplication) getApplication()).typeWriterMsgId = 0;
+        }
+    }
 
     private Runnable mTypingRunnable = new Runnable() {
         @Override
         public void run() {
             // 获取要显示的字符
-            if (mIndex < mText.length) {
-                StringBuffer stringBuffer = new StringBuffer();
-                stringBuffer.append(mText, 0, mIndex);
-                stringBuffer.append("⚫");
-                showAsMarkdown(stringBuffer.toString());
-                // 增加索引以显示下一个字符
-                mIndex+=mStep;
-                EventBus.getDefault().post(new MessageEvent("scroll-to-bottom"));
-                // 在延迟的时间间隔后再次调用该方法
-                mHandler.postDelayed(this, mDelay);
+            if (mIndex <= mText.length) {
+                if(mWaitTimes < MAX_WAIT_TIMES){
+                    StringBuffer stringBuffer = new StringBuffer();
+                    stringBuffer.append(mText, 0, mIndex);
+                    stringBuffer.append("⚫");
+
+                    showAsMarkdown(stringBuffer.toString());
+                    // 增加索引以显示下一个字符
+                    mIndex+=mStep;
+                    EventBus.getDefault().post(new MessageEvent("scroll-to-bottom"));
+                    // 在延迟的时间间隔后再次调用该方法
+                    mHandler.postDelayed(this, mDelay);
+                }else{
+                    showAsMarkdown(String.valueOf(mText));
+                    clearTypeWriterMsgId(mMaxMessage);
+                    EventBus.getDefault().post(new MessageEvent("scroll-to-bottom"));
+                }
             }else{
-                showAsMarkdown(String.valueOf(mText));
-                mMaxMessage.setExtension("{\"typeWriter\":0}");
-                EventBus.getDefault().post(new MessageEvent("scroll-to-bottom"));
+                BMXDataCallBack<BMXMessage> callBack = new BMXDataCallBack<BMXMessage>() {
+                    @Override
+                    public void onResult(BMXErrorCode code, BMXMessage data) {
+                        mMaxMessage = data;
+                        mText = mMaxMessage.content().toCharArray();
+
+                        if((mText.length-mIndex)<mStep && mText.length!=mIndex){
+                            mIndex = mText.length;
+                        }else{
+                            mWaitTimes ++;
+                        }
+                        Boolean finish = false;
+                        JSONObject jsonObject;
+                        try {
+                            jsonObject = new JSONObject(mMaxMessage.extension());
+                            finish = jsonObject.getJSONObject("ai").getBoolean("finish");
+                            if(finish){
+                                showAsMarkdown(String.valueOf(mText));
+                                clearTypeWriterMsgId(mMaxMessage);
+                                EventBus.getDefault().post(new MessageEvent("scroll-to-bottom"));
+                            }
+                        } catch (JSONException e) {
+                            finish = true;
+                            showAsMarkdown(String.valueOf(mText));
+                            clearTypeWriterMsgId(mMaxMessage);
+                            EventBus.getDefault().post(new MessageEvent("scroll-to-bottom"));
+                        }
+                        if(!finish){
+                            mHandler.postDelayed(mTypingRunnable, mDelay);
+                        }
+                    }
+                };
+                ChatManager.getInstance().getMessage(mMaxMessage.msgId(),callBack);
             }
         }
     };
 
-    public void startTypingAnimation(String text) {
-        mText = text.toCharArray();
+    public void startTypingAnimation() {
         int duration = mText.length*mDelay;
         if (duration > 20000){//耗时超过20秒时，保证在20秒内完成动画
             mStep *= duration/20000;
         }
-        mIndex = 0;
         mHandler.removeCallbacks(mTypingRunnable);
         mHandler.postDelayed(mTypingRunnable, mDelay);
     }
@@ -121,6 +169,21 @@ public class MessageItemText extends MessageItemBaseView {
 
     private void showAsMarkdown(String content){
         Markwon markwon = Markwon.builder(mContext)
+                .usePlugin(LinkifyPlugin.create())
+                .usePlugin(new AbstractMarkwonPlugin() {
+                    @Override
+                    public void configureConfiguration(@NonNull MarkwonConfiguration.Builder builder) {
+                        builder.linkResolver(new LinkResolverDef() {
+                            @Override
+                            public void resolve(View view, @NonNull String link) {
+                                if (link.startsWith("lanying:")) {
+                                } else {
+                                    super.resolve(view, link);
+                                }
+                            }
+                        });
+                    }
+                })
                 .usePlugin(GlideImagesPlugin.create(mContext))
                 .usePlugin(GlideImagesPlugin.create(Glide.with(mContext)))
                 .usePlugin(GlideImagesPlugin.create(new GlideImagesPlugin.GlideStore() {
@@ -135,7 +198,9 @@ public class MessageItemText extends MessageItemBaseView {
                         Glide.with(mContext).clear(target);
                     }
                 })).build();
-        markwon.setMarkdown(mChatText, content);
+        Spanned spanned = markwon.toMarkdown(content);
+        mChatText.setText(spanned);
+        mChatText.setMovementMethod(LinkMovementMethod.getInstance());
     }
     /**
      * 展示文本数据
@@ -150,26 +215,16 @@ public class MessageItemText extends MessageItemBaseView {
             mChatText.setText(mContext.getString(R.string.unknown_message));
             return;
         }
-        mIsTypeWriter = false;
-
-        JSONObject jsonObject;
-        try {
-            jsonObject = new JSONObject(mMaxMessage.extension());
-            if(jsonObject.has("typeWriter") && jsonObject.getInt("typeWriter") == 1){
-                mIsTypeWriter = true;
-                mMaxMessage.setExtension("{\"typeWriter\":2}");
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        boolean showTypeWriter = ((MaxIMApplication) getApplication()).typeWriterMsgId == mMaxMessage.msgId(); //是否开启打字机效果
         String content = TextUtils.isEmpty(mMaxMessage.content()) ? "" : mMaxMessage.content();
         BMXMessageConfig config = mMaxMessage.config();
         if (config != null){
             String action = config.getRTCAction();
-            if (action != null){
-                if (action.equals("hangup")){
+            if (!TextUtils.isEmpty(action)){
+                showTypeWriter = false;
+                if (action.equals("record")){
                     if (content.equals("rejected")){
-                        if (mMaxMessage.isReceiveMsg()){
+                        if (!mMaxMessage.isReceiveMsg()){
                             content = getResources().getString(R.string.call_be_declined);
                         } else {
                             content = getResources().getString(R.string.call_declined);
@@ -187,7 +242,7 @@ public class MessageItemText extends MessageItemBaseView {
                             content = getResources().getString(R.string.callee_not_responding);
                         }
                     } else if (content.equals("busy")){
-                        if (mMaxMessage.isReceiveMsg()){
+                        if (!mMaxMessage.isReceiveMsg()){
                             content = getResources().getString(R.string.callee_busy);
                         } else {
                             content = getResources().getString(R.string.call_busy);
@@ -201,12 +256,12 @@ public class MessageItemText extends MessageItemBaseView {
                         }
                     }
                 }
-            }else{
-                mIsTypeWriter = false;
             }
         }
-        if (mIsTypeWriter){
-            startTypingAnimation(content);
+        mText = content.toCharArray();
+
+        if (showTypeWriter){
+            startTypingAnimation();
         }else{
             showAsMarkdown(content);
         }

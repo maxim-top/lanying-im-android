@@ -137,11 +137,6 @@ public interface ChatBaseContract {
         void initChatData(long msgId);
 
         /**
-         * 更新RTC聊天消息数据
-         */
-        void updateChatData();
-
-        /**
          * 获取下拉的历史消息
          *
          * @param msgId  第一条msgId

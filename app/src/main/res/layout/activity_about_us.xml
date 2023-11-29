@@ -104,6 +104,17 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/ll_about_us_contact"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="@string/icp_no"
+        android:textColor="@color/color_black"
+        android:layout_marginTop="@dimen/dimen_15"
+        android:textSize="@dimen/dimen_14" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/dimen_20"

@@ -22,6 +22,8 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import im.floo.BMXCallBack;
 import im.floo.floolib.BMXUserProfile;
@@ -33,6 +35,7 @@ import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.provider.CommonProvider;
@@ -131,6 +134,8 @@ public class SettingUserActivity extends BaseTitleActivity {
     /* 绑定的手机号 */
     private String mPhone;
 
+    private String mNickname;
+
     private CompositeSubscription mSubscription;
 
     private ImageRequestConfig mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
@@ -196,7 +201,7 @@ public class SettingUserActivity extends BaseTitleActivity {
                 .setOnItemClickListener(new ItemLineArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
-                        showSettingDialog(getString(R.string.setting_user_name));
+                        showSettingDialog(getString(R.string.setting_user_name), mNickname);
                     }
                 });
         container.addView(mSetName.build());
@@ -554,6 +559,12 @@ public class SettingUserActivity extends BaseTitleActivity {
     protected void initDataForActivity() {
         super.initDataForActivity();
         initData(false);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                initData(true);
+            }
+        }, 200);
     }
 
     private void initData(boolean forceRefresh) {
@@ -566,10 +577,10 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     private void initUser(BMXUserProfile profile) {
         long id = profile.userId();
-        String nickName = profile.nickname();
+        mNickname = profile.nickname();
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
         mUserId.setEndContent(String.valueOf(id));
-        mSetName.setEndContent(TextUtils.isEmpty(nickName) ? "" : nickName);
+        mSetName.setEndContent(TextUtils.isEmpty(mNickname) ? "" : mNickname);
         showBindPhone(profile.mobilePhone());
         String publicInfo = profile.publicInfo();
         if (TextUtils.isEmpty(publicInfo)) {
@@ -710,6 +721,21 @@ public class SettingUserActivity extends BaseTitleActivity {
      */
     private void showSettingDialog(final String title) {
         DialogUtils.getInstance().showEditDialog(this, title, getString(R.string.confirm),
+                getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener(String content) {
+                        setUserInfo(title, content);
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
+    }
+
+    private void showSettingDialog(final String title, final String content) {
+        DialogUtils.getInstance().showEditDialog(this, title, content, getString(R.string.confirm),
                 getString(R.string.cancel), new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
@@ -891,6 +917,7 @@ public class SettingUserActivity extends BaseTitleActivity {
             if (TextUtils.equals(title, getString(R.string.setting_user_name))) {
                 // 设置昵称
                 mSetName.setEndContent(TextUtils.isEmpty(info) ? "" : info);
+                mNickname = info;
             } else if (TextUtils.equals(title, getString(R.string.setting_user_public))) {
                 // 设置公有信息
                 boolean hide = TextUtils.isEmpty(info);

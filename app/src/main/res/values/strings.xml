@@ -478,4 +478,6 @@
     <string name="new_app_id_scaned">扫描成功，成功切换App ID为：</string>
     <string name="scan_login">扫码登录</string>
     <string name="logout_for_new">确定要登出当前账号以登录新账号？</string>
+    <string name="icp_no" >京ICP备19033149号-11A</string>
+    <string name="yesterday" >昨天</string>
 </resources>

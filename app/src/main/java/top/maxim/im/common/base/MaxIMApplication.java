@@ -46,6 +46,8 @@ public class MaxIMApplication extends Application {
 
     private static final int MEMORY_CACHE_SIZE_MAX = 10 * 1024 * 1024;
 
+    public long typeWriterMsgId;
+
     private Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
         public void uncaughtException(Thread thread, Throwable ex) {
             restartApp();
@@ -61,6 +63,7 @@ public class MaxIMApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        typeWriterMsgId = 0;
         initUtils();
         if (!BuildConfig.DEBUG) {
             Thread.setDefaultUncaughtExceptionHandler(restartHandler);

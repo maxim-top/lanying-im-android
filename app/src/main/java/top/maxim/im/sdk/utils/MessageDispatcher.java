@@ -77,7 +77,7 @@ public class MessageDispatcher {
                     try {
                         //暂停以处理稍后收到的对应通话的挂断消息（mHungupCalls），
                         // 这样可以避免弹出已结束的通话
-                        Thread.sleep(100);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
@@ -119,11 +119,23 @@ public class MessageDispatcher {
             mHungupCalls.add(msg.config().getRTCCallId());
         }
 
+        public void onRTCRecordMessageReceive(BMXMessage msg) {
+            if (msg == null){
+                return;
+            }
+            String content = msg.content();
+            if (!msg.isReceiveMsg() || (!content.equals("canceled") &&
+                    !content.equals("timeout") &&
+                    !content.equals("busy"))){
+                ackMessage(msg);
+            }
+        }
+
     };
 
     private void replyBusy(String callId, long myID, long chatId){
         new MessageSendUtils().sendRTCHangupMessage(
-                myID, chatId, callId, "busy", "callee_busy","");
+                myID, chatId, callId, "busy", "callee_busy","", false);
 
     }
 

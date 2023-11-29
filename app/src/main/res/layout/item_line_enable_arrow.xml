@@ -43,7 +43,11 @@
             <TextView
                 android:id="@+id/item_end_text"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dimen_25"
+                android:layout_marginRight="@dimen/dimen_20"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:layout_centerVertical="true"
                 android:layout_toLeftOf="@id/item_right_arrow"
                 android:gravity="center_vertical|end"

@@ -13,7 +13,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import im.floo.BMXCallBack;
+import im.floo.BMXDataCallBack;
+import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;
@@ -284,7 +289,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
 
     private void initRoster() {
         showLoadingDialog(true);
-        RosterManager.getInstance().getRosterList(mRosterId, true, (bmxErrorCode, bmxRosterItem) -> {
+        BMXDataCallBack bmxDataCallBack = (BMXDataCallBack<BMXRosterItem>) (bmxErrorCode, bmxRosterItem) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {
                 mRosterItem = bmxRosterItem;
@@ -302,7 +307,14 @@ public class RosterDetailActivity extends BaseTitleActivity {
                             bindRoster();
                         });
             }
-        });
+        };
+        RosterManager.getInstance().getRosterList(mRosterId, false, bmxDataCallBack);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                RosterManager.getInstance().getRosterList(mRosterId, true, bmxDataCallBack);
+            }
+        }, 200);
     }
 
     private void bindRoster() {
@@ -347,7 +359,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
         mSetAlias.setEndContent(TextUtils.isEmpty(alias) ? "" : alias);
 
         String ext = mRosterItem.ext();
-        if (TextUtils.isEmpty(publicInfo)) {
+        if (TextUtils.isEmpty(ext)) {
             mTvExt.setVisibility(View.GONE);
         } else {
             mTvExt.setVisibility(View.VISIBLE);

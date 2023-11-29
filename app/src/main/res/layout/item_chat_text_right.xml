@@ -3,7 +3,6 @@
     android:id="@+id/txt_message"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:autoLink="phone"
     android:background="@drawable/item_chat_txt_right_bg"
     android:descendantFocusability="blocksDescendants"
     android:gravity="start|center"

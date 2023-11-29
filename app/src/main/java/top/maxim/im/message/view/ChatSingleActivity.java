@@ -85,14 +85,6 @@ public class ChatSingleActivity extends ChatBaseActivity implements ChatSingleCo
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (mPresenter != null){
-            mPresenter.updateChatData();
-        }
-    }
-
-    @Override
     protected void setViewListener() {
         super.setViewListener();
     }

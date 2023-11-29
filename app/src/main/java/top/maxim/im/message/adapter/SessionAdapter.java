@@ -117,7 +117,7 @@ public class SessionAdapter extends RecyclerWithHFAdapter<BMXConversation> {
             }
         }
         tvTitle.setText(TextUtils.isEmpty(name) ? "" : name);
-        time.setText(lastMsg != null ? TimeUtils.millis2String(mContext, lastMsg.serverTimestamp()) : "");
+        time.setText(lastMsg != null ? TimeUtils.millis2StringOnConversationList(mContext, lastMsg.serverTimestamp()) : "");
         String draft = item == null ? "" : item.editMessage();
         if (!TextUtils.isEmpty(draft)) {
             // 有草稿

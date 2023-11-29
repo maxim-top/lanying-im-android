@@ -477,4 +477,6 @@
     <string name="new_app_id_scaned">QR code scanned successfully, App ID switched to:</string>
     <string name="scan_login">Scan to login</string>
     <string name="logout_for_new">Sure to logout and login to a new account?</string>
+    <string name="icp_no">京ICP备19033149号-11A</string>
+    <string name="yesterday" >Yesterday</string>
 </resources>

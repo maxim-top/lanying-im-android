@@ -336,11 +336,6 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
         // 判断当前是否是扫码登陆
         String appId = SharePreferenceUtils.getInstance().getAppId();
         mTvAppId.setText(appId);
-        if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
-            mWXContainer.setVisibility(View.GONE);
-        } else {
-            mWXContainer.setVisibility(View.VISIBLE);
-        }
         boolean agreeChecked = SharePreferenceUtils.getInstance().getAgreeChecked();
         if (agreeChecked){
             mCheckBox.setChecked(true);
@@ -447,10 +442,6 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText(mChangeAppId);
-                        mWXContainer.setVisibility(
-                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
-                                        ? View.VISIBLE
-                                        : View.GONE);
                     }
                 });
         mSubscription.add(changeAppId);

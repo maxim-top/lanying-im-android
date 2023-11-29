@@ -181,9 +181,6 @@ public class RegisterFragment extends BaseTitleFragment {
         mTvAppId.setText(appId);
         if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
             mChangeAppId = appId;
-            mWXContainer.setVisibility(View.GONE);
-        } else {
-            mWXContainer.setVisibility(View.VISIBLE);
         }
         boolean agreeChecked = SharePreferenceUtils.getInstance().getAgreeChecked();
         if (agreeChecked){
@@ -537,10 +534,6 @@ public class RegisterFragment extends BaseTitleFragment {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText(mChangeAppId);
-                        mWXContainer.setVisibility(
-                                TextUtils.equals(mChangeAppId, ScanConfigs.CODE_APP_ID)
-                                        ? View.VISIBLE
-                                        : View.GONE);
                     }
                 });
         mSubscription.add(changeAppId);

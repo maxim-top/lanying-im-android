@@ -129,7 +129,7 @@ public class ChatUtils {
      * @param content message content
      * @return String
      */
-    private String getMessageDesc(Context context, BMXMessage.ContentType type, String content, boolean isReceiveMsg) {
+    private String getMessageDesc(Context context, BMXMessage.ContentType type, String content, boolean isReceiveMsg, BMXMessage message) {
         if (type == null) {
             return "[" + context.getString(R.string.unknown_message) + "]";
         }
@@ -150,8 +150,24 @@ public class ChatUtils {
             // 语音
             desc = "[" + context.getString(R.string.voice) + "]";
         } else if (type == BMXMessage.ContentType.RTC) {
+            if (message == null){
+                return "[" + context.getString(R.string.unknown_message) + "]";
+            }
+            boolean isRecordMsg = false;
+            BMXMessageConfig config = message.config();
+            if (config != null) {
+                String action = config.getRTCAction();
+                if (action != null) {
+                    if (action.equals("record")) {
+                        isRecordMsg = true;
+                    }
+                }
+            }
+            if (!isRecordMsg){
+                return "[" + context.getString(R.string.unknown_message) + "]";
+            }
             if (content.equals("rejected")){
-                if (isReceiveMsg){
+                if (!isReceiveMsg){
                     content = context.getString(R.string.call_be_declined);
                 } else {
                     content = context.getString(R.string.call_declined);
@@ -169,7 +185,7 @@ public class ChatUtils {
                     content = context.getString(R.string.callee_not_responding);
                 }
             } else if (content.equals("busy")){
-                if (isReceiveMsg){
+                if (!isReceiveMsg){
                     content = context.getString(R.string.callee_busy);
                 } else {
                     content = context.getString(R.string.call_busy);
@@ -201,7 +217,7 @@ public class ChatUtils {
         }
         BMXMessage.ContentType type = message.contentType();
         String content = message.content();
-        return getMessageDesc(context, type, content, message.isReceiveMsg());
+        return getMessageDesc(context, type, content, message.isReceiveMsg(), message);
     }
 
     /**
@@ -217,7 +233,7 @@ public class ChatUtils {
         }
         BMXMessage.ContentType type = message.getContentType();
         String content = message.getContent();
-        return getMessageDesc(context, type, content, message.isReceiveMsg());
+        return getMessageDesc(context, type, content, message.isReceiveMsg(), null);
     }
 
     /**

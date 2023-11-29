@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Message;
@@ -14,6 +13,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -46,6 +46,7 @@ import im.floo.floolib.BMXVideoMediaType;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
+import top.maxim.im.common.utils.CutoutScreenUtil;
 import top.maxim.rtc.RTCManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
@@ -182,7 +183,6 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                     || msg.content().equals("timeout")
                     || !mEngine.isOnCall)){
                 leaveRoom();
-                ackMessage(msg);
             }
         }
 
@@ -233,7 +233,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 public void run() {
                     mSendUtils.sendRTCHangupMessage(
                             mUserId, mChatId, mCallId, "timeout",
-                            "callee_not_responding","");
+                            "callee_not_responding","", false);
                     leaveRoom();
                     mCallRingtoneManager.stopRinging();
                     finish();
@@ -268,6 +268,20 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                             }
                         }
                     });
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                try {
+                    if(CutoutScreenUtil.isCutoutScreen(this)){
+                        //华为
+                        CutoutScreenUtil.setFullScreenWindowLayoutInDisplayCutout(getWindow());
+                        //其它厂商
+                        WindowManager.LayoutParams params = getWindow().getAttributes();
+                        params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+                        getWindow().setAttributes(params);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
         }
         hideHeader();
     }
@@ -322,10 +336,28 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             public void onLeaveRoom(String info, long roomId, BMXErrorCode error, String reason) {
                 super.onLeaveRoom(info, roomId, error, reason);
                 if (BaseManager.bmxFinish(error)) {
-                    Log.e(TAG, "离开房间成功 roomId= " + roomId + "msg = " + reason);
+                    Log.d(TAG, "离开房间成功 roomId= " + roomId + "msg = " + reason);
                 }else{
                     Log.e(TAG, "离开房间失败 roomId= " + roomId + "msg = " + reason);
                 }
+                TimerTask task = new TimerTask() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(() -> {
+                            if (!RTCManager.getInstance().getRTCEngine().isOnCall){
+                                return;
+                            }
+                            sendRTCHangupMessage(true);
+                            leaveRoom();
+                            mCallRingtoneManager.stopRinging();
+                            if (mIsInitiator){
+                                mRingToneTimer.cancel();
+                            }
+                            finish();
+                        });
+                    }
+                };
+                new Timer().schedule(task, 500);
             }
 
             @Override
@@ -644,7 +676,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 处理无权限
      */
     private void deniedPermission(){
-        sendRTCHangupMessage();
+        sendRTCHangupMessage(false);
         ToastUtil.showTextViewPrompt(
                 getString(R.string.video_call_fail_check_permission));
         finish();
@@ -895,12 +927,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 离开房间
      */
     private void leaveRoom() {
-        mEngine.leaveRoom();
         BMXVideoCanvas canvas = new BMXVideoCanvas();
         BMXStream stream = new BMXStream();
         stream.setMMediaType(BMXVideoMediaType.Camera);
         canvas.setMStream(stream);
         mEngine.stopPreview(canvas);
+        mEngine.leaveRoom();
 
         if (mLocalView != null) {
             mLocalView.release();
@@ -934,7 +966,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      * 挂断
      */
     public void onCallHangup(View view){
-        sendRTCHangupMessage();
+        sendRTCHangupMessage(false);
         leaveRoom();
         if (mPickupTimestamp < 1){
             ackMessage(mMsgId);
@@ -1257,7 +1289,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     /**
      * 发送挂断信息
      */
-    private void sendRTCHangupMessage(){
+    private void sendRTCHangupMessage(boolean peerDrop){
         String content = "canceled";
         String pushMessageLocKey = "call_canceled_by_caller";
         String pushMessageLocArgs = "";
@@ -1278,7 +1310,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
 
         mSendUtils.sendRTCHangupMessage(
-                mUserId, mChatId, mCallId, content, pushMessageLocKey, pushMessageLocArgs);
+                mUserId, mChatId, mCallId, content, pushMessageLocKey, pushMessageLocArgs, peerDrop);
     }
 
     /**

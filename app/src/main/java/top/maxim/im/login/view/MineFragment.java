@@ -556,6 +556,11 @@ public class MineFragment extends BaseTitleFragment {
                 window.setStatusBarColor(Color.TRANSPARENT);
             }
         }
+        UserManager.getInstance().getProfile(false, (bmxErrorCode, bmxUserProfile) -> {
+            if (BaseManager.bmxFinish(bmxErrorCode) && bmxUserProfile != null) {
+                initUser(bmxUserProfile);
+            }
+        });
     }
 
     @Override

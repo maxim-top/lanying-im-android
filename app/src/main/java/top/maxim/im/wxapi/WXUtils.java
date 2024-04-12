@@ -1,8 +1,11 @@
 
 package top.maxim.im.wxapi;
 
+import static com.tencent.mm.opensdk.modelmsg.WXMiniProgramObject.MINIPTOGRAM_TYPE_RELEASE;
+
 import android.text.TextUtils;
 
+import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -67,6 +70,20 @@ public class WXUtils {
         SendAuth.Req req = new SendAuth.Req();
         req.scope = "snsapi_userinfo";
         req.state = AppContextUtils.getAppContext().getString(R.string.block_message);
+        mApi.sendReq(req);
+    }
+
+    /**
+     * 微信登录
+     */
+    public void wxMiniProgram(String wxUsername, String wxPath) {
+        if (mApi == null) {
+            return;
+        }
+        WXLaunchMiniProgram.Req req = new WXLaunchMiniProgram.Req();
+        req.userName = wxUsername;
+        req.path = wxPath;
+        req.miniprogramType = MINIPTOGRAM_TYPE_RELEASE;
         mApi.sendReq(req);
     }
 

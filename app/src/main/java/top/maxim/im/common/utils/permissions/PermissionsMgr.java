@@ -1,6 +1,7 @@
 
 package top.maxim.im.common.utils.permissions;
 
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -14,15 +15,25 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import top.maxim.im.R;
+import top.maxim.im.common.utils.AppContextUtils;
 
 /**
  * Description : 权限管理类
@@ -46,6 +57,30 @@ public class PermissionsMgr {
     private final List<PermissionsResultAction> mPendingActions = new ArrayList<>(1);
 
     private static PermissionsMgr mInstance = null;
+
+    private static ViewGroup mRootViewGroup = null;
+
+    private static View mOverlayView = null;
+
+    private static Map<String, String> mTitles = new HashMap<String, String>() {
+        {
+            put(PermissionsConstant.READ_STORAGE, AppContextUtils.getApplication().getResources().getString(R.string.permission_read_storage));
+            put(PermissionsConstant.FINE_LOCATION, AppContextUtils.getApplication().getResources().getString(R.string.permission_fine_location));
+            put(PermissionsConstant.COARSE_LOCATION, AppContextUtils.getApplication().getResources().getString(R.string.permission_coarse_location));
+            put(PermissionsConstant.CAMERA, AppContextUtils.getApplication().getResources().getString(R.string.permission_camera));
+            put(PermissionsConstant.RECORD_AUDIO, AppContextUtils.getApplication().getResources().getString(R.string.permission_mic));
+        }
+    };
+
+    private static Map<String, String> mTexts = new HashMap<String, String>() {
+        {
+            put(PermissionsConstant.READ_STORAGE, AppContextUtils.getApplication().getResources().getString(R.string.permission_text_read_storage));
+            put(PermissionsConstant.FINE_LOCATION, AppContextUtils.getApplication().getResources().getString(R.string.permission_text_fine_location));
+            put(PermissionsConstant.COARSE_LOCATION, AppContextUtils.getApplication().getResources().getString(R.string.permission_text_coarse_location));
+            put(PermissionsConstant.CAMERA, AppContextUtils.getApplication().getResources().getString(R.string.permission_text_camera));
+            put(PermissionsConstant.RECORD_AUDIO, AppContextUtils.getApplication().getResources().getString(R.string.permission_text_mic));
+        }
+    };
 
     public static PermissionsMgr getInstance() {
         if (mInstance == null) {
@@ -136,7 +171,7 @@ public class PermissionsMgr {
         if (context != null) {
             int hasWriteContactsPermission = ActivityCompat.checkSelfPermission(context,
                     permission);
-            if (hasWriteContactsPermission != PermissionsConstant.GRANTED) {
+            if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
                 //是否要展示申请权限的理由
                 if (ActivityCompat.shouldShowRequestPermissionRationale((Activity)context,
                         permission)) {
@@ -178,6 +213,32 @@ public class PermissionsMgr {
         requestPermissionsIfNecessaryForResult(activity, perms, action);
     }
 
+    private void addOverlayView(@Nullable Activity activity, @NonNull String[] permissions){
+        ViewGroup rootViewGroup = (ViewGroup) activity.getWindow().getDecorView().getRootView();
+        LayoutInflater inflater = (LayoutInflater) activity.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View overlayView = inflater.inflate(R.layout.activity_permission_overlay, null);
+        TextView tvTitle = overlayView.findViewById(R.id.overlay_title);
+        TextView tvText = overlayView.findViewById(R.id.overlay_text);
+        StringBuffer sbTitle = new StringBuffer();
+        StringBuffer sbText = new StringBuffer();
+        for (String permission: permissions) {
+            if (!TextUtils.isEmpty(mTexts.get(permission))){
+                sbText.append(mTexts.get(permission));
+                sbText.append("\n");
+                sbTitle.append(mTitles.get(permission));
+                sbTitle.append("/");
+            }
+        }
+        if (sbText.length()>0){
+            sbTitle.delete(sbTitle.length()-1,sbTitle.length());
+            tvTitle.setText(sbTitle.toString());
+            tvText.setText(sbText.toString());
+        }
+
+        rootViewGroup.addView(overlayView);
+        mRootViewGroup = rootViewGroup;
+        mOverlayView = overlayView;
+    }
     /**
      * 用来执行一个数组 传递给该方法的权限,该方法将请求的权限，如果 他们需要被要求（即我们没有许可），并会增加
      * PermissionsResultAction到队列被通知的权限被授予或 否认
@@ -189,6 +250,8 @@ public class PermissionsMgr {
         }
         Log.i(TAG,
                 " requestPermissionsIfNecessaryForResult permissions length:" + permissions.length);
+
+        addOverlayView(activity, permissions);
         addPendingAction(permissions, action);
         // 如果小于23，直接返回现在各权限状态
         if (Build.VERSION.SDK_INT < 23) {
@@ -219,6 +282,9 @@ public class PermissionsMgr {
         }
         requestPermissionsIfNecessaryForResult(activity, permissions, action);
     }
+    public synchronized void permissionProcessed(){
+        mRootViewGroup.removeView(mOverlayView);
+    }
 
     /**
      * 这个方法通知permissionsMgr，权限已经改变。如果你正在做 使用活动的权限请求，则应调用此方法
@@ -228,6 +294,8 @@ public class PermissionsMgr {
             @NonNull int[] results) {
         Log.i(TAG, " notifyPermissionsChange permissions length:" + permissions.length
                 + ";results length:" + results.length);
+        mRootViewGroup.removeView(mOverlayView);
+
         int size = permissions.length;
         if (results.length < size) {
             size = results.length;

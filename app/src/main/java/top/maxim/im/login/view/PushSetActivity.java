@@ -351,8 +351,8 @@ public class PushSetActivity extends BaseTitleActivity {
      * 初始化数据
      */
     private void initData() {
-        String token = PushManager.getInstance().getToken();
-        String cert = PushManager.getInstance().getCert();
+        String token = PushManager.getInstance().getPushToken();
+        String cert = PushManager.getInstance().getPushCert();
         if (!TextUtils.isEmpty(token)) {
             mTvToken.setText(token);
             mLineToken.setVisibility(View.VISIBLE);

@@ -143,8 +143,9 @@ public final class MessageSendUtils {
                         atIds.add(Long.valueOf(entry.getKey()));
                     }
                 }
-                config.setGroupMemberList(atIds);
+                config.setMentionList(atIds);
             }
+            msg.setConfig(config);
         }
         return handlerMessage(msg);
     }

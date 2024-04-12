@@ -175,6 +175,20 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Main"></activity>
 
+        <activity
+            android:name=".ProxyActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Splash"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="lanying" />
+            </intent-filter>
+        </activity>
+
         <!--登录注册-->
         <activity
             android:name=".LoginRegisterActivity"

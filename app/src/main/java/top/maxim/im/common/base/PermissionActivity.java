@@ -52,9 +52,11 @@ public class PermissionActivity extends AppCompatActivity {
     }
 
     public void onPermissionDenied(List<String> permissions) {
+        PermissionsMgr.getInstance().permissionProcessed();
     }
 
     public void onPermissionGranted(List<String> permissions) {
+        PermissionsMgr.getInstance().permissionProcessed();
     }
 
     @Override

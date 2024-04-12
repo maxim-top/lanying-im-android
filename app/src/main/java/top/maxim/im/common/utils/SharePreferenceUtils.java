@@ -28,6 +28,8 @@ public class SharePreferenceUtils {
 
     private static String USER_PWD = "user_pwd";
 
+    private static String DEEP_LINK = "deep_link";
+
     private static String TOKEN = "token";
 
     private static String DEVICE_ID = "device_id";
@@ -127,9 +129,21 @@ public class SharePreferenceUtils {
         return saveEditor.commit();
     }
 
+    public boolean putDeepLink(String link) {
+        saveEditor.putString(DEEP_LINK, link);
+        return saveEditor.commit();
+    }
+
     public String getUserPwd() {
         if (saveInfo != null) {
             return saveInfo.getString(USER_PWD, null);
+        }
+        return null;
+    }
+
+    public String getDeepLink() {
+        if (saveInfo != null) {
+            return saveInfo.getString(DEEP_LINK, null);
         }
         return null;
     }

@@ -107,6 +107,16 @@
     <string name="location_fail_check_permission">Failed to locate, please check permissions</string>
     <string name="not_has_sd_permission">No local storage permission on the phone</string>
     <string name="video_call_fail_check_permission">Call failed to be established, please check the permissions</string>
+    <string name="permission_read_storage">Storage and Media</string>
+    <string name="permission_fine_location">Fine Location</string>
+    <string name="permission_coarse_location">Location</string>
+    <string name="permission_camera">Camera</string>
+    <string name="permission_mic">Microphone</string>
+    <string name="permission_text_read_storage">ⓘThe Storage and Media permission is used to read files from the device and send them with a message</string>
+    <string name="permission_text_fine_location">ⓘThe Fine Location permission is used to get the location information through the GPS and send it as a location message.</string>
+    <string name="permission_text_coarse_location">ⓘThe Coarse Location permission is used to get the latitude and longitude information through WiFi or mobile base station and send it as a location message.</string>
+    <string name="permission_text_camera">ⓘThe Camera permission is used to take photos or videos, and send them with a messages, or scan QR codes to obtain user information or App ID</string>
+    <string name="permission_text_mic">ⓘThe Microphone permission is used to record and send voice messages, or to make real-time audio and video calls</string>
 
     <!--登录-->
     <string name="login">Login</string>
@@ -479,4 +489,7 @@
     <string name="logout_for_new">Sure to logout and login to a new account?</string>
     <string name="icp_no">京ICP备19033149号-11A</string>
     <string name="yesterday" >Yesterday</string>
+    <string name="uri_error" >Scheme URI error</string>
+    <string name="app_id_required" >App ID required</string>
+    <string name="change_app_id_to" >Please Sign Out and Change App ID to </string>
 </resources>

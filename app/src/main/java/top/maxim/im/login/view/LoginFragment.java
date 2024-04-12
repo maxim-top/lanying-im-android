@@ -507,6 +507,14 @@ public class LoginFragment extends BaseTitleFragment {
                         activity.finish();
                         return;
                     }
+                    boolean official_account_followed = false;
+                    if (jsonObject.has("official_account_followed")) {
+                        official_account_followed = jsonObject.getBoolean("official_account_followed");
+                    }
+                    if (!official_account_followed){
+                        WXUtils.getInstance().wxMiniProgram("gh_11b8debeb062", "");
+                        return;
+                    }
                     // 直接登录
                     String userId = jsonObject.getString("user_id");
                     String pwd = jsonObject.getString("password");

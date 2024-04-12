@@ -1528,12 +1528,14 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
                     @Override
                     public void onGranted(List<String> perms) {
+                        PermissionsMgr.getInstance().permissionProcessed();
                         Log.d(TAG, "Permission is Granted:" + perms);
                         onGrantedPermission(requestType, perms);
                     }
 
                     @Override
                     public void onDenied(List<String> perms) {
+                        PermissionsMgr.getInstance().permissionProcessed();
                         Log.d(TAG, "Permission is Denied" + perms);
                         onDeniedPermission(requestType, perms);
                     }

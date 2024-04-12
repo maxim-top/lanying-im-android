@@ -15,6 +15,8 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.common.base.BaseSwitchActivity;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RxBus;
+import top.maxim.im.common.utils.SchemeUtils;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.contact.view.AllContactFragment;
 import top.maxim.im.login.view.MineFragment;
 import top.maxim.im.message.view.SessionFragment;
@@ -45,6 +47,10 @@ public class MainActivity extends BaseSwitchActivity {
         initRxBus();
         //启动后台服务
         MaxIMPushService.startPushService(this);
+        String urlString = SharePreferenceUtils.getInstance().getDeepLink();
+        if (!TextUtils.isEmpty(urlString)){
+            SchemeUtils.handleScheme(this, urlString);
+        }
     }
 
     @Override

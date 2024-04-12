@@ -2,9 +2,12 @@
 package top.maxim.im.common.utils;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
@@ -195,7 +198,15 @@ public class CameraUtils {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, targetFile);
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
         intent.putExtra("noFaceDetection", true); // no face detection
-        activity.startActivityForResult(intent, resultCode);
+        List<ResolveInfo> resInfoList = activity.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        for (ResolveInfo resolveInfo : resInfoList) {
+            String packageName = resolveInfo.activityInfo.packageName;
+            activity.grantUriPermission(packageName, targetFile, Intent.FLAG_GRANT_WRITE_URI_PERMISSION| Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+        ComponentName componentName = intent.resolveActivity(activity.getPackageManager());
+        if (componentName != null) {
+            activity.startActivityForResult(intent, resultCode);
+        }
     }
 
     /**

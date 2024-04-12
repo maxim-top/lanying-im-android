@@ -4,6 +4,7 @@ package top.maxim.im.push.vivo;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.vivo.push.IPushActionListener;
 import com.vivo.push.PushClient;
 import com.vivo.push.ups.TokenResult;
 import com.vivo.push.ups.UPSRegisterCallback;
@@ -39,7 +40,12 @@ public class VivoPushManager extends IPushManager {
         if (!TextUtils.isEmpty(metaAppSecret)) {
             APP_SECRETE = metaAppSecret.substring(2);
         }
-        PushClient.getInstance(context).initialize();
+        PushClient.getInstance(context).turnOnPush(new IPushActionListener() {
+            @Override
+            public void onStateChanged(int i) {
+
+            }
+        });
     }
 
     @Override

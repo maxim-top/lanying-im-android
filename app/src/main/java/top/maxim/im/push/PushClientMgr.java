@@ -13,6 +13,7 @@ import com.heytap.mcssdk.PushManager;
 import com.huawei.hms.api.ConnectionResult;
 import com.huawei.hms.api.HuaweiApiAvailability;
 import com.meizu.cloud.pushsdk.util.MzSystemUtils;
+import com.vivo.push.IPushActionListener;
 import com.vivo.push.PushClient;
 import com.xiaomi.mipush.sdk.MiPushClient;
 
@@ -120,11 +121,16 @@ public final class PushClientMgr {
     }
 
     /**
-     * 判断oppo
+     * 判断vivo
      */
     public static boolean isVivo(Context context) {
         if (!isInited) {
-            PushClient.getInstance(context).initialize();
+            PushClient.getInstance(context).turnOnPush(new IPushActionListener() {
+                @Override
+                public void onStateChanged(int i) {
+
+                }
+            });
         }
         try {
             return RomUtil.isVivo() && PushClient.getInstance(context).isSupport();

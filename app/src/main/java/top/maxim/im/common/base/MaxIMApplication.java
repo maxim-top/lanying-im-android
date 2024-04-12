@@ -1,6 +1,7 @@
 
 package top.maxim.im.common.base;
 
+import android.app.Activity;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.os.LocaleList;
 import androidx.multidex.MultiDex;
@@ -21,6 +23,8 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import java.io.File;
 import java.util.Locale;
 
+import im.floo.floolib.BMXClient;
+import im.floo.floolib.BMXErrorCode;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -48,6 +52,58 @@ public class MaxIMApplication extends Application {
 
     public long typeWriterMsgId;
 
+    private int activityAount = 0;
+
+    private boolean isDisconnected = false;
+
+    /**
+     * Activity 生命周期监听，用于监控app前后台状态切换
+     */
+    ActivityLifecycleCallbacks activityLifecycleCallbacks = new ActivityLifecycleCallbacks() {
+        @Override
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        }
+
+        @Override
+        public void onActivityStarted(Activity activity) {
+            if (activityAount == 0) {
+                //app回到前台
+                if (isDisconnected){
+                    BMXClient client = BaseManager.getBMXClient();
+                    client.reconnect();
+                }
+            }
+            activityAount++;
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
+        }
+        @Override
+        public void onActivityPaused(Activity activity) {
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+            activityAount--;
+            if (activityAount == 0) {
+                //app切到后台
+                if (!RTCManager.getInstance().getRTCEngine().isOnCall){
+                    BMXClient client = BaseManager.getBMXClient();
+                    client.disconnect();
+                    isDisconnected = true;
+                }
+            }
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+        }
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+        }
+    };
+
     private Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
         public void uncaughtException(Thread thread, Throwable ex) {
             restartApp();
@@ -70,6 +126,7 @@ public class MaxIMApplication extends Application {
         }
         initLanguage();
         SharePreferenceUtils.getInstance().putAgreeChecked(false);
+        registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
     }
 
     private String getCountry() {

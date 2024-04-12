@@ -16,8 +16,8 @@ android {
         applicationId "top.maxim.im"
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 2000000011
-        versionName "4.2.1"
+        versionCode 2000000017
+        versionName "4.3.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "HUAWEI_APPID"   : "108316071",
@@ -32,7 +32,7 @@ android {
 
                 "VIVO_APPID"     : "100122979",
                 "VIVO_APP_KEY"   : "20e9451070bbb5de77f16a31c4d61f94",
-                "VIVO_APP_SECRET": "86a3152b-68b1-4c3a-ac1c-047f4ed34fcf",
+                "VIVO_APP_SECRET": "13a2b928-5ed2-455e-8d24-159de891832c",
 
                 "WEIXIN_APPID"   : "wxf0f8e197ecfb0925",
                 "BUGLY_APPID"    : "ae2c13667e",
@@ -138,7 +138,7 @@ dependencies {
 //    implementation project(':floo-android')
 
     //vivo push
-    implementation files("libs/vivo_pushsdk-v2.9.0.0.aar")
+    implementation files("libs/vivo_pushSDK_v4.0.0.0_500.aar")
 
     implementation 'com.squareup.okhttp3:okhttp:3.12.3'
 

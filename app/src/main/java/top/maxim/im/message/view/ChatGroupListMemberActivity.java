@@ -286,10 +286,8 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
             }
         });
     }
-
-    protected void initData(String cursor, BMXDataCallBack<BMXGroupMemberList> callBack) {
+    private void getMembers(String cursor, BMXGroupMemberList memberListTmp, BMXDataCallBack<BMXGroupMemberList> callBack){
         GroupManager.getInstance().getMembers(mGroup, cursor, DEFAULT_PAGE_SIZE, (bmxErrorCode, page) -> {
-            BMXGroupMemberList memberListTmp = new BMXGroupMemberList();
             if (page != null && page.result() != null && !page.result().isEmpty()) {
                 mCursor = page.cursor();
                 BMXGroupMemberList list = page.result();
@@ -300,11 +298,19 @@ public class ChatGroupListMemberActivity extends BaseTitleActivity {
                         memberListTmp.add(list.get(i));
                     }
                 }
-            }
-            if (callBack != null) {
-                callBack.onResult(bmxErrorCode, memberListTmp);
+                if(!TextUtils.isEmpty(mCursor)){
+                    getMembers(page.cursor(), memberListTmp, callBack);
+                }else{
+                    if (callBack != null) {
+                        callBack.onResult(bmxErrorCode, memberListTmp);
+                    }
+                }
             }
         });
+    }
+    protected void initData(String cursor, BMXDataCallBack<BMXGroupMemberList> callBack) {
+        BMXGroupMemberList memberListTmp = new BMXGroupMemberList();
+        getMembers(cursor, memberListTmp, callBack);
     }
 
     protected void bindData(BMXGroupMemberList memberList, boolean upload) {

@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -16,6 +18,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.core.content.FileProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -1070,14 +1074,27 @@ public class SettingUserActivity extends BaseTitleActivity {
                         if (TextUtils.isEmpty(path)) {
                             return;
                         }
+                        if (!FileUtils.checkSDCard()) {
+                            ToastUtil.showTextViewPrompt("SD 不存在！");
+                        }
                         File imageFileDir = new File(FileConfig.DIR_APP_CACHE_CAMERA);
                         if (!imageFileDir.exists()) {
                             imageFileDir.mkdirs();
                         }
                         mIconPath = FileConfig.DIR_APP_CACHE_CAMERA + "/"
                                 + System.currentTimeMillis() + "icon" + ".jpg";
+                        Uri photoURI;
+                        File imageFile = new File(mIconPath);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            // 第二参数是在manifest.xml定义 provider的authorities属性
+                            photoURI = FileProvider.getUriForFile(this,
+                                    this.getPackageName() + ".fileProvider", imageFile);
+                        } else {
+                            photoURI = Uri.fromFile(imageFile);
+                        }
+
                         CameraUtils.getInstance().startPhotoZoom(new File(path),
-                                Uri.fromFile(new File(mIconPath)), FileConfig.DIR_APP_CACHE_CAMERA,
+                                photoURI, FileConfig.DIR_APP_CACHE_CAMERA,
                                 600, 600, this, IMAGE_CROP);
                     } catch (Exception e) {
                         e.printStackTrace();

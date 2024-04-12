@@ -107,6 +107,16 @@
     <string name="location_fail_check_permission">定位失败，请检查权限</string>
     <string name="not_has_sd_permission">没有手机存储权限</string>
     <string name="video_call_fail_check_permission">音视频会话失败，请检查权限</string>
+    <string name="permission_read_storage">存储空间和媒体</string>
+    <string name="permission_fine_location">精确位置信息</string>
+    <string name="permission_coarse_location">位置信息</string>
+    <string name="permission_camera">摄像头</string>
+    <string name="permission_mic">麦克风</string>
+    <string name="permission_text_read_storage">ⓘ存储空间和媒体权限用于读取设备文件存储系统，发送本地文件</string>
+    <string name="permission_text_fine_location">ⓘ精确位置信息权限用于通过GPS芯片接收卫星的定位信息，实现发送位置消息</string>
+    <string name="permission_text_coarse_location">ⓘ位置信息权限用于通过WiFi或移动基站的方式获取用户错略的经纬度信息，实现发送位置消息</string>
+    <string name="permission_text_camera">ⓘ摄像头权限用于拍摄照片或视频，实现发送图片或视频消息，或扫描二维码获取账号信息、App ID等</string>
+    <string name="permission_text_mic">ⓘ麦克风权限用于录音，实现发送语音消息或进行实时音视频通话</string>
 
     <!--登录-->
     <string name="login">登录</string>
@@ -480,4 +490,7 @@
     <string name="logout_for_new">确定要登出当前账号以登录新账号？</string>
     <string name="icp_no" >京ICP备19033149号-11A</string>
     <string name="yesterday" >昨天</string>
+    <string name="uri_error" >错误的协议格式</string>
+    <string name="app_id_required" >缺少App ID</string>
+    <string name="change_app_id_to" >请退出当前账号并切换到App ID到</string>
 </resources>

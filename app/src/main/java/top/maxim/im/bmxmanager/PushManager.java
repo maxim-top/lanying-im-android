@@ -60,8 +60,16 @@ public class PushManager extends BaseManager {
         return mService.getToken();
     }
 
+    public String getPushToken() {
+        return mService.getPushToken();
+    }
+
     public String getCert() {
         return mService.getCert();
+    }
+
+    public String getPushCert() {
+        return mService.getPushCert();
     }
 
     public BMXPushService.PushSdkStatus status() {

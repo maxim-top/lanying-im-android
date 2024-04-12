@@ -13,7 +13,7 @@ public class FileConfig {
     private static String APP_DIR_NAME = "maxIM";
 
     // 应用文件绝对路径
-    public static String DIR_APP_NAME = Environment.getExternalStorageDirectory().getAbsolutePath()
+    public static String DIR_APP_NAME = AppContextUtils.getAppContext().getExternalFilesDir(null).getPath()
             + "/" + APP_DIR_NAME;
 
     // 应用缓存文件绝对路径

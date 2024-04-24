@@ -87,7 +87,7 @@ public class ChatGroupAtActivity extends ChatGroupListMemberActivity {
                     return;
                 }
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(member.getMUid());
-                String name = rosterItem != null ? rosterItem.username() : "";
+                String name = rosterItem == null ? "" : rosterItem.nickname().isEmpty()? rosterItem.username() : rosterItem.nickname();
                 if (!mSelected.containsKey(mId) || !mSelected.get(mId)) {
                     mSelected.put(mId, true);
                     atMap.put(String.valueOf(mId), name);

@@ -54,6 +54,16 @@ public class MainActivity extends BaseSwitchActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        String urlString = SharePreferenceUtils.getInstance().getDeepLink();
+        if (!TextUtils.isEmpty(urlString)){
+            SchemeUtils.handleScheme(this, urlString);
+        }
+    }
+
+    @Override
     protected void initFragment(final List<TabSwitchView> tabSwitch) {
         mSessionTab = new BaseSwitchActivity.TabSwitchView(R.drawable.message_icon_selector,
                 R.string.tab_chat, new SessionFragment(), 0);

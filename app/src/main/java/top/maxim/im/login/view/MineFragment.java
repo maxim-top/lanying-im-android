@@ -1,6 +1,9 @@
 
 package top.maxim.im.login.view;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -15,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gavin.view.flexible.FlexibleLayout;
 
@@ -587,8 +591,68 @@ public class MineFragment extends BaseTitleFragment {
         ChatUtils.getInstance().showProfileAvatar(profile, mUserIcon, mConfig);
         long userId = profile.userId();
         mUserName.setText(TextUtils.isEmpty(name) ? "" : getString(R.string.username_colon)+ name);
+        String finalName = name;
+        mUserName.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                // 获取TextView的文本
+                String textToCopy = finalName;
+                // 创建ClipData对象
+                ClipData clip = ClipData.newPlainText("text_label", textToCopy);
+                // 获取系统剪贴板服务
+                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                // 将ClipData设置到剪贴板
+                clipboard.setPrimaryClip(clip);
+
+                // 给用户反馈
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.copied_to_clipboard) + textToCopy, Toast.LENGTH_SHORT).show();
+
+                return true; // 返回true表示事件已消费
+            }
+        });
+
         mNickName.setText(TextUtils.isEmpty(nickName) ? getString(R.string.please_set_a_nickname) : nickName);
+        String finalNickname = nickName;
+        mNickName.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                // 获取TextView的文本
+                String textToCopy = finalNickname;
+                // 创建ClipData对象
+                ClipData clip = ClipData.newPlainText("text_label", textToCopy);
+                // 获取系统剪贴板服务
+                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                // 将ClipData设置到剪贴板
+                clipboard.setPrimaryClip(clip);
+
+                // 给用户反馈
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.copied_to_clipboard) + textToCopy, Toast.LENGTH_SHORT).show();
+
+                return true; // 返回true表示事件已消费
+            }
+        });
+
         mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
+        String finalId = "" + userId;
+        mUserId.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                // 获取TextView的文本
+                String textToCopy = finalId;
+                // 创建ClipData对象
+                ClipData clip = ClipData.newPlainText("text_label", textToCopy);
+                // 获取系统剪贴板服务
+                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                // 将ClipData设置到剪贴板
+                clipboard.setPrimaryClip(clip);
+
+                // 给用户反馈
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.copied_to_clipboard) + textToCopy, Toast.LENGTH_SHORT).show();
+
+                return true; // 返回true表示事件已消费
+            }
+        });
+
 //        mUserPubInfo.setText(getString(R.string.personalized_signature) + (TextUtils.isEmpty(publicInfo) ? getString(R.string.welcome_to_set_your_signature) : publicInfo));
         // push
         BMXUserProfile.MessageSetting setting = profile.messageSetting();

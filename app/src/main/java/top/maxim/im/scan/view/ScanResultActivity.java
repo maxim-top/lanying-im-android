@@ -12,6 +12,8 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
@@ -24,9 +26,12 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.contact.bean.SupportBean;
 import top.maxim.im.contact.view.RosterDetailActivity;
 import top.maxim.im.group.view.GroupQrcodeDetailActivity;
 import top.maxim.im.login.view.LoginActivity;
+import top.maxim.im.login.view.LoginBindUserActivity;
+import top.maxim.im.login.view.LoginByVerifyActivity;
 import top.maxim.im.login.view.SettingUserActivity;
 import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.net.HttpResponseCallback;
@@ -152,6 +157,56 @@ public class ScanResultActivity extends BaseTitleActivity {
                     finish();
                 }
             }
+        } else if (TextUtils.equals(source, QRCodeConfig.SOURCE.WEB)) {
+            boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
+            String appId = null;
+            String qrcode = null;
+            try {
+                JSONObject jsonObject = new JSONObject(info);
+                if (jsonObject.has("app_id")) {
+                    appId = jsonObject.getString("app_id");
+                }
+                if (jsonObject.has("qrcode")) {
+                    qrcode = jsonObject.getString("qrcode");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            appId = "welovemaxim";
+            String curAppId = SharePreferenceUtils.getInstance().getAppId();
+            if (appId==null || !appId.equals(curAppId)){
+                ToastUtil.showTextViewPrompt(this.getString(R.string.change_app_id_to)+appId);
+                finish();
+                return;
+            }
+
+
+            // 二维码体验功能
+            if (isLogin) {
+                // 如果已登录 只可以识别上传deviceToken
+                if (TextUtils.equals(action, QRCodeConfig.ACTION.LOGIN)) {
+                    final String finalQrCode = qrcode;
+                    //是否切换App ID重新登录
+                    DialogUtils.getInstance().showDialog(this,
+                            getString(R.string.webim_login_ack_title),
+                            getString(R.string.webim_login_ack_body),
+                            new CommonDialog.OnDialogListener() {
+                                @Override
+                                public void onConfirmListener() {
+                                    dealWebLogin(finalQrCode);
+                                    finish();
+                                }
+
+                                @Override
+                                public void onCancelListener() {
+                                    finish();
+                                }
+                            });
+                }
+            } else {
+                ToastUtil.showTextViewPrompt(getString(R.string.login_pls));
+                finish();
+            }
         }
     }
 
@@ -217,6 +272,37 @@ public class ScanResultActivity extends BaseTitleActivity {
                 CommonUtils.getInstance().logout();
             }
         }));
+    }
+
+    /**
+     * 处理web IM扫码登陆
+     */
+    private void dealWebLogin(String qrcode) {
+        showLoadingDialog(true);
+        AppManager.getInstance().getTokenByName(SharePreferenceUtils.getInstance().getUserName(),
+                SharePreferenceUtils.getInstance().getUserPwd(),
+                new HttpResponseCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        AppManager.getInstance().allowLoginWithQrCode(result, qrcode,
+                                new HttpResponseCallback<String>() {
+                                    @Override
+                                    public void onResponse(String result) {
+                                        dismissLoadingDialog();
+                                    }
+
+                                    @Override
+                                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                                        dismissLoadingDialog();
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        dismissLoadingDialog();
+                    }
+                });
     }
 
     /**

@@ -1058,6 +1058,177 @@ public class AppManager {
     }
 
     /**
+     * 更换手机号 根据旧手机获取签名
+     */
+    public void allowLoginWithQrCode(String token, String qrcode, HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        params.put("allow", "1");
+        params.put("qr_code", qrcode);
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "allow", params,
+                header, new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        String data = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                data = jsonObject.getString("data");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(data);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 更换手机号 根据旧手机获取签名
+     */
+    public void getLanyingLinkInfo(String link, HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
+        params.put("link", link);
+        mClient.call(HttpClient.Method.GET, "https://lanying.link/" + "info", params,
+                header, new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        String data = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                data = jsonObject.getString("data");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(data);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 更换手机号 根据旧手机获取签名
+     */
+    public void getSecretInfo(String code, HttpResponseCallback<String> callback) {
+        Map<String, String> header = new HashMap<>();
+        Map<String, String> params = new HashMap<>();
+        params.put("code", code);
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "secret_info", params,
+                header, new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        String data = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                data = jsonObject.getString("data");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(data);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
      * 检查用户名
      */
     public void checkName(String userName, HttpResponseCallback<Boolean> callback) {

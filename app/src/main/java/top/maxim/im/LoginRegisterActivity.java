@@ -4,10 +4,13 @@ package top.maxim.im;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import java.util.List;
 
 import top.maxim.im.common.base.BaseSwitchActivity;
+import top.maxim.im.common.utils.SchemeUtils;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.login.view.LoginByVerifyFragment;
 import top.maxim.im.login.view.LoginFragment;
 import top.maxim.im.login.view.RegisterFragment;
@@ -46,6 +49,16 @@ public class LoginRegisterActivity extends BaseSwitchActivity {
     protected void onCreate(Bundle savedInstanceState) {
         mUseCardFlipAnim = true;
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String urlString = SharePreferenceUtils.getInstance().getDeepLink();
+        if (!TextUtils.isEmpty(urlString)){
+            SchemeUtils.handleScheme(this, urlString);
+        }
     }
 
     protected View getView(){

@@ -11,6 +11,7 @@ public interface QRCodeConfig {
         String APP = "app";
 
         String CONSOLE = "console";
+        String WEB = "web";
     }
 
     // source

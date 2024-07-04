@@ -204,6 +204,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     private CompositeSubscription mSubcription;
 
+    private BMXMessage mVoiceMsg;
+
     private BMXChatServiceListener mListener = new BMXChatServiceListener() {
 
         @Override
@@ -1149,6 +1151,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      * 取消播放的语音
      */
     private void stopVoicePlay() {
+        VoicePlayManager.getInstance().onFinishCallback(mVoiceMsg);
         if (mView != null) {
             mView.cancelVoicePlay();
         }
@@ -1192,6 +1195,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             }
         });
         mVoicePlayHelper.startVoice(mView.getContext(), voicePath);
+        mVoiceMsg = bean;
     }
 
     /**

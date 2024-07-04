@@ -31,6 +31,7 @@ import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.SchemeUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.dialog.DropDownMenu;
@@ -67,6 +68,16 @@ public class AppIdActivity extends BaseTitleActivity {
         Intent intent = new Intent(context, AppIdActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String urlString = SharePreferenceUtils.getInstance().getDeepLink();
+        if (!TextUtils.isEmpty(urlString)){
+            SchemeUtils.handleScheme(this, urlString);
+        }
     }
 
     @Override

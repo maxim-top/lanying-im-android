@@ -40,6 +40,8 @@ public final class PushClientMgr {
 
     private static boolean isInited = false;
 
+    private static boolean sHasOfficialPush = true;
+
     private static int sDevType = 0;
 
     public static final int HW_TYPE = 1;
@@ -85,10 +87,15 @@ public final class PushClientMgr {
                 sDevType = GOOGLE_TYPE;
             } else {
                 sManager = new EmptyPushManager(application.getApplicationContext());
+                sHasOfficialPush = false;
             }
             isInited = true;
             return true;
         }
+    }
+
+    public static boolean hasOfficialPush(){
+        return sHasOfficialPush;
     }
 
     /**

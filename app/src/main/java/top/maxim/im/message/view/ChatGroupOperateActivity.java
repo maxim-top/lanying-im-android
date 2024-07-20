@@ -178,6 +178,8 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
     /* 是否是群聊创建者 */
     private boolean mIsOwner;
 
+    private boolean mShouldHideMembers;
+
     private List<String> memberIdList;
     
     // 最大展示数目
@@ -249,6 +251,13 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
                 //需要获取群管理员列表  判断是否是管理员
                 GroupManager.getInstance().getAdmins(mGroup, true, (bmxErrorCode1, memberList) -> {
                     bindGroupInfo();
+                    boolean isAdmin = mIsAdmin || mIsOwner;
+                    boolean hideByGroupSettings = bmxGroup.hideMemberInfo();
+                    if (hideByGroupSettings && !isAdmin){
+                        mShouldHideMembers = true;
+                        mChatGroupMember.setVisibility(View.GONE);
+                    }
+
                     if (syncMember) {
                         initGroupMembers();
                     }
@@ -750,6 +759,10 @@ public class ChatGroupOperateActivity extends BaseTitleActivity {
      * 初始化群成员
      */
     private void initGroupMembers() {
+        if (mShouldHideMembers){
+            mGvGroupMember.setVisibility(View.GONE);
+            return;
+        }
         GroupManager.getInstance().getMembers(mGroup, true, (bmxErrorCode, memberList) -> {
             dismissLoadingDialog();
             if (BaseManager.bmxFinish(bmxErrorCode)) {

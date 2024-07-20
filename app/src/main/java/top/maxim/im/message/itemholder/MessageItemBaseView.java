@@ -18,7 +18,9 @@ import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.BMXUserProfile;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.GroupManager;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TimeUtils;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
@@ -163,6 +165,19 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
         }
         String userName = null;
         boolean group = mMaxMessage.type() == BMXMessage.MessageType.Group;
+        boolean hideMemberInfo = true;
+        if (group){
+            BMXGroup bmxGroup = RosterFetcher.getFetcher().getGroup(mMaxMessage.conversationId());
+            if (bmxGroup != null) {
+                boolean isOwner = GroupManager.getInstance().isGroupOwner(bmxGroup.ownerId());
+                boolean isAdmin = GroupManager.getInstance().isAdmin(bmxGroup, SharePreferenceUtils.getInstance().getUserId()) || isOwner;
+                boolean hideByGroupSettings = bmxGroup.hideMemberInfo();
+                if (!hideByGroupSettings || isAdmin){
+                    hideMemberInfo = false;
+                }
+            }
+        }
+
         if (mMaxMessage.isReceiveMsg()) {
             BMXRosterItem item = RosterFetcher.getFetcher().getRoster(mMaxMessage.fromId());
             if(group){
@@ -176,6 +191,9 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
                     userName = item.nickname();
                 } else if (item != null) {
                     userName = item.username();
+                    if (hideMemberInfo){
+                        userName = CommonUtils.md5InBase64(item.username()+String.valueOf(mMaxMessage.fromId())).substring(0, 12);
+                    }
                 }
             } else{
                 if (item != null && !TextUtils.isEmpty(item.alias())) {
@@ -213,10 +231,12 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
             }
         }
         if (mIconView != null) {
+            boolean finalHideMemberInfo = hideMemberInfo;
             mIconView.setOnClickListener(v -> {
                 if (mMaxMessage.isReceiveMsg()) {
-                    // 收到的消息进入roster详情
-                    RosterDetailActivity.openRosterDetail(mContext, mMaxMessage.fromId());
+                    if (!finalHideMemberInfo){
+                        RosterDetailActivity.openRosterDetail(mContext, mMaxMessage.fromId());
+                    }
                 } else {
                     // 自己的进入设置页面
                     SettingUserActivity.openSettingUser(mContext);

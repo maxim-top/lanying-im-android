@@ -497,4 +497,5 @@
     <string name="webim_login_ack_title" >Web IM登录确认</string>
     <string name="webim_login_ack_body" >您正在请求在Web版蓝莺IM登录，请确认是您本人登录以免信息泄漏。</string>
     <string name="copied_to_clipboard">已复制到剪贴板：</string>
+    <string name="hide_member_info">隐藏群成员信息</string>
 </resources>

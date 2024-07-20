@@ -26,6 +26,8 @@ public class PhotoViewBean extends BaseBean {
      */
     private String thumbHttpUrl;
 
+    private long msgId;
+
     public String getLocalPath() {
         return localPath;
     }
@@ -57,4 +59,8 @@ public class PhotoViewBean extends BaseBean {
     public void setThumbHttpUrl(String thumbHttpUrl) {
         this.thumbHttpUrl = thumbHttpUrl;
     }
+
+    public long getMsgId() { return msgId; }
+
+    public void setMsgId(long msgId) { this.msgId = msgId; }
 }

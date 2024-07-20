@@ -487,4 +487,11 @@ public class GroupManager extends BaseManager {
     public void setEnableReadAck(BMXGroup group, boolean enable, BMXCallBack callBack) {
         mService.setEnableReadAck(group, enable, callBack);
     }
+
+    /**
+     * 设置隐藏群成员信息
+     */
+    public void setHideMemberInfo(BMXGroup group, boolean enable, BMXCallBack callBack) {
+        mService.setHideMemberInfo(group, enable, callBack);
+    }
 }

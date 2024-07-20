@@ -496,4 +496,5 @@
     <string name="webim_login_ack_title" >Web IM login</string>
     <string name="webim_login_ack_body" >You are requesting to login to the Web client of Lanying IM, please confirm that  is your action to avoid information leakage.</string>
     <string name="copied_to_clipboard">Copied to clipboard: </string>
+    <string name="hide_member_info">Hide member information</string>
 </resources>

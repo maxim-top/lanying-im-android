@@ -468,7 +468,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     if (mView != null) {
                         mView.setControlBarText(mConversation.editMessage());
                     }
-                    initChatData(0);
+                    if (chatType != null && chatType == BMXMessage.MessageType.Single) {
+                        initChatData(0);
+                    }
                 }
             };
             if (chatType != null && chatType == BMXMessage.MessageType.Single) {
@@ -487,7 +489,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
             if (mView != null) {
                 mView.setControlBarText(mConversation.editMessage());
             }
-            initChatData(0);
+            if (chatType != null && chatType == BMXMessage.MessageType.Single) {
+                initChatData(0);
+            }
         }
         UserManager.getInstance().getProfile(false, (bmxErrorCode, bmxUserProfile) -> {
             if (BaseManager.bmxFinish(bmxErrorCode)) {
@@ -1262,6 +1266,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         photoViewBean.setThumbLocalPath(body.thumbnailPath());
         photoViewBean.setThumbHttpUrl(body.thumbnailUrl());
         photoViewBean.setHttpUrl(body.url());
+        photoViewBean.setMsgId(bean.msgId());
         photoViewBeans.add(photoViewBean);
         PhotoViewListBean listBean = new PhotoViewListBean();
         listBean.setPhotoViewBeans(photoViewBeans);

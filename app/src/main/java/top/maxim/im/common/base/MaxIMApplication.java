@@ -126,7 +126,6 @@ public class MaxIMApplication extends Application {
         }
         initLanguage();
         SharePreferenceUtils.getInstance().putAgreeChecked(false);
-        registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
     }
 
     private String getCountry() {
@@ -185,6 +184,9 @@ public class MaxIMApplication extends Application {
         // push
         PushClientMgr.initManager(this);
         PushUtils.getInstance().registerActivityListener(this);
+        if (PushClientMgr.hasOfficialPush()){
+            registerActivityLifecycleCallbacks(activityLifecycleCallbacks);
+        }
 //        BuglyTask.get().init(this);
     }
 

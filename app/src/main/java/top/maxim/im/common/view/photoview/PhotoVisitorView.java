@@ -16,10 +16,16 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
 import java.io.File;
 
+import im.floo.BMXDataCallBack;
+import im.floo.floolib.BMXErrorCode;
+import im.floo.floolib.BMXMessage;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.bean.PhotoViewBean;
 import top.maxim.im.common.view.BMImageLoader;
 import top.maxim.im.common.view.ImageRequestConfig;
+import top.maxim.im.message.interfaces.MsgAttachmentCallback;
+import top.maxim.im.message.utils.ChatAttachmentManager;
 
 public class PhotoVisitorView extends RelativeLayout {
 
@@ -33,6 +39,18 @@ public class PhotoVisitorView extends RelativeLayout {
 
     /* 图片配置 */
     private ImageRequestConfig mConfig;
+    private MsgAttachmentCallback listener = new MsgAttachmentCallback() {
+        @Override
+        public void onProgress(long msgId, int percent) {}
+
+        @Override
+        public void onFinish(long msgId) {
+            showPhoto(0);
+        }
+
+        @Override
+        public void onFail(long msgId) {}
+    };
 
     public PhotoVisitorView(Context context) {
         this(context, null);
@@ -106,6 +124,19 @@ public class PhotoVisitorView extends RelativeLayout {
                 loadUrl = mPhotoViewBean.getThumbHttpUrl();
             }
         }
+
+        if (!TextUtils.isEmpty(mPhotoViewBean.getLocalPath())
+                && !new File(mPhotoViewBean.getLocalPath()).exists()) {
+            BMXDataCallBack<BMXMessage> callBack = new BMXDataCallBack<BMXMessage>() {
+                @Override
+                public void onResult(BMXErrorCode code, BMXMessage data) {
+                    ChatManager.getInstance().downloadAttachment(data);
+                    ChatAttachmentManager.getInstance().registerListener(data.msgId(), listener);
+                }
+            };
+            ChatManager.getInstance().getMessage(mPhotoViewBean.getMsgId(), callBack);
+        }
+
         mPhotoView.setVisibility(View.VISIBLE);
         BMImageLoader.getInstance().display(mPhotoView, loadUrl, mConfig, new ImageLoadingListener() {
             @Override

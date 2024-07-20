@@ -79,6 +79,8 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
     /* 列表 */
     private ItemLineSwitch.Builder mGroupBan;
 
+    private ItemLineSwitch.Builder mHideMemberInfo;
+
     private SparseArray<BMXGroup.MsgMuteMode> muteModeMap = new SparseArray<>();
 
     private SparseArray<BMXGroup.MsgPushMode> pushModeMap = new SparseArray<>();
@@ -312,6 +314,22 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
                 });
         container.addView(mGroupBan.build());
 
+        // 分割线
+        View itemLine11 = new ItemLine.Builder(this, container).setMarginLeft(ScreenUtils.dp2px(15)).build();
+        container.addView(itemLine11);
+
+
+        // 隐藏群成员信息
+        mHideMemberInfo = new ItemLineSwitch.Builder(this)
+                .setLeftText(getString(R.string.hide_member_info))
+                .setOnItemSwitchListener(new ItemLineSwitch.OnItemViewSwitchListener() {
+                    @Override
+                    public void onItemSwitch(View v, boolean curCheck) {
+                        setHideMemberInfo(curCheck);
+                    }
+                });
+        container.addView(mHideMemberInfo.build());
+
         container.setPadding(0, 0, 0, ScreenUtils.dp2px(50));
         ScrollView scrollView = new ScrollView(this);
         scrollView.addView(container, new ScrollView.LayoutParams(
@@ -398,6 +416,8 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
         mGroupMemberBan.setEndContent(banSize <= 0 ? "" : String.valueOf(banSize));
         //全员禁言
         bindBanGroup();
+        // 隐藏群成员信息
+        mHideMemberInfo.setCheckStatus(mGroup.hideMemberInfo());
     }
 
     private void initGroupMode() {
@@ -625,5 +645,21 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
     private void toastError(BMXErrorCode e) {
         String error = e != null ? e.name() : getString(R.string.network_exception);
         ToastUtil.showTextViewPrompt(error);
+    }
+
+    /**
+     * 设置隐藏群成员信息
+     *
+     * @param hide 是否隐藏
+     */
+    private void setHideMemberInfo(boolean hide) {
+        showLoadingDialog(true);
+        GroupManager.getInstance().setHideMemberInfo(mGroup, hide, bmxErrorCode -> {
+            dismissLoadingDialog();
+            if (!BaseManager.bmxFinish(bmxErrorCode)) {
+                toastError(bmxErrorCode);
+                mHideMemberInfo.setCheckStatus(!hide);
+            }
+        });
     }
 }

@@ -94,3 +94,13 @@
 -keep class com.vivo.push.**{*; }
 -keep class com.vivo.vms.**{*; }
 
+# ProGuard configurationsfor NetworkBench Lens
+-keep class com.networkbench.** { *; }
+-dontwarn com.networkbench.**
+-keepattributes Exceptions, Signature, InnerClasses
+# End NetworkBench Lens
+
+-keep class okhttp3.** { *;}
+-dontwarn okhttp3.**
+
+-keepattributes SourceFile,LineNumberTable

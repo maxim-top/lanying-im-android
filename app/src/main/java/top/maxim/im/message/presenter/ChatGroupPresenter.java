@@ -4,6 +4,7 @@ package top.maxim.im.message.presenter;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,13 +12,18 @@ import java.util.List;
 import java.util.Map;
 
 import im.floo.floolib.BMXGroup;
+import im.floo.floolib.BMXGroupBannedMemberList;
+import im.floo.floolib.BMXGroupServiceListener;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageConfig;
+import im.floo.floolib.ListOfLongLong;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
+import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.utils.RosterFetcher;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.message.contract.ChatGroupContract;
@@ -47,11 +53,41 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
     private boolean mShowAckRead = false;
 
+    /* 群组 */
+    private BMXGroupServiceListener mGroupListener = new BMXGroupServiceListener() {
+        @Override
+        public void onGroupInfoUpdate(BMXGroup group, BMXGroup.UpdateInfoType type) {
+            ((Activity)mView.getContext()).runOnUiThread(() -> updateInputBar(group));
+        }
+    };
+
     public ChatGroupPresenter(ChatGroupContract.View view) {
         super();
         mView = view;
         mView.setPresenter(this);
         setChatBaseView(mView, mModel);
+        GroupManager.getInstance().addGroupListener(mGroupListener);
+    }
+
+    private void updateInputBar(BMXGroup group){
+        long currentTime = System.currentTimeMillis();
+        GroupManager.getInstance().getBannedMembers(group,  (error, memberList) -> {
+            if (BaseManager.bmxFinish(error)) {
+                for (int i = 0; i < memberList.size(); i++) {
+                    if (mMyUserId == memberList.get(i).getMUid()){
+                        long banExpireTime = memberList.get(i).getMExpired() * 1000;
+                        mView.enableInputBar((banExpireTime <= currentTime && banExpireTime != -1000), false);
+                        return;
+                    }
+                }
+
+            }
+        });
+        boolean isOwner = GroupManager.getInstance().isGroupOwner(group.ownerId());
+        boolean isAdmin = GroupManager.getInstance().isAdmin(group, SharePreferenceUtils.getInstance().getUserId()) || isOwner;
+        long banExpireTime = group.banExpireTime() * 1000;
+        //临时禁言过期也没有永久禁言
+        mView.enableInputBar((banExpireTime <= currentTime && banExpireTime != -1000)||isAdmin, true);
     }
 
     @Override
@@ -91,6 +127,7 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
                     mView.showReadAck(mShowAckRead);
                 }
                 syncGroupMember(group);
+                updateInputBar(group);
             }
         });
     }

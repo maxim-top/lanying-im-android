@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.gavin.view.flexible.FlexibleLayout;
 
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import im.floo.floolib.BMXClient;
 import im.floo.floolib.BMXErrorCode;
@@ -32,6 +34,7 @@ import top.maxim.im.MainActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonUtils;
@@ -145,6 +148,8 @@ public class MineFragment extends BaseTitleFragment {
     /* app版本号 */
     private TextView mAppVersion;
 
+    private Timer mHeaderTimer = new Timer();
+
     private ImageRequestConfig mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
             .showImageForEmptyUri(R.drawable.default_avatar_icon)
             .showImageOnFail(R.drawable.default_avatar_icon).cacheOnDisk(true)
@@ -176,7 +181,7 @@ public class MineFragment extends BaseTitleFragment {
 
         mFlexibleLayout.setHeader(mRlUserInfo).setReadyListener(() ->
         // 下拉放大的条件
-        mScrollView.getScrollY() == 0);
+        false);
         // 获取app版本
         int versionCode = BuildConfig.VERSION_CODE;
         String versionName = BuildConfig.VERSION_NAME;
@@ -570,6 +575,23 @@ public class MineFragment extends BaseTitleFragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (mHeaderTimer!=null){
+            mHeaderTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (mRlUserInfo.getHeight() > 0){
+                        mFlexibleLayout.setHeader(mRlUserInfo).setReadyListener(() ->
+                                // 下拉放大的条件
+                                mScrollView.getScrollY() == 0);
+                        if (mHeaderTimer!=null){
+                            mHeaderTimer.cancel();
+                            mHeaderTimer.purge();
+                            mHeaderTimer = null;
+                        }
+                    }
+                }
+            }, 1000, 1000);
+        }
         UserManager.getInstance().getProfile(false, (bmxErrorCode, bmxUserProfile) -> {
             if (BaseManager.bmxFinish(bmxErrorCode) && bmxUserProfile != null) {
                 initUser(bmxUserProfile);
@@ -701,6 +723,11 @@ public class MineFragment extends BaseTitleFragment {
     public void onDestroyView() {
         setNull(mQuitView);
         super.onDestroyView();
+        if (mHeaderTimer!=null){
+            mHeaderTimer.cancel();
+            mHeaderTimer.purge();
+            mHeaderTimer = null;
+        }
     }
 
     /**

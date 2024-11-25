@@ -327,6 +327,8 @@ public class RosterDetailActivity extends BaseTitleActivity {
             add.setVisibility(View.GONE);
         } else {
             mTvOpenChat.setVisibility(View.GONE);
+            mTvVideoCall.setVisibility(View.GONE);
+            mTvVoiceCall.setVisibility(View.GONE);
             add.setVisibility(View.VISIBLE);
             add.setText(getString(R.string.add));
         }

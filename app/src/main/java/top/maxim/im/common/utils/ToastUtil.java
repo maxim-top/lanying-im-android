@@ -1,8 +1,12 @@
 
 package top.maxim.im.common.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.StringRes;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
@@ -44,7 +48,13 @@ public class ToastUtil {
      * @param name
      */
     public static void showTextViewPrompt(String name) {
-        showTextViewPrompt(AppContextUtils.getAppContext(), name);
+        Handler mainThreadHandler = new Handler(Looper.getMainLooper());
+        mainThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                showTextViewPrompt(AppContextUtils.getAppContext(), name);
+            }
+        });
     }
 
     public static void showTextViewPrompt(Context context, String name) {

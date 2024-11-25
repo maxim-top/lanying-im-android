@@ -1,11 +1,17 @@
 
 package top.maxim.im.message.view;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 
 import im.floo.floolib.BMXGroup;
+import im.floo.floolib.BMXGroupServiceListener;
 import im.floo.floolib.BMXMessage;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.GroupManager;
+import top.maxim.im.common.utils.RosterFetcher;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.message.contract.ChatGroupContract;
@@ -18,6 +24,10 @@ public class ChatGroupActivity extends ChatBaseActivity implements ChatGroupCont
 
     private ChatGroupContract.Presenter mPresenter;
 
+    private long mMyUserId;
+
+    private long mChatId;
+
     @Override
     protected void onHeaderRightClick() {
         ChatGroupOperateActivity.startGroupOperateActivity(this, mChatId);
@@ -25,8 +35,9 @@ public class ChatGroupActivity extends ChatBaseActivity implements ChatGroupCont
 
     @Override
     protected void initChatInfo(long myUserId, long chatId) {
+        mMyUserId = myUserId;
+        mChatId = chatId;
         mPresenter = new ChatGroupPresenter(this);
-        mPresenter.setChatInfo(BMXMessage.MessageType.Group, myUserId, chatId);
     }
 
     @Override
@@ -84,7 +95,17 @@ public class ChatGroupActivity extends ChatBaseActivity implements ChatGroupCont
     }
 
     @Override
+    public void enableInputBar(boolean enable, boolean isMuteAll) {
+        super.enableInputBar(enable, isMuteAll);
+    }
+
+    @Override
     public Context getContext() {
         return this;
+    }
+
+    public void onResume() {
+        super.onResume();
+        mPresenter.setChatInfo(BMXMessage.MessageType.Group, mMyUserId, mChatId);
     }
 }

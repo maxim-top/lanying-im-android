@@ -25,6 +25,12 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Devices running Android 13 (API level 33) or higher -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
+    <!-- To handle the reselection within the app on Android 14 (API level 34) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -74,6 +80,8 @@
     <uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE" />
     <uses-permission android:name="com.heytap.mcs.permission.RECIEVE_MCS_MESSAGE" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <application
         android:name=".common.base.MaxIMApplication"
         android:allowBackup="true"
@@ -83,7 +91,9 @@
         android:supportsRtl="true"
         android:theme="@style/ActivityAnimation"
         android:usesCleartextTraffic="true"
-        tools:replace="android:icon,android:roundIcon,android:theme">
+        android:requestLegacyExternalStorage="true"
+        tools:replace="android:icon,android:roundIcon,android:theme"
+        tools:targetApi="q">
 
         <activity
             android:name=".login.view.WelcomeActivity"
@@ -151,6 +161,11 @@
         <!--用户协议-->
         <activity
             android:name=".login.view.ProtocolActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--应用内浏览器-->
+        <activity
+            android:name=".common.view.BrowserActivity"
             android:screenOrientation="portrait"></activity>
 
         <!--多设备-->
@@ -347,6 +362,11 @@
         <!--转发联系人-->
         <activity
             android:name=".contact.view.ForwardMsgRosterActivity"
+            android:screenOrientation="portrait" />
+
+        <!--转发给多人多群-->
+        <activity
+            android:name=".contact.view.ForwardMsgActivity"
             android:screenOrientation="portrait" />
 
         <!--转发群组-->
@@ -664,6 +684,9 @@
         <meta-data
             android:name="AGENT_APP_KEY"
             android:value="${AGENT_APP_KEY}" />
+        <meta-data
+            android:name="AGENT_HOST"
+            android:value="${AGENT_HOST}" />
         <!-- *************AGENT END************** -->
 
         <!-- *************Firebase START************** -->

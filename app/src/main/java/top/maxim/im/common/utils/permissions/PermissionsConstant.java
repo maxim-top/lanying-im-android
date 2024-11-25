@@ -94,4 +94,9 @@ public interface PermissionsConstant {
      * 修改系统设置
      */
     String WRITE_SETTINGS = Manifest.permission.WRITE_SETTINGS;
+
+    /**
+     * 通知
+     */
+    String POST_NOTIFICATIONS = Manifest.permission.POST_NOTIFICATIONS;
 }

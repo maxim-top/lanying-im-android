@@ -254,6 +254,9 @@ public class RegisterFragment extends BaseTitleFragment {
             initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER, mChangeAppId);
         });
+        if (WXUtils.getInstance().getWXApi() != null && !WXUtils.getInstance().getWXApi().isWXAppInstalled()){
+            mWXLogin.setVisibility(View.GONE);
+        }
         // 扫一扫
         mIvScan.setOnClickListener(v ->{
             boolean isAgree = mCheckBox.isChecked();

@@ -28,9 +28,13 @@ public class AgentTask {
         if (TextUtils.isEmpty(metaAppKey)) {
             return;
         }
-        NBSAppAgent.setLicenseKey(metaAppKey).withCrashReportEnabled(true)
-                .enableLogging(true)
-                .withLocationServiceEnabled(false).start(context);
+        String metaHost = PushClientMgr.getPushAppId("AGENT_HOST");
+        if (TextUtils.isEmpty(metaHost)) {
+            return;
+        }
+
+        NBSAppAgent.setLicenseKey(metaAppKey).setRedirectHost(metaHost).withCrashReportEnabled(true)
+                .enableLogging(true).setStartOption(7).start(context);
     }
 
 }

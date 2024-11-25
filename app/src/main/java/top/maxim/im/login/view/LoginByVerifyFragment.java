@@ -232,6 +232,9 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
             initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN_VERIFY, mChangeAppId);
         });
+        if (WXUtils.getInstance().getWXApi() != null && !WXUtils.getInstance().getWXApi().isWXAppInstalled()){
+            mWXLogin.setVisibility(View.GONE);
+        }
         // 扫一扫
         mIvScan.setOnClickListener(v ->{
             boolean isAgree = mCheckBox.isChecked();

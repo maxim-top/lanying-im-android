@@ -248,7 +248,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
                     public void onConfirmListener(String content) {
                         if (TextUtils.equals(title, getString(R.string.dns_change_appId_title))) {
                             // 修改appId
-                            mAppId = content;
+                            mAppId = content.trim().strip();
                             if (mSetAppId != null) {
                                 mSetAppId.setEndContent(
                                         TextUtils.isEmpty(content) ? ScanConfigs.CODE_APP_ID
@@ -257,7 +257,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
                         } else if (TextUtils.equals(title,
                                 getString(R.string.dns_change_server_title))) {
                             // 修改IM Server
-                            mServer = content;
+                            mServer = content.trim().strip();
                             if (mSetServer != null) {
                                 mSetServer.setEndContent(TextUtils.isEmpty(content)
                                         ? getString(R.string.dns_config_default)
@@ -266,7 +266,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
                         } else if (TextUtils.equals(title,
                                 getString(R.string.dns_change_port_title))) {
                             // 修改IM Port
-                            mPort = content;
+                            mPort = content.trim().strip();
                             if (mSetPort != null) {
                                 mSetPort.setEndContent(TextUtils.isEmpty(content)
                                         ? getString(R.string.dns_config_default)
@@ -275,7 +275,7 @@ public class DNSConfigActivity extends BaseTitleActivity {
                         } else if (TextUtils.equals(title,
                                 getString(R.string.dns_change_rest_server_title))) {
                             // 修改Rest Server
-                            mRestServer = content;
+                            mRestServer = content.trim().strip();
                             if (mSetRestServer != null) {
                                 mSetRestServer.setEndContent(TextUtils.isEmpty(content)
                                         ? getString(R.string.dns_config_default)

@@ -216,11 +216,22 @@ public class MessageInputBar extends AutoComputerInputMethodHeightView
                 return true;
             }
         });
+        mChatEditText.setEnabled(false);
+        mMoreView.setEnabled(false);
+        mKeyBoardView.setEnabled(false);
     }
 
     public void hideKeyboard() {
         dismissKeyBoard();
         isShowKeyBoard = false;
+    }
+
+    public void enableInput(boolean enable, boolean isMuteAll) {
+        mChatEditText.setEnabled(enable);
+        mMoreView.setEnabled(enable);
+        mKeyBoardView.setEnabled(enable);
+        int resId = enable ? R.string.input_message_content : isMuteAll ? R.string.group_mute_all: R.string.group_mute_you;
+        mChatEditText.setHint(resId);
     }
 
     public void hidePanel() {

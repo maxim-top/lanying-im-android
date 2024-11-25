@@ -1,7 +1,13 @@
 
 package top.maxim.im.common.utils.permissions;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.READ_MEDIA_IMAGES;
+import static android.Manifest.permission.READ_MEDIA_VIDEO;
+import static android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED;
 import static android.content.Context.LAYOUT_INFLATER_SERVICE;
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -11,9 +17,15 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.provider.Settings;
+
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -61,6 +73,8 @@ public class PermissionsMgr {
     private static ViewGroup mRootViewGroup = null;
 
     private static View mOverlayView = null;
+
+    private static ActivityResultLauncher<String[]> mPermissionLauncher;
 
     private static Map<String, String> mTitles = new HashMap<String, String>() {
         {
@@ -162,6 +176,10 @@ public class PermissionsMgr {
         }
     }
 
+    public synchronized void setPermissionLauncher(ActivityResultLauncher<String[]> permissionLauncher){
+        mPermissionLauncher = permissionLauncher;
+    }
+
     /**
      * 这个静态方法可以用来检查你是否有一个特定的权限
      */
@@ -169,6 +187,33 @@ public class PermissionsMgr {
             @NonNull String permission) {
         boolean hasPermission = false;
         if (context != null) {
+            if (TextUtils.equals(permission, READ_EXTERNAL_STORAGE)){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    boolean rmi = ContextCompat.checkSelfPermission(context, READ_MEDIA_IMAGES) == PERMISSION_GRANTED;
+                    boolean rmv = ContextCompat.checkSelfPermission(context, READ_MEDIA_VIDEO) == PERMISSION_GRANTED;
+                    Log.d("PermMgr", "rmi:"+rmi + " rmv:"+rmv);
+                    if (rmi || rmv){
+                        // Full access on Android 13 (API level 33) or higher
+                        hasPermission = true;
+                    }
+                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    boolean rmvss = ContextCompat.checkSelfPermission(context, READ_MEDIA_VISUAL_USER_SELECTED) == PERMISSION_GRANTED;
+                    Log.d("PermMgr", "rmvss:"+rmvss);
+                    if (rmvss){
+                        // Partial access on Android 14 (API level 34) or higher
+                        hasPermission = true;
+                    }
+                }  else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                    boolean res = ContextCompat.checkSelfPermission(context, READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED;
+                    Log.d("PermMgr", "res:"+res);
+                    if (res){
+                        // Full access up to Android 12 (API level 32)
+                        hasPermission = true;
+                    }
+                }
+                return hasPermission;
+            }
+
             int hasWriteContactsPermission = ActivityCompat.checkSelfPermission(context,
                     permission);
             if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
@@ -196,7 +241,12 @@ public class PermissionsMgr {
         }
         boolean hasAllPermissions = true;
         for (String perm : permissions) {
-            hasAllPermissions &= hasPermission(context, perm);
+            boolean hp = hasPermission(context, perm);
+            Log.d("PermMgr", "hp:"+hp);
+            if (!hp){
+                hasAllPermissions = false;
+                break;
+            }
         }
         return hasAllPermissions;
     }
@@ -253,9 +303,30 @@ public class PermissionsMgr {
 
         addOverlayView(activity, permissions);
         addPendingAction(permissions, action);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ){
+            List<String> permList = new ArrayList<>();
+            for (String permission: permissions) {
+                if (!TextUtils.equals(permission, READ_EXTERNAL_STORAGE)){
+                    permList.add(permission);
+                }
+            }
+            if (permList.size() < permissions.length && mPermissionLauncher != null){
+                String[] perms = new String[permissions.length+1];
+                int i = 0;
+                for (String p: permList) {
+                    perms[i++] = p;
+                }
+                perms[i++] = READ_MEDIA_IMAGES;
+                perms[i] = READ_MEDIA_VIDEO;
+                mPermissionLauncher.launch(perms);
+                return;
+            }
+        }
         // 如果小于23，直接返回现在各权限状态
         if (Build.VERSION.SDK_INT < 23) {
             doPermissionWorkBeforeAndroidM(activity, permissions, action);
+        } else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2 && mPermissionLauncher!=null) {
+            mPermissionLauncher.launch(permissions);
         } else {
             List<String> permList = getPermissionsListToRequest(activity, permissions, action);
             if (permList.isEmpty()) {

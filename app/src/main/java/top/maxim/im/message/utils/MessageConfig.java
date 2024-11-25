@@ -22,6 +22,16 @@ public interface MessageConfig {
     String CHAT_MSG = "chat_msg";
 
     /**
+     * 转发消息时选中的好友
+     */
+    String SELECTED_ROSTER_ITEMS = "selectedRosterItems";
+
+    /**
+     * 转发消息时选中的群
+     */
+    String SELECTED_GROUPS = "selectedGroups";
+
+    /**
      * 拍照路径
      */
     String KEY_CAMERA_PATH = "camera_path";

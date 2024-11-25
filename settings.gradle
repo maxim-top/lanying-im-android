@@ -1,1 +1,42 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        maven { url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/" }// 添加基调听云仓库
+        maven {
+            url 'https://developer.huawei.com/repo/'
+        }
+        // 听云
+        maven {
+            url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
+        }
+        maven {
+            url uri("${rootProject.projectDir}/repo")
+        }
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+    }
+}
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.5.0'
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        maven { url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/" }// 添加基调听云仓库
+        maven {
+            url 'https://developer.huawei.com/repo/'
+        }
+        // 听云
+        maven {
+            url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
+        }
+        maven {
+            url uri("${rootProject.projectDir}/repo")
+        }
+        maven { url 'https://maven.aliyun.com/repository/public/' }
+    }
+}
+
 include ':app'

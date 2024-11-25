@@ -74,7 +74,7 @@ public class LogViewActivity extends BaseTitleActivity {
     protected Header onCreateHeader(RelativeLayout headerContainer) {
         Header.Builder builder = new Header.Builder(this, headerContainer);
         builder.setTitle(R.string.log_info);
-        builder.setRightIcon(R.drawable.icon_more, v -> {
+        builder.setRightIcon(R.drawable.icon_share, v -> {
             showSaveLog();
         });
         builder.setBackIcon(R.drawable.header_back_icon, new View.OnClickListener() {

@@ -10,7 +10,7 @@ public interface ChatSingleContract {
      * 单聊view
      */
     interface View extends ChatBaseContract.View {
-
+        void enableInputBar(boolean enable);
     }
 
     /**

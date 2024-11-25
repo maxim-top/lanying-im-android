@@ -1,6 +1,11 @@
 
 package top.maxim.im.message.presenter;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.READ_MEDIA_IMAGES;
+import static android.Manifest.permission.READ_MEDIA_VIDEO;
+import static android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED;
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static top.maxim.im.common.utils.AppContextUtils.getApplication;
 import static top.maxim.im.message.presenter.ChatBasePresenter.FunctionType.*;
 
@@ -28,7 +33,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import org.json.JSONException;
@@ -71,6 +81,7 @@ import top.maxim.im.common.bean.PhotoViewBean;
 import top.maxim.im.common.bean.PhotoViewListBean;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.CameraUtils;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.RxBus;
@@ -86,6 +97,7 @@ import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.utils.permissions.PermissionsMgr;
 import top.maxim.im.common.utils.permissions.PermissionsResultAction;
 import top.maxim.im.common.utils.video.PhotoRecorderActivity;
+import top.maxim.im.contact.view.ForwardMsgActivity;
 import top.maxim.im.contact.view.ForwardMsgRosterActivity;
 import top.maxim.im.message.contract.ChatBaseContract;
 import top.maxim.im.message.customviews.MessageInputBar;
@@ -95,14 +107,10 @@ import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.utils.RefreshChatActivityEvent;
 import top.maxim.im.message.utils.VoicePlayManager;
 import top.maxim.im.message.view.ChatBaseActivity;
-import top.maxim.im.message.view.ChatGroupActivity;
-import top.maxim.im.message.view.ChatSingleActivity;
 import top.maxim.im.message.view.ChooseFileActivity;
 import top.maxim.im.message.view.PhotoDetailActivity;
 import top.maxim.im.message.view.VideoDetailActivity;
 import top.maxim.im.sdk.utils.MessageSendUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Description : 聊天基类presenter Created by Mango on 2018/11/11
@@ -205,6 +213,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     private CompositeSubscription mSubcription;
 
     private BMXMessage mVoiceMsg;
+
+    private ActivityResultLauncher<String[]> permissionLauncher;
 
     private BMXChatServiceListener mListener = new BMXChatServiceListener() {
 
@@ -335,6 +345,43 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     ChatBasePresenter() {
         ChatManager.getInstance().addChatListener(mListener);
+    }
+
+    private void requestPhotoPermissions() {
+        String[] permissions;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            permissions = new String[] {READ_MEDIA_IMAGES, READ_MEDIA_VIDEO};
+        } else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU) {
+            permissions = new String[] {READ_MEDIA_IMAGES, READ_MEDIA_VIDEO};
+        } else {
+            permissions = new String[] {READ_EXTERNAL_STORAGE};
+        }
+        permissionLauncher.launch(permissions);
+    }
+
+    private boolean hasPhotoPermission() {
+        boolean res = false;
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                (
+                    ContextCompat.checkSelfPermission(((AppCompatActivity)mView.getContext()), READ_MEDIA_IMAGES) == PERMISSION_GRANTED ||
+                    ContextCompat.checkSelfPermission(((AppCompatActivity)mView.getContext()), READ_MEDIA_VIDEO) == PERMISSION_GRANTED
+                )
+        ) {
+            // Full access on Android 13 (API level 33) or higher
+            res = true;
+        } else if (
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+                        ContextCompat.checkSelfPermission(((AppCompatActivity)mView.getContext()), READ_MEDIA_VISUAL_USER_SELECTED) == PERMISSION_GRANTED
+        ) {
+            // Partial access on Android 14 (API level 34) or higher
+            res = true;
+        }  else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2 &&
+                ContextCompat.checkSelfPermission(((AppCompatActivity)mView.getContext()), READ_EXTERNAL_STORAGE) == PERMISSION_GRANTED) {
+            // Full access up to Android 12 (API level 32)
+            res = true;
+        }
+        return res;
     }
 
     @Override
@@ -506,6 +553,22 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         mModel = model;
         mSubcription = new CompositeSubscription();
         receiveRxBus();
+
+        if (permissionLauncher == null){
+            try {
+                permissionLauncher = ((AppCompatActivity)mView.getContext()).registerForActivityResult(
+                        new ActivityResultContracts.RequestMultiplePermissions(),
+                        new ActivityResultCallback<Map<String, Boolean>>() {
+                            @Override
+                            public void onActivityResult(Map<String, Boolean> grantResults) {
+                            }
+                        }
+                );
+                PermissionsMgr.getInstance().setPermissionLauncher(permissionLauncher);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     private void receiveRxBus() {
@@ -610,11 +673,12 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         switch (type) {
             case PHOTOS:
                 // 选择相册 需要SD卡读写权限
-                if (hasPermission(PermissionsConstant.READ_STORAGE,
-                        PermissionsConstant.WRITE_STORAGE)) {
+                if (hasPermission(PermissionsConstant.READ_STORAGE)) {
                     CameraUtils.getInstance().takeGalley((Activity)mView.getContext(),
                             IMAGE_REQUEST);
                 } else {
+                    Log.d("PermMgr", "requestPermissions TYPE_PHOTO_PERMISSION");
+
                     requestPermissions(TYPE_PHOTO_PERMISSION, PermissionsConstant.READ_STORAGE);
                 }
                 break;
@@ -624,7 +688,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                         PermissionsConstant.WRITE_STORAGE)) {
                     takePic();
                 } else {
-                    requestPermissions(TYPE_CAMERA_PERMISSION, PermissionsConstant.READ_STORAGE);
+                    requestPermissions(TYPE_CAMERA_PERMISSION, PermissionsConstant.CAMERA,
+                            PermissionsConstant.WRITE_STORAGE, PermissionsConstant.READ_STORAGE);
                 }
                 break;
             case VIDEO:
@@ -828,7 +893,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         relay.setText(mView.getContext().getString(R.string.chat_msg_relay));
         relay.setOnClickListener(v -> {
             dialog.dismiss();
-            ForwardMsgRosterActivity.openForwardMsgRosterActivity((Activity)mView.getContext(),
+            ForwardMsgActivity.openForwardMsgRosterActivity((Activity)mView.getContext(),
                     ChatUtils.getInstance().buildMessage(message, mChatType, mChatId),
                     FORWARD_REQUEST);
         });
@@ -1344,6 +1409,60 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         VideoDetailActivity.openVideoDetail(mView.getContext(), videoUrl);
     }
 
+    private void forwardMsgMultiTarget(Intent data){
+        MessageBean messageBean = (MessageBean)data
+                .getSerializableExtra(MessageConfig.CHAT_MSG);
+        ArrayList<Long> chooseRosterItems = (ArrayList<Long>)data
+                .getSerializableExtra(MessageConfig.SELECTED_ROSTER_ITEMS);
+        ArrayList<Long> chooseGroups = (ArrayList<Long>)data
+                .getSerializableExtra(MessageConfig.SELECTED_GROUPS);
+        for (Long chatId:chooseRosterItems) {
+            if (messageBean != null && chatId > 0 && mSendUtils != null) {
+                if (mChatId == chatId) {
+                    // 转发给当前会话
+                    if (mView != null) {
+                        mView.sendChatMessage(mSendUtils.forwardMessage(messageBean,
+                                BMXMessage.MessageType.Single, mMyUserId, chatId));
+                    }
+                } else {
+                    mSendUtils.forwardMessage(messageBean, BMXMessage.MessageType.Single, mMyUserId, chatId);
+                }
+            }
+        }
+        for (Long chatId:chooseGroups) {
+            if (messageBean != null && chatId > 0 && mSendUtils != null) {
+                if (mChatId == chatId) {
+                    // 转发给当前会话
+                    if (mView != null) {
+                        mView.sendChatMessage(mSendUtils.forwardMessage(messageBean,
+                                BMXMessage.MessageType.Group, mMyUserId, chatId));
+                    }
+                } else {
+                    mSendUtils.forwardMessage(messageBean, BMXMessage.MessageType.Group, mMyUserId, chatId);
+                }
+            }
+        }
+    }
+
+    private void forwardMsg(Intent data) {
+        BMXMessage.MessageType type = (BMXMessage.MessageType) data
+                .getSerializableExtra(MessageConfig.CHAT_TYPE);
+        MessageBean messageBean = (MessageBean) data
+                .getSerializableExtra(MessageConfig.CHAT_MSG);
+        long chatId = data.getLongExtra(MessageConfig.CHAT_ID, 0);
+        if (messageBean != null && chatId > 0 && mSendUtils != null) {
+            if (mChatType == type && mChatId == chatId) {
+                // 转发给当前会话
+                if (mView != null) {
+                    mView.sendChatMessage(mSendUtils.forwardMessage(messageBean,
+                            type, mMyUserId, chatId));
+                }
+            } else {
+                mSendUtils.forwardMessage(messageBean, type, mMyUserId, chatId);
+            }
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -1428,22 +1547,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 // 转发
                 if (resultCode == Activity.RESULT_OK) {
                     if (data != null) {
-                        BMXMessage.MessageType type = (BMXMessage.MessageType)data
-                                .getSerializableExtra(MessageConfig.CHAT_TYPE);
-                        MessageBean messageBean = (MessageBean)data
-                                .getSerializableExtra(MessageConfig.CHAT_MSG);
-                        long chatId = data.getLongExtra(MessageConfig.CHAT_ID, 0);
-                        if (messageBean != null && chatId > 0 && mSendUtils != null) {
-                            if (mChatType == type && mChatId == chatId) {
-                                // 转发给当前会话
-                                if (mView != null) {
-                                    mView.sendChatMessage(mSendUtils.forwardMessage(messageBean,
-                                            type, mMyUserId, chatId));
-                                }
-                            } else {
-                                mSendUtils.forwardMessage(messageBean, type, mMyUserId, chatId);
-                            }
-                        }
+                        forwardMsgMultiTarget(data);
                     }
                 }
                 break;
@@ -1843,10 +1947,32 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         dialog.showDialog((Activity) mView.getContext());
     }
 
+    private void showPremissionErrorDialog() {
+        DialogUtils.getInstance().showDialog((Activity)mView.getContext(),
+                ((Activity) mView.getContext()).getString(R.string.permission_required),
+                ((Activity) mView.getContext()).getString(R.string.permission_need_enabled),
+                new CommonDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
+    }
+
     /**
      * 获取当前位置
      */
     private void sendCurrentLocation() {
+        boolean disableSendLocation = CommonUtils.getAppConfigSwitch("disable_send_location");
+        if (disableSendLocation){
+            showPremissionErrorDialog();
+            return;
+        }
         LocationManager manager = mView == null ? null
                 : (LocationManager)mView.getContext().getSystemService(Context.LOCATION_SERVICE);
         if (manager == null) {

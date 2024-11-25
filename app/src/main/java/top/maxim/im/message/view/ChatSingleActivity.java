@@ -93,4 +93,9 @@ public class ChatSingleActivity extends ChatBaseActivity implements ChatSingleCo
     public Context getContext() {
         return this;
     }
+
+    @Override
+    public void enableInputBar(boolean enable) {
+        super.enableInputBar(enable, false);
+    }
 }

@@ -224,49 +224,49 @@ public class MessageDispatcher {
         public void onFriendAdded(long sponsorId, long recipientId) {
             super.onFriendAdded(sponsorId, recipientId);
             // 添加好友
-            toastListener("onFriendAdded");
+//            toastListener("onFriendAdded");
         }
 
         @Override
         public void onFriendRemoved(long sponsorId, long recipientId) {
             super.onFriendRemoved(sponsorId, recipientId);
-            toastListener("onFriendRemoved");
+//            toastListener("onFriendRemoved");
         }
 
         @Override
         public void onApplied(long sponsorId, long recipientId, String message) {
             super.onApplied(sponsorId, recipientId, message);
-            toastListener("onApplied");
+//            toastListener("onApplied");
         }
 
         @Override
         public void onApplicationAccepted(long sponsorId, long recipientId) {
             super.onApplicationAccepted(sponsorId, recipientId);
-            toastListener("onApplicationAccepted");
+//            toastListener("onApplicationAccepted");
         }
 
         @Override
         public void onApplicationDeclined(long sponsorId, long recipientId, String reason) {
             super.onApplicationDeclined(sponsorId, recipientId, reason);
-            toastListener("onApplicationDeclined");
+//            toastListener("onApplicationDeclined");
         }
 
         @Override
         public void onBlockListAdded(long sponsorId, long recipientId) {
             super.onBlockListAdded(sponsorId, recipientId);
-            toastListener("onBlockListAdded");
+//            toastListener("onBlockListAdded");
         }
 
         @Override
         public void onBlockListRemoved(long sponsorId, long recipientId) {
             super.onBlockListRemoved(sponsorId, recipientId);
-            toastListener("onBlockListRemoved");
+//            toastListener("onBlockListRemoved");
         }
 
         @Override
         public void onRosterInfoUpdate(BMXRosterItem item) {
             super.onRosterInfoUpdate(item);
-            toastListener("onRosterInfoUpdate");
+//            toastListener("onRosterInfoUpdate");
             RosterFetcher.getFetcher().putRoster(item);
             downloadRosterAvatar(item);
         }
@@ -277,13 +277,13 @@ public class MessageDispatcher {
         @Override
         public void onUserSignIn(BMXUserProfile profile) {
             super.onUserSignIn(profile);
-            toastListener("onUserSignIn");
+//            toastListener("onUserSignIn");
         }
 
         @Override
         public void onUserSignOut(BMXErrorCode error, long userId) {
             super.onUserSignOut(error, userId);
-            toastListener("onUserSignOut");
+//            toastListener("onUserSignOut");
             if (error.swigValue() == BMXErrorCode.UserRemoved.swigValue()) {
                 // 被其他设备踢下线 跳转到登录页面
                 Observable.just("").subscribeOn(Schedulers.computation())
@@ -311,13 +311,13 @@ public class MessageDispatcher {
         @Override
         public void onConnectStatusChanged(BMXConnectStatus status) {
             super.onConnectStatusChanged(status);
-            toastListener("onConnectStatusChanged");
+//            toastListener("onConnectStatusChanged");
         }
 
         @Override
         public void onInfoUpdated(BMXUserProfile profile) {
             super.onInfoUpdated(profile);
-            toastListener("onInfoUpdated");
+//            toastListener("onInfoUpdated");
             RosterFetcher.getFetcher().putProfile(profile);
             downloadProfileAvatar(profile);
         }
@@ -325,13 +325,13 @@ public class MessageDispatcher {
         @Override
         public void onOtherDeviceSingIn(int deviceSN) {
             super.onOtherDeviceSingIn(deviceSN);
-            toastListener("onOtherDeviceSingIn");
+//            toastListener("onOtherDeviceSingIn");
         }
 
         @Override
         public void onOtherDeviceSingOut(int deviceSN) {
             super.onOtherDeviceSingOut(deviceSN);
-            toastListener("onOtherDeviceSingOut");
+//            toastListener("onOtherDeviceSingOut");
         }
     };
 
@@ -340,13 +340,13 @@ public class MessageDispatcher {
         @Override
         public void onGroupCreate(BMXGroup group) {
             super.onGroupCreate(group);
-            toastListener("onGroupCreate");
+//            toastListener("onGroupCreate");
         }
 
         @Override
         public void onGroupInfoUpdate(BMXGroup group, BMXGroup.UpdateInfoType type) {
             super.onGroupInfoUpdate(group, type);
-            toastListener("onGroupInfoUpdate");
+//            toastListener("onGroupInfoUpdate");
             RosterFetcher.getFetcher().putGroup(group);
             downloadGroupAvatar(group);
             Intent intent = new Intent();
@@ -358,139 +358,139 @@ public class MessageDispatcher {
         @Override
         public void onGroupJoined(BMXGroup group) {
             super.onGroupJoined(group);
-            toastListener("onGroupJoined");
+//            toastListener("onGroupJoined");
         }
 
         @Override
         public void onGroupLeft(BMXGroup group, String reason) {
             super.onGroupLeft(group, reason);
-            toastListener("onGroupLeft");
+//            toastListener("onGroupLeft");
         }
 
         @Override
         public void onGroupListUpdate(BMXGroupList list) {
             super.onGroupListUpdate(list);
-            toastListener("onGroupListUpdate");
+//            toastListener("onGroupListUpdate");
         }
 
         @Override
         public void onAdminsAdded(BMXGroup group, ListOfLongLong members) {
             super.onAdminsAdded(group, members);
-            toastListener("onAdminsAdded");
+//            toastListener("onAdminsAdded");
         }
 
         @Override
         public void onAdminsRemoved(BMXGroup group, ListOfLongLong members, String reason) {
             super.onAdminsRemoved(group, members, reason);
-            toastListener("onAdminsRemoved");
+//            toastListener("onAdminsRemoved");
         }
 
         @Override
         public void onAnnouncementUpdate(BMXGroup group, BMXGroup.Announcement announcement) {
             super.onAnnouncementUpdate(group, announcement);
-            toastListener("onAnnouncementUpdate");
+//            toastListener("onAnnouncementUpdate");
         }
 
         @Override
         public void onApplicationAccepted(BMXGroup group, long approver) {
             super.onApplicationAccepted(group, approver);
-            toastListener("onApplicationAccepted");
+//            toastListener("onApplicationAccepted");
         }
 
         @Override
         public void onApplicationDeclined(BMXGroup group, long approver, String reason) {
             super.onApplicationDeclined(group, approver, reason);
-            toastListener("onApplicationDeclined");
+//            toastListener("onApplicationDeclined");
         }
 
         @Override
         public void onApplied(BMXGroup group, long applicantId, String message) {
             super.onApplied(group, applicantId, message);
-            toastListener("onApplied");
+//            toastListener("onApplied");
         }
 
         @Override
         public void onInvitated(long groupId, long inviter, String message) {
             super.onInvitated(groupId, inviter, message);
-            toastListener("onInvitated");
+//            toastListener("onInvitated");
         }
 
         @Override
         public void onInvitationAccepted(BMXGroup group, long inviteeId) {
             super.onInvitationAccepted(group, inviteeId);
-            toastListener("onInvitationAccepted");
+//            toastListener("onInvitationAccepted");
         }
 
         @Override
         public void onInvitationDeclined(BMXGroup group, long inviteeId, String reason) {
             super.onInvitationDeclined(group, inviteeId, reason);
-            toastListener("onInvitationDeclined");
+//            toastListener("onInvitationDeclined");
         }
 
         @Override
         public void onMemberChangeNickName(BMXGroup group, long memberId, String nickName) {
             super.onMemberChangeNickName(group, memberId, nickName);
-            toastListener("onMemberChangeNickName");
+//            toastListener("onMemberChangeNickName");
         }
 
         @Override
         public void onMemberJoined(BMXGroup group, long memberId, long inviter) {
             super.onMemberJoined(group, memberId, inviter);
-            toastListener("onMemberJoined");
+//            toastListener("onMemberJoined");
         }
 
         @Override
         public void onMemberLeft(BMXGroup group, long memberId, String reason) {
             super.onMemberLeft(group, memberId, reason);
-            toastListener("onMemberLeft");
+//            toastListener("onMemberLeft");
         }
 
         @Override
         public void onBlockListAdded(BMXGroup group, ListOfLongLong members) {
             super.onBlockListAdded(group, members);
-            toastListener("onBlockListAdded");
+//            toastListener("onBlockListAdded");
         }
 
         @Override
         public void onBlockListRemoved(BMXGroup group, ListOfLongLong members) {
             super.onBlockListRemoved(group, members);
-            toastListener("onBlockListRemoved");
+//            toastListener("onBlockListRemoved");
         }
 
         @Override
         public void onMembersBanned(BMXGroup group, ListOfLongLong members, long duration) {
             super.onMembersBanned(group, members, duration);
-            toastListener("onMembersBanned");
+//            toastListener("onMembersBanned");
         }
 
         @Override
         public void onMembersUnbanned(BMXGroup group, ListOfLongLong members) {
             super.onMembersUnbanned(group, members);
-            toastListener("onMembersUnbanned");
+//            toastListener("onMembersUnbanned");
         }
 
         @Override
         public void onOwnerAssigned(BMXGroup group) {
             super.onOwnerAssigned(group);
-            toastListener("onOwnerAssigned");
+//            toastListener("onOwnerAssigned");
         }
 
         @Override
         public void onSharedFileDeleted(BMXGroup group, BMXGroup.SharedFile sharedFile) {
             super.onSharedFileDeleted(group, sharedFile);
-            toastListener("onSharedFileDeleted");
+//            toastListener("onSharedFileDeleted");
         }
 
         @Override
         public void onSharedFileUpdated(BMXGroup group, BMXGroup.SharedFile sharedFile) {
             super.onSharedFileUpdated(group, sharedFile);
-            toastListener("onSharedFileUpdated");
+//            toastListener("onSharedFileUpdated");
         }
 
         @Override
         public void onSharedFileUploaded(BMXGroup group, BMXGroup.SharedFile sharedFile) {
             super.onSharedFileUploaded(group, sharedFile);
-            toastListener("onSharedFileUploaded");
+//            toastListener("onSharedFileUploaded");
         }
     };
 

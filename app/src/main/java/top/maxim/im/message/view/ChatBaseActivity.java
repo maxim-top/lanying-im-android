@@ -496,4 +496,8 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
         setNull(mPresenter);
         super.onDestroy();
     }
+
+    public void enableInputBar(boolean enable, boolean isMuteAll) {
+        mInputBar.enableInput(enable, isMuteAll);
+    }
 }

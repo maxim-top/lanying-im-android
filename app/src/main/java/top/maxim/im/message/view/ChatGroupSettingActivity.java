@@ -1,6 +1,7 @@
 
 package top.maxim.im.message.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -21,10 +22,12 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.TimeUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
+import top.maxim.im.common.utils.dialog.CommonDialog;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
@@ -572,10 +575,12 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
     private void bindBanGroup(){
         long banExpireTime = mGroup.banExpireTime() * 1000;
         long currentTime = System.currentTimeMillis();
-        if (banExpireTime > currentTime) {
+        if (banExpireTime > currentTime || banExpireTime == -1000) {
             //判断是否当前在禁言
-            mGroupBan.setLeftText(getString(R.string.group_all_ban) + "(" +
-                    TimeUtils.millis2String(this, banExpireTime) + ")");
+            if (banExpireTime != -1000){
+                mGroupBan.setLeftText(getString(R.string.group_all_ban) + "(" +
+                        TimeUtils.millis2String(this, banExpireTime) + ")");
+            }
             mGroupBan.setCheckStatus(true);
         } else {
             mGroupBan.setLeftText(getString(R.string.group_all_ban));
@@ -591,20 +596,23 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
                 getString(R.string.cancel), true, new CommonEditDialog.OnDialogListener() {
                     @Override
                     public void onConfirmListener(String content) {
-                        if (!TextUtils.isEmpty(content)) {
-                            showLoadingDialog(true);
-                            GroupManager.getInstance().banGroup(mGroup, Long.valueOf(content), new BMXCallBack() {
-                                @Override
-                                public void onResult(BMXErrorCode bmxErrorCode) {
-                                    dismissLoadingDialog();
-                                    if (BaseManager.bmxFinish(bmxErrorCode)) {
-                                        bindBanGroup();
-                                    } else {
-                                        toastError(bmxErrorCode);
-                                    }
-                                }
-                            });
+                        long duration = -1;
+                        if (!TextUtils.isEmpty(content)){
+                            duration = Long.valueOf(content);
                         }
+
+                        showLoadingDialog(true);
+                        GroupManager.getInstance().banGroup(mGroup, duration, new BMXCallBack() {
+                            @Override
+                            public void onResult(BMXErrorCode bmxErrorCode) {
+                                dismissLoadingDialog();
+                                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                                    bindBanGroup();
+                                } else {
+                                    toastError(bmxErrorCode);
+                                }
+                            }
+                        });
                     }
 
                     @Override
@@ -647,12 +655,36 @@ public class ChatGroupSettingActivity extends BaseTitleActivity {
         ToastUtil.showTextViewPrompt(error);
     }
 
+    private void showPremissionErrorDialog() {
+        DialogUtils.getInstance().showDialog(this,
+                getString(R.string.permission_required),
+                getString(R.string.permission_need_enabled),
+                new CommonDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+
+                    }
+                });
+    }
+
     /**
      * 设置隐藏群成员信息
      *
      * @param hide 是否隐藏
      */
     private void setHideMemberInfo(boolean hide) {
+        boolean hideMemberInfo = CommonUtils.getAppConfigSwitch("hide_member_info");
+        if (!hideMemberInfo){
+            showPremissionErrorDialog();
+            mHideMemberInfo.setCheckStatus(!hide);
+            return;
+        }
+
         showLoadingDialog(true);
         GroupManager.getInstance().setHideMemberInfo(mGroup, hide, bmxErrorCode -> {
             dismissLoadingDialog();

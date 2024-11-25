@@ -2,9 +2,12 @@
 
 buildscript {
 
+    ext {
+        agp_version = '8.5.1'
+    }
     ext.tingyun_sdk_version = '2.14.10'//听云SDK版本
     ext.tingyun_ndk_version = '2.0.0'//听云NDK版本
-    ext.kotlin_version = "1.5.20"
+    ext.kotlin_version = '1.8.22'
     repositories {
         google()
         jcenter()
@@ -16,16 +19,13 @@ buildscript {
         maven {
             url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
         }
+        maven { url 'https://maven.aliyun.com/repository/public/' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.2.2'
+        classpath "com.android.tools.build:gradle:$agp_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-//        bugly 符号表
-//        classpath 'com.tencent.bugly:symtabfileuploader:latest.release'
-        //听云
-        classpath "com.networkbench.newlens.agent.android:agent-gradle-plugin:$tingyun_sdk_version"
         //google service
-        classpath 'com.google.gms:google-services:4.3.5'
+        classpath 'com.google.gms:google-services:4.3.10'
         // 增加agcp配置。
         classpath 'com.huawei.agconnect:agcp:1.6.0.300'
         // NOTE: Do not place your application dependencies here; they belong
@@ -34,20 +34,13 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.android.application' version "8.1.0" apply false //demo used
+    id 'com.networkbench.gradleplugin.agp8on' version "2.17.5" apply false //添加基调听云插件
+}
+
 allprojects {
     repositories {
-        google()
-        jcenter()
-        maven {
-            url 'https://developer.huawei.com/repo/'
-        }
-        // 听云
-        maven {
-            url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
-        }
-        maven {
-            url uri("${rootProject.projectDir}/repo")
-        }
     }
 }
 

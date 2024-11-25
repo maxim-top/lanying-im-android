@@ -84,6 +84,7 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
                 mView.setHeadTitle(name);
             }
         });
+        mView.enableInputBar(true);
     }
 
     @Override

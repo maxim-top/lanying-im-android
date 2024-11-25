@@ -21,6 +21,8 @@ public interface ChatGroupContract {
         void showLoading(boolean cancel);
 
         void cancelLoading();
+
+        void enableInputBar(boolean enable, boolean isMuteAll);
     }
 
     /**

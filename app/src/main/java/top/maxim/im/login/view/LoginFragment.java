@@ -1,9 +1,12 @@
 
 package top.maxim.im.login.view;
 
+import static org.webrtc.ContextUtils.getApplicationContext;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.text.Editable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -13,12 +16,15 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -32,11 +38,14 @@ import org.json.JSONObject;
 import java.util.List;
 
 import im.floo.BMXCallBack;
+import im.floo.floolib.BMXClient;
+import im.floo.floolib.ListOfLongLong;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
+import top.maxim.im.BuildConfig;
 import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.MainActivity;
 import top.maxim.im.R;
@@ -51,12 +60,18 @@ import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.CommonUtils;
+import top.maxim.im.common.utils.IPAddressUtil;
 import top.maxim.im.common.utils.RxBus;
+import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonCustomDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
+import top.maxim.im.common.view.BrowserActivity;
 import top.maxim.im.common.view.Header;
+import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.login.bean.DNSConfigEvent;
 import top.maxim.im.net.ConnectivityReceiver;
 import top.maxim.im.net.HttpResponseCallback;
@@ -272,6 +287,9 @@ public class LoginFragment extends BaseTitleFragment {
             initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN, mChangeAppId);
         });
+        if (WXUtils.getInstance().getWXApi() != null && !WXUtils.getInstance().getWXApi().isWXAppInstalled()){
+            mWXLogin.setVisibility(View.GONE);
+        }
         mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -362,6 +380,64 @@ public class LoginFragment extends BaseTitleFragment {
         login(activity, name, pwd, isLoginById, SharePreferenceUtils.getInstance().getAppId());
     }
 
+    /**
+     * 显示错误对话框
+     */
+    private static void showErrorDialog(final Activity activity, String msg, String solution,
+                                        String deviceInfo, String appId) {
+        final LinearLayout ll = new LinearLayout(activity);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams textP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams editP = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        editP.setMargins(ScreenUtils.dp2px(10), ScreenUtils.dp2px(5), ScreenUtils.dp2px(10),
+                ScreenUtils.dp2px(5));
+        // msg
+        TextView tvMsg = new TextView(activity);
+        tvMsg.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(5), ScreenUtils.dp2px(15),
+                ScreenUtils.dp2px(5));
+        tvMsg.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        tvMsg.setTextColor(activity.getResources().getColor(R.color.color_black));
+        tvMsg.setBackgroundColor(activity.getResources().getColor(R.color.color_white));
+        tvMsg.setText(msg);
+        ll.addView(tvMsg, textP);
+
+        // solution
+        TextView tvSolution = new TextView(activity);
+        tvSolution.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(5), ScreenUtils.dp2px(15),
+                ScreenUtils.dp2px(5));
+        tvSolution.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        tvSolution.setTextColor(activity.getResources().getColor(R.color.color_black));
+        tvSolution.setBackgroundColor(activity.getResources().getColor(R.color.color_white));
+        tvSolution.setText(activity.getString(R.string.solution_colon)+solution);
+        ll.addView(tvSolution, textP);
+
+        // solution
+        TextView tvDevInfo = new TextView(activity);
+        tvDevInfo.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(5), ScreenUtils.dp2px(15),
+                ScreenUtils.dp2px(5));
+        tvDevInfo.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        tvDevInfo.setTextColor(activity.getResources().getColor(R.color.color_5c5c5c));
+        tvDevInfo.setBackgroundColor(activity.getResources().getColor( R.color.color_white));
+        tvDevInfo.setText(deviceInfo);
+        ll.addView(tvDevInfo, textP);
+
+        DialogUtils.getInstance().showCustomDialog(activity, ll,
+                activity.getString(R.string.failed_to_login), activity.getString(R.string.show_log),
+                activity.getString(R.string.faq), new CommonCustomDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        LogViewActivity.openLogView(activity, appId);
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+                        BrowserActivity.open(activity, "FAQ", "https://docs.lanyingim.com/faq/");
+                    }
+                });
+    }
+
     public static void login(final Activity activity, String name, final String pwd,
             final boolean isLoginById, final String changeAppId) {
         // 登陆时候获取
@@ -446,8 +522,23 @@ public class LoginFragment extends BaseTitleFragment {
             if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
                 ((BaseTitleActivity)activity).dismissLoadingDialog();
             }
-            String error = bmxErrorCode != null ? bmxErrorCode.name() : activity.getString(R.string.network_exception);
-            ToastUtil.showTextViewPrompt(error);
+            String ip = IPAddressUtil.getIPAddress(getApplicationContext());
+            if (TextUtils.isEmpty(ip)){
+                ip = "No IP";
+            }
+            String appVersion = BuildConfig.VERSION_NAME;
+            BMXClient client = BaseManager.getBMXClient();
+            String sdkVersion = "";
+            if (client != null && client.getSDKConfig() != null
+                    && !TextUtils.isEmpty(client.getSDKConfig().getSDKVersion())) {
+                sdkVersion = client.getSDKConfig().getSDKVersion();
+            }
+
+            String deviceInfo = android.os.Build.BRAND + ";" + Build.PRODUCT + "; " + Build.VERSION.RELEASE + ";" +
+                    Build.VERSION.SDK_INT + ";" + ip + ";" + appVersion + ";"+ sdkVersion;
+            showErrorDialog(activity, activity.getString(CommonUtils.getErrorMessage(bmxErrorCode)) , activity.getString(CommonUtils.getErrorSolution(bmxErrorCode)), deviceInfo, changeAppId);
+//            String error = bmxErrorCode != null ? bmxErrorCode.name() : activity.getString(R.string.network_exception);
+//            ToastUtil.showTextViewPrompt(error);
         };
         boolean isChange = !TextUtils.isEmpty(changeAppId)
                 && !TextUtils.equals(changeAppId, SharePreferenceUtils.getInstance().getAppId());
@@ -507,14 +598,14 @@ public class LoginFragment extends BaseTitleFragment {
                         activity.finish();
                         return;
                     }
-                    boolean official_account_followed = false;
-                    if (jsonObject.has("official_account_followed")) {
-                        official_account_followed = jsonObject.getBoolean("official_account_followed");
-                    }
-                    if (!official_account_followed){
-                        WXUtils.getInstance().wxMiniProgram("gh_11b8debeb062", "");
-                        return;
-                    }
+//                    boolean official_account_followed = false;
+//                    if (jsonObject.has("official_account_followed")) {
+//                        official_account_followed = jsonObject.getBoolean("official_account_followed");
+//                    }
+//                    if (!official_account_followed){
+//                        WXUtils.getInstance().wxMiniProgram("gh_11b8debeb062", "");
+//                        return;
+//                    }
                     // 直接登录
                     String userId = jsonObject.getString("user_id");
                     String pwd = jsonObject.getString("password");

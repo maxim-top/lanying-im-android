@@ -18,7 +18,6 @@ import java.util.TimerTask;
 
 import im.floo.BMXCallBack;
 import im.floo.BMXDataCallBack;
-import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;
@@ -26,6 +25,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -468,7 +468,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
                 ToastUtil.showTextViewPrompt(getString(R.string.add_successful));
                 initRoster();
             } else {
-                ToastUtil.showTextViewPrompt(getString(R.string.add_failed));
+                ToastUtil.showTextViewPrompt(CommonUtils.getErrorMessage(bmxErrorCode));
             }
         });
     }

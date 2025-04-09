@@ -1,10 +1,8 @@
 
 package top.maxim.im.login.view;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -18,16 +16,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 
 import java.util.List;
-import java.util.Map;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -52,14 +46,11 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
-import top.maxim.im.common.utils.permissions.PermissionsMgr;
-import top.maxim.im.common.utils.permissions.PermissionsResultAction;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.SplashVideoPlayView;
 import top.maxim.im.login.bean.DNSConfigEvent;
 import top.maxim.im.net.ConnectivityReceiver;
 import top.maxim.im.push.NotificationUtils;
-import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 import top.maxim.rtc.RTCManager;
 
@@ -68,8 +59,6 @@ public class WelcomeActivity extends BaseTitleActivity {
     private ImageView mIvSplash;
 
     private SplashVideoPlayView mVideoSplash;
-
-    private static Boolean mPermissionChecked;
 
     private ActivityResultLauncher<String[]> permissionLauncher;
 
@@ -110,45 +99,6 @@ public class WelcomeActivity extends BaseTitleActivity {
 
     private void initPermission(){
         NotificationUtils.getInstance().cancelAll();
-        NotificationManager manager = (NotificationManager)AppContextUtils.getAppContext()
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-        if (!manager.areNotificationsEnabled()){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
-                if (permissionLauncher == null){
-                    try {
-                        permissionLauncher = ((AppCompatActivity)this).registerForActivityResult(
-                                new ActivityResultContracts.RequestMultiplePermissions(),
-                                new ActivityResultCallback<Map<String, Boolean>>() {
-                                    @Override
-                                    public void onActivityResult(Map<String, Boolean> grantResults) {
-                                    }
-                                }
-                        );
-                        PermissionsMgr.getInstance().setPermissionLauncher(permissionLauncher);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
-                
-                String[] permissions = new String[] {
-                        PermissionsConstant.POST_NOTIFICATIONS
-                };
-                if (!PermissionsMgr.getInstance().hasAllPermissions(this, permissions)) {
-                    PermissionsMgr.getInstance().requestPermissionsIfNecessaryForResult(this,
-                            permissions, new PermissionsResultAction() {
-
-                                @Override
-                                public void onGranted(List<String> perms) {
-                                }
-
-                                @Override
-                                public void onDenied(List<String> perms) {
-                                }
-                            });
-                }
-           }
-        }
-
         showProtocol();
     }
 
@@ -195,11 +145,11 @@ public class WelcomeActivity extends BaseTitleActivity {
         long userId = SharePreferenceUtils.getInstance().getUserId();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();
         if (isLogin && userId > 0 && !TextUtils.isEmpty(pwd)) {
-            if (!checkPermission()) {
-                requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
-            }else{
+//            if (!checkPermission()) {
+//                requestPermissions(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+//            }else{
                 autoLogin(userId, pwd);
-            }
+//            }
             return;
         }
         AppIdActivity.open(WelcomeActivity.this);

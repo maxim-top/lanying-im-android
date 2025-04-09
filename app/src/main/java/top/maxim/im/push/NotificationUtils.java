@@ -103,7 +103,8 @@ public class NotificationUtils {
         }
         builder.setLargeIcon(bitmap);
         PendingIntent pIntent = PendingIntent.getActivity(AppContextUtils.getAppContext(), notifyId,
-                it, PendingIntent.FLAG_UPDATE_CURRENT);
+                it, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE:
+                        PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pIntent);
         Notification notification = builder.build();
         manager.notify(notifyId, notification);

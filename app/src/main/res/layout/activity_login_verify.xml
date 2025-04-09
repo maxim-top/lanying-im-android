@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:paddingLeft="@dimen/dimen_48"
+    android:paddingRight="@dimen/dimen_48"
     android:paddingTop="@dimen/dimen_50"
     android:paddingBottom="@dimen/dimen_32">
 
@@ -11,7 +13,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="@dimen/dimen_48"
         android:layout_marginTop="@dimen/dimen_60"
         android:text="@string/verify_login"
         android:textColor="@color/color_333333"
@@ -30,9 +31,7 @@
             android:layout_height="@dimen/dimen_48"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="@dimen/dimen_48"
             android:layout_marginTop="@dimen/dimen_20"
-            android:layout_marginRight="@dimen/dimen_48"
             android:background="@null"
             android:inputType="phone"
             android:gravity="center_vertical"
@@ -44,8 +43,6 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_0.3"
-            android:layout_marginLeft="@dimen/dimen_48"
-            android:layout_marginRight="@dimen/dimen_48"
             android:background="@color/guide_divider" />
     </LinearLayout>
 
@@ -59,8 +56,6 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/dimen_48"
-            android:layout_marginRight="@dimen/dimen_48"
             android:layout_marginTop="@dimen/dimen_20">
 
             <LinearLayout
@@ -109,8 +104,6 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_0.3"
-            android:layout_marginLeft="@dimen/dimen_48"
-            android:layout_marginRight="@dimen/dimen_48"
             android:background="@color/guide_divider" />
 
     </LinearLayout>
@@ -130,7 +123,7 @@
             android:layout_width="@dimen/dimen_15"
             android:layout_height="@dimen/dimen_15"
             android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/dimen_10"
+            android:layout_marginRight="@dimen/dimen_5"
             android:background="@drawable/checkbox_style"
             android:button="@null"
             android:visibility="visible" />
@@ -139,7 +132,6 @@
             android:id="@+id/tv_register_protocol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:textColor="@color/color_black"
             android:textSize="@dimen/dimen_12" />
 
@@ -152,9 +144,7 @@
         android:layout_below="@id/ll_register_protocol"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:layout_marginLeft="@dimen/dimen_48"
         android:layout_marginTop="@dimen/dimen_30"
-        android:layout_marginRight="@dimen/dimen_48"
         android:background="@drawable/common_btn_corner_seleced_bg"
         android:enabled="false"
         android:gravity="center"
@@ -201,8 +191,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="@dimen/dimen_48"
-        android:layout_marginLeft="@dimen/dimen_48"
         android:orientation="vertical">
 
         <RelativeLayout

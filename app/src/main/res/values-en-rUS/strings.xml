@@ -254,11 +254,12 @@
     <string name="about_us_net">https://www.lanyingim.com</string>
     <string name="about_us_phone_pre"></string>
     <string name="about_us_phone">400-666-0162</string>
-    <string name="about_us_company">© 2023 Maximtop</string>
+    <string name="about_us_company">© 2019-%s Maximtop</string>
 
 
     <string name="common_empty">No conversation here, you can search the user ID in the upper right corner of the contacts page to add friends</string>
     <string name="support_empty">To contact technical support, please switch the App ID to “welovemaxim” after logging out</string>
+    <string name="support_empty_for_test">To contact technical support, please login Lanying official web site</string>
 
     <!--push设置-->
     <string name="set_push">Push Settings</string>

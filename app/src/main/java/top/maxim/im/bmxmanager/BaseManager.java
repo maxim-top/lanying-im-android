@@ -2,8 +2,11 @@
 package top.maxim.im.bmxmanager;
 
 import android.content.Context;
-import android.os.Environment;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 
@@ -33,6 +36,21 @@ public class BaseManager {
         return context.getFilesDir().getPath() ;
     }
 
+    private static String getVersionName(Context context){
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return "Unknown"; // 如果出现异常，返回"Unknown"
+        }
+    }
+
+    private static String getUserAgent(Context context){
+        return android.os.Build.BRAND + ";" + Build.MODEL + ";" + Build.VERSION.SDK_INT  +
+                ";AppVer:" + getVersionName(context) + ";PackName:"+ context.getPackageName();
+    }
+
     /**
      * 配置环境
      */
@@ -45,7 +63,7 @@ public class BaseManager {
 
         String pushId = getPushId();
         BMXSDKConfig conf = new BMXSDKConfig(BMXClientType.Android, "1", dataPath.getAbsolutePath(),
-                cachePath.getAbsolutePath(), TextUtils.isEmpty(pushId) ? "MaxIM" : pushId);
+                cachePath.getAbsolutePath(), TextUtils.isEmpty(pushId) ? "MaxIM" : pushId, getUserAgent(AppContextUtils.getAppContext()) );
         conf.setAppID(SharePreferenceUtils.getInstance().getAppId());
 //        conf.setAppSecret(ScanConfigs.CODE_SECRET);
         conf.setConsoleOutput(true);
@@ -142,6 +160,12 @@ public class BaseManager {
             String metaAppId = PushClientMgr.getPushAppId("VIVO_APPID");
             if (!TextUtils.isEmpty(metaAppId)) {
                 return metaAppId.substring(2);
+            }
+        } else if (PushClientMgr.isGoogle(context)) {
+            Log.d("BaseManager", "Push client is Google");
+            String metaAppId = PushClientMgr.getPushAppId("GOOGLE_PUSH_ID");
+            if (!TextUtils.isEmpty(metaAppId)) {
+                return metaAppId;
             }
         }
         return "";

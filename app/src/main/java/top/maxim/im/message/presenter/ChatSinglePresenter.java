@@ -5,8 +5,6 @@ import android.text.TextUtils;
 
 import org.json.JSONObject;
 
-import java.util.List;
-
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;

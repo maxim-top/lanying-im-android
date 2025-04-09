@@ -215,7 +215,7 @@ public class LoginByVerifyActivity extends BaseTitleActivity {
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
-            if (!WXUtils.getInstance().wxSupported()) {
+            if (!WXUtils.getInstance().wxSupported(this)) {
                 ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }

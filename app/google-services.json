@@ -1,36 +1,45 @@
 {
   "project_info": {
-    "project_number": "272266865369",
-    "project_id": "maxim-im-demo",
-    "storage_bucket": "maxim-im-demo.appspot.com"
+    "project_number": "1065745051185",
+    "project_id": "lanyingim",
+    "storage_bucket": "lanyingim.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:272266865369:android:988c770685ab0d7a0eecc8",
+        "mobilesdk_app_id": "1:1065745051185:android:cf50f6bfc19f05a4386f10",
         "android_client_info": {
           "package_name": "top.maxim.im"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "272266865369-lnn77chqehdqepsr3tkufhfkd70d8r3e.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDfOm_xdU4AMS5XXRS_geBRNQXUgg_UcHI"
+          "current_key": "AIzaSyCpugECHbMHIS7qQroqUAnrvAfzUz05FRc"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "272266865369-lnn77chqehdqepsr3tkufhfkd70d8r3e.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1065745051185:android:e13ca374b906acb2386f10",
+        "android_client_info": {
+          "package_name": "top.maxim.im2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpugECHbMHIS7qQroqUAnrvAfzUz05FRc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
         }
       }
     }

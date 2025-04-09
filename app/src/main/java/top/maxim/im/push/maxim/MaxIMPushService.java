@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+import android.os.Handler;
 
 import androidx.annotation.Nullable;
 
@@ -19,6 +21,7 @@ import im.floo.floolib.BMXPushServiceListener;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.PushManager;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.push.PushClientMgr;
@@ -29,9 +32,16 @@ import top.maxim.im.sdk.utils.MsgConstants;
  */
 public class MaxIMPushService extends Service {
 
+    private Handler handler;
+    private Runnable runnable;
+
     public static void startPushService(Context context) {
-        Intent intent = new Intent(context, MaxIMPushService.class);
-        context.startService(intent);
+        try {
+            Intent intent = new Intent(context, MaxIMPushService.class);
+            context.startService(intent);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private static final String TAG = MaxIMPushService.class.getName();
@@ -99,9 +109,23 @@ public class MaxIMPushService extends Service {
         @Override
         public void onCertRetrieved(String cert) {
             super.onCertRetrieved(cert);
-            Log.d(TAG, "onCertRetrieved" + cert);
-            BaseManager.getBMXClient().getSDKConfig().setPushCertName(cert);
+            Log.d(TAG, "onCertRetrieved:" + cert);
             PushClientMgr.getManager().register(MaxIMPushService.this);
+            int delay = 5000;//ms
+            handler = new Handler(Looper.getMainLooper());
+            runnable = new Runnable() {
+                @Override
+                public void run() {
+                    new Thread(()->{
+                        String token = SharePreferenceUtils.getInstance().getPushToken();
+                        if (TextUtils.isEmpty(token)){
+                            PushClientMgr.getManager().register(MaxIMPushService.this);
+                            handler.postDelayed(this, delay);
+                        }
+                    }).start();
+                }
+            };
+            handler.postDelayed(runnable, delay);
         }
     };
 

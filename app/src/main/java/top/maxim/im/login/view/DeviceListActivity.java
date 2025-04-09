@@ -24,9 +24,7 @@ import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
-import top.maxim.im.common.view.recyclerview.BaseViewHolder;
 import top.maxim.im.common.view.recyclerview.DividerItemDecoration;
-import top.maxim.im.common.view.recyclerview.RecyclerWithHFAdapter;
 import top.maxim.im.common.view.recyclerview.SwipeRecyclerViewHelper;
 
 /**

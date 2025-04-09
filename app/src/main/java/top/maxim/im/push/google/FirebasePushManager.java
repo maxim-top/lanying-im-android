@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import top.maxim.im.push.IPushManager;
@@ -24,11 +25,12 @@ public class FirebasePushManager extends IPushManager {
     private static final String TAG = "FirebasePushManager";
 
     public FirebasePushManager(Context context) {
-        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
+//        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
     }
 
     @Override
     public void register(Context context) {
+        FirebaseApp.initializeApp(context);
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
             @Override
             public void onComplete(@NonNull Task<String> task) {

@@ -176,14 +176,14 @@ public class CameraUtils {
      * @param picCropWidth 生成图片的宽
      * @param picCropHigh  生成图片的高
      */
-    public void startPhotoZoom(File originalFile, Uri targetFile, String filepath, int picCropWidth,
+    public void startPhotoZoom(File originalFile, Uri originalUri, Uri targetFile, String filepath, int picCropWidth,
                                int picCropHigh, Activity activity, int resultCode) {
         File file = new File(filepath);
         if (!file.exists()) {
             file.mkdirs();
         }
         Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(getImageContentUri(activity, originalFile), IMAGE_UNSPECIFIED);
+        intent.setDataAndType(originalUri, IMAGE_UNSPECIFIED);
         intent.putExtra("crop", "true");
         // 是否允许缩放
         intent.putExtra("scale", "true");

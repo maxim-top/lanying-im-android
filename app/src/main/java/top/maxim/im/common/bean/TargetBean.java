@@ -1,7 +1,6 @@
 
 package top.maxim.im.common.bean;
 
-import im.floo.floolib.BMXConnectStatus;
 import im.floo.floolib.BMXConversation;
 
 /**

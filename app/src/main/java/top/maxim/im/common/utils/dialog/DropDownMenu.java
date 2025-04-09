@@ -19,7 +19,6 @@ import android.widget.FrameLayout;
 import androidx.annotation.Nullable;
 
 import top.maxim.im.R;
-import top.maxim.im.common.utils.ScreenUtils;
 
 /**
  * Description : 下拉菜单.

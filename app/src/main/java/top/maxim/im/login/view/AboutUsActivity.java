@@ -9,6 +9,10 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import im.floo.floolib.BMXClient;
 import top.maxim.im.BuildConfig;
 import top.maxim.im.R;
@@ -62,6 +66,9 @@ public class AboutUsActivity extends BaseTitleActivity {
         mFlooVersion = view.findViewById(R.id.tv_floo_version);
         mTvNet = view.findViewById(R.id.tv_about_us_net);
         mTvPhone = view.findViewById(R.id.tv_about_us_contact);
+        TextView tvCopyRight = view.findViewById(R.id.copyright);
+        String ret = new SimpleDateFormat("yyyy", Locale.getDefault()).format(new Date());
+        tvCopyRight.setText(String.format(getString(R.string.about_us_company), ret));
         mTvNet.setText(mUrl = getString(R.string.about_us_net));
         mTvPhone.setText(mPhone = getString(R.string.about_us_phone));
         return view;

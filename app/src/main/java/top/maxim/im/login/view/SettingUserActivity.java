@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -19,13 +18,19 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,9 +44,9 @@ import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
-import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.base.PermissionActivity;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.CameraUtils;
 import top.maxim.im.common.utils.ClickTimeUtils;
@@ -57,6 +62,8 @@ import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.CustomDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
+import top.maxim.im.common.utils.permissions.PermissionsMgr;
+import top.maxim.im.common.utils.permissions.PermissionsResultAction;
 import top.maxim.im.common.view.BMImageLoader;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
@@ -74,6 +81,12 @@ import top.maxim.im.wxapi.WXUtils;
  * Description : 用户设置 Created by Mango on 2018/11/21.
  */
 public class SettingUserActivity extends BaseTitleActivity {
+
+    private String TAG = "SettingUserActivity";
+
+    private final int TYPE_PHOTO_PERMISSION = 2;
+
+    private ActivityResultLauncher<String[]> permissionLauncher;
 
     private ShapeImageView mUserIcon;
 
@@ -367,6 +380,22 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mRTCConfig.build());
         // 分割线
         addLineView(container);
+        if (permissionLauncher == null){
+            try {
+                permissionLauncher = registerForActivityResult(
+                        new ActivityResultContracts.RequestMultiplePermissions(),
+                        new ActivityResultCallback<Map<String, Boolean>>() {
+                            @Override
+                            public void onActivityResult(Map<String, Boolean> grantResults) {
+                            }
+                        }
+                );
+                PermissionsMgr.getInstance().setPermissionLauncher(permissionLauncher);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
         return view;
     }
     
@@ -380,18 +409,107 @@ public class SettingUserActivity extends BaseTitleActivity {
         return view;
     }
 
+    /**
+     * 请求权限
+     *
+     * @param requestType 权限请求类型
+     * @param permissions 权限列表
+     * @return 是否具有所有权限
+     */
+    void requestPermissions(final int requestType, final String... permissions) {
+       PermissionsMgr.getInstance().requestPermissionsIfNecessaryForResult(
+                this, permissions, new PermissionsResultAction() {
+
+                    @Override
+                    public void onGranted(List<String> perms) {
+                        PermissionsMgr.getInstance().permissionProcessed();
+                        Log.d(TAG, "Permission is Granted:" + perms);
+                        onGrantedPermission(requestType, perms);
+                    }
+
+                    @Override
+                    public void onDenied(List<String> perms) {
+                        PermissionsMgr.getInstance().permissionProcessed();
+                        Log.d(TAG, "Permission is Denied" + perms);
+                        onDeniedPermission(requestType, perms);
+                    }
+                });
+    }
+
+    /**
+     * 权限接受
+     *
+     * @param requestType 请求权限类型
+     * @param permissions 权限接受的列表
+     */
+    private void onGrantedPermission(int requestType, List<String> permissions) {
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        for (String permission : permissions) {
+            switch (permission) {
+                case PermissionsConstant.READ_STORAGE:
+                    // 读SD权限
+                    if (hasPermission(PermissionsConstant.WRITE_STORAGE)) {
+                        // 如果有读写权限都有 则直接操作
+                        hasPermissionHandler(requestType);
+                    } else {
+                        requestPermissions(requestType, PermissionsConstant.WRITE_STORAGE);
+                    }
+                    break;
+               default:
+                    break;
+            }
+        }
+    }
+    /**
+     * 获取到权限之后的操作
+     *
+     * @param requestType 请求的权限类型
+     */
+    private void hasPermissionHandler(int requestType) {
+        switch (requestType) {
+            case TYPE_PHOTO_PERMISSION:
+                // 相册
+                CameraUtils.getInstance().takeGalley(this, IMAGE_REQUEST);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 权限拒绝
+     *
+     * @param requestType 请求权限类型
+     * @param permissions 被拒绝的权限
+     */
+    private void onDeniedPermission(int requestType, List<String> permissions) {
+        if (permissions == null || permissions.size() == 0) {
+            return;
+        }
+        for (String permission : permissions) {
+            switch (permission) {
+                case PermissionsConstant.READ_STORAGE:
+                    // 读写SD权限拒绝
+                    CommonProvider.openAppPermission(this);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
     @Override
     protected void setViewListener() {
         mUserIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 选择相册 需要SD卡读写权限
-                if (hasPermission(PermissionsConstant.READ_STORAGE,
-                        PermissionsConstant.WRITE_STORAGE)) {
+                if (hasPermission(PermissionsConstant.READ_STORAGE)) {
                     CameraUtils.getInstance().takeGalley(SettingUserActivity.this, IMAGE_REQUEST);
                 } else {
-                    requestPermissions(PermissionsConstant.READ_STORAGE,
-                            PermissionsConstant.WRITE_STORAGE);
+                    requestPermissions(TYPE_PHOTO_PERMISSION, PermissionsConstant.READ_STORAGE);
                 }
             }
         });
@@ -690,10 +808,6 @@ public class SettingUserActivity extends BaseTitleActivity {
                     } else {
                         requestPermissions(PermissionsConstant.WRITE_STORAGE);
                     }
-                    break;
-                case PermissionsConstant.WRITE_STORAGE:
-                    // 写SD权限 如果有读写权限都有 则直接操作
-                    CameraUtils.getInstance().takeGalley(SettingUserActivity.this, IMAGE_REQUEST);
                     break;
                 default:
                     break;
@@ -1093,7 +1207,7 @@ public class SettingUserActivity extends BaseTitleActivity {
                             photoURI = Uri.fromFile(imageFile);
                         }
 
-                        CameraUtils.getInstance().startPhotoZoom(new File(path),
+                        CameraUtils.getInstance().startPhotoZoom(new File(path), selectedImage,
                                 photoURI, FileConfig.DIR_APP_CACHE_CAMERA,
                                 600, 600, this, IMAGE_CROP);
                     } catch (Exception e) {

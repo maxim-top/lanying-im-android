@@ -3,10 +3,12 @@ package top.maxim.im.message.itemholder;
 
 import static top.maxim.im.common.utils.AppContextUtils.getApplication;
 
+import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
 
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Handler;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.target.Target;
 
 import org.greenrobot.eventbus.EventBus;
@@ -167,40 +170,64 @@ public class MessageItemText extends MessageItemBaseView {
         showText();
     }
 
-    private void showAsMarkdown(String content){
-        Markwon markwon = Markwon.builder(mContext)
-                .usePlugin(LinkifyPlugin.create())
-                .usePlugin(new AbstractMarkwonPlugin() {
-                    @Override
-                    public void configureConfiguration(@NonNull MarkwonConfiguration.Builder builder) {
-                        builder.linkResolver(new LinkResolverDef() {
-                            @Override
-                            public void resolve(View view, @NonNull String link) {
-                                if (link.startsWith("lanying:")) {
-                                } else {
-                                    super.resolve(view, link);
-                                }
-                            }
-                        });
-                    }
-                })
-                .usePlugin(GlideImagesPlugin.create(mContext))
-                .usePlugin(GlideImagesPlugin.create(Glide.with(mContext)))
-                .usePlugin(GlideImagesPlugin.create(new GlideImagesPlugin.GlideStore() {
-                    @NonNull
-                    @Override
-                    public RequestBuilder<Drawable> load(@NonNull AsyncDrawable drawable) {
-                        return Glide.with(mContext).load(drawable.getDestination());
-                    }
+    private RequestManager requestManagerByGlide(){
+        if (mContext instanceof Activity){
+            Activity activity = (Activity) mContext;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && activity.isDestroyed()) {
+                return null;
+            }
+        }
+        return Glide.with(mContext);
+    }
 
-                    @Override
-                    public void cancel(@NonNull Target<?> target) {
-                        Glide.with(mContext).clear(target);
+    private void showAsMarkdown(String content){
+        try{
+            GlideImagesPlugin plugin1 = GlideImagesPlugin.create(mContext);
+            GlideImagesPlugin plugin2 = GlideImagesPlugin.create(requestManagerByGlide());
+            GlideImagesPlugin plugin3 = GlideImagesPlugin.create(new GlideImagesPlugin.GlideStore() {
+                @NonNull
+                @Override
+                public RequestBuilder<Drawable> load(@NonNull AsyncDrawable drawable) {
+                    RequestManager requestManager = requestManagerByGlide();
+                    if (requestManager!=null){
+                        return requestManager.load(drawable.getDestination());
                     }
-                })).build();
-        Spanned spanned = markwon.toMarkdown(content);
-        mChatText.setText(spanned);
-        mChatText.setMovementMethod(LinkMovementMethod.getInstance());
+                    return null;
+                }
+
+                @Override
+                public void cancel(@NonNull Target<?> target) {
+                    RequestManager requestManager = requestManagerByGlide();
+                    if (requestManager!=null){
+                        requestManager.clear(target);
+                    }
+                }
+            });
+            Markwon markwon = Markwon.builder(mContext)
+                    .usePlugin(LinkifyPlugin.create())
+                    .usePlugin(new AbstractMarkwonPlugin() {
+                        @Override
+                        public void configureConfiguration(@NonNull MarkwonConfiguration.Builder builder) {
+                            builder.linkResolver(new LinkResolverDef() {
+                                @Override
+                                public void resolve(View view, @NonNull String link) {
+                                    if (link.startsWith("lanying:")) {
+                                    } else {
+                                        super.resolve(view, link);
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .usePlugin(plugin1)
+                    .usePlugin(plugin2)
+                    .usePlugin(plugin3).build();
+            Spanned spanned = markwon.toMarkdown(content);
+            mChatText.setText(spanned);
+            mChatText.setMovementMethod(LinkMovementMethod.getInstance());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
     /**
      * 展示文本数据

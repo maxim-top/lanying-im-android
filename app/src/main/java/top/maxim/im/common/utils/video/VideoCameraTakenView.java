@@ -11,7 +11,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import top.maxim.im.R;
 import top.maxim.im.common.utils.ScreenUtils;
 
 public class VideoCameraTakenView extends View {

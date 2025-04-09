@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <top.maxim.im.common.view.ShapeImageView
+    <ImageView
         android:id="@+id/image_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:layout_gravity="center"
         android:visibility="gone">
 
-        <top.maxim.im.common.view.ShapeImageView
+        <ImageView
             android:id="@+id/image_message_shadow"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

@@ -37,7 +37,6 @@ import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseSwitchActivity;
-import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RxBus;
@@ -242,7 +241,7 @@ public class RegisterFragment extends BaseTitleFragment {
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
-            if (!WXUtils.getInstance().wxSupported()) {
+            if (!WXUtils.getInstance().wxSupported(activity)) {
                 ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }
@@ -254,7 +253,7 @@ public class RegisterFragment extends BaseTitleFragment {
             initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_REGISTER, mChangeAppId);
         });
-        if (WXUtils.getInstance().getWXApi() != null && !WXUtils.getInstance().getWXApi().isWXAppInstalled()){
+        if (WXUtils.getInstance().getWXApi() != null && !WXUtils.getInstance().wxSupported(activity)){
             mWXLogin.setVisibility(View.GONE);
         }
         // 扫一扫
@@ -317,6 +316,8 @@ public class RegisterFragment extends BaseTitleFragment {
 
             @Override
             public void afterTextChanged(Editable s) {
+                mInputName.setBackground(null);
+
                 boolean isNameEmpty = TextUtils.isEmpty(mInputName.getText().toString().trim());
                 boolean isPwdEmpty = TextUtils.isEmpty(mInputPwd.getText().toString().trim());
                 boolean isPhoneEmpty = TextUtils.isEmpty(mInputPhone.getText().toString().trim());
@@ -457,10 +458,12 @@ public class RegisterFragment extends BaseTitleFragment {
             } else {
                 if (bmxErrorCode.swigValue() == BMXErrorCode.InvalidRequestParameter.swigValue()) {
                     ToastUtil.showTextViewPrompt(getString(R.string.username_only_supports));
+                    mInputName.setBackgroundResource(R.drawable.username_error_bg);
                 } else if (bmxErrorCode.equals(BMXErrorCode.UserAlreadyExist)) {
                     ToastUtil.showTextViewPrompt(getString(R.string.exit_user));
+                    mInputName.setBackgroundResource(R.drawable.username_error_bg);
                 } else if (bmxErrorCode.equals(BMXErrorCode.ServerUnknownError)) {
-                    ToastUtil.showTextViewPrompt(getString(R.string.exit_user));
+                    ToastUtil.showTextViewPrompt(getString(R.string.network_exception));
                 } else {
                     ToastUtil.showTextViewPrompt(getString(R.string.network_exception));
                 }
@@ -501,11 +504,13 @@ public class RegisterFragment extends BaseTitleFragment {
                                 CommonConfig.WX_LOGIN_ACTION)) {
                             return;
                         }
-                        if (mSubscription != null) {
-                            mSubscription.unsubscribe();
-                        }
                         String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
-                        LoginFragment.wxChatLogin(getActivity(), openId);
+                        if(openId.contains("official_account_followed=false")){
+                            getActivity().finish();
+                            LoginRegisterActivity.openLoginRegister(getActivity(), false);
+                        }else{
+                            LoginFragment.wxChatLogin(getActivity(), openId);
+                        }
                     }
                 });
         mSubscription.add(wxLogin);

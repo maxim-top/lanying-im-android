@@ -25,7 +25,7 @@ buildscript {
         classpath "com.android.tools.build:gradle:$agp_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         //google service
-        classpath 'com.google.gms:google-services:4.3.10'
+        classpath 'com.google.gms:google-services:4.3.13'
         // 增加agcp配置。
         classpath 'com.huawei.agconnect:agcp:1.6.0.300'
         // NOTE: Do not place your application dependencies here; they belong
@@ -37,6 +37,7 @@ buildscript {
 plugins {
     id 'com.android.application' version "8.1.0" apply false //demo used
     id 'com.networkbench.gradleplugin.agp8on' version "2.17.5" apply false //添加基调听云插件
+    id 'com.google.gms.google-services' version '4.4.2' apply false
 }
 
 allprojects {

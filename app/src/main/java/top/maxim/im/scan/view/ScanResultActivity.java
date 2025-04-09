@@ -12,8 +12,6 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-
 import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
@@ -26,14 +24,9 @@ import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
-import top.maxim.im.contact.bean.SupportBean;
 import top.maxim.im.contact.view.RosterDetailActivity;
 import top.maxim.im.group.view.GroupQrcodeDetailActivity;
-import top.maxim.im.login.view.LoginActivity;
-import top.maxim.im.login.view.LoginBindUserActivity;
-import top.maxim.im.login.view.LoginByVerifyActivity;
 import top.maxim.im.login.view.SettingUserActivity;
-import top.maxim.im.login.view.WelcomeActivity;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.utils.QRCodeConfig;

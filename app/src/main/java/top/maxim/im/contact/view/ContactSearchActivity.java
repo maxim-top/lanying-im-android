@@ -27,6 +27,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -35,7 +36,6 @@ import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.ImageRequestConfig;
-import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseRecyclerAdapter;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
@@ -162,7 +162,7 @@ public class ContactSearchActivity extends BaseTitleActivity {
             add.setVisibility(myId == item.rosterId() || friend ? View.GONE : View.VISIBLE);
             add.setOnClickListener(v -> {
                 long rosterId = item.rosterId();
-                showAddReason(rosterId, item.authQuestion());
+                showAddReason(rosterId, item.authQuestion(), item.addFriendAuthMode());
             });
 
             String name = item.username();
@@ -173,8 +173,8 @@ public class ContactSearchActivity extends BaseTitleActivity {
         /**
          * 输入框弹出
          */
-        private void showAddReason(final long rosterId, String authQuestion) {
-            if (authQuestion.length()>0){
+        private void showAddReason(final long rosterId, String authQuestion, BMXRosterItem.AddFriendAuthMode addFriendAuthMode) {
+            if (addFriendAuthMode == BMXRosterItem.AddFriendAuthMode.AnswerQuestion && authQuestion.length()>0){
                 final LinearLayout ll = new LinearLayout(ContactSearchActivity.this);
                 ll.setOrientation(LinearLayout.VERTICAL);
                 LinearLayout.LayoutParams textP = new LinearLayout.LayoutParams(
@@ -244,7 +244,7 @@ public class ContactSearchActivity extends BaseTitleActivity {
                         ToastUtil.showTextViewPrompt(getString(R.string.add_successful));
                         finish();
                     } else {
-                        ToastUtil.showTextViewPrompt(getString(R.string.add_failed));
+                        ToastUtil.showTextViewPrompt(CommonUtils.getErrorMessage(bmxErrorCode));
                     }
                 });
             } else {
@@ -254,7 +254,7 @@ public class ContactSearchActivity extends BaseTitleActivity {
                         ToastUtil.showTextViewPrompt(getString(R.string.add_successful));
                         finish();
                     } else {
-                        ToastUtil.showTextViewPrompt(getString(R.string.add_failed));
+                        ToastUtil.showTextViewPrompt(CommonUtils.getErrorMessage(bmxErrorCode));
                     }
                 });
             }

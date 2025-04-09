@@ -103,7 +103,12 @@ public class SupportFragment extends BaseTitleFragment {
         String appId = SharePreferenceUtils.getInstance().getAppId();
         if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {
             // 非默认appId
-            showEmpty(getString(R.string.support_empty));
+            int resId = R.string.support_empty;
+            String name = SharePreferenceUtils.getInstance().getUserName();
+            if (TextUtils.equals(name,"maxim-test")){
+                resId = R.string.support_empty_for_test;
+            }
+            showEmpty(getString(resId));
             return;
         }
         AppManager.getInstance().getTokenByName(SharePreferenceUtils.getInstance().getUserName(),

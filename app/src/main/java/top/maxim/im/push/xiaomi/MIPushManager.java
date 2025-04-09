@@ -1,10 +1,14 @@
 
 package top.maxim.im.push.xiaomi;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.os.Process;
 import android.text.TextUtils;
 
 import com.xiaomi.mipush.sdk.MiPushClient;
+
+import java.util.List;
 
 import top.maxim.im.push.IPushManager;
 import top.maxim.im.push.PushClientMgr;
@@ -32,9 +36,22 @@ public class MIPushManager extends IPushManager {
         }
     }
 
+    private boolean isMainProcess(Context context) {
+        ActivityManager am = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE));
+        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
+        String mainProcessName = context.getPackageName();
+        int myPid = Process.myPid();
+        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
+            if (info.pid == myPid && mainProcessName.equals(info.processName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public void register(Context context) {
-        if (!TextUtils.isEmpty(APP_ID) && !TextUtils.isEmpty(APP_KEY)) {
+        if (isMainProcess(context) && !TextUtils.isEmpty(APP_ID) && !TextUtils.isEmpty(APP_KEY)) {
             MiPushClient.registerPush(context, APP_ID, APP_KEY);
         }
     }

@@ -44,7 +44,6 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.bean.UserBean;
-import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
@@ -259,7 +258,7 @@ public class LoginActivity extends BaseTitleActivity {
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
-            if (!WXUtils.getInstance().wxSupported()) {
+            if (!WXUtils.getInstance().wxSupported(this)) {
                 ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }

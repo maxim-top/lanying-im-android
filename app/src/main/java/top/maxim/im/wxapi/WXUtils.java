@@ -1,8 +1,11 @@
 
 package top.maxim.im.wxapi;
 
-import static com.tencent.mm.opensdk.modelmsg.WXMiniProgramObject.MINIPTOGRAM_TYPE_RELEASE;
+import static com.tencent.mm.opensdk.modelmsg.WXMiniProgramObject.*;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
@@ -51,11 +54,14 @@ public class WXUtils {
      * 
      * @return boolean
      */
-    public boolean wxSupported() {
-        if (mApi == null) {
+    public boolean wxSupported(Context context) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            ApplicationInfo info = pm.getApplicationInfo("com.tencent.mm", 0);
+            return info.enabled;
+        } catch (PackageManager.NameNotFoundException e) {
             return false;
         }
-        return mApi.isWXAppInstalled();
     }
 
     /**
@@ -74,7 +80,7 @@ public class WXUtils {
     }
 
     /**
-     * 微信登录
+     * 跳转到小程序
      */
     public void wxMiniProgram(String wxUsername, String wxPath) {
         if (mApi == null) {

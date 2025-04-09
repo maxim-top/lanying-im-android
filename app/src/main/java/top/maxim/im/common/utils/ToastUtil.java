@@ -1,7 +1,6 @@
 
 package top.maxim.im.common.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.StringRes;
 

@@ -1,8 +1,6 @@
 
 package top.maxim.im.common.utils;
 
-import android.os.Environment;
-
 /**
  * Description : 文件常量 Created by Mango on 2018/11/06.
  */

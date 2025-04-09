@@ -8,8 +8,11 @@ import android.text.TextUtils;
 import android.util.LongSparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 
@@ -20,7 +23,6 @@ import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.view.BMImageLoader;
 import top.maxim.im.common.view.ImageRequestConfig;
-import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.message.interfaces.ChatActionListener;
 import top.maxim.im.message.interfaces.MsgAttachmentCallback;
 import top.maxim.im.message.utils.ChatAttachmentManager;
@@ -30,11 +32,9 @@ import top.maxim.im.message.utils.ChatAttachmentManager;
  */
 public class MessageItemImage extends MessageItemBaseView {
 
-    private ShapeImageView mImageView;
+    private ImageView mImageView;
 
     private View mFlShadow;
-
-    private ShapeImageView mShadowView;
 
     private TextView mProgress;
 
@@ -81,13 +81,11 @@ public class MessageItemImage extends MessageItemBaseView {
             view = View.inflate(mContext, R.layout.item_chat_image_left, parent);
             mImageView = view.findViewById(R.id.image_message);
             mFlShadow = view.findViewById(R.id.fl_image_message_shadow);
-            mShadowView = view.findViewById(R.id.image_message_shadow);
             mProgress = view.findViewById(R.id.image_progress);
         } else {
             view = View.inflate(mContext, R.layout.item_chat_image_right, parent);
             mImageView = view.findViewById(R.id.image_message);
             mFlShadow = view.findViewById(R.id.fl_image_message_shadow);
-            mShadowView = view.findViewById(R.id.image_message_shadow);
             mProgress = view.findViewById(R.id.image_progress);
         }
         return view;
@@ -208,17 +206,13 @@ public class MessageItemImage extends MessageItemBaseView {
         mImageView.setLayoutParams(imgLayoutParams);
         String picUrl = null;
         if (!TextUtils.isEmpty(body.thumbnailPath()) && new File(body.thumbnailPath()).exists()) {
-            picUrl = "file://" + body.thumbnailPath();
-            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+            Glide.with(mContext).load(body.thumbnailPath()).into(mImageView);
         } else if (!TextUtils.isEmpty(body.path()) && new File(body.path()).exists()) {
-            picUrl = "file://" + body.path();
-            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+            Glide.with(mContext).load(body.path()).into(mImageView);
         } else if (!TextUtils.isEmpty(body.thumbnailUrl())) {
-            picUrl = body.thumbnailUrl();
-            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+            Glide.with(mContext).load(body.thumbnailUrl()).into(mImageView);
         } else if (!TextUtils.isEmpty(body.url())) {
-            picUrl = body.url();
-            BMImageLoader.getInstance().display(mImageView, picUrl, mImageConfig);
+            Glide.with(mContext).load(body.url()).into(mImageView);
         } else {
             BMImageLoader.getInstance().display(mImageView, "", mImageConfig);
             ChatManager.getInstance().downloadAttachment(mMaxMessage);

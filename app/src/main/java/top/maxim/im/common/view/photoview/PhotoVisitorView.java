@@ -37,16 +37,15 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.bean.PhotoViewBean;
 import top.maxim.im.common.utils.ScreenUtils;
+import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CustomDialog;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.utils.permissions.PermissionsMgr;
 import top.maxim.im.common.utils.permissions.PermissionsResultAction;
 import top.maxim.im.common.view.BMImageLoader;
 import top.maxim.im.common.view.ImageRequestConfig;
-import top.maxim.im.contact.view.ForwardMsgRosterActivity;
 import top.maxim.im.message.interfaces.MsgAttachmentCallback;
 import top.maxim.im.message.utils.ChatAttachmentManager;
-import top.maxim.im.message.utils.ChatUtils;
 
 public class PhotoVisitorView extends RelativeLayout {
 
@@ -149,6 +148,7 @@ public class PhotoVisitorView extends RelativeLayout {
                 }
                 fos.flush();
                 fos.close();
+                ToastUtil.showTextViewPrompt(context.getString(R.string.saved_to_system_album));
             }
             MediaScannerConnection.scanFile(mContext, new String[]{newPath}, null, new MediaScannerConnection.OnScanCompletedListener() {
                 @Override

@@ -67,6 +67,7 @@ public final class PushClientMgr {
         } else if (isInited) {
             return true;
         } else {
+            SharePreferenceUtils.getInstance().putHasPush(true);
             if (isHuawei(application.getApplicationContext())) {
                 sManager = new HWPushManager(application.getApplicationContext());
                 sDevType = HW_TYPE;
@@ -88,6 +89,7 @@ public final class PushClientMgr {
             } else {
                 sManager = new EmptyPushManager(application.getApplicationContext());
                 sHasOfficialPush = false;
+                SharePreferenceUtils.getInstance().putHasPush(false);
             }
             isInited = true;
             return true;
@@ -176,13 +178,14 @@ public final class PushClientMgr {
     }
 
     public static void setPushToken(String token) {
-        SharePreferenceUtils.getInstance().putPushToken(sDevType, token);
         if (TextUtils.isEmpty(token)) {
             return;
         }
         UserManager.getInstance().bindDevice(token, bmxErrorCode -> {
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
                 Log.e("bindDevice failed", bmxErrorCode.name());
+            }else{
+                SharePreferenceUtils.getInstance().putPushToken(sDevType, token);
             }
         });
         top.maxim.im.bmxmanager.PushManager.getInstance().bindDeviceToken(token, bmxErrorCode -> {

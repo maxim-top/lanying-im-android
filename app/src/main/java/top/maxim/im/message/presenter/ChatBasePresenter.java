@@ -98,7 +98,6 @@ import top.maxim.im.common.utils.permissions.PermissionsMgr;
 import top.maxim.im.common.utils.permissions.PermissionsResultAction;
 import top.maxim.im.common.utils.video.PhotoRecorderActivity;
 import top.maxim.im.contact.view.ForwardMsgActivity;
-import top.maxim.im.contact.view.ForwardMsgRosterActivity;
 import top.maxim.im.message.contract.ChatBaseContract;
 import top.maxim.im.message.customviews.MessageInputBar;
 import top.maxim.im.message.utils.ChatAttachmentManager;
@@ -215,6 +214,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
     private BMXMessage mVoiceMsg;
 
     private ActivityResultLauncher<String[]> permissionLauncher;
+
+    private boolean hasInitData = false;
 
     private BMXChatServiceListener mListener = new BMXChatServiceListener() {
 
@@ -394,6 +395,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 mView.setControlBarText("被举报人昵称(选填)：\n\n被举报人用户ID（必填）：\n\n举报事由（必填）：");
             }
         }
+        if (hasInitData){
+            return;
+        }
         //拉取历史消息
         ChatManager.getInstance().retrieveHistoryMessages(mConversation, msgId,
                 MessageConfig.DEFAULT_PAGE_SIZE, (bmxErrorCode, messageList) -> {
@@ -431,6 +435,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                                 }
                             });
                 });
+        hasInitData = true;
     }
 
     @Override
@@ -699,7 +704,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     showVideoView();
                 } else {
                     // 如果没有权限 首先请求SD读权限
-                    requestPermissions(TYPE_VIDEO_PERMISSION, PermissionsConstant.READ_STORAGE);
+                    requestPermissions(TYPE_PHOTO_PERMISSION,PermissionsConstant.CAMERA,
+                            PermissionsConstant.WRITE_STORAGE, PermissionsConstant.RECORD_AUDIO,
+                            PermissionsConstant.READ_STORAGE);
                 }
                 break;
             case FILE:

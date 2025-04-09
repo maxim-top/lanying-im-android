@@ -3,13 +3,13 @@ apply plugin: 'com.android.application'
 //听云符号表插件
 apply plugin: 'newlens'
 //google service
+apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 //apply plugin: 'com.huawei.agconnect'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 //apply plugin: 'com.kezong.fat-aar'
-
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -26,10 +26,11 @@ android {
         compileSdk 34
         targetSdk 34
         //noinspection HighAppVersionCode
-        versionCode 2000000052
-        versionName "4.8.0"
+        versionCode 2000000073
+        versionName "4.8.21"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
+                "GOOGLE_PUSH_ID"   : "fcm",
                 "HUAWEI_APPID"   : "108316071",
                 "XIAOMI_APPID"   : "2882303761517923338",
                 "XIAOMI_APP_KEY" : "5221792385338",
@@ -62,6 +63,18 @@ android {
             abiFilters 'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
         }
         multiDexEnabled true
+
+        bundle {
+            language {
+                enableSplit = true
+            }
+            density {
+                enableSplit = true
+            }
+            abi {
+                enableSplit = false
+            }
+        }
     }
 
     signingConfigs {
@@ -160,7 +173,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.5'
     //微信
-    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:5.4.0'
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android:+'
 
 //    //bugly
 //    implementation 'com.tencent.bugly:crashreport:latest.release'
@@ -173,10 +186,12 @@ dependencies {
     // 采集 OOM 数据需要 kotlin-gradle-plugin 插件 1.3+ ，并依赖 androidx.core:core-ktx、androidx.appcompat:appcompat、androidx.lifecycle:lifecycle-process、com.squareup.okio:okio 等库
     implementation "com.networkbench:tingyun-javaleak:1.0.2" // 采集 OOM 需集成此包
     // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:26.0.0')
+    implementation platform('com.google.firebase:firebase-bom:33.10.0')
     // Declare the dependencies for the Firebase Cloud Messaging and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase library dependencies
+//    implementation 'com.google.firebase:firebase-core'
     implementation 'com.google.firebase:firebase-messaging'
+    implementation "com.google.firebase:firebase-inappmessaging-display"
     implementation 'com.google.firebase:firebase-analytics'
 //    implementation 'com.google.firebase:firebase-messaging:21.0.1'
 //    implementation 'com.google.firebase:firebase-analytics:18.0.1'

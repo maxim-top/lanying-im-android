@@ -3,11 +3,13 @@ package top.maxim.im.common.base;
 
 import android.app.Activity;
 import android.app.Application;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -24,7 +26,6 @@ import java.io.File;
 import java.util.Locale;
 
 import im.floo.floolib.BMXClient;
-import im.floo.floolib.BMXErrorCode;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -88,10 +89,15 @@ public class MaxIMApplication extends Application {
             activityAount--;
             if (activityAount == 0) {
                 //app切到后台
-                if (!RTCManager.getInstance().getRTCEngine().isOnCall){
-                    BMXClient client = BaseManager.getBMXClient();
-                    client.disconnect();
-                    isDisconnected = true;
+                try {
+                    if (!RTCManager.getInstance().getRTCEngine().isOnCall &&
+                            SharePreferenceUtils.getInstance().getHasPush()){
+                        BMXClient client = BaseManager.getBMXClient();
+                        client.disconnect();
+                        isDisconnected = true;
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
                 }
             }
         }
@@ -161,7 +167,15 @@ public class MaxIMApplication extends Application {
             CharSequence name = getString(R.string.channel_name);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel("109568", name, importance);
-            channel.setDescription("sdf desc");
+            channel.setDescription("IM");
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            channel.shouldShowLights();//是否会闪光
+            channel.enableLights(true);//闪光
+            channel.canShowBadge();//桌面launcher消息角标
+            channel.enableVibration(true);//是否允许震动
+            channel.setSound(Uri.parse("android.resource://"+ getPackageName() + "/"
+                    + R.raw.message_received), Notification.AUDIO_ATTRIBUTES_DEFAULT);
+            channel.getGroup();//获取通知渠道组
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);

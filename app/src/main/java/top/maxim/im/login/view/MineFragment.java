@@ -34,7 +34,6 @@ import top.maxim.im.MainActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
-import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonUtils;

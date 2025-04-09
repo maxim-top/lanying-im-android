@@ -35,7 +35,6 @@ import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.common.base.BaseSwitchActivity;
-import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RxBus;
@@ -43,7 +42,6 @@ import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
-import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
 import top.maxim.im.wxapi.WXUtils;
 
@@ -95,6 +93,8 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
     private boolean mCountDown;
 
     private CheckBox mCheckBox;
+
+    private boolean mWxRxBusSubscribed;
 
     private CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
 
@@ -220,7 +220,7 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
-            if (!WXUtils.getInstance().wxSupported()) {
+            if (!WXUtils.getInstance().wxSupported(activity)) {
                 ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }
@@ -229,10 +229,13 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
                 ToastUtil.showTextViewPrompt(getString(R.string.check_first));
                 return;
             }
-            initWXRxBus();
+            if (!mWxRxBusSubscribed){
+                initWXRxBus();
+                mWxRxBusSubscribed = true;
+            }
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN_VERIFY, mChangeAppId);
         });
-        if (WXUtils.getInstance().getWXApi() != null && !WXUtils.getInstance().getWXApi().isWXAppInstalled()){
+        if (WXUtils.getInstance().getWXApi() != null && !WXUtils.getInstance().wxSupported(activity)){
             mWXLogin.setVisibility(View.GONE);
         }
         // 扫一扫
@@ -409,11 +412,13 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
                                 CommonConfig.WX_LOGIN_ACTION)) {
                             return;
                         }
-                        if (mSubscription != null) {
-                            mSubscription.unsubscribe();
-                        }
                         String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
-                        LoginFragment.wxChatLogin(getActivity(), openId);
+                        if(openId.contains("official_account_followed=false")){
+                            getActivity().finish();
+                            LoginRegisterActivity.openLoginRegister(getActivity(), false);
+                        }else{
+                            LoginFragment.wxChatLogin(getActivity(), openId);
+                        }
                     }
                 });
         mSubscription.add(wxLogin);

@@ -254,11 +254,12 @@
     <string name="about_us_net">https://www.lanyingim.com</string>
     <string name="about_us_phone_pre">联系商务&#8194;&#8194;</string>
     <string name="about_us_phone">400-666-0162</string>
-    <string name="about_us_company">© 2023 美信拓扑</string>
+    <string name="about_us_company">© 2019-%s 美信拓扑</string>
 
 
     <string name="common_empty">你没有聊天会话，可以在联系人页面右上角搜索用户ID来添加好友</string>
     <string name="support_empty">如果想联系技术支持,请退出后,将App ID切换成"welovemaxim"</string>
+    <string name="support_empty_for_test">如果想联系技术支持,请登录蓝莺官网</string>
 
     <!--push设置-->
     <string name="set_push">推送设置</string>

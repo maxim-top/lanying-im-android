@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="top.maxim.im">
 
+    <queries>
+        <package android:name="com.tencent.mm" />
+    </queries>
+
     <!-- webrtc -->
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -45,9 +49,11 @@
     <uses-permission android:name="android.permission.CALL_PHONE"
         tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!--去除谷歌广告id权限-->
+    <uses-permission android:name ="com.google.android.gms.permission.AD_ID" tools:node ="remove" />
 
-    <!-- Android O版本调用安装需要使用该权限 -->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+<!--    &lt;!&ndash; Android O版本调用安装需要使用该权限 &ndash;&gt;-->
+<!--    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />-->
 
 <!--    &lt;!&ndash;华为push permission&ndash;&gt;-->
 <!--    <uses-permission android:name="com.huawei.android.launcher.permission.CHANGE_BADGE" />-->
@@ -455,6 +461,11 @@
 <!--        <meta-data-->
 <!--            android:name="com.huawei.hms.client.appid"-->
 <!--            android:value="${HUAWEI_APPID}" />-->
+
+        <!--google push  配置-->
+        <meta-data
+            android:name="GOOGLE_PUSH_ID"
+            android:value="${GOOGLE_PUSH_ID}" />
 
         <!--华为push  配置-->
         <meta-data

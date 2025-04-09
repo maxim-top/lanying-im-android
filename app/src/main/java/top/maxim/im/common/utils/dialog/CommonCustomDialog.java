@@ -87,6 +87,10 @@ public class CommonCustomDialog extends BaseDialog implements View.OnClickListen
         bindView();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+    }
+
     private void bindView() {
         mTvTitle.setText(!TextUtils.isEmpty(mDialogTitle) ? mDialogTitle : "");
         if (!TextUtils.isEmpty(mConfirm)) {

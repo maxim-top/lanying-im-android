@@ -2,10 +2,14 @@
 package top.maxim.im;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.List;
 
@@ -13,14 +17,19 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import top.maxim.im.common.base.BaseSwitchActivity;
+import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SchemeUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.common.utils.permissions.PermissionsConstant;
+import top.maxim.im.common.utils.permissions.PermissionsMgr;
+import top.maxim.im.common.utils.permissions.PermissionsResultAction;
 import top.maxim.im.contact.view.AllContactFragment;
 import top.maxim.im.login.view.MineFragment;
 import top.maxim.im.message.view.SessionFragment;
 import top.maxim.im.push.NotificationUtils;
+import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.maxim.MaxIMPushService;
 
 /**
@@ -44,6 +53,10 @@ public class MainActivity extends BaseSwitchActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharePreferenceUtils.getInstance().putPushToken(0, "");
+        if(PushClientMgr.isGoogle(this)){
+            GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
+        }
         initRxBus();
         //启动后台服务
         MaxIMPushService.startPushService(this);
@@ -51,6 +64,7 @@ public class MainActivity extends BaseSwitchActivity {
         if (!TextUtils.isEmpty(urlString)){
             SchemeUtils.handleScheme(this, urlString);
         }
+        initPermission();
     }
 
     @Override
@@ -60,6 +74,31 @@ public class MainActivity extends BaseSwitchActivity {
         String urlString = SharePreferenceUtils.getInstance().getDeepLink();
         if (!TextUtils.isEmpty(urlString)){
             SchemeUtils.handleScheme(this, urlString);
+        }
+    }
+
+    private void initPermission(){
+        NotificationManager manager = (NotificationManager) AppContextUtils.getAppContext()
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        if (!manager.areNotificationsEnabled()){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
+                String[] permissions = new String[] {
+                        PermissionsConstant.POST_NOTIFICATIONS
+                };
+                if (!PermissionsMgr.getInstance().hasAllPermissions(this, permissions)) {
+                    PermissionsMgr.getInstance().requestPermissionsIfNecessaryForResult(this,
+                            permissions, new PermissionsResultAction() {
+
+                                @Override
+                                public void onGranted(List<String> perms) {
+                                }
+
+                                @Override
+                                public void onDenied(List<String> perms) {
+                                }
+                            });
+                }
+            }
         }
     }
 

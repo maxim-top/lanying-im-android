@@ -24,6 +24,8 @@ public class SharePreferenceUtils {
 
     private static String AGREE_CHECKED = "agree_checked";//是否选中"我已阅读并同意《用户服务》及《隐私政策》"
 
+    private static String HAS_PUSH = "has_push_server";//当前设备有推送平台
+
     private static String USER_NAME = "user_name";
 
     private static String USER_PWD = "user_pwd";
@@ -96,6 +98,18 @@ public class SharePreferenceUtils {
     public boolean getAgreeChecked() {
         if (saveInfo != null) {
             return saveInfo.getBoolean(AGREE_CHECKED, false);
+        }
+        return false;
+    }
+
+    public boolean putHasPush(boolean hasPush) {
+        saveEditor.putBoolean(HAS_PUSH, hasPush);
+        return saveEditor.commit();
+    }
+
+    public boolean getHasPush() {
+        if (saveInfo != null) {
+            return saveInfo.getBoolean(HAS_PUSH, false);
         }
         return false;
     }

@@ -39,7 +39,6 @@ import java.util.List;
 
 import im.floo.BMXCallBack;
 import im.floo.floolib.BMXClient;
-import im.floo.floolib.ListOfLongLong;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -71,7 +70,6 @@ import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.BrowserActivity;
 import top.maxim.im.common.view.Header;
-import top.maxim.im.common.view.ItemLineSwitch;
 import top.maxim.im.login.bean.DNSConfigEvent;
 import top.maxim.im.net.ConnectivityReceiver;
 import top.maxim.im.net.HttpResponseCallback;
@@ -275,7 +273,7 @@ public class LoginFragment extends BaseTitleFragment {
         });
         // 微信登录
         mWXLogin.setOnClickListener(v -> {
-            if (!WXUtils.getInstance().wxSupported()) {
+            if (!WXUtils.getInstance().wxSupported(activity)) {
                 ToastUtil.showTextViewPrompt(getString(R.string.please_install_wechat));
                 return;
             }
@@ -287,7 +285,7 @@ public class LoginFragment extends BaseTitleFragment {
             initWXRxBus();
             WXUtils.getInstance().wxLogin(CommonConfig.SourceToWX.TYPE_LOGIN, mChangeAppId);
         });
-        if (WXUtils.getInstance().getWXApi() != null && !WXUtils.getInstance().getWXApi().isWXAppInstalled()){
+        if (WXUtils.getInstance().getWXApi() != null && !WXUtils.getInstance().wxSupported(activity)){
             mWXLogin.setVisibility(View.GONE);
         }
         mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -570,8 +568,12 @@ public class LoginFragment extends BaseTitleFragment {
     }
 
     public static void wxChatLogin(final Activity activity, String openId) {
-        if (TextUtils.isEmpty(openId)) {
+        if (TextUtils.equals(openId, "official_account_followed=true")) {
             ToastUtil.showTextViewPrompt(activity.getString(R.string.cannot_be_empty));
+            String appId = SharePreferenceUtils.getInstance().getAppId();
+            long userId = SharePreferenceUtils.getInstance().getUserId();
+            String pwd = SharePreferenceUtils.getInstance().getUserPwd();
+            LoginFragment.login(activity, String.valueOf(userId), pwd, true, appId);
             return;
         }
         if (activity instanceof BaseTitleActivity && !activity.isFinishing()) {
@@ -588,7 +590,7 @@ public class LoginFragment extends BaseTitleFragment {
                     ToastUtil.showTextViewPrompt("登陆失败");
                     return;
                 }
-                String appId = WXUtils.getInstance().getAppId();
+                String appId = SharePreferenceUtils.getInstance().getAppId();
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     if (!jsonObject.has("user_id") || !jsonObject.has("password")) {
@@ -598,17 +600,21 @@ public class LoginFragment extends BaseTitleFragment {
                         activity.finish();
                         return;
                     }
-//                    boolean official_account_followed = false;
-//                    if (jsonObject.has("official_account_followed")) {
-//                        official_account_followed = jsonObject.getBoolean("official_account_followed");
-//                    }
-//                    if (!official_account_followed){
-//                        WXUtils.getInstance().wxMiniProgram("gh_11b8debeb062", "");
-//                        return;
-//                    }
-                    // 直接登录
                     String userId = jsonObject.getString("user_id");
                     String pwd = jsonObject.getString("password");
+                    boolean official_account_followed = false;
+                    if (jsonObject.has("official_account_followed")) {
+                        official_account_followed = jsonObject.getBoolean("official_account_followed");
+                    }
+                    if (!official_account_followed){
+                        SharePreferenceUtils.getInstance().putAppId(appId);
+                        SharePreferenceUtils.getInstance().putUserId(Long.parseLong(userId));
+                        SharePreferenceUtils.getInstance().putUserPwd(pwd);
+                        String path = String.format("pages/profile/official_account/index?app_id=%s&user_id=%s", appId, userId);
+                        WXUtils.getInstance().wxMiniProgram("gh_11b8debeb062", path);
+                        return;
+                    }
+                    // 直接登录
                     LoginFragment.login(activity, userId, pwd, true, appId);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -671,11 +677,13 @@ public class LoginFragment extends BaseTitleFragment {
                                 CommonConfig.WX_LOGIN_ACTION)) {
                             return;
                         }
-                        if (mSubscription != null) {
-                            mSubscription.unsubscribe();
-                        }
                         String openId = intent.getStringExtra(CommonConfig.WX_OPEN_ID);
-                        wxChatLogin(getActivity(), openId);
+                        if(openId.contains("official_account_followed=false")){
+                            getActivity().finish();
+                            LoginRegisterActivity.openLoginRegister(getActivity(), false);
+                        }else{
+                            wxChatLogin(getActivity(), openId);
+                        }
                     }
                 });
         mSubscription.add(wxLogin);

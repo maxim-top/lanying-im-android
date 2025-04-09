@@ -5,7 +5,6 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.Map;
 
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageConfig;
-import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.message.interfaces.ChatActionListener;
 import top.maxim.im.message.itemholder.BaseChatHolder;
 import top.maxim.im.message.itemholder.IItemChatFactory;

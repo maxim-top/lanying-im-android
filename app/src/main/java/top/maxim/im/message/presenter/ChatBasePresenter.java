@@ -53,6 +53,7 @@ import java.util.Map;
 
 import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXChatServiceListener;
+import im.floo.floolib.BMXClient;
 import im.floo.floolib.BMXConversation;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXFileAttachment;
@@ -86,6 +87,7 @@ import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TaskDispatcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.VoicePlayHelper;
@@ -109,6 +111,7 @@ import top.maxim.im.message.view.ChatBaseActivity;
 import top.maxim.im.message.view.ChooseFileActivity;
 import top.maxim.im.message.view.PhotoDetailActivity;
 import top.maxim.im.message.view.VideoDetailActivity;
+import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.sdk.utils.MessageSendUtils;
 
 /**
@@ -392,7 +395,15 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }
         if (mChatId == REPORT_ID){
             if (mView != null) {
-                mView.setControlBarText("被举报人昵称(选填)：\n\n被举报人用户ID（必填）：\n\n举报事由（必填）：");
+                String appId = SharePreferenceUtils.getInstance().getAppId();
+                if (!TextUtils.equals(appId, ScanConfigs.CODE_APP_ID)) {// 非默认appId
+                    DialogUtils.getInstance().showDialog((Activity)mView.getContext(),
+                            ((Activity) mView.getContext()).getString(R.string.report_need_welovemaxim_title),
+                            ((Activity) mView.getContext()).getString(R.string.report_need_welovemaxim),
+                            null);
+                }else{
+                    mView.setControlBarText("被举报人昵称(选填)：\n\n被举报人用户ID（必填）：\n\n举报事由（必填）：");
+                }
             }
         }
         if (hasInitData){
@@ -525,7 +536,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     }
                 }
             };
-            if (chatType != null && chatType == BMXMessage.MessageType.Single) {
+            if (chatType != null && (chatType == BMXMessage.MessageType.Single ||
+                    chatType == BMXMessage.MessageType.System)) {
                 ChatManager.getInstance().openConversation(chatId, BMXConversation.Type.Single,
                         true, callBack);
             } else if (chatType != null && chatType == BMXMessage.MessageType.Group) {
@@ -689,12 +701,10 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 break;
             case SNAP:
                 // 拍照 需要SD卡读写 拍照权限
-                if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.READ_STORAGE,
-                        PermissionsConstant.WRITE_STORAGE)) {
+                if (hasPermission(PermissionsConstant.CAMERA)) {
                     takePic();
                 } else {
-                    requestPermissions(TYPE_CAMERA_PERMISSION, PermissionsConstant.CAMERA,
-                            PermissionsConstant.WRITE_STORAGE, PermissionsConstant.READ_STORAGE);
+                    requestPermissions(TYPE_CAMERA_PERMISSION, PermissionsConstant.CAMERA);
                 }
                 break;
             case VIDEO:
@@ -783,12 +793,11 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     ToastUtil.showTextViewPrompt("SD 不存在！");
                 } else {
                     // 语音需要SD卡读写 麦克风权限
-                    if (hasPermission(PermissionsConstant.RECORD_AUDIO,
-                            PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE)) {
+                    if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
                         recordMedia(voiceAction, voiceTime);
                     } else {
                         // 如果没有权限 首先请求SD读权限
-                        requestPermissions(TYPE_VOICE_PERMISSION, PermissionsConstant.READ_STORAGE);
+                        requestPermissions(TYPE_VOICE_PERMISSION, PermissionsConstant.RECORD_AUDIO);
                     }
                 }
             } else {

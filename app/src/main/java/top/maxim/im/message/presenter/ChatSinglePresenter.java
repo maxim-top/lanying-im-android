@@ -87,7 +87,7 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
 
     @Override
     protected boolean isCurrentSession(BMXMessage message) {
-        if (message == null || message.type() != BMXMessage.MessageType.Single) {
+        if (message == null || message.type() == BMXMessage.MessageType.Group) {
             return false;
         }
         if (message.isReceiveMsg()) {

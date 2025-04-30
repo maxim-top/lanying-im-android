@@ -26,8 +26,8 @@ android {
         compileSdk 34
         targetSdk 34
         //noinspection HighAppVersionCode
-        versionCode 2000000073
-        versionName "4.8.21"
+        versionCode 2000000083
+        versionName "4.9.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "GOOGLE_PUSH_ID"   : "fcm",

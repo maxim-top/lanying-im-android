@@ -245,7 +245,8 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
             if (conversation == null) {
                 continue;
             }
-            if (conversation.type() == BMXConversation.Type.Single) {
+            if (conversation.type() == BMXConversation.Type.Single||
+                    conversation.type() == BMXConversation.Type.System) {
                 if (RosterFetcher.getFetcher().getRoster(conversation.conversationId()) == null) {
                     rosterIds.add(conversation.conversationId());
                 }
@@ -327,7 +328,7 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                     return;
                 }
                 BMXMessage.MessageType type = null;
-                if (item.type() == BMXConversation.Type.Single) {
+                if (item.type() == BMXConversation.Type.Single || item.type() == BMXConversation.Type.System) {
                     type = BMXMessage.MessageType.Single;
                 } else if (item.type() == BMXConversation.Type.Group) {
                     type = BMXMessage.MessageType.Group;

@@ -35,6 +35,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
+import top.maxim.im.common.GuardianModeActivity;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.ScreenUtils;
@@ -131,6 +132,9 @@ public class MineFragment extends BaseTitleFragment {
 
     /* 关于我们 */
     private ItemLineArrow.Builder mAboutUs;
+
+    /* 青少年模式 */
+    private ItemLineArrow.Builder mGuardianMode;
 
     /* 用户服务 */
     private ItemLineArrow.Builder mProtocolTerms;
@@ -389,10 +393,24 @@ public class MineFragment extends BaseTitleFragment {
         container.addView(viewBindWeChat);
         viewBindWeChat.setVisibility(View.GONE);
 
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
+        // 青少年模式
+        mGuardianMode = new ItemLineArrow.Builder(getActivity())
+                .setStartContent(getString(R.string.guardian_mode))
+                .setOnItemClickListener(v -> GuardianModeActivity.open(getActivity()));
+        container.addView(mGuardianMode.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+
         // 关于我们
         mAboutUs = new ItemLineArrow.Builder(getActivity())
                 .setStartContent(getString(R.string.about_us))
-                .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity()));
+                .setOnItemClickListener(v -> AboutUsActivity.startAboutUsActivity(getActivity(), false));
         container.addView(mAboutUs.build());
 
         // 分割线

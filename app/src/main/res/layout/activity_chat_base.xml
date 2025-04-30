@@ -3,6 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
+    <TextView
+        android:id="@+id/tv_notice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@string/fraud_notice"
+        android:textColor="@color/c4"
+        android:textSize="@dimen/dimen_12"
+        android:layout_margin="@dimen/dimen_4"
+        android:visibility="gone"
+        android:background="@color/color_EA6A57"/>
 
     <top.maxim.im.message.customviews.MessageInputBar
         android:id="@+id/chat_control_bar"
@@ -14,6 +25,7 @@
         android:id="@+id/chat_view_group"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/tv_notice"
         android:layout_above="@id/chat_control_bar">
 
         <top.maxim.im.message.customviews.ChatRecyclerView

@@ -79,7 +79,8 @@ public class SessionAdapter extends RecyclerWithHFAdapter<BMXConversation> {
         boolean isDisturb = false;
         BMXConversation.Type type = item == null ? null : item.type();
         String name = "";
-        if (type != null && type == BMXConversation.Type.Single) {
+        if (type != null && (type == BMXConversation.Type.Single ||
+                type == BMXConversation.Type.System)) {
             BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(item.conversationId());
             if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
                 name = rosterItem.alias();

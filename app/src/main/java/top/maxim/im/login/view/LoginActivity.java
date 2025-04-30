@@ -197,10 +197,6 @@ public class LoginActivity extends BaseTitleActivity {
         return view;
     }
 
-    private boolean checkPermission() {
-        return hasPermission(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
-    }
-
     @Override
     public void onPermissionGranted(List<String> permissions) {
         super.onPermissionGranted(permissions);

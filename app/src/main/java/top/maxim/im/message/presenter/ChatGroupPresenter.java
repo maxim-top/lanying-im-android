@@ -166,7 +166,8 @@ public class ChatGroupPresenter extends ChatBasePresenter implements ChatGroupCo
 
     @Override
     protected boolean isCurrentSession(BMXMessage message) {
-        return message != null && message.type() == BMXMessage.MessageType.Group
+        return message != null && (message.type() == BMXMessage.MessageType.Group ||
+                message.type() == BMXMessage.MessageType.System)
                 && message.toId() == mChatId;
     }
 

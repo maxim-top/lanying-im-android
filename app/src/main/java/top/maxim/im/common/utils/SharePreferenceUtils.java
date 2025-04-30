@@ -18,6 +18,10 @@ public class SharePreferenceUtils {
 
     private static final String SH_DATA_NAME = "maxIM_user_data";
 
+    private static final String NOTICE_ID_DATA_NAME = "notice_id_list";
+
+    private static final String ABOUT_POPPED_APP_ID_DATA_NAME = "about_popped_app_id_list";
+
     private static String IS_LOGIN = "isLogin";
 
     private static String USER_ID = "user_id";
@@ -33,6 +37,8 @@ public class SharePreferenceUtils {
     private static String DEEP_LINK = "deep_link";
 
     private static String TOKEN = "token";
+
+    private static String GUARDIAN_MODE_PASSWORD = "guardianModePassword";
 
     private static String DEVICE_ID = "device_id";
 
@@ -64,6 +70,14 @@ public class SharePreferenceUtils {
 
     private static SharedPreferences saveInfo;
 
+    private static SharedPreferences.Editor noticeIdEditor;
+
+    private static SharedPreferences noticeId;
+
+    private static SharedPreferences.Editor aboutPoppedAppIdEditor;
+
+    private static SharedPreferences aboutPoppedAppId;
+
     public static SharePreferenceUtils getInstance() {
         if (instance == null) {
             synchronized (SharePreferenceUtils.class) {
@@ -72,10 +86,44 @@ public class SharePreferenceUtils {
                     saveInfo = AppContextUtils.getAppContext().getSharedPreferences(SH_DATA_NAME,
                             Context.MODE_PRIVATE);
                     saveEditor = saveInfo.edit();
+                    noticeId = AppContextUtils.getAppContext().getSharedPreferences(NOTICE_ID_DATA_NAME,
+                            Context.MODE_PRIVATE);
+                    noticeIdEditor = noticeId.edit();
+                    aboutPoppedAppId = AppContextUtils.getAppContext().getSharedPreferences(ABOUT_POPPED_APP_ID_DATA_NAME,
+                            Context.MODE_PRIVATE);
+                    aboutPoppedAppIdEditor = aboutPoppedAppId.edit();
                 }
             }
         }
         return instance;
+    }
+
+    // 当前用户或群ID已被提醒过
+    public boolean putNoticeId(long id) {
+        noticeIdEditor.putBoolean(String.valueOf(id), true);
+        return noticeIdEditor.commit();
+    }
+
+    // 当前用户或群ID是否已被提醒过
+    public boolean getNoticeId(long id) {
+        if (noticeId != null) {
+            return noticeId.getBoolean(String.valueOf(id), false);
+        }
+        return false;
+    }
+
+    // 当前App ID已弹出过关于我们
+    public boolean putAboutPoppedAppId(String id) {
+        aboutPoppedAppIdEditor.putBoolean(id, true);
+        return aboutPoppedAppIdEditor.commit();
+    }
+
+    // 当前App ID是否已弹出过关于我们
+    public boolean getAboutPoppedAppId(String id) {
+        if (aboutPoppedAppId != null) {
+            return aboutPoppedAppId.getBoolean(id, false);
+        }
+        return false;
     }
 
     public boolean putLoginStatus(boolean status) {
@@ -170,6 +218,18 @@ public class SharePreferenceUtils {
     public String getToken() {
         if (saveInfo != null) {
             return saveInfo.getString(TOKEN, null);
+        }
+        return null;
+    }
+
+    public boolean putGuardianModePassword(String val) {
+        saveEditor.putString(GUARDIAN_MODE_PASSWORD, val);
+        return saveEditor.commit();
+    }
+
+    public String getGuardianModePassword() {
+        if (saveInfo != null) {
+            return saveInfo.getString(GUARDIAN_MODE_PASSWORD, null);
         }
         return null;
     }

@@ -1,6 +1,8 @@
 
 package top.maxim.im.message.itemholder;
 
+import static top.maxim.im.sdk.bean.MsgBodyHelper.VIEW_TYPE.*;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
@@ -28,6 +30,7 @@ import top.maxim.im.contact.view.RosterDetailActivity;
 import top.maxim.im.login.view.SettingUserActivity;
 import top.maxim.im.message.interfaces.ChatActionListener;
 import top.maxim.im.message.utils.ChatUtils;
+import top.maxim.im.sdk.bean.MsgBodyHelper;
 
 /**
  * Description : 聊天基础item Created by Mango on 2018/11/18.
@@ -36,21 +39,6 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
 
     /* 头像 */
     protected ImageRequestConfig ICON_CONFIG;
-
-    /**
-     * 中间位置
-     */
-    public static final int ITEM_CENTER = -1;
-
-    /**
-     * 右边
-     */
-    public static final int ITEM_RIGHT = 0;
-
-    /**
-     * 左边
-     */
-    public static final int ITEM_LEFT = 1;
 
     /*  消息体 */
     protected BMXMessage mMaxMessage;
@@ -94,10 +82,10 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
 
     @Override
     public View obtainView(ViewGroup parent) {
-        if (mItemPos == ITEM_LEFT) {
+        if (MsgBodyHelper.isLeftStyle(mItemPos)) {
             mItemView = LayoutInflater.from(mContext).inflate(R.layout.item_chat_base_left, parent,
                     false);
-        } else if (mItemPos == ITEM_RIGHT) {
+        } else if (MsgBodyHelper.isRightStyle(mItemPos)) {
             mItemView = LayoutInflater.from(mContext).inflate(R.layout.item_chat_base_right, parent,
                     false);
             mTvReadStatus = mItemView.findViewById(R.id.tv_read_status);
@@ -127,7 +115,7 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
      */
     private void bindCommonView() {
         mTxtMessageTime = mItemView.findViewById(R.id.message_time);
-        if (mItemPos != ITEM_CENTER) {
+        if (!MsgBodyHelper.isSystemViewType(mItemPos)) {
             mIconView = mItemView.findViewById(R.id.message_avatar);
             mUsetText = mItemView.findViewById(R.id.message_name);
             mSendFailImg = mItemView.findViewById(R.id.img_sendfail);
@@ -160,7 +148,7 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
      * 展示头像
      */
     private void showHead() {
-        if (mItemPos == ITEM_CENTER || mMaxMessage == null) {
+        if (MsgBodyHelper.isSystemViewType(mItemPos) || mMaxMessage == null) {
             return;
         }
         String userName = null;
@@ -255,7 +243,7 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
      * 展示已读状态
      */
     private void showReadStatus() {
-        if (mItemPos != ITEM_RIGHT || mTvReadStatus == null) {
+        if (!MsgBodyHelper.isRightStyle(mItemPos) || mTvReadStatus == null) {
             return;
         }
         if (mMaxMessage == null) {
@@ -287,7 +275,7 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
      * 展示发送消息的发送状态
      */
     private void showSendStatus() {
-        if (mItemPos != ITEM_RIGHT || mSendFailImg == null || mSendingImg == null) {
+        if (!MsgBodyHelper.isRightStyle(mItemPos) || mSendFailImg == null || mSendingImg == null) {
             return;
         }
         BMXMessage.DeliveryStatus sendStatus = mMaxMessage == null ? null

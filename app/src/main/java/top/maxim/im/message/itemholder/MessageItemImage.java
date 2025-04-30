@@ -1,6 +1,8 @@
 
 package top.maxim.im.message.itemholder;
 
+import static top.maxim.im.sdk.bean.MsgBodyHelper.VIEW_TYPE.*;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import androidx.annotation.NonNull;
@@ -26,6 +28,7 @@ import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.message.interfaces.ChatActionListener;
 import top.maxim.im.message.interfaces.MsgAttachmentCallback;
 import top.maxim.im.message.utils.ChatAttachmentManager;
+import top.maxim.im.sdk.bean.MsgBodyHelper;
 
 /**
  * Description : 消息图片类型 Created by Mango on 2018/11/18.
@@ -76,18 +79,11 @@ public class MessageItemImage extends MessageItemBaseView {
 
     @Override
     protected View initView(ViewGroup parent) {
-        View view;
-        if (mItemPos == ITEM_LEFT) {
-            view = View.inflate(mContext, R.layout.item_chat_image_left, parent);
-            mImageView = view.findViewById(R.id.image_message);
-            mFlShadow = view.findViewById(R.id.fl_image_message_shadow);
-            mProgress = view.findViewById(R.id.image_progress);
-        } else {
-            view = View.inflate(mContext, R.layout.item_chat_image_right, parent);
-            mImageView = view.findViewById(R.id.image_message);
-            mFlShadow = view.findViewById(R.id.fl_image_message_shadow);
-            mProgress = view.findViewById(R.id.image_progress);
-        }
+        View view = View.inflate(mContext, MsgBodyHelper.isLeftStyle(mItemPos) ?
+                R.layout.item_chat_image_left : R.layout.item_chat_image_right, parent);
+        mImageView = view.findViewById(R.id.image_message);
+        mFlShadow = view.findViewById(R.id.fl_image_message_shadow);
+        mProgress = view.findViewById(R.id.image_progress);
         return view;
     }
 
@@ -237,11 +233,11 @@ public class MessageItemImage extends MessageItemBaseView {
             notExit = false;
         }
         long msgId = mMaxMessage.msgId();
-        if (mItemPos == ITEM_RIGHT) {
+        if (MsgBodyHelper.isRightStyle(mItemPos)) {
             BMXMessage.DeliveryStatus sendStatus = mMaxMessage.deliveryStatus();
             register = sendStatus != null && sendStatus != BMXMessage.DeliveryStatus.Deliveried
                     && sendStatus != BMXMessage.DeliveryStatus.Failed || notExit;
-        } else if (mItemPos == ITEM_LEFT) {
+        } else if (MsgBodyHelper.isLeftStyle(mItemPos)) {
             register = notExit;
         }
         if (register) {

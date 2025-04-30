@@ -19,6 +19,7 @@ import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.message.interfaces.ChatActionListener;
 import top.maxim.im.message.interfaces.VoicePlayCallback;
 import top.maxim.im.message.utils.VoicePlayManager;
+import top.maxim.im.sdk.bean.MsgBodyHelper;
 
 /**
  * Description : 消息语音类型 Created by Mango on 2018/11/18.
@@ -60,12 +61,8 @@ public class MessageItemAudio extends MessageItemBaseView {
 
     @Override
     protected View initView(ViewGroup parent) {
-        View view;
-        if (mItemPos == ITEM_LEFT) {
-            view = View.inflate(mContext, R.layout.item_chat_voice_left, parent);
-        } else {
-            view = View.inflate(mContext, R.layout.item_chat_voice_right, parent);
-        }
+        View view = View.inflate(mContext, MsgBodyHelper.isLeftStyle(mItemPos) ?
+                    R.layout.item_chat_voice_left : R.layout.item_chat_voice_right, parent);
         mFlChatVoice = view.findViewById(R.id.fl_voice_message);
         mVoiceTime = view.findViewById(R.id.tv_voice_time);
         mIvVoicePlay = view.findViewById(R.id.iv_voice_play);
@@ -139,7 +136,7 @@ public class MessageItemAudio extends MessageItemBaseView {
             if (voice instanceof AnimationDrawable) {
                 ((AnimationDrawable)voice).stop();
             }
-            mIvVoicePlay.setImageDrawable(mItemPos == ITEM_LEFT
+            mIvVoicePlay.setImageDrawable(MsgBodyHelper.isLeftStyle(mItemPos)
                     ? mContext.getResources().getDrawable(R.drawable.voice_play_left3)
                     : mContext.getResources().getDrawable(R.drawable.voice_play_right3));
         }
@@ -153,7 +150,7 @@ public class MessageItemAudio extends MessageItemBaseView {
     private Drawable createRightAnimation() {
         AnimationDrawable animationDrawable = new AnimationDrawable();
         int[] defValue;
-        if (mItemPos == ITEM_LEFT) {
+        if (MsgBodyHelper.isLeftStyle(mItemPos)) {
             defValue = new int[] {
                     R.drawable.voice_play_left1, R.drawable.voice_play_left2,
                     R.drawable.voice_play_left3

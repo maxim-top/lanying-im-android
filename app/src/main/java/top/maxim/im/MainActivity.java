@@ -53,7 +53,6 @@ public class MainActivity extends BaseSwitchActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharePreferenceUtils.getInstance().putPushToken(0, "");
         if(PushClientMgr.isGoogle(this)){
             GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(this);
         }

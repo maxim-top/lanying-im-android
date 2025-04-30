@@ -1,11 +1,17 @@
 
 package top.maxim.im.message.adapter;
 
+import static top.maxim.im.sdk.bean.MsgBodyHelper.VIEW_TYPE.*;
+
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.view.ViewGroup;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -118,42 +124,26 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
      */
     private BaseChatHolder getChatItemHolder(ViewGroup parent, int viewType) {
         IItemChatFactory factory = null;
-        boolean isMySend = MsgBodyHelper.getContentBodyClass(viewType) != null;
-        int type = isMySend ? viewType : ~viewType;
-        if (type == BMXMessage.ContentType.Text.swigValue()) {
-            // 文本
-            factory = new MessageItemText(mContext, mActionListener,
-                    isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
-        } else if (type == BMXMessage.ContentType.Image.swigValue()) {
-            // 图片
-            factory = new MessageItemImage(mContext, mActionListener,
-                    isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
-        } else if (type == BMXMessage.ContentType.Video.swigValue()) {
-            // 视频
-            factory = new MessageItemVideo(mContext, mActionListener,
-                    isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
-        } else if (type == BMXMessage.ContentType.Location.swigValue()) {
-            // 位置
-            factory = new MessageItemLocation(mContext, mActionListener,
-                    isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
-        } else if (type == BMXMessage.ContentType.File.swigValue()) {
-            // 文件
-            factory = new MessageItemFile(mContext, mActionListener,
-                    isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
-
-        } else if (type == BMXMessage.ContentType.Voice.swigValue()) {
-            // 语音
-            factory = new MessageItemAudio(mContext, mActionListener,
-                    isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
-        } else if (type == BMXMessage.ContentType.RTC.swigValue()) {
-            // RTC
-            factory = new MessageItemText(mContext, mActionListener,
-                    isMySend ? MessageItemBaseView.ITEM_RIGHT : MessageItemBaseView.ITEM_LEFT);
-        }
-        if (factory == null) {
-            // 无法识别的类型转为文本
-            factory = new MessageItemText(mContext, mActionListener,
-                    MessageItemBaseView.ITEM_RIGHT);
+        MsgBodyHelper.BASE_VIEW_TYPE baseViewType = MsgBodyHelper.getBaseViewType(viewType);
+        switch (baseViewType){
+            case BASE_VIEW_TYPE_IMAGE:
+                factory = new MessageItemImage(mContext, mActionListener, viewType);
+                break;
+            case BASE_VIEW_TYPE_VOICE:
+                factory = new MessageItemAudio(mContext, mActionListener, viewType);
+                break;
+            case BASE_VIEW_TYPE_VIDEO:
+                factory = new MessageItemVideo(mContext, mActionListener, viewType);
+                break;
+            case BASE_VIEW_TYPE_FILE:
+                factory = new MessageItemFile(mContext, mActionListener, viewType);
+                break;
+            case BASE_VIEW_TYPE_LOCATION:
+                factory = new MessageItemLocation(mContext, mActionListener, viewType);
+                break;
+            default:
+                factory = new MessageItemText(mContext, mActionListener, viewType);
+                break;
         }
         return new BaseChatHolder(factory.obtainView(parent), factory);
     }
@@ -169,10 +159,26 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<BaseChatHolder> {
             return -1;
         }
         boolean isMySend = !bean.isReceiveMsg();
-        int viewType = MsgBodyHelper.getContentBodyClass(bean.contentType().swigValue()) != null
-                ? bean.contentType().swigValue()
-                : -1;
-        return isMySend ? viewType : ~viewType;
+        boolean isSystem = bean.type() == BMXMessage.MessageType.System;
+        int viewType;
+        if (isSystem){
+            JSONObject jsonObject;
+            try {
+                jsonObject = new JSONObject(bean.extension());
+                String style = jsonObject.getString("style");
+                if (!TextUtils.isEmpty(style)){
+                    viewType = MsgBodyHelper.getViewTypeByStyle(style);
+                    return viewType;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            viewType = MsgBodyHelper.VIEW_TYPE.VIEW_TYPE_INFO.ordinal();
+            return viewType;
+        }
+
+        viewType = MsgBodyHelper.getViewTypeByContentType(bean.contentType(), isMySend);
+        return viewType;
     }
 
     /**

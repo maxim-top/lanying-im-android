@@ -99,7 +99,7 @@ public class WelcomeActivity extends BaseTitleActivity {
 
     private void initPermission(){
         NotificationUtils.getInstance().cancelAll();
-        showProtocol();
+        initJump();
     }
 
     @Override
@@ -278,79 +278,6 @@ public class WelcomeActivity extends BaseTitleActivity {
                     @Override
                     public void onNext(String s) {
 
-                    }
-                });
-    }
-
-    /**
-     * 展示用户协议
-     */
-    private void showProtocol() {
-        boolean show = SharePreferenceUtils.getInstance().getProtocolDialogStatus();
-        if (show) {
-            showVideo();
-            return;
-        }
-        // 标题
-        StringBuilder title = new StringBuilder(getString(R.string.register_protocol2))
-                .append(getString(R.string.register_protocol3))
-                .append(getString(R.string.register_protocol4));
-
-        // 内容
-        SpannableStringBuilder builder = new SpannableStringBuilder();
-        builder.append(getResources().getString(R.string.register_protocol_content1));
-
-        // 用户服务
-        SpannableString spannableString = new SpannableString(
-                "《" + getResources().getString(R.string.register_protocol2) + "》");
-        spannableString.setSpan(new ClickableSpan() {
-
-            @Override
-            public void updateDrawState(@NonNull TextPaint ds) {
-                ds.setColor(getResources().getColor(R.color.color_0079F4));
-                ds.setUnderlineText(false);
-            }
-
-            @Override
-            public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtocol(WelcomeActivity.this, 1);
-            }
-        }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        builder.append(spannableString);
-        // 隐私政策
-        builder.append(getResources().getString(R.string.register_protocol3));
-        SpannableString spannableString1 = new SpannableString(
-                "《" + getResources().getString(R.string.register_protocol4) + "》");
-        spannableString1.setSpan(new ClickableSpan() {
-
-            @Override
-            public void updateDrawState(@NonNull TextPaint ds) {
-                ds.setColor(getResources().getColor(R.color.color_0079F4));
-                ds.setUnderlineText(false);
-            }
-
-            @Override
-            public void onClick(@NonNull View widget) {
-                ProtocolActivity.openProtocol(WelcomeActivity.this, 0);
-            }
-        }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        builder.append(spannableString1);
-        builder.append(getString(R.string.register_protocol_content2));
-
-        TextView tv = new TextView(this);
-        tv.setMovementMethod(LinkMovementMethod.getInstance());
-        tv.setText(builder);
-        DialogUtils.getInstance().showCustomDialog(this, tv, false, title.toString(), getString(R.string.agree), getString(R.string.not_available_for_now),
-                new CommonCustomDialog.OnDialogListener() {
-                    @Override
-                    public void onConfirmListener() {
-                        SharePreferenceUtils.getInstance().putProtocolDialogStatus(true);
-                        showVideo();
-                    }
-
-                    @Override
-                    public void onCancelListener() {
-                        finish();
                     }
                 });
     }

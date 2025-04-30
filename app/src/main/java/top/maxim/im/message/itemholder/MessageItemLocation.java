@@ -1,6 +1,7 @@
 
 package top.maxim.im.message.itemholder;
 
+
 import android.content.Context;
 import androidx.annotation.NonNull;
 import android.view.View;
@@ -12,6 +13,7 @@ import im.floo.floolib.BMXLocationAttachment;
 import im.floo.floolib.BMXMessage;
 import top.maxim.im.R;
 import top.maxim.im.message.interfaces.ChatActionListener;
+import top.maxim.im.sdk.bean.MsgBodyHelper;
 
 /**
  * Description : 消息位置类型 Created by Mango on 2018/11/18.
@@ -29,7 +31,7 @@ public class MessageItemLocation extends MessageItemBaseView {
     @Override
     protected View initView(ViewGroup parent) {
         View view;
-        if (mItemPos == ITEM_LEFT) {
+        if (MsgBodyHelper.isLeftStyle(mItemPos)) {
             view = View.inflate(mContext, R.layout.item_chat_location_left, parent);
             mLocationLayout = view.findViewById(R.id.layout_location_left);
             mLocationAddr = ((TextView)view.findViewById(R.id.txt_local_title_left));

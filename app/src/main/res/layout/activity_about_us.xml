@@ -3,124 +3,142 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingLeft="@dimen/dimen_20"
-    android:paddingTop="@dimen/dimen_50"
-    android:paddingRight="@dimen/dimen_20"
+    android:paddingLeft="@dimen/dimen_40"
+    android:paddingTop="@dimen/dimen_150"
+    android:paddingRight="@dimen/dimen_40"
     android:paddingBottom="@dimen/dimen_20"
     android:background="@color/color_white">
 
-    <ImageView
-        android:id="@+id/iv_about_us"
-        android:layout_width="180dp"
-        android:layout_height="60dp"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/icon_about_us" />
-
-    <TextView
-        android:id="@+id/tv_app_version"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/iv_about_us"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dimen_10"
-        android:textColor="@color/color_black"
-        android:textSize="@dimen/dimen_12" />
-
-    <TextView
-        android:id="@+id/tv_floo_version"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_app_version"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/color_black"
-        android:textSize="@dimen/dimen_12" />
-
-    <TextView
-        android:id="@+id/tv_about_us_desc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/tv_floo_version"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dimen_30"
-        android:gravity="center"
-        android:text="@string/about_us_desc"
-        android:textColor="@color/color_black"
-        android:textSize="@dimen/dimen_16" />
-
     <LinearLayout
-        android:id="@+id/ll_about_us_net"
+        android:id="@+id/ll_company"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_about_us_desc"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dimen_30"
-        android:orientation="horizontal">
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tv_about_us_this_app"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="@string/about_us_this_app"
+            android:textColor="@color/color_666666"
+            android:textSize="@dimen/dimen_12" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_about_us_company_name"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dimen_20"
             android:gravity="center"
-            android:text="@string/about_us_net_pre"
-            android:textColor="@color/color_black"
-            android:textSize="@dimen/dimen_14" />
+            android:text="@string/about_us_unverified_developer"
+            android:textColor="@color/c9"
+            android:textSize="@dimen/dimen_24" />
 
         <TextView
-            android:id="@+id/tv_about_us_net"
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_about_us_verification_status"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dimen_20"
             android:gravity="center"
-            android:textColor="@color/color_black"
-            android:textSize="@dimen/dimen_14" />
+            android:text="@string/about_us_unverified"
+            android:textColor="@color/color_666666"
+            android:textSize="@dimen/dimen_12" />
+
+        <TextView
+            android:id="@+id/tv_go"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_50"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dimen_50"
+            android:background="@drawable/common_btn_corner_seleced_bg"
+            android:gravity="center"
+            android:text="@string/confirm"
+            android:textColor="@drawable/common_btn_corner_seleced_text_color"
+            android:textSize="@dimen/dimen_16" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ll_about_us_contact"
+        android:id="@+id/ll_maxim"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ll_about_us_net"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dimen_15"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/about_us_phone_pre"
-            android:textColor="@color/color_black"
-            android:textSize="@dimen/dimen_14" />
-
-        <TextView
-            android:id="@+id/tv_about_us_contact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/color_black"
-            android:textSize="@dimen/dimen_14" />
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/ll_about_us_contact"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:text="@string/icp_no"
-        android:textColor="@color/color_black"
-        android:layout_marginTop="@dimen/dimen_15"
-        android:textSize="@dimen/dimen_14" />
-
-    <TextView
-        android:id="@+id/copyright"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/dimen_20"
-        android:gravity="center"
-        android:text="@string/about_us_company"
-        android:textColor="@color/color_666666"
-        android:textSize="@dimen/dimen_14" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_about_us_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="@string/about_us_desc"
+            android:textColor="@color/color_666666"
+            android:textSize="@dimen/dimen_12" />
+
+        <LinearLayout
+            android:id="@+id/ll_about_us_net"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_about_us_desc"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dimen_2"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/about_us_net_pre"
+                android:textColor="@color/color_666666"
+                android:textSize="@dimen/dimen_12" />
+
+            <TextView
+                android:id="@+id/tv_about_us_net"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/color_666666"
+                android:textSize="@dimen/dimen_12" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_app_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dimen_5"
+            android:layout_below="@+id/ll_about_us_net"
+            android:gravity="center"
+            android:textColor="@color/color_666666"
+            android:textSize="@dimen/dimen_12" />
+
+        <TextView
+            android:id="@+id/copyright"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/dimen_5"
+            android:gravity="center"
+            android:text="@string/about_us_company"
+            android:textColor="@color/color_666666"
+            android:layout_below="@+id/tv_floo_version"
+            android:textSize="@dimen/dimen_12" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/copyright"
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:text="@string/icp_no"
+            android:textColor="@color/color_666666"
+            android:textSize="@dimen/dimen_12" />
+    </LinearLayout>
 </RelativeLayout>

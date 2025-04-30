@@ -36,9 +36,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import im.floo.BMXCallBack;
 import im.floo.floolib.BMXClient;
+import im.floo.floolib.BMXErrorCode;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -118,6 +121,8 @@ public class LoginFragment extends BaseTitleFragment {
 
     private TextView mTvAppId;
 
+    private TextView mTvCompany;
+
     private String mChangeAppId;
 
     private CompositeSubscription mSubscription;
@@ -193,10 +198,14 @@ public class LoginFragment extends BaseTitleFragment {
         mIvScan = view.findViewById(R.id.iv_scan);
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
         mTvAppId = view.findViewById(R.id.tv_login_appid);
+        mTvCompany = view.findViewById(R.id.tv_company);
         mSwitchLoginMode = view.findViewById(R.id.tv_switch_login_mode);
         mSwitchLoginMode.setVisibility(View.GONE);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
         mCheckBox = view.findViewById(R.id.cb_choice);
+        String companyName = CommonUtils.getCompanyName(getContext());
+        String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
+        mTvCompany.setText(companyName + " " + verificationStatus);
 
         buildProtocol();
         // 三次点击打开日志
@@ -206,11 +215,79 @@ public class LoginFragment extends BaseTitleFragment {
         });
         
         initRxBus();
+        showProtocol();
         return view;
     }
 
-    private boolean checkPermission() {
-        return hasPermission(PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE);
+    /**
+     * 展示用户协议
+     */
+    private void showProtocol() {
+        boolean show = SharePreferenceUtils.getInstance().getProtocolDialogStatus();
+        if (show) {
+            return;
+        }
+        // 标题
+        StringBuilder title = new StringBuilder(getString(R.string.register_protocol2))
+                .append(getString(R.string.register_protocol3))
+                .append(getString(R.string.register_protocol4));
+
+        // 内容
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append(getResources().getString(R.string.register_protocol_content1));
+
+        // 用户服务
+        SpannableString spannableString = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol2) + "》");
+        spannableString.setSpan(new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_0079F4));
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(getContext(), 1);
+            }
+        }, 0, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString);
+        // 隐私政策
+        builder.append(getResources().getString(R.string.register_protocol3));
+        SpannableString spannableString1 = new SpannableString(
+                "《" + getResources().getString(R.string.register_protocol4) + "》");
+        spannableString1.setSpan(new ClickableSpan() {
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                ds.setColor(getResources().getColor(R.color.color_0079F4));
+                ds.setUnderlineText(false);
+            }
+
+            @Override
+            public void onClick(@NonNull View widget) {
+                ProtocolActivity.openProtocol(getContext(), 0);
+            }
+        }, 0, spannableString1.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.append(spannableString1);
+        builder.append(getString(R.string.register_protocol_content2));
+
+        TextView tv = new TextView(getContext());
+        tv.setMovementMethod(LinkMovementMethod.getInstance());
+        tv.setText(builder);
+        DialogUtils.getInstance().showCustomDialog(getActivity(), tv, false, title.toString(), getString(R.string.agree), getString(R.string.not_available_for_now),
+                new CommonCustomDialog.OnDialogListener() {
+                    @Override
+                    public void onConfirmListener() {
+                        SharePreferenceUtils.getInstance().putProtocolDialogStatus(true);
+                    }
+
+                    @Override
+                    public void onCancelListener() {
+                        getActivity().finishAffinity();
+                    }
+                });
     }
 
     @Override
@@ -339,6 +416,12 @@ public class LoginFragment extends BaseTitleFragment {
         // 修改appId
         mIvChangeAppId.setOnClickListener(v -> {
             DNSConfigActivity.startDNSConfigActivity(getActivity());
+        });
+        mTvCompany.setOnClickListener(v -> {
+            AboutUsActivity.startAboutUsActivity(getContext(), false);
+        });
+        mTvAppId.setOnClickListener(v -> {
+            AboutUsActivity.startAboutUsActivity(getContext(), false);
         });
     }
 
@@ -715,6 +798,26 @@ public class LoginFragment extends BaseTitleFragment {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText(mChangeAppId);
+
+                        SharePreferenceUtils.getInstance().putAppId(mChangeAppId);
+                        UserManager.getInstance().changeAppId(mChangeAppId, bmxErrorCode -> {
+                            if (bmxErrorCode != BMXErrorCode.NoError){
+                                ToastUtil.showTextViewPrompt(getString(R.string.error_code_ServerAppIdInvalid));
+                            }
+                            new Timer().schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            String companyName = CommonUtils.getCompanyName(getContext());
+                                            String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
+                                            mTvCompany.setText(companyName + " " + verificationStatus);
+                                        }
+                                    });
+                                }
+                            }, 100);
+                        });
                     }
                 });
         mSubscription.add(changeAppId);

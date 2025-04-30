@@ -1,6 +1,7 @@
 
 package top.maxim.im.login.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
@@ -25,6 +26,9 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import im.floo.floolib.BMXErrorCode;
 import rx.Subscriber;
 import rx.Subscription;
@@ -39,6 +43,7 @@ import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseSwitchActivity;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -82,6 +87,8 @@ public class RegisterFragment extends BaseTitleFragment {
     private TextWatcher mInputWatcher;
 
     private TextView mTvAppId;
+
+    private TextView mTvCompany;
 
     private ImageView mIvChangeAppId;
 
@@ -163,10 +170,14 @@ public class RegisterFragment extends BaseTitleFragment {
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
         mTvAppId = view.findViewById(R.id.tv_login_appid);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
+        mTvCompany = view.findViewById(R.id.tv_company);
         mCheckBox = view.findViewById(R.id.cb_choice);
         mWXContainer = view.findViewById(R.id.iv_wx_login);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
+        String companyName = CommonUtils.getCompanyName(getContext());
+        String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
+        mTvCompany.setText(companyName + " " + verificationStatus);
         buildProtocol();
         view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
         view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);
@@ -378,6 +389,12 @@ public class RegisterFragment extends BaseTitleFragment {
                 SharePreferenceUtils.getInstance().putAgreeChecked(isChecked);
             }
         });
+        mTvCompany.setOnClickListener(v -> {
+            AboutUsActivity.startAboutUsActivity(getContext(), false);
+        });
+        mTvAppId.setOnClickListener(v -> {
+            AboutUsActivity.startAboutUsActivity(getContext(), false);
+        });
     }
 
     /**
@@ -542,6 +559,26 @@ public class RegisterFragment extends BaseTitleFragment {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText(mChangeAppId);
+
+                        SharePreferenceUtils.getInstance().putAppId(mChangeAppId);
+                        UserManager.getInstance().changeAppId(mChangeAppId, bmxErrorCode -> {
+                            if (bmxErrorCode != BMXErrorCode.NoError){
+                                ToastUtil.showTextViewPrompt(getString(R.string.error_code_ServerAppIdInvalid));
+                            }
+                            new Timer().schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            String companyName = CommonUtils.getCompanyName(getContext());
+                                            String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
+                                            mTvCompany.setText(companyName + " " + verificationStatus);
+                                        }
+                                    });
+                                }
+                            }, 100);
+                        });
                     }
                 });
         mSubscription.add(changeAppId);

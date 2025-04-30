@@ -171,7 +171,7 @@
     <string name="black_list">Blacklist</string>
     <string name="other_device_tips">Show Notification Toast</string>
     <string name="device_list">Device Management</string>
-    <string name="about_us">About Us</string>
+    <string name="about_us">About</string>
     <string name="setting_user_name">Nickname</string>
     <string name="setting_user_phone">Phone Number</string>
     <string name="setting_user_pwd">Change Password</string>
@@ -249,9 +249,9 @@
     <string name="push_receiver_rec_msg_count">You have received %1$s messages</string>
 
 
-    <string name="about_us_desc">Build next-gen AI Chat apps\nwith Lanying IM\'s pro SDK!</string>
+    <string name="about_us_desc">Powered by Lanying IM Team</string>
     <string name="about_us_net_pre"></string>
-    <string name="about_us_net">https://www.lanyingim.com</string>
+    <string name="about_us_net">www.lanyingim.com</string>
     <string name="about_us_phone_pre"></string>
     <string name="about_us_phone">400-666-0162</string>
     <string name="about_us_company">© 2019-%s Maximtop</string>
@@ -259,6 +259,7 @@
 
     <string name="common_empty">No conversation here, you can search the user ID in the upper right corner of the contacts page to add friends</string>
     <string name="support_empty">To contact technical support, please switch the App ID to “welovemaxim” after logging out</string>
+    <string name="report_need_welovemaxim_title">Notice</string>
     <string name="support_empty_for_test">To contact technical support, please login Lanying official web site</string>
 
     <!--push设置-->
@@ -753,4 +754,15 @@
     <string name="group_mute_all">All members of the group are forbidden to speak</string>
     <string name="group_mute_you">You are forbidden to speak</string>
     <string name="max_targets">No more than %d friend(s) or group(s) can be selected</string>
+    <string name="guardian_mode">Guardian Mode</string>
+    <string name="guardian_mode_content">The guardian mode of Lanying IM is to care for the healthy growth of minors.In this mode, some features will be restricted. If the user of this app is a minor, please switch to this mode by your guardian</string>
+    <string name="open">Turn On</string>
+    <string name="close">Turn Off</string>
+    <string name="fraud_notice">Do NOT to trust links and QR codes from strangers, beware of fraud! Where money transactions are involved, you should verify them through formal ways, protect the safety of your property!</string>
+    <string name="about_us_this_app">This app（APPID:%s）served by</string>
+    <string name="about_us_verified">✅Verified</string>
+    <string name="about_us_unverified">❓Unverified</string>
+    <string name="about_us_expired">❗Unapproved</string>
+    <string name="about_us_unverified_developer">Unverified Developer</string>
+    <string name="about_us_individual_developer">Individual Developer:</string>
 </resources>

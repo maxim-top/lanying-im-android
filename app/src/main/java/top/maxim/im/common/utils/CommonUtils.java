@@ -1,8 +1,10 @@
 
 package top.maxim.im.common.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
 import java.io.File;
@@ -494,12 +496,66 @@ public class CommonUtils {
         return res;
     }
 
+    public static String getAppConfigString(String key) {
+        String res = "";
+        String config = BaseManager.getBMXClient().getSDKConfig().getAppConfig();
+        if (!TextUtils.isEmpty(config)) {
+            try {
+                JSONObject jsonObject = new JSONObject(config);
+                if (jsonObject.has(key)) {
+                    res = jsonObject.getString(key);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return res;
+    }
+
     public static int getErrorMessage(BMXErrorCode bmxErrorCode){
         return mapCode2Msg.get(bmxErrorCode);
     }
 
     public static int getErrorSolution(BMXErrorCode bmxErrorCode){
         return mapCode2Solution.get(bmxErrorCode);
+    }
+
+    public static String getCompanyName(Context context) {
+        String companyName = CommonUtils.getAppConfigString("account_verification_name");
+        String verificationtype = CommonUtils.getAppConfigString("account_verification_type");
+        if (TextUtils.equals(verificationtype, "personal") && !TextUtils.isEmpty(companyName)){
+            companyName = String.format("%s%s", context.getString(R.string.about_us_individual_developer), companyName);
+        }
+        if (TextUtils.isEmpty(companyName)){
+            companyName = context.getString(R.string.about_us_unverified_developer);
+        }
+        return companyName;
+    }
+
+    public static String getVerificationStatusText(Context context) {
+        String verificationStatus = CommonUtils.getAppConfigString("account_verification_status");
+        Map<String, String> map = ImmutableMap.<String, String>builder()
+                .put("unverified", context.getString(R.string.about_us_unverified))
+                .put("verified", context.getString(R.string.about_us_verified))
+                .put("expired", context.getString(R.string.about_us_expired))
+                .put("","")
+                .build();
+
+        String verifyString = map.get(verificationStatus);
+        return verifyString;
+    }
+
+    public static String getVerificationStatusChar(Context context) {
+        String verificationStatus = CommonUtils.getAppConfigString("account_verification_status");
+        Map<String, String> map = ImmutableMap.<String, String>builder()
+                .put("unverified", "❓")
+                .put("verified", "✅")
+                .put("expired", "❗")
+                .put("", "")
+                .build();
+
+        String verifyString = map.get(verificationStatus);
+        return verifyString;
     }
 
 }

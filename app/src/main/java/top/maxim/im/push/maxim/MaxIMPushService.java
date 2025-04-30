@@ -121,6 +121,9 @@ public class MaxIMPushService extends Service {
                         if (TextUtils.isEmpty(token)){
                             PushClientMgr.getManager().register(MaxIMPushService.this);
                             handler.postDelayed(this, delay);
+                        }else if (!TextUtils.equals(token, "bind-ok")){
+                            PushClientMgr.setPushToken(token);
+                            handler.postDelayed(this, delay);
                         }
                     }).start();
                 }

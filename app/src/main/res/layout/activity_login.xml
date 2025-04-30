@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/dimen_48"
     android:paddingRight="@dimen/dimen_48"
     android:paddingTop="@dimen/dimen_50"
-    android:paddingBottom="@dimen/dimen_32">
+    android:paddingBottom="@dimen/dimen_12">
 
     <TextView
         android:id="@+id/tv_login_tag"
@@ -220,6 +220,21 @@
             </LinearLayout>
         </RelativeLayout>
         <RelativeLayout
+            android:id="@+id/ll_company"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/tv_company"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_centerInParent="true"
+                android:textColor="@color/color_999999"
+                android:textSize="@dimen/dimen_12" />
+        </RelativeLayout>
+        <RelativeLayout
             android:id="@+id/ll_app_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -232,7 +247,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_centerInParent="true"
                 android:textColor="@color/color_999999"
-                android:textSize="@dimen/dimen_15" />
+                android:textSize="@dimen/dimen_12" />
         </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>

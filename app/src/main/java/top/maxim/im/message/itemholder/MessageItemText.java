@@ -2,6 +2,7 @@
 package top.maxim.im.message.itemholder;
 
 import static top.maxim.im.common.utils.AppContextUtils.getApplication;
+import static top.maxim.im.sdk.bean.MsgBodyHelper.VIEW_TYPE.*;
 
 import android.app.Activity;
 import android.content.Context;
@@ -43,6 +44,7 @@ import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.base.MaxIMApplication;
 import top.maxim.im.message.interfaces.ChatActionListener;
 import top.maxim.im.message.utils.MessageEvent;
+import top.maxim.im.sdk.bean.MsgBodyHelper;
 
 /**
  * Description : 消息文本类型 Created by Mango on 2018/11/18.
@@ -148,10 +150,21 @@ public class MessageItemText extends MessageItemBaseView {
     @Override
     protected View initView(ViewGroup parent) {
         View view;
-        if (mItemPos == ITEM_LEFT) {
-            view = View.inflate(mContext, R.layout.item_chat_text_left, parent);
-        } else {
-            view = View.inflate(mContext, R.layout.item_chat_text_right, parent);
+        switch (MsgBodyHelper.getViewStyle(mItemPos)){
+            case VIEW_STYLE_LEFT:
+                view = View.inflate(mContext, R.layout.item_chat_text_left, parent);
+                break;
+            case VIEW_STYLE_CRITICAL:
+                view = View.inflate(mContext, R.layout.item_chat_text_center_critical, parent);
+                break;
+            case VIEW_STYLE_WARNING:
+                view = View.inflate(mContext, R.layout.item_chat_text_center_warning, parent);
+                break;
+            case VIEW_STYLE_INFO:
+                view = View.inflate(mContext, R.layout.item_chat_text_center_info, parent);
+                break;
+            default:
+                view = View.inflate(mContext, R.layout.item_chat_text_right, parent);
         }
         mChatText = ((TextView)view.findViewById(R.id.txt_message));
         return view;

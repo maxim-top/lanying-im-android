@@ -1,6 +1,8 @@
 
 package top.maxim.im.message.itemholder;
 
+import static top.maxim.im.sdk.bean.MsgBodyHelper.VIEW_TYPE.*;
+
 import android.content.Context;
 import androidx.annotation.NonNull;
 import android.text.TextUtils;
@@ -20,6 +22,7 @@ import top.maxim.im.message.customviews.FileProgressView;
 import top.maxim.im.message.interfaces.ChatActionListener;
 import top.maxim.im.message.interfaces.MsgAttachmentCallback;
 import top.maxim.im.message.utils.ChatAttachmentManager;
+import top.maxim.im.sdk.bean.MsgBodyHelper;
 
 /**
  * Description : 消息文件类型 Created by Mango on 2018/11/18.
@@ -65,7 +68,7 @@ public class MessageItemFile extends MessageItemBaseView {
     @Override
     protected View initView(ViewGroup parent) {
         View view;
-        if (mItemPos == ITEM_LEFT) {
+        if (MsgBodyHelper.isLeftStyle(mItemPos)) {
             view = View.inflate(mContext, R.layout.item_chat_file_left, parent);
             mFileLayout = view.findViewById(R.id.layout_file_left);
             mFileDesc = view.findViewById(R.id.txt_file_title_left);
@@ -179,11 +182,11 @@ public class MessageItemFile extends MessageItemBaseView {
         }
         BMXFileAttachment body = BMXFileAttachment.dynamic_cast(mMaxMessage.attachment());
         boolean register = false;
-        if (mItemPos == ITEM_RIGHT) {
+        if (MsgBodyHelper.isRightStyle(mItemPos)) {
             BMXMessage.DeliveryStatus sendStatus = mMaxMessage.deliveryStatus();
             register = sendStatus != null && sendStatus != BMXMessage.DeliveryStatus.Deliveried
                     && sendStatus != BMXMessage.DeliveryStatus.Failed;
-        } else if (mItemPos == ITEM_LEFT) {
+        } else if (MsgBodyHelper.isLeftStyle(mItemPos)) {
             // 对方发送文件 需要在点击时候注册
         }
         long msgId = mMaxMessage.msgId();

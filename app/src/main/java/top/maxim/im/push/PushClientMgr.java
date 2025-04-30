@@ -181,16 +181,19 @@ public final class PushClientMgr {
         if (TextUtils.isEmpty(token)) {
             return;
         }
+        SharePreferenceUtils.getInstance().putPushToken(sDevType, token);
         UserManager.getInstance().bindDevice(token, bmxErrorCode -> {
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
                 Log.e("bindDevice failed", bmxErrorCode.name());
             }else{
-                SharePreferenceUtils.getInstance().putPushToken(sDevType, token);
+                SharePreferenceUtils.getInstance().putPushToken(sDevType, "bind-ok");
             }
         });
         top.maxim.im.bmxmanager.PushManager.getInstance().bindDeviceToken(token, bmxErrorCode -> {
             if (!BaseManager.bmxFinish(bmxErrorCode)) {
                 Log.e("bindDevice failed", bmxErrorCode.name());
+            }else{
+                SharePreferenceUtils.getInstance().putPushToken(sDevType, "bind-ok");
             }
         });
         notifierBind(token);

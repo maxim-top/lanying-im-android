@@ -1,6 +1,7 @@
 
 package top.maxim.im.login.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.CountDownTimer;
@@ -26,6 +27,10 @@ import androidx.annotation.NonNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import im.floo.floolib.BMXErrorCode;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -34,9 +39,11 @@ import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
+import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseSwitchActivity;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -84,6 +91,8 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
     private TextWatcher mInputWatcher;
 
     private TextView mTvAppId;
+
+    private TextView mTvCompany;
 
     private TextView mTvRegisterProtocol;
     private String mChangeAppId;
@@ -182,8 +191,12 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
         mIvScan = view.findViewById(R.id.iv_scan);
         mIvChangeAppId = view.findViewById(R.id.iv_app_id);
         mTvAppId = view.findViewById(R.id.tv_login_appid);
+        mTvCompany = view.findViewById(R.id.tv_company);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
         mCheckBox = view.findViewById(R.id.cb_choice);
+        String companyName = CommonUtils.getCompanyName(getContext());
+        String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
+        mTvCompany.setText(companyName + " " + verificationStatus);
 
         buildProtocol();
         initRxBus();
@@ -324,6 +337,12 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
                 }
             });
         });
+        mTvCompany.setOnClickListener(v -> {
+            AboutUsActivity.startAboutUsActivity(getContext(), false);
+        });
+        mTvAppId.setOnClickListener(v -> {
+            AboutUsActivity.startAboutUsActivity(getContext(), false);
+        });
     }
 
     /**
@@ -450,6 +469,26 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
                         }
                         mChangeAppId = intent.getStringExtra(CommonConfig.CHANGE_APP_ID);
                         mTvAppId.setText(mChangeAppId);
+
+                        SharePreferenceUtils.getInstance().putAppId(mChangeAppId);
+                        UserManager.getInstance().changeAppId(mChangeAppId, bmxErrorCode -> {
+                            if (bmxErrorCode != BMXErrorCode.NoError){
+                                ToastUtil.showTextViewPrompt(getString(R.string.error_code_ServerAppIdInvalid));
+                            }
+                            new Timer().schedule(new TimerTask() {
+                                @Override
+                                public void run() {
+                                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            String companyName = CommonUtils.getCompanyName(getContext());
+                                            String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
+                                            mTvCompany.setText(companyName + " " + verificationStatus);
+                                        }
+                                    });
+                                }
+                            }, 100);
+                        });
                     }
                 });
         mSubscription.add(changeAppId);

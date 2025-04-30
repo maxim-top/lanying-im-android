@@ -171,7 +171,7 @@
     <string name="black_list">黑名单列表</string>
     <string name="other_device_tips">是否Toast提示</string>
     <string name="device_list">设备管理</string>
-    <string name="about_us">关于我们</string>
+    <string name="about_us">关于</string>
     <string name="setting_user_name">昵称</string>
     <string name="setting_user_phone">手机号</string>
     <string name="setting_user_pwd">修改密码</string>
@@ -249,9 +249,9 @@
     <string name="push_receiver_rec_msg_count">您收到了%1$s条消息</string>
 
 
-    <string name="about_us_desc">构建新一代智能聊天APP\n用蓝莺IM专业SDK！</string>
-    <string name="about_us_net_pre">官网&#8194;&#8194;</string>
-    <string name="about_us_net">https://www.lanyingim.com</string>
+    <string name="about_us_desc">使用蓝莺IM专业技术</string>
+    <string name="about_us_net_pre"></string>
+    <string name="about_us_net">www.lanyingim.com</string>
     <string name="about_us_phone_pre">联系商务&#8194;&#8194;</string>
     <string name="about_us_phone">400-666-0162</string>
     <string name="about_us_company">© 2019-%s 美信拓扑</string>
@@ -259,6 +259,8 @@
 
     <string name="common_empty">你没有聊天会话，可以在联系人页面右上角搜索用户ID来添加好友</string>
     <string name="support_empty">如果想联系技术支持,请退出后,将App ID切换成"welovemaxim"</string>
+    <string name="report_need_welovemaxim_title">功能提醒</string>
+    <string name="report_need_welovemaxim">如果想举报对方，请退出当前账号,将App ID切换成"welovemaxim"。“主界面-联系人-客服”下联系客服人员。</string>
     <string name="support_empty_for_test">如果想联系技术支持,请登录蓝莺官网</string>
 
     <!--push设置-->
@@ -754,4 +756,15 @@
     <string name="group_mute_all">全员禁言中</string>
     <string name="group_mute_you">你已被管理员禁言</string>
     <string name="max_targets">最多%d个好友或群可被选择</string>
+    <string name="guardian_mode">青少年模式</string>
+    <string name="guardian_mode_content">蓝莺IM的青少年模式，旨在呵护未成年人健康成长。在此模式下，App的部分功能将被限制使用，如果本App使用者是未成年人时，请监护人主动设置</string>
+    <string name="open">开启</string>
+    <string name="close">关闭</string>
+    <string name="fraud_notice">请您不轻信他人发送的链接、二维码，谨防诈骗！凡涉及金钱交易，务必通过正规渠道核实，守护家人财产安全！</string>
+    <string name="about_us_this_app">本APP（APPID:%s）服务提供方</string>
+    <string name="about_us_verified">✅已认证</string>
+    <string name="about_us_unverified">❓未认证</string>
+    <string name="about_us_expired">❗认证失败</string>
+    <string name="about_us_unverified_developer">未认证开发者</string>
+    <string name="about_us_individual_developer">个人开发者:</string>
 </resources>

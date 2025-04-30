@@ -15,11 +15,15 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import im.floo.BMXCallBack;
+import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXMessage;
+import im.floo.floolib.BMXMessageList;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -59,6 +63,7 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
 
     private ImageView mRecordMic;
     private TextView mRecordTip;
+    private TextView mNotice;
 
     protected ChatBaseContract.Presenter mPresenter;
 
@@ -111,6 +116,7 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
         mRecordMic = view.findViewById(R.id.iv_record_mic);
         mChatViewHelper = new ChatViewHelper(this, mChatRecyclerView);
         mRecordTip = view.findViewById(R.id.txt_record_tip);
+        mNotice = view.findViewById(R.id.tv_notice);
         return view;
     }
 
@@ -126,6 +132,19 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
     @Override
     protected void initDataForActivity() {
         initChatInfo(mMyUserId, mChatId);
+        boolean noticed = SharePreferenceUtils.getInstance().getNoticeId(mChatId);
+        if (!noticed){
+            BMXMessage msg = BMXMessage.createMessage(mChatId, mMyUserId, BMXMessage.MessageType.System, mChatId,getString(R.string.fraud_notice));
+            msg.setExtension("{\"style\":\"warning\"}");
+            BMXMessageList list = new BMXMessageList();
+            list.add(msg);
+            ChatManager.getInstance().insertMessages(list, new BMXCallBack() {
+                @Override
+                public void onResult(BMXErrorCode bmxErrorCode) {
+                }
+            });
+            SharePreferenceUtils.getInstance().putNoticeId(mChatId);
+        }
         receiveRxBus();
     }
 

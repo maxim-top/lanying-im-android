@@ -127,7 +127,12 @@ public class AppIdActivity extends BaseTitleActivity {
             if (!TextUtils.isEmpty(appId)){
                 SharePreferenceUtils.getInstance().putAppId(appId);
                 UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {});
-                LoginRegisterActivity.openLoginRegister(AppIdActivity.this, false);
+                if (!SharePreferenceUtils.getInstance().getAboutPoppedAppId(appId)){
+                    AboutUsActivity.startAboutUsActivity(this, true);
+                    SharePreferenceUtils.getInstance().putAboutPoppedAppId(appId);
+                }else{
+                    LoginRegisterActivity.openLoginRegister(AppIdActivity.this, false);
+                }
             }
         });
 

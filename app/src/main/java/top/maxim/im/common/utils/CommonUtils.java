@@ -25,9 +25,12 @@ import java.util.zip.ZipOutputStream;
 import im.floo.floolib.BMXErrorCode;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
+import top.maxim.rtc.RTCManager;
+
 import android.util.Base64;
 
 import org.json.JSONObject;
@@ -556,6 +559,24 @@ public class CommonUtils {
 
         String verifyString = map.get(verificationStatus);
         return verifyString;
+    }
+
+    public static void initializeSDKAndAppId(){
+        boolean initialized = SharePreferenceUtils.getInstance().hasSDKInitialized();
+        if (!initialized){
+            RTCManager.getInstance().init(AppContextUtils.getApplication(), BaseManager.getBMXClient());
+            SharePreferenceUtils.getInstance().putSDKInitialized(true);
+        }
+        String appId = SharePreferenceUtils.getInstance().getAppId();
+        UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {});
+    }
+
+    public static void initializeSDK(){
+        boolean initialized = SharePreferenceUtils.getInstance().hasSDKInitialized();
+        if (!initialized){
+            RTCManager.getInstance().init(AppContextUtils.getApplication(), BaseManager.getBMXClient());
+            SharePreferenceUtils.getInstance().putSDKInitialized(true);
+        }
     }
 
 }

@@ -31,6 +31,8 @@ import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SchemeUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -126,13 +128,7 @@ public class AppIdActivity extends BaseTitleActivity {
             String appId = mAppId.getText().toString().trim();
             if (!TextUtils.isEmpty(appId)){
                 SharePreferenceUtils.getInstance().putAppId(appId);
-                UserManager.getInstance().changeAppId(appId, bmxErrorCode -> {});
-                if (!SharePreferenceUtils.getInstance().getAboutPoppedAppId(appId)){
-                    AboutUsActivity.startAboutUsActivity(this, true);
-                    SharePreferenceUtils.getInstance().putAboutPoppedAppId(appId);
-                }else{
-                    LoginRegisterActivity.openLoginRegister(AppIdActivity.this, false);
-                }
+                LoginRegisterActivity.openLoginRegister(AppIdActivity.this, false);
             }
         });
 

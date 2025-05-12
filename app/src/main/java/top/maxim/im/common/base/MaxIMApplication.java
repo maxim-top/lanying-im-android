@@ -70,8 +70,11 @@ public class MaxIMApplication extends Application {
             if (activityAount == 0) {
                 //app回到前台
                 if (isDisconnected){
-                    BMXClient client = BaseManager.getBMXClient();
-                    client.reconnect();
+                    boolean initialized = SharePreferenceUtils.getInstance().hasSDKInitialized();
+                    if (initialized){
+                        BMXClient client = BaseManager.getBMXClient();
+                        client.reconnect();
+                    }
                 }
             }
             activityAount++;
@@ -90,7 +93,9 @@ public class MaxIMApplication extends Application {
             if (activityAount == 0) {
                 //app切到后台
                 try {
-                    if (!RTCManager.getInstance().getRTCEngine().isOnCall &&
+                    boolean initialized = SharePreferenceUtils.getInstance().hasSDKInitialized();
+                    if (initialized &&
+                            !RTCManager.getInstance().getRTCEngine().isOnCall &&
                             SharePreferenceUtils.getInstance().getHasPush()){
                         BMXClient client = BaseManager.getBMXClient();
                         client.disconnect();
@@ -132,6 +137,7 @@ public class MaxIMApplication extends Application {
         }
         initLanguage();
         SharePreferenceUtils.getInstance().putAgreeChecked(false);
+        SharePreferenceUtils.getInstance().putSDKInitialized(false);
     }
 
     private String getCountry() {

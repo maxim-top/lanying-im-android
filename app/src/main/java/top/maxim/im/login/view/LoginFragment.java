@@ -80,6 +80,7 @@ import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 import top.maxim.im.wxapi.WXUtils;
+import top.maxim.rtc.RTCManager;
 
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
@@ -203,9 +204,23 @@ public class LoginFragment extends BaseTitleFragment {
         mSwitchLoginMode.setVisibility(View.GONE);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
         mCheckBox = view.findViewById(R.id.cb_choice);
-        String companyName = CommonUtils.getCompanyName(getContext());
-        String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
-        mTvCompany.setText(companyName + " " + verificationStatus);
+        boolean showed = SharePreferenceUtils.getInstance().getProtocolDialogStatus();
+        if (showed){
+            CommonUtils.initializeSDKAndAppId();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String companyName = CommonUtils.getCompanyName(getContext());
+                            String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
+                            mTvCompany.setText(companyName + " " + verificationStatus);
+                        }
+                    });
+                }
+            }, 100);
+        }
 
         buildProtocol();
         // 三次点击打开日志
@@ -281,6 +296,14 @@ public class LoginFragment extends BaseTitleFragment {
                     @Override
                     public void onConfirmListener() {
                         SharePreferenceUtils.getInstance().putProtocolDialogStatus(true);
+
+                        CommonUtils.initializeSDKAndAppId();
+
+                        String appId = SharePreferenceUtils.getInstance().getAppId();
+                        if (!SharePreferenceUtils.getInstance().getAboutPoppedAppId(appId)){
+                            AboutUsActivity.startAboutUsActivity(getContext(), true);
+                            SharePreferenceUtils.getInstance().putAboutPoppedAppId(appId);
+                        }
                     }
 
                     @Override

@@ -39,9 +39,11 @@ import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
+import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseSwitchActivity;
 import top.maxim.im.common.base.BaseTitleFragment;
+import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RxBus;
@@ -51,6 +53,7 @@ import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.view.ScannerActivity;
 import top.maxim.im.wxapi.WXUtils;
+import top.maxim.rtc.RTCManager;
 
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
@@ -194,9 +197,23 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
         mTvCompany = view.findViewById(R.id.tv_company);
         mTvRegisterProtocol = view.findViewById(R.id.tv_register_protocol);
         mCheckBox = view.findViewById(R.id.cb_choice);
-        String companyName = CommonUtils.getCompanyName(getContext());
-        String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
-        mTvCompany.setText(companyName + " " + verificationStatus);
+        boolean showed = SharePreferenceUtils.getInstance().getProtocolDialogStatus();
+        if (showed){
+            CommonUtils.initializeSDKAndAppId();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String companyName = CommonUtils.getCompanyName(getContext());
+                            String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
+                            mTvCompany.setText(companyName + " " + verificationStatus);
+                        }
+                    });
+                }
+            }, 100);
+        }
 
         buildProtocol();
         initRxBus();

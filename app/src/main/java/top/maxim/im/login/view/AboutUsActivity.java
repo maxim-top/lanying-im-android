@@ -32,7 +32,9 @@ import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.CommonUtils;
+import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TelLinkPopupWindow;
 import top.maxim.im.common.view.Header;
@@ -106,14 +108,28 @@ public class AboutUsActivity extends BaseTitleActivity {
         String companyName = CommonUtils.getCompanyName(this);
         String verificationStatus = CommonUtils.getVerificationStatusText(this);
         mCompanyName.setText(companyName);
-        // 登陆
+        mVerificationStatus.setText(verificationStatus);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String companyName = CommonUtils.getCompanyName(AboutUsActivity.this);
+                        String verificationStatus = CommonUtils.getVerificationStatusChar(AboutUsActivity.this);
+                        mCompanyName.setText(companyName);
+                        mVerificationStatus.setText(verificationStatus);
+                    }
+                });
+            }
+        }, 100);
         mTvGo.setOnClickListener(v -> {
-            LoginRegisterActivity.openLoginRegister(AboutUsActivity.this, false);
+            finish();
         });
         if (!mShowGo){
             mTvGo.setVisibility(View.GONE);
         }
-        mVerificationStatus.setText(verificationStatus);
+
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -150,6 +166,15 @@ public class AboutUsActivity extends BaseTitleActivity {
             sdkVersion = client.getSDKConfig().getSDKVersion();
         }
         mAppVersion.setText("Lanying IM " + versionName + " SDK " + sdkVersion);
+    }
+
+    @Override
+    protected void onDestroy() {
+        Intent intent = new Intent();
+        intent.setAction(CommonConfig.CHANGE_APP_ID_ACTION);
+        intent.putExtra(CommonConfig.CHANGE_APP_ID, SharePreferenceUtils.getInstance().getAppId());
+        RxBus.getInstance().send(intent);
+        super.onDestroy();
     }
 
     @Override

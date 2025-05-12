@@ -42,6 +42,7 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseSwitchActivity;
 import top.maxim.im.common.base.BaseTitleFragment;
+import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.CommonConfig;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RxBus;
@@ -53,6 +54,7 @@ import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
 import top.maxim.im.wxapi.WXUtils;
+import top.maxim.rtc.RTCManager;
 
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
@@ -175,9 +177,23 @@ public class RegisterFragment extends BaseTitleFragment {
         mWXContainer = view.findViewById(R.id.iv_wx_login);
         mWXLogin = view.findViewById(R.id.iv_wx_login);
         mIvScan = view.findViewById(R.id.iv_scan);
-        String companyName = CommonUtils.getCompanyName(getContext());
-        String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
-        mTvCompany.setText(companyName + " " + verificationStatus);
+        boolean showed = SharePreferenceUtils.getInstance().getProtocolDialogStatus();
+        if (showed){
+            CommonUtils.initializeSDKAndAppId();
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String companyName = CommonUtils.getCompanyName(getContext());
+                            String verificationStatus = CommonUtils.getVerificationStatusChar(getContext());
+                            mTvCompany.setText(companyName + " " + verificationStatus);
+                        }
+                    });
+                }
+            }, 100);
+        }
         buildProtocol();
         view.findViewById(R.id.ll_et_user_phone).setVisibility(View.GONE);
         view.findViewById(R.id.ll_et_user_verify).setVisibility(View.GONE);

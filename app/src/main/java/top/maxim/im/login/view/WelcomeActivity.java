@@ -4,20 +4,12 @@ package top.maxim.im.login.view;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 
@@ -43,8 +35,6 @@ import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
-import top.maxim.im.common.utils.dialog.CommonCustomDialog;
-import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.SplashVideoPlayView;
@@ -52,7 +42,6 @@ import top.maxim.im.login.bean.DNSConfigEvent;
 import top.maxim.im.net.ConnectivityReceiver;
 import top.maxim.im.push.NotificationUtils;
 import top.maxim.im.sdk.utils.MessageDispatcher;
-import top.maxim.rtc.RTCManager;
 
 public class WelcomeActivity extends BaseTitleActivity {
 
@@ -140,7 +129,6 @@ public class WelcomeActivity extends BaseTitleActivity {
     }
 
     private void initJump() {
-        RTCManager.getInstance().init(AppContextUtils.getApplication(), BaseManager.getBMXClient());
         boolean isLogin = SharePreferenceUtils.getInstance().getLoginStatus();
         long userId = SharePreferenceUtils.getInstance().getUserId();
         String pwd = SharePreferenceUtils.getInstance().getUserPwd();
@@ -191,6 +179,7 @@ public class WelcomeActivity extends BaseTitleActivity {
      * 自动登陆
      */
     private void autoLogin(long userId, final String pwd) {
+        CommonUtils.initializeSDK();
         String dns = SharePreferenceUtils.getInstance().getDnsConfig();
         // 是否自定义dns配置
         boolean changeDns = false;

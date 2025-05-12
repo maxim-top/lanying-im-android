@@ -58,6 +58,8 @@ public class SharePreferenceUtils {
 
     private static String IS_SHOW_PROTOCOL_DIALOG = "isShowProtocolDialog";
 
+    private static String SDK_INITIALIZED = "sdkInitialized";
+
     private static String LOGIN_USER_DATA = "loginUserData";
 
     private static String DNS_CONFIG = "dnsConfig";
@@ -366,6 +368,18 @@ public class SharePreferenceUtils {
     public boolean getProtocolDialogStatus() {
         if (saveInfo != null) {
             return saveInfo.getBoolean(IS_SHOW_PROTOCOL_DIALOG, false);
+        }
+        return false;
+    }
+
+    public boolean putSDKInitialized(boolean initialized) {
+        saveEditor.putBoolean(SDK_INITIALIZED, initialized);
+        return saveEditor.commit();
+    }
+
+    public boolean hasSDKInitialized() {
+        if (saveInfo != null) {
+            return saveInfo.getBoolean(SDK_INITIALIZED, false);
         }
         return false;
     }

@@ -16,6 +16,7 @@ import rx.schedulers.Schedulers;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.message.contract.ChatSingleContract;
 import top.maxim.im.message.utils.MessageConfig;
@@ -47,13 +48,7 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
             String name = "";
             BMXRosterItem rosterItem = RosterFetcher.getFetcher()
                     .getRoster(mConversation.conversationId());
-            if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
-                name = rosterItem.alias();
-            } else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
-                name = rosterItem.nickname();
-            } else if (rosterItem != null) {
-                name = rosterItem.username();
-            }
+            name = CommonUtils.getRosterDisplayName(rosterItem);
             if (mView != null) {
                 mView.setHeadTitle(name);
             }
@@ -70,14 +65,7 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
                 mRoster = bmxRosterItem;
             }
             RosterFetcher.getFetcher().putRoster(mRoster);
-            String name = "";
-            if (mRoster != null && !TextUtils.isEmpty(mRoster.alias())) {
-                name = mRoster.alias();
-            } else if (mRoster != null && !TextUtils.isEmpty(mRoster.nickname())) {
-                name = mRoster.nickname();
-            } else if (mRoster != null) {
-                name = mRoster.username();
-            }
+            String name = CommonUtils.getRosterDisplayName(mRoster);
             if (mView != null) {
                 mView.setHeadTitle(name);
             }
@@ -119,11 +107,7 @@ public class ChatSinglePresenter extends ChatBasePresenter implements ChatSingle
                         name = mView.getContext().getString(R.string.other_party_typing);
                     } else if (TextUtils.equals(status, MessageConfig.InputStatus.NOTHING_STATUS)) {
                         // 还原标题头
-                        if (mRoster != null && !TextUtils.isEmpty(mRoster.nickname())) {
-                            name = mRoster.nickname();
-                        } else if (mRoster != null) {
-                            name = mRoster.username();
-                        }
+                        name = CommonUtils.getRosterDisplayName(mRoster);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

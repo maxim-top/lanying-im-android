@@ -23,8 +23,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import im.floo.floolib.BMXErrorCode;
+import im.floo.floolib.BMXGroup;
+import im.floo.floolib.BMXRosterItem;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.bean.UserBean;
 import top.maxim.im.push.PushClientMgr;
@@ -521,6 +524,38 @@ public class CommonUtils {
 
     public static int getErrorSolution(BMXErrorCode bmxErrorCode){
         return mapCode2Solution.get(bmxErrorCode);
+    }
+
+    public static String getGroupMemberDisplayName(BMXRosterItem item, long groupId, long userId, boolean hideMemberInfo) {
+        String name = "";
+        BMXGroup.Member member = GroupManager.getInstance().getMemberByDB(groupId, userId);
+        if (item != null && !TextUtils.isEmpty(item.alias())) {
+            name = item.alias();
+        } else if (member != null && !TextUtils.isEmpty(member.getMGroupNickname())) {
+            name = member.getMGroupNickname();
+        } else if (item != null && !TextUtils.isEmpty(item.nickname())) {
+            name = item.nickname();
+        } else if (item != null) {
+            name = item.username();
+            if (hideMemberInfo){
+                name = CommonUtils.md5InBase64(item.username()+String.valueOf(userId)).substring(0, 12);
+            }
+        }
+        return name;
+    }
+
+    public static String getRosterDisplayName(BMXRosterItem rosterItem) {
+        String name = "";
+        if (rosterItem != null) {
+            if (!TextUtils.isEmpty(rosterItem.alias())) {
+                name = rosterItem.alias();
+            } else if (!TextUtils.isEmpty(rosterItem.nickname())) {
+                name = rosterItem.nickname();
+            } else {
+                name = rosterItem.username();
+            }
+        }
+        return name;
     }
 
     public static String getCompanyName(Context context) {

@@ -34,6 +34,7 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -445,16 +446,7 @@ public class ChatGroupBannedActivity extends BaseTitleActivity {
                         "drawable://" + R.drawable.default_remove_icon);
             } else {
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(member.getMUid());
-                String name;
-                if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
-                    name = rosterItem.alias();
-                } else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
-                    name = rosterItem.nickname();
-                } else if (rosterItem != null) {
-                    name = rosterItem.username();
-                } else {
-                    name = member.getMGroupNickname();
-                }
+                String name = CommonUtils.getRosterDisplayName(rosterItem);
                 tvName.setText(TextUtils.isEmpty(name) ? "" : name);
                 ChatUtils.getInstance().showRosterAvatar(rosterItem, icon, mConfig);
             }

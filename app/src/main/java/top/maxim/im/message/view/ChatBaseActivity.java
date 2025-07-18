@@ -133,6 +133,7 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
     protected void initDataForActivity() {
         initChatInfo(mMyUserId, mChatId);
         boolean noticed = SharePreferenceUtils.getInstance().getNoticeId(mChatId);
+        noticed = true;//暂时关闭固定的提醒，改为服务端下发
         if (!noticed){
             BMXMessage msg = BMXMessage.createMessage(mChatId, mMyUserId, BMXMessage.MessageType.System, mChatId,getString(R.string.fraud_notice));
             msg.setExtension("{\"style\":\"warning\"}");

@@ -27,6 +27,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -221,17 +222,7 @@ public class RosterApplyActivity extends BaseTitleActivity {
             }
             BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(item.getMRosterId());
             ChatUtils.getInstance().showRosterAvatar(rosterItem, avatar, mConfig);
-            String name = "";
-            if (rosterItem != null) {
-                if (!TextUtils.isEmpty(rosterItem.alias())) {
-                    name = rosterItem.alias();
-                } else if (!TextUtils.isEmpty(rosterItem.nickname())) {
-                    name = rosterItem.nickname();
-                } else {
-                    name = rosterItem.username();
-                }
-            }
-
+            String name = CommonUtils.getRosterDisplayName(rosterItem);
             title.setText(!TextUtils.isEmpty(name) ? name : "");
 
             BMXRosterService.ApplicationStatus applicationStatus = item.getMStatus();

@@ -28,6 +28,7 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.TimeUtils;
 import top.maxim.im.common.view.Header;
@@ -281,13 +282,8 @@ public class MessageSearchActivity extends BaseTitleActivity {
             if (message == null) {
                 return;
             }
-            String name = "";
             BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(message.fromId());
-            if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
-                name = rosterItem.nickname();
-            } else if (rosterItem != null) {
-                name = rosterItem.username();
-            }
+            String name = CommonUtils.getRosterDisplayName(rosterItem);
             ChatUtils.getInstance().showRosterAvatar(rosterItem, avatar, mConfig);
             tvTitle.setText(TextUtils.isEmpty(name) ? "" : name);
             time.setText(TimeUtils.millis2String(mContext, message.serverTimestamp()));

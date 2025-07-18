@@ -30,6 +30,7 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -182,14 +183,7 @@ public class GroupApplyActivity extends BaseTitleActivity {
             final BMXGroup groupItem = RosterFetcher.getFetcher()
                     .getGroup(item.getMGroupId());
             ChatUtils.getInstance().showRosterAvatar(rosterItem, avatar, mConfig);
-            String name = "";
-            if (!TextUtils.isEmpty(rosterItem.alias())) {
-                name = rosterItem.alias();
-            } else if (!TextUtils.isEmpty(rosterItem.nickname())) {
-                name = rosterItem.nickname();
-            } else {
-                name = rosterItem.username();
-            }
+            String name = CommonUtils.getRosterDisplayName(rosterItem);
             title.setText(name);
 
             BMXGroup.ApplicationStatus inviteStatus = item.getMStatus();

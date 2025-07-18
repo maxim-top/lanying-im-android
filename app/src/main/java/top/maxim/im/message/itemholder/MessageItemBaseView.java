@@ -170,27 +170,10 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
             BMXRosterItem item = RosterFetcher.getFetcher().getRoster(mMaxMessage.fromId());
             if(group){
                 //如果是群  需要获取群成员名称
-                BMXGroup.Member member = GroupManager.getInstance().getMemberByDB(mMaxMessage.conversationId(), mMaxMessage.fromId());
-                if (item != null && !TextUtils.isEmpty(item.alias())) {
-                    userName = item.alias();
-                } else if (member != null && !TextUtils.isEmpty(member.getMGroupNickname())) {
-                    userName = member.getMGroupNickname();
-                } else if (item != null && !TextUtils.isEmpty(item.nickname())) {
-                    userName = item.nickname();
-                } else if (item != null) {
-                    userName = item.username();
-                    if (hideMemberInfo){
-                        userName = CommonUtils.md5InBase64(item.username()+String.valueOf(mMaxMessage.fromId())).substring(0, 12);
-                    }
-                }
+                userName = CommonUtils.getGroupMemberDisplayName(item,
+                        mMaxMessage.conversationId(), mMaxMessage.fromId(), hideMemberInfo);
             } else{
-                if (item != null && !TextUtils.isEmpty(item.alias())) {
-                    userName = item.alias();
-                } else if (item != null && !TextUtils.isEmpty(item.nickname())) {
-                    userName = item.nickname();
-                } else if (item != null) {
-                    userName = item.username();
-                }
+                userName = CommonUtils.getRosterDisplayName(item);
             }
             if (mIconView != null) {
                 ChatUtils.getInstance().showRosterAvatar(item, mIconView, ICON_CONFIG);

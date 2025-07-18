@@ -18,6 +18,7 @@ import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXRosterItem;
 import top.maxim.im.R;
 import top.maxim.im.common.bean.TargetBean;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
@@ -88,13 +89,7 @@ public class ForwardingSessionAdapter extends RecyclerWithHFAdapter<TargetBean> 
         } else{
             BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(item.getId());
             if (rosterItem != null){
-                if (!TextUtils.isEmpty(rosterItem.alias())) {
-                    name = rosterItem.alias();
-                } else if (!TextUtils.isEmpty(rosterItem.nickname())) {
-                    name = rosterItem.nickname();
-                } else {
-                    name = rosterItem.username();
-                }
+                name = CommonUtils.getRosterDisplayName(rosterItem);
                 ChatUtils.getInstance().showRosterAvatar(rosterItem, icon, mConfig);
             } else{
                 ChatUtils.getInstance().showRosterAvatar(null, icon, mConfig);

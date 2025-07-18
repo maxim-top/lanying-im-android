@@ -4,6 +4,7 @@ package top.maxim.im.message.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.RelativeLayout;
@@ -18,6 +19,7 @@ import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXGroupMemberList;
 import im.floo.floolib.BMXRosterItem;
 import top.maxim.im.R;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.message.utils.MessageConfig;
@@ -87,7 +89,8 @@ public class ChatGroupAtActivity extends ChatGroupListMemberActivity {
                     return;
                 }
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(member.getMUid());
-                String name = rosterItem == null ? "" : rosterItem.nickname().isEmpty()? rosterItem.username() : rosterItem.nickname();
+                String name = CommonUtils.getRosterDisplayName(rosterItem);
+
                 if (!mSelected.containsKey(mId) || !mSelected.get(mId)) {
                     mSelected.put(mId, true);
                     atMap.put(String.valueOf(mId), name);

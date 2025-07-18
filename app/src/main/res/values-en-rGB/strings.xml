@@ -438,7 +438,7 @@
     <string name="rejected">Rejected</string>
     <string name="enabled">Enabled</string>
     <string name="added">Added</string>
-    <string name="username_only_supports">Only letters, numbers, underscore, and Chinese characters are allowed, and cannot be a numbers or start with maxim, mta</string>
+    <string name="username_only_supports">Only letters, numbers and underscore are allowed, and cannot be a numbers or start with maxim, mta</string>
     <string name="someone_at_you">[You are mentioned]</string>
     <string name="voice">[voice]</string>
     <string name="voice_not_exist">Voice does not exist!</string>
@@ -765,4 +765,13 @@
     <string name="about_us_expired">❗Unapproved</string>
     <string name="about_us_unverified_developer">Unverified Developer</string>
     <string name="about_us_individual_developer">Individual Developer:</string>
+    <string name="real_name_verification">Real Name Verification</string>
+    <string name="verified_successfully">Verified Successfully</string>
+    <string name="verified_failed">Verification failure</string>
+    <string name="change_the_verification_phone_number">Change the Verification Phone Number</string>
+    <string name="go_to_verify">Go to Verify</string>
+    <string name="real_name_verified">You have completed real-name verification. Mobile number：%s</string>
+    <string name="re_verify">Re-verify</string>
+    <string name="user_not_exist_or_app_id_not_same">The user has been deleted or does not match your App ID</string>
+    <string name="unknown_error">Unknown Error</string>
 </resources>

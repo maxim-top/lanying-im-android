@@ -58,6 +58,7 @@ import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CommonCustomDialog;
+import top.maxim.im.common.utils.dialog.CommonDialog;
 import top.maxim.im.common.utils.dialog.CommonEditDialog;
 import top.maxim.im.common.utils.dialog.CustomDialog;
 import top.maxim.im.common.utils.dialog.DialogUtils;
@@ -71,6 +72,7 @@ import top.maxim.im.common.view.ItemEnableArrow;
 import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ShapeImageView;
+import top.maxim.im.contact.bean.SupportBean;
 import top.maxim.im.filebrowser.FileBrowserActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.net.HttpResponseCallback;
@@ -101,6 +103,9 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     /* 设置手机号 */
     private ItemEnableArrow.Builder mSetPhone;
+
+    /* 实名认证 */
+    private ItemEnableArrow.Builder mRealNameVerification;
 
     /* 修改密码 */
     private ItemLineArrow.Builder mSetPwd;
@@ -150,6 +155,9 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     /* 绑定的手机号 */
     private String mPhone;
+
+    /* 实名的手机号 */
+    private String mRealNamePhone;
 
     private String mNickname;
 
@@ -241,6 +249,41 @@ public class SettingUserActivity extends BaseTitleActivity {
                     }
                 });
         container.addView(mSetPhone.build());
+
+        // 分割线
+        addLineView(container);
+
+        // 实名认证
+        mRealNameVerification = new ItemEnableArrow.Builder(this)
+                .setStartContent(getString(R.string.real_name_verification))
+                .setOnItemClickListener(new ItemEnableArrow.OnItemArrowViewClickListener() {
+                    @Override
+                    public void onItemClick(View v) {
+                        DialogUtils.getInstance().showDialog(SettingUserActivity.this,
+                                getString(R.string.real_name_verification),
+                                String.format(getString(R.string.real_name_verified), mRealNamePhone),
+                                getString(R.string.re_verify),
+                                getString(R.string.confirm),
+                                new CommonDialog.OnDialogListener() {
+                                    @Override
+                                    public void onConfirmListener() {
+                                        UserVerificationActivity.openUserVerification(SettingUserActivity.this);
+                                    }
+
+                                    @Override
+                                    public void onCancelListener() {
+
+                                    }
+                                });
+
+                    }
+
+                    @Override
+                    public void onItemEnableClick(View v) {
+                        UserVerificationActivity.openUserVerification(SettingUserActivity.this);
+                    }
+                });
+        container.addView(mRealNameVerification.build());
 
         // 分割线
         addLineView(container);
@@ -553,6 +596,9 @@ public class SettingUserActivity extends BaseTitleActivity {
                         } else if (TextUtils.equals(action, CommonConfig.MOBILE_BIND_ACTION)) {
                             // 绑定手机号
                             initData(true);
+                        } else if (TextUtils.equals(action, CommonConfig.REAL_NAME_VERIFY_ACTION)) {
+                            // 实名认证
+                            showRealNameInfo();
                         }
                     }
                 });
@@ -680,6 +726,7 @@ public class SettingUserActivity extends BaseTitleActivity {
     @Override
     protected void initDataForActivity() {
         super.initDataForActivity();
+        mRealNameVerification.setEnableContent(getString(R.string.go_to_verify));
         initData(false);
         new Timer().schedule(new TimerTask() {
             @Override
@@ -704,6 +751,7 @@ public class SettingUserActivity extends BaseTitleActivity {
         mUserId.setEndContent(String.valueOf(id));
         mSetName.setEndContent(TextUtils.isEmpty(mNickname) ? "" : mNickname);
         showBindPhone(profile.mobilePhone());
+        showRealNameInfo();
         String publicInfo = profile.publicInfo();
         if (TextUtils.isEmpty(publicInfo)) {
             mTvPublic.setVisibility(View.GONE);
@@ -737,6 +785,28 @@ public class SettingUserActivity extends BaseTitleActivity {
         } else {
             mSetPhone.setEndContent(phone);
         }
+    }
+
+    private void showRealNameInfo() {
+        AppManager.getInstance().getUserVerificationInfo(
+                new HttpResponseCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        dismissLoadingDialog();
+                        String mobile = result;
+                        mRealNamePhone = mobile;
+                        if (!TextUtils.isEmpty(mobile)) {
+                            mRealNameVerification.setEndContent(mobile);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg,
+                                          Throwable t) {
+                        dismissLoadingDialog();
+                        ToastUtil.showTextViewPrompt(errorMsg);
+                    }
+                });
     }
 
     private void showBindWeChat() {

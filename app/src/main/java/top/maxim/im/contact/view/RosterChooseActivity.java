@@ -28,6 +28,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.BMImageLoader;
@@ -315,14 +316,7 @@ public class RosterChooseActivity extends BaseTitleActivity {
             } else {
                 checkBox.setVisibility(View.GONE);
             }
-            String name = "";
-            if (!TextUtils.isEmpty(member.alias())) {
-                name = member.alias();
-            } else if (!TextUtils.isEmpty(member.nickname())) {
-                name = member.nickname();
-            } else {
-                name = member.username();
-            }
+            String name = CommonUtils.getRosterDisplayName(member);
             tvName.setText(name);
             ChatUtils.getInstance().showRosterAvatar(member, icon, mConfig);
         }

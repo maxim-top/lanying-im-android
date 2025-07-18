@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import im.floo.floolib.BMXRosterItem;
 import top.maxim.im.R;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.view.ImageRequestConfig;
 import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.common.view.recyclerview.BaseViewHolder;
@@ -59,14 +60,7 @@ public class ContactAdapter extends RecyclerWithHFAdapter<BMXRosterItem> {
         if (bean == null) {
             return;
         }
-        String name = "";
-        if (!TextUtils.isEmpty(bean.alias())) {
-            name = bean.alias();
-        } else if (!TextUtils.isEmpty(bean.nickname())) {
-            name = bean.nickname();
-        } else {
-            name = bean.username();
-        }
+        String name = CommonUtils.getRosterDisplayName(bean);
         title.setText(name);
         ChatUtils.getInstance().showRosterAvatar(bean, avatar, mConfig);
     }

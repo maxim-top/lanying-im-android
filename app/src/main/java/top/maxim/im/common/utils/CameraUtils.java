@@ -168,6 +168,17 @@ public class CameraUtils {
     }
 
     /**
+     * 跳转相册选择视频
+     * @param activity  上下文
+     * @param resultCode 请求码
+     */
+    public void takeGalleyForVideo(Activity activity, int resultCode) {
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        activity.startActivityForResult(intent, resultCode);
+    }
+
+    /**
      * 裁剪头像(控制生成图片大小)
      *
      * @param originalFile 路径

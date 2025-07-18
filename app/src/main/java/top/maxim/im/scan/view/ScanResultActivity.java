@@ -12,10 +12,12 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import im.floo.floolib.BMXErrorCode;
 import top.maxim.im.LoginRegisterActivity;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
+import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.CommonUtils;
@@ -226,7 +228,17 @@ public class ScanResultActivity extends BaseTitleActivity {
             // 自己进入设置页面
             SettingUserActivity.openSettingUser(this);
         } else {
-            RosterDetailActivity.openRosterDetail(this, uid);
+            RosterManager.getInstance().getRosterList(uid, true, (bmxErrorCode, bmxRosterItem) -> {
+                if (BaseManager.bmxFinish(bmxErrorCode)) {
+                    RosterDetailActivity.openRosterDetail(this, bmxRosterItem.rosterId());
+                } else {
+                    int textResId = R.string.unknown_error;
+                    if (bmxErrorCode == BMXErrorCode.UserNotExist){
+                        textResId = R.string.user_not_exist_or_app_id_not_same;
+                    }
+                    ToastUtil.showTextViewPrompt(textResId);
+                }
+            });
         }
         finish();
     }

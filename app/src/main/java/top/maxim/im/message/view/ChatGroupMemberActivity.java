@@ -26,6 +26,7 @@ import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.BMImageLoader;
@@ -402,16 +403,8 @@ public class ChatGroupMemberActivity extends BaseTitleActivity {
                 BMImageLoader.getInstance().display(icon, "drawable://" + R.drawable.default_remove_icon);
             } else {
                 BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(memberId);
-                String name = "";
-                if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
-                    name = rosterItem.alias();
-                } else if (member != null && !TextUtils.isEmpty(member.getMGroupNickname())) {
-                    name = member.getMGroupNickname();
-                }else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
-                    name = rosterItem.nickname();
-                } else if (rosterItem != null) {
-                    name = rosterItem.username();
-                }
+                String name = CommonUtils.getGroupMemberDisplayName(rosterItem, mGroupId,
+                        member.getMUid(), mGroup.hideMemberInfo());
                 tvName.setText(TextUtils.isEmpty(name) ? "" : name);
 
                 ChatUtils.getInstance().showRosterAvatar(rosterItem, icon, mConfig);

@@ -18,6 +18,8 @@ public interface CommonConfig {
 
     String MOBILE_BIND_ACTION = "mobilebindAction";
 
+    String REAL_NAME_VERIFY_ACTION = "realNameVerifyAction";
+
     String WX_OPEN_ID = "wxOpenId";
 
     String VERIFY_TYPE = "verifyType";

@@ -43,6 +43,9 @@ public class MainActivity extends BaseSwitchActivity {
 
     protected TabSwitchView mSettingTab;
 
+    private int mLastSelectedIndex;// 上一次点击的索引
+    private long mLastClickTime; // 上一次点击的时间
+
     public static void openMain(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -124,6 +127,18 @@ public class MainActivity extends BaseSwitchActivity {
     @Override
     protected void onTabClick() {
         super.onTabClick();
+        long now = System.currentTimeMillis(); // 返回毫秒级时间戳
+        // 两次点击按钮都是“对话”， 时间间隔 < 0.5秒
+        if (mLastSelectedIndex == 0 && mCurrentIndex == 0 &&
+                (now - mLastClickTime) < 500){
+            Intent intent = new Intent();
+            intent.setAction("chatDoubleClicked");
+            RxBus.getInstance().send(intent);
+            mLastClickTime = 0;
+        }else{
+            mLastClickTime = now;
+            mLastSelectedIndex = mCurrentIndex;
+        }
     }
 
     @Override

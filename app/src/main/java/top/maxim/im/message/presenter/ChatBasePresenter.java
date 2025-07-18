@@ -21,6 +21,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -53,7 +54,6 @@ import java.util.Map;
 
 import im.floo.BMXDataCallBack;
 import im.floo.floolib.BMXChatServiceListener;
-import im.floo.floolib.BMXClient;
 import im.floo.floolib.BMXConversation;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXFileAttachment;
@@ -454,35 +454,34 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         if (mConversation == null || msgId < 0) {
             return;
         }
-        ChatManager.getInstance().retrieveHistoryMessages(mConversation, msgId,
-                MessageConfig.DEFAULT_PAGE_SIZE, (bmxErrorCode, messageList) -> {
-                    if (BaseManager.bmxFinish(bmxErrorCode)) {
-                        if (!messageList.isEmpty()) {
-                            List<BMXMessage> messages = new ArrayList<>();
-                            for (int i = 0; i < messageList.size(); i++) {
-                                messages.add(messageList.get(i));
+        List<BMXMessage> messages = new ArrayList<>();
+        mConversation.loadMessages(msgId, MessageConfig.DEFAULT_PAGE_SIZE,
+                (bmxErrorCode1, bmxMessageList) -> {
+                    if (BaseManager.bmxFinish(bmxErrorCode1)) {
+                        if (!bmxMessageList.isEmpty()) {
+                            for (int i = 0; i < bmxMessageList.size(); i++) {
+                                messages.add(bmxMessageList.get(i));
                             }
-                            if (mView != null) {
+                            if (mView != null && !messages.isEmpty()) {
                                 mView.showPullChatMessages(messages, offset);
                             }
                         }
-                        return;
                     }
-                    // 历史消息没有拉到 从DB获取
-                    mConversation.loadMessages(msgId, MessageConfig.DEFAULT_PAGE_SIZE,
-                            (bmxErrorCode1, bmxMessageList) -> {
-                                if (BaseManager.bmxFinish(bmxErrorCode1)) {
-                                    if (!bmxMessageList.isEmpty()) {
-                                        List<BMXMessage> messages = new ArrayList<>();
-                                        for (int i = 0; i < messageList.size(); i++) {
-                                            messages.add(messageList.get(i));
-                                        }
-                                        if (mView != null) {
-                                            mView.showPullChatMessages(messages, offset);
+                    if (messages.isEmpty()){
+                        ChatManager.getInstance().retrieveHistoryMessages(mConversation, msgId,
+                                MessageConfig.DEFAULT_PAGE_SIZE, (bmxErrorCode, messageList) -> {
+                                    if (BaseManager.bmxFinish(bmxErrorCode)) {
+                                        if (!messageList.isEmpty()) {
+                                            for (int i = 0; i < messageList.size(); i++) {
+                                                messages.add(messageList.get(i));
+                                            }
+                                            if (mView != null && !messages.isEmpty()) {
+                                                mView.showPullChatMessages(messages, offset);
+                                            }
                                         }
                                     }
-                                }
-                            });
+                                });
+                    }
                 });
     }
 
@@ -708,15 +707,14 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 }
                 break;
             case VIDEO:
-                // 视频需要SD卡读写 麦克风权限
-                if (hasPermission(PermissionsConstant.CAMERA, PermissionsConstant.RECORD_AUDIO,
-                        PermissionsConstant.READ_STORAGE, PermissionsConstant.WRITE_STORAGE)) {
-                    showVideoView();
+                // 选择相册 需要SD卡读写权限
+                if (hasPermission(PermissionsConstant.READ_STORAGE)) {
+                    CameraUtils.getInstance().takeGalleyForVideo((Activity)mView.getContext(),
+                            VIDEO_REQUEST);
                 } else {
-                    // 如果没有权限 首先请求SD读权限
-                    requestPermissions(TYPE_PHOTO_PERMISSION,PermissionsConstant.CAMERA,
-                            PermissionsConstant.WRITE_STORAGE, PermissionsConstant.RECORD_AUDIO,
-                            PermissionsConstant.READ_STORAGE);
+                    Log.d("PermMgr", "requestPermissions TYPE_PHOTO_PERMISSION");
+
+                    requestPermissions(TYPE_VIDEO_PERMISSION, PermissionsConstant.READ_STORAGE);
                 }
                 break;
             case FILE:
@@ -1479,6 +1477,50 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         }
     }
 
+    public final class VideoInfo {
+        private final long duration;
+        private final int width;
+        private final int height;
+
+        public VideoInfo(long duration, int width, int height) {
+            this.duration = duration;
+            this.width = width;
+            this.height = height;
+        }
+
+        public long getDuration() { return this.duration; }
+        public int getWidth() { return this.width; }
+        public int getHeight() { return this.height; }
+    }
+
+    private VideoInfo getVideoInfo(String videoPath){
+
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        try {
+            mmr.setDataSource(videoPath); // 视频文件路径
+            String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            long duration = Long.parseLong(durationStr);
+            String widthStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+            String heightStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+            String rotationStr = mmr.extractMetadata(
+                    MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION
+            );
+            int width = Integer.parseInt(widthStr);
+            int height = Integer.parseInt(heightStr);
+            int rotation = (rotationStr != null) ? Integer.parseInt(rotationStr) : 0;
+            if (rotation == 90 || rotation == 270){//交换宽和高
+                width = width ^ height;
+                height = width ^ height;
+                width = width ^ height;
+            }
+            mmr.release(); // 必须调用以避免内存泄漏
+            return new VideoInfo(duration, width, height);
+        } catch (IllegalArgumentException | IOException e) {
+            e.printStackTrace();
+            return new VideoInfo(0, 0, 0);
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -1496,21 +1538,22 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                     }
                 }
                 break;
-            case CAMERA_REQUEST:
-                // 拍照
-                if (resultCode == Activity.RESULT_OK) {
-                    if (!TextUtils.isEmpty(mCameraPath) && new File(mCameraPath).exists()) {
-                        File f = new File(mCameraPath);
-                        mView.getContext().sendBroadcast(new Intent(
-                                Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + f)));
-                        int[] size = ChatUtils.getInstance().getImageSize(mCameraPath);
-                        mView.sendChatMessage(mSendUtils.sendImageMessage(mChatType, mMyUserId,
-                                mChatId, mCameraPath, size[0], size[1]));
+            case VIDEO_REQUEST:
+                // 相册
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    try {
+                        Uri selectedVideo = data.getData(); // 获取系统返回的视频的Uri
+                        String path = FileUtils.getFilePathByUri(selectedVideo);
+                        VideoInfo videoInfo = getVideoInfo(path);
+                        mView.sendChatMessage(mSendUtils.sendVideoMessage(mChatType, mMyUserId,
+                                mChatId, path, (int)videoInfo.duration, videoInfo.width, videoInfo.height));
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 break;
-            case VIDEO_REQUEST:
-                // 视频
+            case CAMERA_REQUEST:
+                // 拍照
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     int type = data.getIntExtra(PhotoRecorderActivity.EXTRA_RECORD_TYPE, -1);
                     if (type == 1) {
@@ -1699,14 +1742,14 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 case PermissionsConstant.CAMERA:
                     if (requestType == TYPE_CAMERA_PERMISSION) {
                         // 拍照
-                        takePic();
-                    } else if (requestType == TYPE_VIDEO_PERMISSION) {
-                        // 视频
                         if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
-                            showVideoView();
+                            takePic();
                         } else {
                             requestPermissions(requestType, PermissionsConstant.RECORD_AUDIO);
                         }
+                    } else if (requestType == TYPE_VIDEO_PERMISSION) {
+                        // 视频
+                        ToastUtil.showTextViewPrompt("Exception:CAMERA by TYPE_VIDEO_PERMISSION.");
                     } else if (requestType == TYPE_VIDEO_CALL_PERMISSION) {
                         //视频通话
                         if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
@@ -1724,8 +1767,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                             e.printStackTrace();
                         }
                     } else if (requestType == TYPE_VIDEO_PERMISSION) {
-                        // 视频
-                        showVideoView();
+                        ToastUtil.showTextViewPrompt("Exception:RECORD_AUDIO by TYPE_VIDEO_PERMISSION.");
                     } else if (requestType == TYPE_VIDEO_CALL_PERMISSION) {
                         // 视频通话
                         handelVideoCall(true);
@@ -1855,16 +1897,7 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                 break;
             case TYPE_VIDEO_PERMISSION:
                 // 视频
-                if (hasPermission(PermissionsConstant.CAMERA)) {
-                    // 视频
-                    if (hasPermission(PermissionsConstant.RECORD_AUDIO)) {
-                        showVideoView();
-                    } else {
-                        requestPermissions(requestType, PermissionsConstant.RECORD_AUDIO);
-                    }
-                } else {
-                    requestPermissions(requestType, PermissionsConstant.CAMERA);
-                }
+                CameraUtils.getInstance().takeGalley((Activity)mView.getContext(), VIDEO_REQUEST);
                 break;
             default:
                 break;
@@ -1876,28 +1909,8 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
      */
     private void takePic() {
         // 拍照
-        if (!TextUtils.isEmpty(mCameraName)) {
-            mCameraName = null;
-        }
-        if (!TextUtils.isEmpty(mCameraDir)) {
-            mCameraDir = null;
-        }
-        if (!TextUtils.isEmpty(mCameraPath)) {
-            mCameraPath = null;
-        }
-        mCameraName = CameraUtils.getInstance().getCameraName();
-        mCameraDir = FileConfig.DIR_APP_CACHE_CAMERA + "/";
-        mCameraPath = FileConfig.DIR_APP_CACHE_CAMERA + "/" + mCameraName + ".jpg";
-        CameraUtils.getInstance().takePhoto(mCameraDir, mCameraPath, (Activity)mView.getContext(),
-                CAMERA_REQUEST);
-    }
-
-    /**
-     * 录制视频
-     */
-    private void showVideoView() {
         Intent it = new Intent(mView.getContext(), PhotoRecorderActivity.class);
-        ((Activity)mView.getContext()).startActivityForResult(it, VIDEO_REQUEST);
+        ((Activity)mView.getContext()).startActivityForResult(it, CAMERA_REQUEST);
     }
 
     /**

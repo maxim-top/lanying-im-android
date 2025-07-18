@@ -305,6 +305,14 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
                             if (mAdapter != null) {
                                 mAdapter.notifyDataSetChanged();
                             }
+                        } else if (TextUtils.equals(action, "chatDoubleClicked")) {
+                            for (int i=0; i<mAdapter.getItemCount(); i++){
+                                BMXConversation item = mAdapter.getItem(i);
+                                if (item != null && item.unreadNumber() > 0) {
+                                    LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+                                    layoutManager.scrollToPositionWithOffset(i+1, 0); // targetPosition 为目标项索引
+                                }
+                            }
                         }
                     }
                 });

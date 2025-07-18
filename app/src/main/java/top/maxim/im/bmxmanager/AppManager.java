@@ -121,6 +121,76 @@ public class AppManager {
     }
 
     /**
+     * 获取实名认证信息
+     *
+     * @param callback
+     */
+    public void getUserVerificationInfo(HttpResponseCallback<String> callback) {
+        String token = SharePreferenceUtils.getInstance().getToken();
+        if (TextUtils.isEmpty(token)) {
+            return;
+        }
+
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        mClient.call(HttpClient.Method.GET, mBaseUrl + "user_verification", null, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        String mobile = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                String data = jsonObject.getString("data");
+                                jsonObject = new JSONObject(data);
+                                if (jsonObject.has("status")) {
+                                    int status = jsonObject.getInt("status");
+                                    if (status == 1){
+                                        mobile = jsonObject.getString("mobile");
+                                    }
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(mobile);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, t);
+                        }
+                    }
+                });
+    }
+
+    /**
      * 根据userName获取token
      *
      * @param name
@@ -709,6 +779,64 @@ public class AppManager {
         params.put("mobile", mobile);
         params.put("captcha", captcha);
         mClient.call(HttpClient.Method.POST, mBaseUrl + "user/mobile_bind", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 实名认证
+     */
+    public void userVerifyByPhone(String token, String mobile, String captcha,
+            HttpResponseCallback<Boolean> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        params.put("mobile", mobile);
+        params.put("captcha", captcha);
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "user_verification_by_mobile", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {

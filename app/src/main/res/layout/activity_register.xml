@@ -36,6 +36,7 @@
             android:gravity="center_vertical"
             android:hint="@string/register_user_name_hint"
             android:inputType="textVisiblePassword"
+            android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
             android:maxLines="1"
             android:textColorHint="@color/color_666666"
             android:textSize="@dimen/dimen_14" />

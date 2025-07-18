@@ -84,7 +84,7 @@ public class MyQrCodeActivity extends BaseTitleActivity {
                 long userId = profile.userId();
                 mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
                 mNickName.setText(TextUtils.isEmpty(nickName) ? "" : getString(R.string.nickname_colon) + nickName);
-                mUserId.setText(userId <= 0 ? "" : "BMXID:" + userId);
+                mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
             }
         });
     }

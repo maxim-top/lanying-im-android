@@ -27,7 +27,7 @@ public abstract class BaseSwitchActivity extends BaseTitleActivity {
     public static final int CAMERA_DISTANCE = 6000;
     protected BaseFragment mCurrentFragment;
 
-    private int mCurrentIndex = -1;
+    protected int mCurrentIndex = -1;
 
     private SparseArray<BaseFragment> mFragmentCache;
 

@@ -27,6 +27,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -159,6 +160,7 @@ public class GroupInviteActivity extends BaseTitleActivity {
         protected void onBindHolder(BaseViewHolder holder, int position) {
             ShapeImageView avatar = holder.findViewById(R.id.apply_avatar);
             TextView title = holder.findViewById(R.id.apply_title);
+            TextView reason = holder.findViewById(R.id.apply_reason);
             TextView status = holder.findViewById(R.id.apply_status);
             TextView accept = holder.findViewById(R.id.tv_accept);
             final BMXGroup.Invitation item = getItem(position);
@@ -172,16 +174,8 @@ public class GroupInviteActivity extends BaseTitleActivity {
                             : "");
 
             BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(item.getMInviterId());
-            String name = "";
-            if (rosterItem != null) {
-                if (!TextUtils.isEmpty(rosterItem.alias())) {
-                    name = rosterItem.alias();
-                } else if (!TextUtils.isEmpty(rosterItem.nickname())) {
-                    name = rosterItem.nickname();
-                } else {
-                    name = rosterItem.username();
-                }
-            }
+            String name = CommonUtils.getRosterDisplayName(rosterItem);
+            reason.setText(name);
 
             BMXGroup.InvitationStatus inviteStatus = item.getMStatus();
             String statusDesc = "";

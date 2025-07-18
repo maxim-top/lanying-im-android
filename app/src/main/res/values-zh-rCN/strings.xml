@@ -440,7 +440,7 @@
     <string name="rejected">已拒绝</string>
     <string name="enabled">已开启</string>
     <string name="added">已添加</string>
-    <string name="username_only_supports">用户名仅支持字母数字下划线中文组合，且不能是纯数字，不能以maxim、mta开头</string>
+    <string name="username_only_supports">用户名仅支持字母数字下划线组合，且不能是纯数字，不能以maxim、mta开头</string>
     <string name="someone_at_you">[有人@你]</string>
     <string name="voice">语音</string>
     <string name="voice_not_exist">语音不存在!</string>
@@ -767,4 +767,13 @@
     <string name="about_us_expired">❗认证失败</string>
     <string name="about_us_unverified_developer">未认证开发者</string>
     <string name="about_us_individual_developer">个人开发者:</string>
+    <string name="real_name_verification">实名认证</string>
+    <string name="verified_successfully">认证成功</string>
+    <string name="verified_failed">认证失败</string>
+    <string name="change_the_verification_phone_number">更改实名认证手机号</string>
+    <string name="go_to_verify">去认证</string>
+    <string name="real_name_verified">您已实名认证。手机号：%s</string>
+    <string name="re_verify">重新认证</string>
+    <string name="user_not_exist_or_app_id_not_same">用户账号已注销或者不在同一App ID</string>
+    <string name="unknown_error">未知错误</string>
 </resources>

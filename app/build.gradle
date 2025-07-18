@@ -5,7 +5,7 @@ apply plugin: 'newlens'
 //google service
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
-//apply plugin: 'com.huawei.agconnect'
+apply plugin: 'com.huawei.agconnect'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
@@ -23,11 +23,11 @@ android {
     defaultConfig {
         applicationId "top.maxim.im"
         minSdkVersion 23
-        compileSdk 34
-        targetSdk 34
+        compileSdk 35
+        targetSdk 35
         //noinspection HighAppVersionCode
-        versionCode 2000000087
-        versionName "4.9.13"
+        versionCode 2000000091
+        versionName "4.9.17"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 "GOOGLE_PUSH_ID"   : "fcm",

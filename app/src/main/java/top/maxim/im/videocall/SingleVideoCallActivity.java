@@ -46,6 +46,7 @@ import im.floo.floolib.BMXVideoMediaType;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.CutoutScreenUtil;
 import top.maxim.rtc.RTCManager;
 import top.maxim.im.bmxmanager.RosterManager;
@@ -717,14 +718,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         peerInfo.setVisibility(View.VISIBLE);
         TextView nameText = mVideoContainer.findViewById(R.id.tv_video_peer_name);
         ShapeImageView avatar = mVideoContainer.findViewById(R.id.iv_video_peer_avatar);
-        String name = "";
-        if (mRosterItem != null && !TextUtils.isEmpty(mRosterItem.alias())) {
-            name = mRosterItem.alias();
-        } else if (mRosterItem != null && !TextUtils.isEmpty(mRosterItem.nickname())) {
-            name = mRosterItem.nickname();
-        } else if (mRosterItem != null) {
-            name = mRosterItem.username();
-        }
+        String name = CommonUtils.getRosterDisplayName(mRosterItem);
         nameText.setText(name);
         ChatUtils.getInstance().showRosterAvatar(mRosterItem, avatar, new ImageRequestConfig.Builder().cacheInMemory(true)
                 .showImageForEmptyUri(R.drawable.default_avatar_icon)
@@ -784,14 +778,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         peerInfo.setVisibility(View.VISIBLE);
         TextView nameText = mAudioContainer.findViewById(R.id.tv_audio_peer_name);
         ShapeImageView avatar = mAudioContainer.findViewById(R.id.iv_audio_peer_avatar);
-        String name = "";
-        if (mRosterItem != null && !TextUtils.isEmpty(mRosterItem.alias())) {
-            name = mRosterItem.alias();
-        } else if (mRosterItem != null && !TextUtils.isEmpty(mRosterItem.nickname())) {
-            name = mRosterItem.nickname();
-        } else if (mRosterItem != null) {
-            name = mRosterItem.username();
-        }
+        String name = CommonUtils.getRosterDisplayName(mRosterItem);
         nameText.setText(name);
         ChatUtils.getInstance().showRosterAvatar(mRosterItem, avatar, new ImageRequestConfig.Builder().cacheInMemory(true)
                 .showImageForEmptyUri(R.drawable.default_avatar_icon)

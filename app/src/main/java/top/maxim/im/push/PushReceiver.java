@@ -19,6 +19,7 @@ import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.bean.MessageBean;
 import top.maxim.im.common.utils.AppContextUtils;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.message.utils.MessageConfig;
 import top.maxim.im.message.view.ChatGroupActivity;
@@ -71,12 +72,7 @@ public class PushReceiver extends BroadcastReceiver {
                                     if (rosterItem == null || rosterItem.isMuteNotification()) {
                                         return;
                                     }
-                                    String name = "";
-                                    if (!TextUtils.isEmpty(rosterItem.alias())) {
-                                        name = rosterItem.alias();
-                                    } else {
-                                        name = rosterItem.username();
-                                    }
+                                    String name = CommonUtils.getRosterDisplayName(rosterItem);
                                     handleNotify(context, name, bean, isPushSound, isPushVibrate,
                                             isPushDetail);
                                 });

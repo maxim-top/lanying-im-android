@@ -116,7 +116,7 @@ public class AboutUsActivity extends BaseTitleActivity {
                     @Override
                     public void run() {
                         String companyName = CommonUtils.getCompanyName(AboutUsActivity.this);
-                        String verificationStatus = CommonUtils.getVerificationStatusChar(AboutUsActivity.this);
+                        String verificationStatus = CommonUtils.getVerificationStatusText(AboutUsActivity.this);
                         mCompanyName.setText(companyName);
                         mVerificationStatus.setText(verificationStatus);
                     }

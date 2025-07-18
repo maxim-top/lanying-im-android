@@ -22,6 +22,7 @@ import im.floo.floolib.BMXMessageConfig;
 import im.floo.floolib.BMXRosterItem;
 import im.floo.floolib.ListOfLongLong;
 import top.maxim.im.R;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TimeUtils;
@@ -82,13 +83,7 @@ public class SessionAdapter extends RecyclerWithHFAdapter<BMXConversation> {
         if (type != null && (type == BMXConversation.Type.Single ||
                 type == BMXConversation.Type.System)) {
             BMXRosterItem rosterItem = RosterFetcher.getFetcher().getRoster(item.conversationId());
-            if (rosterItem != null && !TextUtils.isEmpty(rosterItem.alias())) {
-                name = rosterItem.alias();
-            } else if (rosterItem != null && !TextUtils.isEmpty(rosterItem.nickname())) {
-                name = rosterItem.nickname();
-            } else if (rosterItem != null) {
-                name = rosterItem.username();
-            }
+            name = CommonUtils.getRosterDisplayName(rosterItem);
             if (item.conversationId() == 0){
                 name = mContext.getString(R.string.sys_msg);
             }

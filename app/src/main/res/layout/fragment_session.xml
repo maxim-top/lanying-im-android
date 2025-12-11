@@ -10,4 +10,48 @@
         android:overScrollMode="never"
         android:scrollbars="none" />
 
+    <LinearLayout
+        android:id="@+id/notification_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:background="@color/c3"
+        android:layout_alignParentBottom="true"
+        android:clickable="true">
+        <ImageView
+            android:id="@+id/icon_bell"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/icon_group"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside" />
+        <TextView
+            android:id="@+id/text_notification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/open_notification_tip"
+            android:textSize="@dimen/dimen_12"
+            android:layout_marginStart="5dp" />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+        <TextView
+            android:id="@+id/button_open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/open_notification"
+            android:textColor="@color/red"
+            android:textSize="@dimen/dimen_15"
+            android:layout_gravity="center_vertical"/>
+        <ImageView
+            android:id="@+id/button_close"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/icon_clear"
+            android:layout_marginStart="5dp"
+            android:layout_gravity="center_vertical"/>
+    </LinearLayout>
 </RelativeLayout>

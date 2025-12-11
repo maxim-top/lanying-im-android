@@ -209,7 +209,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
         });
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.dp2px(44));
-        params.topMargin = ScreenUtils.dp2px(30);
+        params.topMargin = ScreenUtils.dp2px(6);
         params.bottomMargin = ScreenUtils.dp2px(5);
         params.leftMargin = ScreenUtils.dp2px(15);
         params.rightMargin = ScreenUtils.dp2px(15);
@@ -234,7 +234,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
         });
         LinearLayout.LayoutParams paramsVideoCall = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.dp2px(44));
-        paramsVideoCall.topMargin = ScreenUtils.dp2px(30);
+        paramsVideoCall.topMargin = ScreenUtils.dp2px(1);
         paramsVideoCall.bottomMargin = ScreenUtils.dp2px(5);
         paramsVideoCall.leftMargin = ScreenUtils.dp2px(15);
         paramsVideoCall.rightMargin = ScreenUtils.dp2px(15);
@@ -259,7 +259,7 @@ public class RosterDetailActivity extends BaseTitleActivity {
         });
         LinearLayout.LayoutParams paramsVoiceCall = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ScreenUtils.dp2px(44));
-        paramsVoiceCall.topMargin = ScreenUtils.dp2px(30);
+        paramsVoiceCall.topMargin = ScreenUtils.dp2px(1);
         paramsVoiceCall.bottomMargin = ScreenUtils.dp2px(5);
         paramsVoiceCall.leftMargin = ScreenUtils.dp2px(15);
         paramsVoiceCall.rightMargin = ScreenUtils.dp2px(15);

@@ -16,6 +16,7 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
@@ -44,6 +45,9 @@ public class UserVerificationActivity extends BaseTitleActivity {
 
     /* 输入监听 */
     private TextWatcher mInputWatcher;
+
+    /* 跳过 */
+    private TextView mTvSkip;
 
     private String mSign;
 
@@ -88,6 +92,9 @@ public class UserVerificationActivity extends BaseTitleActivity {
         mSendVerify = view.findViewById(R.id.tv_send_verify);
         mSendVerify.setEnabled(false);
         mVerifyCountDown = view.findViewById(R.id.tv_send_verify_count_down);
+        mTvSkip = view.findViewById(R.id.tv_skip);
+        mTvSkip.setVisibility(CommonUtils.isOptionalVerification("mobile") ?
+                View.VISIBLE : View.INVISIBLE);
         mHeader.setTitle(R.string.real_name_verification);
         return view;
     }
@@ -99,6 +106,11 @@ public class UserVerificationActivity extends BaseTitleActivity {
 
     @Override
     protected void setViewListener() {
+        mTvSkip.setOnClickListener(v -> {
+            UserVerificationIdNumberActivity.openUserVerification(
+                    UserVerificationActivity.this);
+            finish();
+        });
         // 继续
         mLogin.setOnClickListener(v -> {
             String name = mInputName.getText().toString().trim();
@@ -155,6 +167,7 @@ public class UserVerificationActivity extends BaseTitleActivity {
         mInputPwd.addTextChangedListener(mInputWatcher);
         // 发送验证码
         mSendVerify.setOnClickListener(v -> {
+            mInputPwd.requestFocus();
             verifyCountDown();
             String phone = mInputName.getEditableText().toString().trim();
             AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {
@@ -175,7 +188,11 @@ public class UserVerificationActivity extends BaseTitleActivity {
 
                 @Override
                 public void onFailure(int errorCode, String errorMsg, Throwable t) {
-                    ToastUtil.showTextViewPrompt(getString(R.string.failed_to_get_captcha));
+                    int resId = R.string.failed_to_get_captcha;
+                    if (errorCode == 500 && errorMsg.startsWith("Too Many Requests")){
+                        resId = R.string.error_sms_code_RequestTooMany;
+                    }
+                    ToastUtil.showTextViewPrompt(getString(resId));
                     mSendVerify.setEnabled(true);
                     mSendVerify.setVisibility(View.VISIBLE);
                     mVerifyCountDown.setText("");
@@ -217,6 +234,10 @@ public class UserVerificationActivity extends BaseTitleActivity {
                                             Intent intent = new Intent();
                                             intent.setAction(CommonConfig.REAL_NAME_VERIFY_ACTION);
                                             RxBus.getInstance().send(intent);
+                                            if (CommonUtils.needShowVerificationPage("id_card")) {
+                                                UserVerificationIdNumberActivity.openUserVerification(
+                                                        UserVerificationActivity.this);
+                                            }
                                             finish();
                                         } else {
                                             ToastUtil.showTextViewPrompt(getString(R.string.verified_failed));
@@ -227,7 +248,7 @@ public class UserVerificationActivity extends BaseTitleActivity {
                                     public void onFailure(int errorCode, String errorMsg,
                                             Throwable t) {
                                         dismissLoadingDialog();
-                                        ToastUtil.showTextViewPrompt(errorMsg);
+                                        ToastUtil.showTextViewPrompt(getString(R.string.verified_failed));
                                     }
                                 });
                     }

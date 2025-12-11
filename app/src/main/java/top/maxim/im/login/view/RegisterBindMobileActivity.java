@@ -15,6 +15,7 @@ import android.widget.TextView;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.common.base.BaseTitleActivity;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.net.HttpResponseCallback;
@@ -45,7 +46,7 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
     /* 验证码倒计时 */
     private TextView mVerifyCountDown;
 
-    /* 扫一扫 */
+    /* 跳过 */
     private TextView mTvSkip;
 
     /* 输入监听 */
@@ -163,6 +164,7 @@ public class RegisterBindMobileActivity extends BaseTitleActivity {
         mInputPwd.addTextChangedListener(mInputWatcher);
         // 发送验证码
         mSendVerify.setOnClickListener(v -> {
+            mInputPwd.requestFocus();
             verifyCountDown();
             String phone = mInputName.getEditableText().toString().trim();
             AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {

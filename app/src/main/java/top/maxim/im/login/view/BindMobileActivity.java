@@ -177,6 +177,7 @@ public class BindMobileActivity extends BaseTitleActivity {
         mInputPwd.addTextChangedListener(mInputWatcher);
         // 发送验证码
         mSendVerify.setOnClickListener(v -> {
+            mInputPwd.requestFocus();
             verifyCountDown();
             String phone = mInputName.getEditableText().toString().trim();
             AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {

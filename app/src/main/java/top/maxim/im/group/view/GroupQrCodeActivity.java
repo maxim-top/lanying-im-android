@@ -37,6 +37,8 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
 
     private TextView mTvGroupId;
 
+    private TextView mTvAppId;
+
     private ImageView mIvQrCode;
 
     private long mGroupId;
@@ -68,6 +70,7 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
         mGroupName = view.findViewById(R.id.tv_user_name);
         mTvGroupId = view.findViewById(R.id.tv_user_id);
         mIvQrCode = view.findViewById(R.id.iv_qrcode);
+        mTvAppId = view.findViewById(R.id.tv_app_id);
         return view;
     }
 
@@ -96,6 +99,7 @@ public class GroupQrCodeActivity extends BaseTitleActivity {
                 mGroupName.setText(TextUtils.isEmpty(name) ? "" : name);
             }
         });
+        mTvAppId.setText(SharePreferenceUtils.getInstance().getAppId());
     }
 
     /**

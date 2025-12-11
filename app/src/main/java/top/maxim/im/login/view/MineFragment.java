@@ -54,6 +54,7 @@ import top.maxim.im.common.view.ShapeImageView;
 import top.maxim.im.contact.view.BlockListActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.net.HttpResponseCallback;
+import top.maxim.im.videocall.RTCConfigActivity;
 
 /**
  * Description : 我的 Created by Mango on 2018/11/06
@@ -68,8 +69,6 @@ public class MineFragment extends BaseTitleFragment {
     private ScrollView mScrollView;
 
     private RelativeLayout mRlUserInfo;
-
-    private ImageView mUserEdit;
 
     private ShapeImageView mUserIcon;
 
@@ -148,6 +147,9 @@ public class MineFragment extends BaseTitleFragment {
     /* 删除账号 */
     private ItemLineArrow.Builder mDeleteAccount;
 
+    /* RTC设置 */
+    private ItemLineArrow.Builder mRTCConfig;
+
     /* app版本号 */
     private TextView mAppVersion;
 
@@ -172,7 +174,6 @@ public class MineFragment extends BaseTitleFragment {
         mFlexibleLayout = view.findViewById(R.id.flexible_layout);
         mScrollView = view.findViewById(R.id.scroll_user);
         mRlUserInfo = view.findViewById(R.id.rl_user_info);
-        mUserEdit = view.findViewById(R.id.iv_user_info_edit);
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
         mUserName = view.findViewById(R.id.tv_user_name);
         mNickName = view.findViewById(R.id.tv_nick_name);
@@ -336,6 +337,14 @@ public class MineFragment extends BaseTitleFragment {
                     }
                 });
         container.addView(mBlockList.build());
+
+        // 分割线
+        container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
+                .build());
+        // RCT设置
+        mRTCConfig = new ItemLineArrow.Builder(getActivity()).setStartContent(getString(R.string.config_rtc))
+                .setOnItemClickListener(v -> RTCConfigActivity.openRTCConfig(getActivity()));
+        container.addView(mRTCConfig.build());
 
         // 分割线
         container.addView(new ItemLine.Builder(getActivity(), container).setMarginLeft(ScreenUtils.dp2px(15))
@@ -550,14 +559,14 @@ public class MineFragment extends BaseTitleFragment {
             window.getDecorView().setSystemUiVisibility(systemUiVisibility);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)mRlUserInfo
                     .getLayoutParams();
-            params.height = ScreenUtils.dp2px(150) + ScreenUtils.getStatusBarHeight();
-            mRlUserInfo.setPadding(mRlUserInfo.getPaddingLeft(), ScreenUtils.getStatusBarHeight(),
+            params.height = ScreenUtils.dp2px(150) + ScreenUtils.getStatusBarHeight(getActivity());
+            mRlUserInfo.setPadding(mRlUserInfo.getPaddingLeft(), ScreenUtils.getStatusBarHeight(getActivity()),
                     mRlUserInfo.getPaddingRight(), mRlUserInfo.getPaddingBottom());
             mScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
                 @Override
                 public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX,
                         int oldScrollY) {
-                    if (ScreenUtils.getStatusBarHeight() < scrollY) {
+                    if (ScreenUtils.getStatusBarHeight(getActivity()) < scrollY) {
                         window.setStatusBarColor(getResources().getColor(R.color.color_0079F4));
                     } else {
                         window.setStatusBarColor(Color.TRANSPARENT);
@@ -576,7 +585,7 @@ public class MineFragment extends BaseTitleFragment {
             }
             Window window = getActivity().getWindow();
             int scrollY = mScrollView.getScrollY();
-            if (ScreenUtils.getStatusBarHeight() < scrollY) {
+            if (ScreenUtils.getStatusBarHeight(getActivity()) < scrollY) {
                 window.setStatusBarColor(getResources().getColor(R.color.color_0079F4));
             } else {
                 window.setStatusBarColor(Color.TRANSPARENT);
@@ -728,7 +737,10 @@ public class MineFragment extends BaseTitleFragment {
     protected void setViewListener() {
         mQuitView.setOnClickListener(v -> logout());
 
-        mUserEdit.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
+        mRlUserInfo.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
+        mNickName.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
+        mUserName.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
+        mUserId.setOnClickListener(v -> SettingUserActivity.openSettingUser(getActivity()));
 
         mMyQrCode.setOnClickListener(v -> MyQrCodeActivity.openMyQrcode(getActivity()));
 

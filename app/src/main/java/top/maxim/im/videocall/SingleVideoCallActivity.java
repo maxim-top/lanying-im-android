@@ -147,6 +147,8 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
 
     private long mDuration;
 
+    BMXVideoCanvas mLocalCanvas;
+
     private BMXChatServiceListener mChatListener = new BMXChatServiceListener(){
         @Override
         public void onReceive(BMXMessageList list) {
@@ -383,6 +385,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             public void onLocalPublish(BMXStream stream, String info, BMXErrorCode error) {
                 super.onLocalPublish(stream, info, error);
                 if (BaseManager.bmxFinish(error)) {
+                    BMXVideoCanvas canvas = new BMXVideoCanvas();
+                    canvas.setMStream(stream);
+                    canvas.setMView(mLocalView);
                     onUserJoin(stream);
                     Log.e(TAG, "发布本地流成功 开启预览 msg = " + info);
                 }else{
@@ -483,6 +488,17 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             BMXVideoConfig config = new BMXVideoConfig();
             config.setProfile(EngineConfig.VIDEO_PROFILE);
             mEngine.setVideoProfile(config);
+
+            runOnUiThread(() -> {
+                addLocalView();
+                BMXVideoCanvas mLocalCanvas = new BMXVideoCanvas();
+                mLocalCanvas.setMView(mLocalView);
+                BMXStream stream = new BMXStream();
+                stream.setMMediaType(BMXVideoMediaType.Camera);
+                stream.setMEnableVideo(true);
+                mLocalCanvas.setMStream(stream);
+                mEngine.startPreview(mLocalCanvas);
+            });
         }
 
         if (mIsInitiator) {
@@ -525,6 +541,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
      */
     private void addLocalView() {
         ViewGroup smallViewGroup = mVideoContainer.findViewById(R.id.video_view_container_small);
+        if (smallViewGroup.getChildCount() > 0){
+            return;
+        }
 
         if (mRemoteView == null){
             ViewGroup.LayoutParams layoutParams = smallViewGroup.getLayoutParams();
@@ -602,7 +621,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
             showVideoPeerInfo();
         } else {
             // 音频
-            hideVideoPeerInfo();
+            hideVideoPeerInfo(false);
             showAudioPeerInfo();
         }
         if (mIsInitiator) {
@@ -717,7 +736,9 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         ViewGroup peerInfo = mVideoContainer.findViewById(R.id.container_video_peer_info);
         peerInfo.setVisibility(View.VISIBLE);
         TextView nameText = mVideoContainer.findViewById(R.id.tv_video_peer_name);
+        nameText.setVisibility(View.VISIBLE);
         ShapeImageView avatar = mVideoContainer.findViewById(R.id.iv_video_peer_avatar);
+        avatar.setVisibility(View.VISIBLE);
         String name = CommonUtils.getRosterDisplayName(mRosterItem);
         nameText.setText(name);
         ChatUtils.getInstance().showRosterAvatar(mRosterItem, avatar, new ImageRequestConfig.Builder().cacheInMemory(true)
@@ -731,9 +752,16 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
     /**
      * 隐藏视频发起者信息
      */
-    private void hideVideoPeerInfo() {
-        ViewGroup peerInfo = mVideoContainer.findViewById(R.id.container_video_peer_info);
-        peerInfo.setVisibility(View.GONE);
+    private void hideVideoPeerInfo(boolean showDuration) {
+        if (showDuration){
+            View tv_video_peer_name = mVideoContainer.findViewById(R.id.tv_video_peer_name);
+            View iv_video_peer_avatar = mVideoContainer.findViewById(R.id.iv_video_peer_avatar);
+            tv_video_peer_name.setVisibility(View.GONE);
+            iv_video_peer_avatar.setVisibility(View.GONE);
+        } else {
+            ViewGroup peerInfo = mVideoContainer.findViewById(R.id.container_video_peer_info);
+            peerInfo.setVisibility(View.GONE);
+        }
     }
 
     private void showDuration() {
@@ -825,8 +853,12 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         ViewGroup view = findViewById(R.id.ll_recipient_control);
         view.setVisibility(View.VISIBLE);
 
-        View recipientView = mHasVideo ? view.findViewById(R.id.layout_recipient_video) : view.findViewById(R.id.layout_recipient_audio);
+        View videoView = view.findViewById(R.id.layout_recipient_video);
+        View audioView = view.findViewById(R.id.layout_recipient_audio);
+        View recipientView = mHasVideo ? videoView : audioView;
+        View otherView = mHasVideo ? audioView : videoView;
         recipientView.setVisibility(View.VISIBLE);
+        otherView.setVisibility(View.GONE);
     }
 
     /**
@@ -1046,7 +1078,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         runOnUiThread(() -> {
             removeLocalView();
             removeRemoteView();
-            hideVideoPeerInfo();
+            hideVideoPeerInfo(false);
             showAudioPeerInfo();
             showControlView(mHasVideo);
         });
@@ -1117,11 +1149,16 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
         }
         if (mHasVideo) {
             runOnUiThread(() -> {
-                addLocalView();
-                BMXVideoCanvas canvas = new BMXVideoCanvas();
-                canvas.setMView(mLocalView);
-                canvas.setMStream(info);
-                mEngine.startPreview(canvas);
+                if (mLocalCanvas != null){
+                    mEngine.stopPreview(mLocalCanvas);
+                }
+
+                if (mLocalCanvas == null){
+                    mLocalCanvas = new BMXVideoCanvas();
+                }
+                mLocalCanvas.setMView(mLocalView);
+                mLocalCanvas.setMStream(info);
+                mEngine.startPreview(mLocalCanvas);
             });
         } else {
 
@@ -1155,7 +1192,7 @@ public class SingleVideoCallActivity extends BaseTitleActivity {
                 canvas.setMUserId(info.getMUserId());
                 canvas.setMStream(info);
                 mEngine.startRemoteView(canvas);
-                hideVideoPeerInfo();
+                hideVideoPeerInfo(true);
             } else {
 
             }

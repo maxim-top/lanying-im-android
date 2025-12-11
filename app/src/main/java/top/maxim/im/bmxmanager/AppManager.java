@@ -2,6 +2,7 @@
 package top.maxim.im.bmxmanager;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -138,6 +139,8 @@ public class AppManager {
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {
+                        Log.d("AppManager", "url:" + mBaseUrl + "user_verification" +
+                                " res:" + result);
                         if (TextUtils.isEmpty(result)) {
                             if (callback != null) {
                                 callback.onCallFailure(-1, "", new Throwable());
@@ -146,7 +149,78 @@ public class AppManager {
                         }
                         int code = -1;
                         String error = "";
-                        String mobile = "";
+                        String data = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                data = jsonObject.getString("data");
+                                jsonObject = new JSONObject(data);
+                                if (jsonObject.has("status")) {
+                                    int status = jsonObject.getInt("status");
+                                    if (status == 0){
+                                        data = "";
+                                    }
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code == 200) {
+                            // 成功
+                            if (callback != null) {
+                                callback.onCallResponse(data);
+                            }
+                        } else {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, t);
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 聊天文本中网址域名是否允许跳转
+     * @param domain 域名
+     * @param callback 返回值
+     */
+    public void getDomainAccessibility(String domain, HttpResponseCallback<String> callback) {
+        String token = SharePreferenceUtils.getInstance().getToken();
+        if (TextUtils.isEmpty(token)) {
+            return;
+        }
+        Map<String, String> params = new HashMap<>();
+        params.put("domain", domain);
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "check_domain", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        String action = "";
                         try {
                             JSONObject jsonObject = new JSONObject(result);
                             if (jsonObject.has("code")) {
@@ -158,11 +232,8 @@ public class AppManager {
                             if (jsonObject.has("data")) {
                                 String data = jsonObject.getString("data");
                                 jsonObject = new JSONObject(data);
-                                if (jsonObject.has("status")) {
-                                    int status = jsonObject.getInt("status");
-                                    if (status == 1){
-                                        mobile = jsonObject.getString("mobile");
-                                    }
+                                if (jsonObject.has("action")) {
+                                    action = jsonObject.getString("action");
                                 }
                             }
                         } catch (JSONException e) {
@@ -171,7 +242,7 @@ public class AppManager {
                         if (code == 200) {
                             // 成功
                             if (callback != null) {
-                                callback.onCallResponse(mobile);
+                                callback.onCallResponse(action);
                             }
                         } else {
                             // 失败
@@ -837,6 +908,64 @@ public class AppManager {
         params.put("mobile", mobile);
         params.put("captcha", captcha);
         mClient.call(HttpClient.Method.POST, mBaseUrl + "user_verification_by_mobile", params, header,
+                new HttpCallback<String>() {
+                    @Override
+                    public void onResponse(String result) {
+                        if (TextUtils.isEmpty(result)) {
+                            if (callback != null) {
+                                callback.onCallFailure(-1, "", new Throwable());
+                            }
+                            return;
+                        }
+                        int code = -1;
+                        String error = "";
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("code")) {
+                                code = jsonObject.getInt("code");
+                            }
+                            if (jsonObject.has("message")) {
+                                error = jsonObject.getString("message");
+                            }
+                            if (jsonObject.has("data")) {
+                                boolean data = jsonObject.getBoolean("data");
+                                if (callback != null) {
+                                    callback.onCallResponse(data);
+                                }
+                                return;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        if (code != 200) {
+                            // 失败
+                            if (callback != null) {
+                                callback.onCallFailure(code, error, new Throwable(error));
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                        if (callback != null) {
+                            callback.onCallFailure(errorCode, errorMsg, new Throwable());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 实名认证
+     */
+    public void userVerifyByIdNumber(String token, String name, String idNumber,
+            HttpResponseCallback<Boolean> callback) {
+        Map<String, String> header = new HashMap<>();
+        header.put("access-token", token);
+        header.put("app_id", SharePreferenceUtils.getInstance().getAppId());
+        Map<String, String> params = new HashMap<>();
+        params.put("name", name);
+        params.put("id_card_number", idNumber);
+        mClient.call(HttpClient.Method.POST, mBaseUrl + "user_verification_by_id_card", params, header,
                 new HttpCallback<String>() {
                     @Override
                     public void onResponse(String result) {

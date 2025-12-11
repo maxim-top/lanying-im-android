@@ -35,8 +35,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="@dimen/dimen_12"
-                android:layout_marginLeft="@dimen/dimen_12"
+                android:layout_marginStart="@dimen/dimen_8"
+                android:layout_marginLeft="@dimen/dimen_8"
                 android:background="@drawable/common_arrow_right"
                 android:gravity="center_vertical" />
 
@@ -45,7 +45,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/dimen_25"
-                android:layout_marginRight="@dimen/dimen_20"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:layout_centerVertical="true"

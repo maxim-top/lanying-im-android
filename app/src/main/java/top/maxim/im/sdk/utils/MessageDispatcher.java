@@ -37,6 +37,8 @@ import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.bmxmanager.GroupManager;
+import top.maxim.im.common.utils.dialog.CommonDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.rtc.RTCManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.bmxmanager.UserManager;
@@ -284,7 +286,10 @@ public class MessageDispatcher {
         public void onUserSignOut(BMXErrorCode error, long userId) {
             super.onUserSignOut(error, userId);
 //            toastListener("onUserSignOut");
-            if (error.swigValue() == BMXErrorCode.UserRemoved.swigValue()) {
+            if (error == BMXErrorCode.UserRemoved ||
+                    error == BMXErrorCode.UserKickedByAppDeprecated ||
+                    error == BMXErrorCode.UserKickedBySameDevice ||
+                    error == BMXErrorCode.UserKickedByOtherDevices) {
                 // 被其他设备踢下线 跳转到登录页面
                 Observable.just("").subscribeOn(Schedulers.computation())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -302,7 +307,12 @@ public class MessageDispatcher {
                             @Override
                             public void onNext(String s) {
                                 CommonUtils.getInstance().logout();
-                                WelcomeActivity.openWelcome(AppContextUtils.getAppContext());
+                                String errorMessage = mActivityRef.get().getString(CommonUtils.getErrorMessage(error));
+                                if (TextUtils.isEmpty(errorMessage)){
+                                    WelcomeActivity.openWelcome(AppContextUtils.getAppContext());
+                                } else {
+                                    WelcomeActivity.openWelcomeWithErrorMessage(AppContextUtils.getAppContext(), errorMessage);
+                                }
                             }
                         });
             }

@@ -14,6 +14,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -21,14 +22,13 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -46,11 +46,11 @@ import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.BaseTitleActivity;
-import top.maxim.im.common.base.PermissionActivity;
 import top.maxim.im.common.provider.CommonProvider;
 import top.maxim.im.common.utils.CameraUtils;
 import top.maxim.im.common.utils.ClickTimeUtils;
 import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
 import top.maxim.im.common.utils.RxBus;
@@ -72,11 +72,9 @@ import top.maxim.im.common.view.ItemEnableArrow;
 import top.maxim.im.common.view.ItemLine;
 import top.maxim.im.common.view.ItemLineArrow;
 import top.maxim.im.common.view.ShapeImageView;
-import top.maxim.im.contact.bean.SupportBean;
 import top.maxim.im.filebrowser.FileBrowserActivity;
 import top.maxim.im.message.utils.ChatUtils;
 import top.maxim.im.net.HttpResponseCallback;
-import top.maxim.im.videocall.RTCConfigActivity;
 import top.maxim.im.wxapi.WXUtils;
 
 /**
@@ -91,6 +89,8 @@ public class SettingUserActivity extends BaseTitleActivity {
     private ActivityResultLauncher<String[]> permissionLauncher;
 
     private ShapeImageView mUserIcon;
+
+    private ImageView mRightArrow;
 
     /* Id */
     private ItemLineArrow.Builder mUserId;
@@ -147,9 +147,6 @@ public class SettingUserActivity extends BaseTitleActivity {
     /* 推送设置 */
     private ItemLineArrow.Builder mPushSet;
 
-    /* RTC设置 */
-    private ItemLineArrow.Builder mRTCConfig;
-
     /* 头像路径 */
     private String mIconPath;
 
@@ -158,6 +155,15 @@ public class SettingUserActivity extends BaseTitleActivity {
 
     /* 实名的手机号 */
     private String mRealNamePhone;
+
+    /* 实名的姓名 */
+    private String mRealName;
+
+    /* 实名的身份证号 */
+    private String mRealNameIdNumber;
+
+    /* 实名详情 */
+    private String mRealNameVerificationDetail;
 
     private String mNickname;
 
@@ -199,6 +205,8 @@ public class SettingUserActivity extends BaseTitleActivity {
         View view = View.inflate(this, R.layout.activity_setting_user, null);
         LinearLayout container = view.findViewById(R.id.ll_setting_container);
         mUserIcon = view.findViewById(R.id.iv_user_avatar);
+
+        mRightArrow = view.findViewById(R.id.item_right_arrow);
 
         // Id
         mUserId = new ItemLineArrow.Builder(this).setStartContent("ID")
@@ -259,15 +267,31 @@ public class SettingUserActivity extends BaseTitleActivity {
                 .setOnItemClickListener(new ItemEnableArrow.OnItemArrowViewClickListener() {
                     @Override
                     public void onItemClick(View v) {
+                        if(TextUtils.isEmpty(mRealNameVerificationDetail)){
+                            return;
+                        }
+                        int rightButtonTextResId = R.string.re_verify;
+                        if(!CommonUtils.didAllRequiredFinished()){
+                            rightButtonTextResId = R.string.continue_verify;
+                        }
                         DialogUtils.getInstance().showDialog(SettingUserActivity.this,
                                 getString(R.string.real_name_verification),
-                                String.format(getString(R.string.real_name_verified), mRealNamePhone),
-                                getString(R.string.re_verify),
+                                mRealNameVerificationDetail,
+                                getString(rightButtonTextResId),
                                 getString(R.string.confirm),
                                 new CommonDialog.OnDialogListener() {
                                     @Override
                                     public void onConfirmListener() {
-                                        UserVerificationActivity.openUserVerification(SettingUserActivity.this);
+                                        if (CommonUtils.didAllRequiredFinished()){
+                                            CommonUtils.setFinishedVerifications("[]");
+                                        }
+                                        if (CommonUtils.needShowVerificationPage("mobile")){
+                                            UserVerificationActivity.openUserVerification(
+                                                    SettingUserActivity.this);
+                                        } else if (CommonUtils.needShowVerificationPage("id_card")) {
+                                            UserVerificationIdNumberActivity.openUserVerification(
+                                                    SettingUserActivity.this);
+                                        }
                                     }
 
                                     @Override
@@ -280,7 +304,8 @@ public class SettingUserActivity extends BaseTitleActivity {
 
                     @Override
                     public void onItemEnableClick(View v) {
-                        UserVerificationActivity.openUserVerification(SettingUserActivity.this);
+                        UserVerificationActivity.openUserVerification(
+                                SettingUserActivity.this);
                     }
                 });
         container.addView(mRealNameVerification.build());
@@ -417,12 +442,6 @@ public class SettingUserActivity extends BaseTitleActivity {
         container.addView(mPushSet.build());
         // 分割线
         addLineView(container);
-        // RCT设置
-        mRTCConfig = new ItemLineArrow.Builder(this).setStartContent(getString(R.string.config_rtc))
-                .setOnItemClickListener(v -> RTCConfigActivity.openRTCConfig(this));
-        container.addView(mRTCConfig.build());
-        // 分割线
-        addLineView(container);
         if (permissionLauncher == null){
             try {
                 permissionLauncher = registerForActivityResult(
@@ -441,7 +460,7 @@ public class SettingUserActivity extends BaseTitleActivity {
 
         return view;
     }
-    
+
     // 添加分割线
     private View addLineView(ViewGroup container) {
         // 分割线
@@ -546,6 +565,17 @@ public class SettingUserActivity extends BaseTitleActivity {
     @Override
     protected void setViewListener() {
         mUserIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 选择相册 需要SD卡读写权限
+                if (hasPermission(PermissionsConstant.READ_STORAGE)) {
+                    CameraUtils.getInstance().takeGalley(SettingUserActivity.this, IMAGE_REQUEST);
+                } else {
+                    requestPermissions(TYPE_PHOTO_PERMISSION, PermissionsConstant.READ_STORAGE);
+                }
+            }
+        });
+        mRightArrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 选择相册 需要SD卡读写权限
@@ -783,20 +813,63 @@ public class SettingUserActivity extends BaseTitleActivity {
             // 未绑定
             mSetPhone.setEnableContent(getString(R.string.go_to_bind));
         } else {
-            mSetPhone.setEndContent(phone);
+            mSetPhone.setEndContent(CommonUtils.replacePhoneNumber(phone));
         }
     }
 
     private void showRealNameInfo() {
+        mRealNamePhone = "";
+        mRealName = "";
+        mRealNameIdNumber = "";
+        mRealNameVerificationDetail = "";
         AppManager.getInstance().getUserVerificationInfo(
                 new HttpResponseCallback<String>() {
                     @Override
                     public void onResponse(String result) {
                         dismissLoadingDialog();
-                        String mobile = result;
-                        mRealNamePhone = mobile;
-                        if (!TextUtils.isEmpty(mobile)) {
-                            mRealNameVerification.setEndContent(mobile);
+                        try {
+                            JSONObject jsonObject = new JSONObject(result);
+                            if (jsonObject.has("status")) {
+                                int status = jsonObject.getInt("status");
+                                if (status == 1){
+                                    if (jsonObject.has("mobile")){
+                                        mRealNamePhone = jsonObject.getString("mobile");
+                                        mRealNamePhone = CommonUtils.replacePhoneNumber(mRealNamePhone);
+                                    }
+                                    if (jsonObject.has("name")) {
+                                        mRealName = jsonObject.getString("name");
+                                    }
+                                    if (jsonObject.has("id_card_number")) {
+                                        mRealNameIdNumber = jsonObject.getString("id_card_number");
+                                    }
+                                    if (jsonObject.has("required_list")) {
+                                        JSONArray jsonArray = jsonObject.getJSONArray("required_list");
+                                        CommonUtils.setRequiredVerifications(jsonArray.toString());
+                                    }
+                                    if (jsonObject.has("optional_list")) {
+                                        JSONArray jsonArray = jsonObject.getJSONArray("optional_list");
+                                        CommonUtils.setOptionalVerifications(jsonArray.toString());
+                                    }
+                                    if (jsonObject.has("finish_list")) {
+                                        JSONArray jsonArray = jsonObject.getJSONArray("finish_list");
+                                        CommonUtils.setFinishedVerifications(jsonArray.toString());
+                                    }
+                                    if (!TextUtils.isEmpty(mRealNameIdNumber)) {
+                                        mRealNameVerification.setEndContent(getString(R.string.id_verified));
+                                        mRealNameVerificationDetail = String.format(
+                                                getString(R.string.real_name_verified_id_card),
+                                                mRealNamePhone,
+                                                mRealName,
+                                                mRealNameIdNumber);
+                                    } else if (!TextUtils.isEmpty(mRealNamePhone)) {
+                                        mRealNameVerification.setEndContent(getString(R.string.phone_verified));
+                                        mRealNameVerificationDetail = String.format(getString(R.string.real_name_verified), mRealNamePhone);
+                                    } // else {} 默认显示“去认证”
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            mRealNameVerification.setEnableContent(getString(R.string.go_to_verify));
                         }
                     }
 
@@ -805,6 +878,7 @@ public class SettingUserActivity extends BaseTitleActivity {
                                           Throwable t) {
                         dismissLoadingDialog();
                         ToastUtil.showTextViewPrompt(errorMsg);
+                        mRealNameVerification.setEnableContent(getString(R.string.go_to_verify));
                     }
                 });
     }

@@ -14,7 +14,9 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.LinkMovementMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.text.style.ClickableSpan;
 import android.util.TypedValue;
 import android.view.View;
@@ -80,7 +82,6 @@ import top.maxim.im.scan.config.ScanConfigs;
 import top.maxim.im.scan.view.ScannerActivity;
 import top.maxim.im.sdk.utils.MessageDispatcher;
 import top.maxim.im.wxapi.WXUtils;
-import top.maxim.rtc.RTCManager;
 
 /**
  * Description : 登陆 Created by Mango on 2018/11/21.
@@ -92,6 +93,9 @@ public class LoginFragment extends BaseTitleFragment {
 
     /* 密码 */
     private EditText mInputPwd;
+
+    /* 显示密码 */
+    private ImageView mExposePwd;
 
     /* 登陆 */
     private TextView mLogin;
@@ -191,6 +195,7 @@ public class LoginFragment extends BaseTitleFragment {
         View view = View.inflate(getActivity(), R.layout.activity_login, null);
         mInputName = view.findViewById(R.id.et_user_name);
         mInputPwd = view.findViewById(R.id.et_user_pwd);
+        mExposePwd = view.findViewById(R.id.iv_expose);
         mLogin = view.findViewById(R.id.tv_login);
         mRegister = view.findViewById(R.id.tv_register);
         mVerifyLogin = view.findViewById(R.id.tv_verify);
@@ -405,6 +410,19 @@ public class LoginFragment extends BaseTitleFragment {
             }
             ScannerActivity.openScan(getActivity());
         });
+        mExposePwd.setOnClickListener(v -> {
+            boolean isPasswordVisible = (mInputPwd.getTransformationMethod()
+                    != PasswordTransformationMethod.getInstance());
+            if (isPasswordVisible) {
+                mInputPwd.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                mExposePwd.setImageResource(R.drawable.lock_password);
+            } else {
+                mInputPwd.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                mExposePwd.setImageResource(R.drawable.unlock_password);
+            }
+            mInputPwd.setSelection(mInputPwd.getText().length()); // 光标移至末尾
+        });
+
         mInputWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -666,6 +684,7 @@ public class LoginFragment extends BaseTitleFragment {
     }
     
     private static void realLogin(boolean isLoginById, String name, String pwd, BMXCallBack callBack) {
+        SharePreferenceUtils.getInstance().putNotificationTipClosed(false);
         if (isLoginById) {
             UserManager.getInstance().signInById(Long.valueOf(name), pwd, callBack);
         } else {

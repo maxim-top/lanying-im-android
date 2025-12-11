@@ -382,7 +382,7 @@ public class ChatVideoPlayView extends FrameLayout implements View.OnClickListen
         mHeight = height;
         // 获取状态栏高度 SDK19以上 隐藏状态栏 所以为0
         mStatusBarHeight = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ? 0
-                : ScreenUtils.getStatusBarHeight();
+                : ScreenUtils.getStatusBarHeight(getContext());
         mXLocation = x;
         mYLocation = y - mStatusBarHeight < 0 ? 0 : y - mStatusBarHeight;
         // 如果宽高为0 不显示动画

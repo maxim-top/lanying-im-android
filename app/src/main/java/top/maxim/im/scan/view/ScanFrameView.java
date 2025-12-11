@@ -90,7 +90,7 @@ public class ScanFrameView extends View {
         // 如果是sdk版本大于4.4，设置沉浸式之后需要加上状态栏的高度
         int extraHeight = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            extraHeight = ScreenUtils.getStatusBarHeight();
+            extraHeight = ScreenUtils.getStatusBarHeight(getContext());
         }
         scanRectHeight = rightOffset - leftOffset;
         mFrameRect = new Rect(leftOffset, topOffset + extraHeight, rightOffset,

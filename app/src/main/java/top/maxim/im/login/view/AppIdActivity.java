@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -36,6 +39,8 @@ import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SchemeUtils;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.common.utils.dialog.CommonDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.dialog.DropDownMenu;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.scan.view.ScannerActivity;
@@ -63,13 +68,43 @@ public class AppIdActivity extends BaseTitleActivity {
 
     private View mVUnderline;
 
+    private String mErrorMessage;
+
     /* 输入监听 */
     private TextWatcher mInputWatcher;
 
-    public static void open(Context context) {
+    public static void open(Context context, String errorMessage) {
         Intent intent = new Intent(context, AppIdActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("errorMessage", errorMessage);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (!TextUtils.isEmpty(mErrorMessage)){
+            DialogUtils.getInstance().showDialog(AppIdActivity.this,
+                    getString(R.string.failed_to_login),
+                    mErrorMessage,
+                    new CommonDialog.OnDialogListener() {
+                        @Override
+                        public void onConfirmListener() {
+                        }
+
+                        @Override
+                        public void onCancelListener() {
+                        }
+                    });
+        }
+    }
+
+    @Override
+    protected void initDataFromFront(Intent intent) {
+        super.initDataFromFront(intent);
+        if (intent != null) {
+            mErrorMessage = intent.getStringExtra("errorMessage");
+        }
     }
 
     @Override

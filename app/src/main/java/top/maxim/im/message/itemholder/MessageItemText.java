@@ -5,18 +5,24 @@ import static top.maxim.im.common.utils.AppContextUtils.getApplication;
 import static top.maxim.im.sdk.bean.MsgBodyHelper.VIEW_TYPE.*;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import androidx.annotation.NonNull;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -40,10 +46,15 @@ import io.noties.markwon.image.AsyncDrawable;
 import io.noties.markwon.image.glide.GlideImagesPlugin;
 import io.noties.markwon.linkify.LinkifyPlugin;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.ChatManager;
 import top.maxim.im.common.base.MaxIMApplication;
+import top.maxim.im.common.utils.ScreenUtils;
+import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CustomDialog;
 import top.maxim.im.message.interfaces.ChatActionListener;
 import top.maxim.im.message.utils.MessageEvent;
+import top.maxim.im.net.HttpResponseCallback;
 import top.maxim.im.sdk.bean.MsgBodyHelper;
 
 /**
@@ -91,6 +102,9 @@ public class MessageItemText extends MessageItemBaseView {
                 BMXDataCallBack<BMXMessage> callBack = new BMXDataCallBack<BMXMessage>() {
                     @Override
                     public void onResult(BMXErrorCode code, BMXMessage data) {
+                        if (code != BMXErrorCode.NoError || data == null){
+                            return;
+                        }
                         mMaxMessage = data;
                         mText = mMaxMessage.content().toCharArray();
 
@@ -193,6 +207,57 @@ public class MessageItemText extends MessageItemBaseView {
         return Glide.with(mContext);
     }
 
+    /**
+     * 复制链接
+     */
+    private void copyMessage(String url, Context context) {
+        ClipboardManager clipboard = (ClipboardManager)context
+                .getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard == null) {
+            return;
+        }
+        ClipData clip = ClipData.newPlainText("url", url);
+        clipboard.setPrimaryClip(clip);
+        ToastUtil.showTextViewPrompt(context.getString(R.string.copy_successful));
+    }
+
+    private void showLinkMenu(String url) {
+        final CustomDialog dialog = new CustomDialog();
+        LinearLayout ll = new LinearLayout(mContext);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        // 复制链接
+        TextView copy = new TextView(mContext);
+        copy.setPadding(ScreenUtils.dp2px(15), 0, ScreenUtils.dp2px(15), 0);
+        copy.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        copy.setTextColor(mContext.getResources().getColor(R.color.color_black));
+        copy.setBackgroundColor(mContext.getResources().getColor(R.color.color_white));
+        copy.setText(mContext.getString(R.string.copy_url));
+        copy.setOnClickListener(v -> {
+            dialog.dismiss();
+            copyMessage(url, mContext);
+        });
+        ll.addView(copy, params);
+
+        // 打开链接
+        TextView open = new TextView(mContext);
+        open.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), ScreenUtils.dp2px(15), 0);
+        open.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        open.setTextColor(mContext.getResources().getColor(R.color.color_black));
+        open.setBackgroundColor(mContext.getResources().getColor(R.color.color_white));
+        open.setText(mContext.getString(R.string.navigate_url));
+        open.setOnClickListener(v -> {
+            dialog.dismiss();
+            EventBus.getDefault().post(new MessageEvent("openWithBrowser", url));
+        });
+        ll.addView(open, params);
+
+        dialog.setCustomView(ll);
+        dialog.showDialog((Activity)mContext);
+    }
+
     private void showAsMarkdown(String content){
         try{
             GlideImagesPlugin plugin1 = GlideImagesPlugin.create(mContext);
@@ -224,9 +289,8 @@ public class MessageItemText extends MessageItemBaseView {
                             builder.linkResolver(new LinkResolverDef() {
                                 @Override
                                 public void resolve(View view, @NonNull String link) {
-                                    if (link.startsWith("lanying:")) {
-                                    } else {
-                                        super.resolve(view, link);
+                                    if (!link.startsWith("lanying:")) {
+                                        showLinkMenu(link);
                                     }
                                 }
                             });

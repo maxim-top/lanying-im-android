@@ -4,6 +4,8 @@ package top.maxim.im.login.view;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -35,6 +37,8 @@ import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.utils.permissions.PermissionsConstant;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.common.view.SplashVideoPlayView;
@@ -51,10 +55,28 @@ public class WelcomeActivity extends BaseTitleActivity {
 
     private ActivityResultLauncher<String[]> permissionLauncher;
 
+    private String mErrorMessage;
+
     public static void openWelcome(Context context) {
         Intent intent = new Intent(context, WelcomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+    }
+
+    public static void openWelcomeWithErrorMessage(Context context, String errorMessage) {
+        Intent intent = new Intent(context, WelcomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("errorMessage", errorMessage);
+        context.startActivity(intent);
+    }
+
+
+    @Override
+    protected void initDataFromFront(Intent intent) {
+        super.initDataFromFront(intent);
+        if (intent != null) {
+            mErrorMessage = intent.getStringExtra("errorMessage");
+        }
     }
 
     @Override
@@ -140,7 +162,7 @@ public class WelcomeActivity extends BaseTitleActivity {
 //            }
             return;
         }
-        AppIdActivity.open(WelcomeActivity.this);
+        AppIdActivity.open(WelcomeActivity.this, mErrorMessage);
         finish();
     }
 

@@ -328,6 +328,7 @@ public class LoginByVerifyFragment extends BaseTitleFragment {
         });
         // 发送验证码
         mSendVerify.setOnClickListener(v -> {
+            mInputPwd.requestFocus();
             verifyCountDown();
             String phone = mInputName.getEditableText().toString().trim();
             AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {

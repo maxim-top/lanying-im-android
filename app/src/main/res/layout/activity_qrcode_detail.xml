@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
     <LinearLayout
@@ -75,5 +74,15 @@
             android:layout_height="@dimen/dimen_220"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/dimen_30" />
+
+        <TextView
+            android:id="@+id/tv_app_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_15"
+            android:layout_gravity="center_horizontal"
+            android:maxLines="1"
+            android:textColor="@color/color_355522"
+            android:textSize="@dimen/dimen_13" />
     </LinearLayout>
 </LinearLayout>

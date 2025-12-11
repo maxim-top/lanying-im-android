@@ -37,7 +37,9 @@ import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
+import top.maxim.im.common.utils.dialog.CommonDialog;
 import top.maxim.im.common.utils.dialog.CustomDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.filebrowser.FileBrowserActivity;
 
@@ -205,12 +207,25 @@ public class LogViewActivity extends BaseTitleActivity {
 
         intent.setType("application/octet-stream");
         intent.putExtra(Intent.EXTRA_STREAM, uri);
+        Intent chooseIntent = Intent.createChooser(intent, getString(R.string.share_log_to));
         ComponentName componentName = intent.resolveActivity(context.getPackageManager());
         if (componentName != null) {
-            context.startActivity(intent);
+            context.startActivity(chooseIntent);
         } else {
             ToastUtil.showTextViewPrompt(
                     context.getResources().getString(R.string.chat_file_not_open));
+        }
+    }
+
+    public long getFileSize(String filePath) {
+        File targetFile = new File(filePath);
+        // 关键：先检查文件是否存在且确实是一个文件
+        if (targetFile.exists() && targetFile.isFile()) {
+            // length() 方法返回的是文件的字节数
+            return targetFile.length();
+        } else {
+            // 文件不存在或路径指向的是目录，返回0或进行错误处理
+            return 0L;
         }
     }
 
@@ -253,7 +268,25 @@ public class LogViewActivity extends BaseTitleActivity {
             String zipPath = appPath + "/data_dir_" + new Date().getTime() + ".zip";
             try {
                 CommonUtils.getInstance().zipFolder(dataPath, zipPath);
-                shareFile(zipPath);
+                long length = getFileSize(zipPath);
+                if (length < 1){
+                    DialogUtils.getInstance().showDialog(this,
+                            getString(R.string.log_zip_empty_title),
+                            zipPath + getString(R.string.log_zip_empty_content_part) + length,
+                            new CommonDialog.OnDialogListener() {
+                                @Override
+                                public void onConfirmListener() {
+
+                                }
+
+                                @Override
+                                public void onCancelListener() {
+
+                                }
+                            });
+                }else{
+                    shareFile(zipPath);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

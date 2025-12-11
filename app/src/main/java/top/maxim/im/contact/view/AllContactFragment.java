@@ -124,7 +124,7 @@ public class AllContactFragment extends BaseTitleFragment {
                 return;
             }
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, ScreenUtils.getStatusBarHeight());
+                    LinearLayout.LayoutParams.MATCH_PARENT, ScreenUtils.getStatusBarHeight(getActivity()));
             mStatusBar.setLayoutParams(params);
             mStatusBar.setVisibility(View.VISIBLE);
             Window window = getActivity().getWindow();

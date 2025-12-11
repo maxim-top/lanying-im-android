@@ -13,6 +13,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import im.floo.BMXCallBack;
@@ -23,10 +29,14 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import top.maxim.im.R;
+import top.maxim.im.bmxmanager.AppManager;
 import top.maxim.im.bmxmanager.ChatManager;
+import top.maxim.im.common.WebViewActivity;
 import top.maxim.im.common.base.BaseTitleActivity;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
+import top.maxim.im.common.utils.dialog.CommonDialog;
+import top.maxim.im.common.utils.dialog.DialogUtils;
 import top.maxim.im.common.view.Header;
 import top.maxim.im.message.contract.ChatBaseContract;
 import top.maxim.im.message.customviews.ChatRecyclerView;
@@ -35,6 +45,8 @@ import top.maxim.im.message.customviews.MessageInputBar;
 import top.maxim.im.message.utils.ChatRecyclerScrollListener;
 import top.maxim.im.message.utils.ChatViewHelper;
 import top.maxim.im.message.utils.MessageConfig;
+import top.maxim.im.message.utils.MessageEvent;
+import top.maxim.im.net.HttpResponseCallback;
 
 /**
  * Description : 基础聊天activity Created by Mango on 2018/11/06.
@@ -77,6 +89,85 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
         }
         intent.putExtra(MessageConfig.CHAT_ID, chatId);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    private void getDomainAccessibility(String url) {
+        showLoadingDialog(true);
+        try {
+            URL u = new URL(url);
+            AppManager.getInstance().getDomainAccessibility( u.getHost(), new HttpResponseCallback<String>() {
+                @Override
+                public void onResponse(String result) {
+                    dismissLoadingDialog();
+                    if (result.equals("safe")){
+                        WebViewActivity.openUrl(ChatBaseActivity.this, url);
+                    } else if (result.equals("warning")){
+                        DialogUtils.getInstance().showDialog(ChatBaseActivity.this,
+                                getString(R.string.risk_notice),
+                                getString(R.string.risk_notice_open_browser),
+                                new CommonDialog.OnDialogListener() {
+                                    @Override
+                                    public void onConfirmListener() {
+                                        WebViewActivity.openUrl(ChatBaseActivity.this, url);
+                                    }
+
+                                    @Override
+                                    public void onCancelListener() {
+                                    }
+                                });
+                    } else {
+                        DialogUtils.getInstance().showDialog(ChatBaseActivity.this,
+                                getString(R.string.risk_notice),
+                                getString(R.string.risk_notice_url_cannot_verified),
+                                new CommonDialog.OnDialogListener() {
+                                    @Override
+                                    public void onConfirmListener() {
+                                    }
+
+                                    @Override
+                                    public void onCancelListener() {
+                                    }
+                                });
+                    }
+                }
+
+                @Override
+                public void onFailure(int errorCode, String errorMsg, Throwable t) {
+                    dismissLoadingDialog();
+                    DialogUtils.getInstance().showDialog(ChatBaseActivity.this,
+                            getString(R.string.risk_notice),
+                            getString(R.string.risk_notice_url_cannot_verified),
+                            new CommonDialog.OnDialogListener() {
+                                @Override
+                                public void onConfirmListener() {
+                                }
+
+                                @Override
+                                public void onCancelListener() {
+                                }
+                            });
+                }
+            });
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void Event(MessageEvent messageEvent) {
+        if (messageEvent.getMessage().equals("scroll-to-bottom")){
+            LinearLayoutManager llm = (LinearLayoutManager) mChatRecyclerView.getLayoutManager();
+            int pos = mChatViewHelper.getLastVisiblePosition();
+            llm.scrollToPositionWithOffset(pos,-100000);
+        } else if (messageEvent.getMessage().equals("openWithBrowser")){
+            getDomainAccessibility(messageEvent.getParams());
+        }
     }
 
     @Override
@@ -513,6 +604,10 @@ public abstract class ChatBaseActivity extends BaseTitleActivity
         if (mPresenter != null) {
             mPresenter.onDestroyPresenter();
         }
+        if(EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
+
         setNull(mPresenter);
         super.onDestroy();
     }

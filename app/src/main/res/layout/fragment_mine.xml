@@ -29,17 +29,6 @@
                 android:clipToPadding="false"
                 android:paddingLeft="@dimen/dimen_36">
 
-                <ImageView
-                    android:id="@+id/iv_user_info_edit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:paddingLeft="@dimen/dimen_10"
-                    android:paddingTop="@dimen/dimen_20"
-                    android:paddingRight="@dimen/dimen_18"
-                    android:paddingBottom="@dimen/dimen_10"
-                    android:src="@drawable/my_info_edit_icon" />
-
                 <LinearLayout
                     android:id="@+id/ll_user_info"
                     android:layout_width="wrap_content"

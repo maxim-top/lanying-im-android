@@ -64,20 +64,34 @@
         android:layout_below="@id/tv_switch_login_mode"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/et_user_pwd"
+        <RelativeLayout
+            android:layout_marginTop="@dimen/dimen_20"
+            android:id="@+id/ll_pwd"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dimen_48"
+            android:layout_below="@id/ll_et_user_pwd"
             android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/dimen_20"
-            android:background="@null"
-            android:gravity="center_vertical"
-            android:hint="@string/login_user_pwd_hint"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:textColorHint="@color/color_666666"
-            android:textSize="@dimen/dimen_14" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_user_pwd"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_48"
+                android:background="@null"
+                android:gravity="center_vertical"
+                android:hint="@string/login_user_pwd_hint"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:textColorHint="@color/color_666666"
+                android:textSize="@dimen/dimen_14" />
+            <ImageView
+                android:id="@+id/iv_expose"
+                android:layout_width="@dimen/dimen_20"
+                android:layout_height="@dimen/dimen_20"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/lock_password" />
+        </RelativeLayout>
 
         <View
             android:layout_width="match_parent"

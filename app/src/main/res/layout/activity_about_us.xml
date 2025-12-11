@@ -47,6 +47,42 @@
             android:textColor="@color/color_666666"
             android:textSize="@dimen/dimen_12" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dimen_20"
+            android:layout_marginTop="@dimen/dimen_20"
+            >
+
+            <!-- 文本视图：宽度自适应 -->
+            <TextView
+                android:id="@+id/tv_about_us_app_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/iv_info"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_chainStyle="packed" />
+
+            <!-- 按钮：宽度固定 -->
+            <ImageView
+                android:id="@+id/iv_info"
+                android:layout_width="@dimen/dimen_20"
+                android:layout_height="@dimen/dimen_20"
+                android:src="@drawable/info"
+                android:layout_marginLeft="@dimen/dimen_5"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tv_about_us_app_status"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <TextView
             android:id="@+id/tv_go"
             android:layout_width="match_parent"

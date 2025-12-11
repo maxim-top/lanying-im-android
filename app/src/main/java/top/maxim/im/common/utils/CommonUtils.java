@@ -1,7 +1,9 @@
 
 package top.maxim.im.common.utils;
 
+import android.app.AppOpsManager;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.text.TextUtils;
 
 import com.google.common.collect.ImmutableMap;
@@ -11,6 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -34,8 +38,13 @@ import top.maxim.im.push.PushClientMgr;
 import top.maxim.im.push.PushUtils;
 import top.maxim.rtc.RTCManager;
 
+import android.util.ArraySet;
 import android.util.Base64;
 
+import androidx.core.app.NotificationManagerCompat;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -44,6 +53,15 @@ import org.json.JSONObject;
 public class CommonUtils {
 
     private static CommonUtils mInstance;
+
+    /* 必须认证列表 */
+    private static ArraySet<String> mRequiredVerifications;
+
+    /* 可选认证列表 */
+    private static ArraySet<String> mOptionalVerifications;
+
+    /* 可选认证列表 */
+    private static ArraySet<String> mFinishedVerifications;
 
     private static final String TAG = "CommonUtils";
     private static final Map<BMXErrorCode, Integer> mapCode2Msg = new HashMap<BMXErrorCode, Integer>() {
@@ -74,6 +92,7 @@ public class CommonUtils {
             put(BMXErrorCode.UserCancel, R.string.error_code_UserCancel);
             put(BMXErrorCode.UserOldPasswordNotMatch, R.string.error_code_UserOldPasswordNotMatch);
             put(BMXErrorCode.UserSigningIn, R.string.error_code_UserSigningIn);
+            put(BMXErrorCode.UserKickedByAppDeprecated, R.string.error_code_UserKickedByAppDeprecated);
             put(BMXErrorCode.PushTokenInvalid, R.string.error_code_PushTokenInvalid);
             put(BMXErrorCode.PushAliasBindByOtherUser, R.string.error_code_PushAliasBindByOtherUser);
             put(BMXErrorCode.PushAliasTokenNotMatch, R.string.error_code_PushAliasTokenNotMatch);
@@ -174,6 +193,15 @@ public class CommonUtils {
         }
     };
 
+    private static final Map<String, Integer> mapAppStatus2Text = new HashMap<String, Integer>() {
+        {
+            put("normal", R.string.app_status_normal);
+            put("frozen", R.string.app_status_frozen);
+            put("banned", R.string.app_status_banned);
+            put("revoked", R.string.app_status_revoked);
+        }
+    };
+
     private static final Map<BMXErrorCode, Integer> mapCode2Solution = new HashMap<BMXErrorCode, Integer>() {
         {
             put(BMXErrorCode.InvalidParam, R.string.error_solution_InvalidParam);
@@ -202,6 +230,7 @@ public class CommonUtils {
             put(BMXErrorCode.UserCancel, R.string.error_solution_UserCancel);
             put(BMXErrorCode.UserOldPasswordNotMatch, R.string.error_solution_UserOldPasswordNotMatch);
             put(BMXErrorCode.UserSigningIn, R.string.error_solution_UserSigningIn);
+            put(BMXErrorCode.UserKickedByAppDeprecated, R.string.error_solution_UserKickedByAppDeprecated);
             put(BMXErrorCode.PushTokenInvalid, R.string.error_solution_PushTokenInvalid);
             put(BMXErrorCode.PushAliasBindByOtherUser, R.string.error_solution_PushAliasBindByOtherUser);
             put(BMXErrorCode.PushAliasTokenNotMatch, R.string.error_solution_PushAliasTokenNotMatch);
@@ -518,6 +547,30 @@ public class CommonUtils {
         return res;
     }
 
+    public static String getAppStatusString(Context context) {
+        String res = "";
+        String appStatus = BaseManager.getBMXClient().getAppStatus();
+        if (!TextUtils.isEmpty(appStatus)) {
+            try {
+                String status = context.getString(mapAppStatus2Text.get(appStatus));
+                res = String.format( context.getString(R.string.app_status),
+                       status );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return res;
+    }
+
+    public static String getAppStatus(Context context) {
+        String appStatus = BaseManager.getBMXClient().getAppStatus();
+        return appStatus;
+    }
+
+    public static String getRatelIPList() {
+        return BaseManager.getBMXClient().getRatelIpList();
+    }
+
     public static int getErrorMessage(BMXErrorCode bmxErrorCode){
         return mapCode2Msg.get(bmxErrorCode);
     }
@@ -612,6 +665,115 @@ public class CommonUtils {
             RTCManager.getInstance().init(AppContextUtils.getApplication(), BaseManager.getBMXClient());
             SharePreferenceUtils.getInstance().putSDKInitialized(true);
         }
+    }
+
+
+    private static boolean checkViaReflection(Context context) {
+        try {
+            AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+            ApplicationInfo appInfo = context.getApplicationInfo();
+            String pkgName = context.getPackageName();
+            int uid = appInfo.uid;
+
+            Class<?> appOpsClass = Class.forName(AppOpsManager.class.getName());
+            Method checkOpNoThrowMethod = appOpsClass.getMethod("checkOpNoThrow", Integer.TYPE, Integer.TYPE, String.class);
+            Field opPostNotificationField = appOpsClass.getDeclaredField("OP_POST_NOTIFICATION");
+            int opValue = (int) opPostNotificationField.get(Integer.class);
+
+            int mode = (int) checkOpNoThrowMethod.invoke(appOps, opValue, uid, pkgName);
+            return mode == AppOpsManager.MODE_ALLOWED;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
+    }
+
+    /**
+     * 检查当前应用的通知权限是否开启
+     * @param context 上下文对象
+     * @return true 表示权限已开启，false 表示未开启
+     */
+    public static boolean areNotificationsEnabled(Context context) {
+        // 在 API 24（Android 7.0）及以上，使用官方推荐方法
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            NotificationManagerCompat manager = NotificationManagerCompat.from(context);
+            return manager.areNotificationsEnabled();
+        }
+        // 对于 API 19（Android 4.4）到 API 23，使用反射调用 AppOpsManager 进行判断
+        else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            return checkViaReflection(context);
+        }
+        // API 18 及以下，默认返回 true
+        else {
+            return true;
+        }
+    }
+
+    public static String replacePhoneNumber(String phone) {
+        if (phone == null || phone.length() < 5) {
+            return phone;
+        }
+        String masked = phone.replaceAll("(.*\\d{3})\\d{4}(\\d{4})", "$1****$2");
+        if (masked.equals(phone)){
+            masked = phone.replaceAll("(.{3}).*", "$1********");
+        }
+        return masked;
+    }
+
+    public static boolean needShowVerificationPage(String verificationName){
+        return (mRequiredVerifications.contains(verificationName) ||
+                mOptionalVerifications.contains(verificationName)) &&
+                !mFinishedVerifications.contains(verificationName);
+    }
+
+    public static void setRequiredVerifications(String list){
+        try {
+            mRequiredVerifications = new ArraySet<>();
+            JSONArray jsonArray = new JSONArray(list);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                mRequiredVerifications.add(jsonArray.getString(i));
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void setOptionalVerifications(String list){
+        try {
+            mOptionalVerifications = new ArraySet<>();
+            JSONArray jsonArray = new JSONArray(list);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                mOptionalVerifications.add(jsonArray.getString(i));
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void setFinishedVerifications(String list){
+        try {
+            mFinishedVerifications = new ArraySet<>();
+            JSONArray jsonArray = new JSONArray(list);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                mFinishedVerifications.add(jsonArray.getString(i));
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean didAllRequiredFinished(){
+        for (String required: mRequiredVerifications) {
+            if (!mFinishedVerifications.contains(required)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isOptionalVerification(String verificationName){
+        return mOptionalVerifications.contains(verificationName);
     }
 
 }

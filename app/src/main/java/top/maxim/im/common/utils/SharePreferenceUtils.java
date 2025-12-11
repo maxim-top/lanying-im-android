@@ -30,6 +30,8 @@ public class SharePreferenceUtils {
 
     private static String HAS_PUSH = "has_push_server";//当前设备有推送平台
 
+    private static String NOTIFICATION_TIP_CLOSED = "NotificationTipClosed"; //会话列表底部提示条“打开通知，方便即时接收推送消息”是否被关闭
+
     private static String USER_NAME = "user_name";
 
     private static String USER_PWD = "user_pwd";
@@ -160,6 +162,18 @@ public class SharePreferenceUtils {
     public boolean getHasPush() {
         if (saveInfo != null) {
             return saveInfo.getBoolean(HAS_PUSH, false);
+        }
+        return false;
+    }
+
+    public boolean putNotificationTipClosed(boolean closed) {
+        saveEditor.putBoolean(NOTIFICATION_TIP_CLOSED, closed);
+        return saveEditor.commit();
+    }
+
+    public boolean getNotificationTipClosed() {
+        if (saveInfo != null) {
+            return saveInfo.getBoolean(NOTIFICATION_TIP_CLOSED, false);
         }
         return false;
     }

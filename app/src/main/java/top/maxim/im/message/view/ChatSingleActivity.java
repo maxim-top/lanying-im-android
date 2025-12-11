@@ -165,7 +165,6 @@ public class ChatSingleActivity extends ChatBaseActivity implements ChatSingleCo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
         RosterManager.getInstance().addRosterListener(mRosterListener);
         initRoster();
     }
@@ -173,19 +172,7 @@ public class ChatSingleActivity extends ChatBaseActivity implements ChatSingleCo
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
         RosterManager.getInstance().removeRosterListener(mRosterListener);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void Event(MessageEvent messageEvent) {
-        if (messageEvent.getMessage().equals("scroll-to-bottom")){
-            LinearLayoutManager llm = (LinearLayoutManager) mChatRecyclerView.getLayoutManager();
-            int pos = mChatViewHelper.getLastVisiblePosition();
-            llm.scrollToPositionWithOffset(pos,-100000);
-        }
     }
 
     @Override

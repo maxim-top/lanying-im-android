@@ -366,6 +366,7 @@ public class RegisterFragment extends BaseTitleFragment {
         mInputVerify.addTextChangedListener(mInputWatcher);
         // 发送验证码
         mSendVerify.setOnClickListener(v -> {
+            mInputPwd.requestFocus();
             verifyCountDown();
             String phone = mInputPhone.getEditableText().toString().trim();
             AppManager.getInstance().captchaSMS(phone, new HttpResponseCallback<Boolean>() {

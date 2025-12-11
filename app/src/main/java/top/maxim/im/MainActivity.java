@@ -2,23 +2,27 @@
 package top.maxim.im;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
 import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.util.List;
+import java.util.Map;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import top.maxim.im.common.base.BaseSwitchActivity;
-import top.maxim.im.common.utils.AppContextUtils;
 import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SchemeUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -45,6 +49,8 @@ public class MainActivity extends BaseSwitchActivity {
 
     private int mLastSelectedIndex;// 上一次点击的索引
     private long mLastClickTime; // 上一次点击的时间
+
+    private ActivityResultLauncher<String[]> permissionLauncher;
 
     public static void openMain(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
@@ -80,9 +86,23 @@ public class MainActivity extends BaseSwitchActivity {
     }
 
     private void initPermission(){
-        NotificationManager manager = (NotificationManager) AppContextUtils.getAppContext()
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-        if (!manager.areNotificationsEnabled()){
+        if (permissionLauncher == null){
+            try {
+                permissionLauncher = registerForActivityResult(
+                        new ActivityResultContracts.RequestMultiplePermissions(),
+                        new ActivityResultCallback<Map<String, Boolean>>() {
+                            @Override
+                            public void onActivityResult(Map<String, Boolean> grantResults) {
+                            }
+                        }
+                );
+                PermissionsMgr.getInstance().setPermissionLauncher(permissionLauncher);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        if (!CommonUtils.areNotificationsEnabled(this)){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2) {
                 String[] permissions = new String[] {
                         PermissionsConstant.POST_NOTIFICATIONS

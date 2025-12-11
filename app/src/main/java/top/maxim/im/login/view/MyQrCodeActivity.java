@@ -35,6 +35,8 @@ public class MyQrCodeActivity extends BaseTitleActivity {
 
     private TextView mNickName;
 
+    private TextView mAppId;
+
     private ImageView mIvQrCode;
 
     private ImageRequestConfig mConfig = new ImageRequestConfig.Builder().cacheInMemory(true)
@@ -64,6 +66,7 @@ public class MyQrCodeActivity extends BaseTitleActivity {
         mNickName = view.findViewById(R.id.tv_nick_name);
         mUserId = view.findViewById(R.id.tv_user_id);
         mIvQrCode = view.findViewById(R.id.iv_qrcode);
+        mAppId = view.findViewById(R.id.tv_app_id);
         return view;
     }
 
@@ -85,6 +88,7 @@ public class MyQrCodeActivity extends BaseTitleActivity {
                 mUserName.setText(TextUtils.isEmpty(name) ? "" : name);
                 mNickName.setText(TextUtils.isEmpty(nickName) ? "" : getString(R.string.nickname_colon) + nickName);
                 mUserId.setText(userId <= 0 ? "" : "ID:" + userId);
+                mAppId.setText(SharePreferenceUtils.getInstance().getAppId());
             }
         });
     }

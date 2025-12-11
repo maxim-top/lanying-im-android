@@ -146,7 +146,10 @@ public class VerifyActivity extends BaseTitleActivity {
             }
         });
         // 发送验证码
-        mSendVerify.setOnClickListener(v -> verifyCountDown());
+        mSendVerify.setOnClickListener(v -> {
+            mEtPwd.requestFocus();
+            verifyCountDown();
+        });
         return view;
     }
 

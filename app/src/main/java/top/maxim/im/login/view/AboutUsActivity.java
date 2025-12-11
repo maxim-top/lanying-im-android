@@ -2,6 +2,8 @@
 package top.maxim.im.login.view;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,6 +15,7 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.util.TypedValue;
@@ -37,6 +40,7 @@ import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.TelLinkPopupWindow;
+import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.view.Header;
 
 /**
@@ -53,6 +57,10 @@ public class AboutUsActivity extends BaseTitleActivity {
     private TextView mCompanyName;
 
     private TextView mVerificationStatus;
+
+    private TextView mTvAppStatus;
+
+    private ImageView mIvInfo;
 
     private TextView mTvGo;
 
@@ -97,6 +105,7 @@ public class AboutUsActivity extends BaseTitleActivity {
         mTvNet = view.findViewById(R.id.tv_about_us_net);
         mThisApp = view.findViewById(R.id.tv_about_us_this_app);
         mCompanyName = view.findViewById(R.id.tv_about_us_company_name);
+        mTvAppStatus = view.findViewById(R.id.tv_about_us_app_status);
         mVerificationStatus = view.findViewById(R.id.tv_about_us_verification_status);
         mTvGo = view.findViewById(R.id.tv_go);
         TextView tvCopyRight = view.findViewById(R.id.copyright);
@@ -108,6 +117,8 @@ public class AboutUsActivity extends BaseTitleActivity {
         String companyName = CommonUtils.getCompanyName(this);
         String verificationStatus = CommonUtils.getVerificationStatusText(this);
         mCompanyName.setText(companyName);
+        String appStatusString = CommonUtils.getAppStatusString(this);
+        mTvAppStatus.setText(appStatusString);
         mVerificationStatus.setText(verificationStatus);
         new Timer().schedule(new TimerTask() {
             @Override
@@ -119,10 +130,12 @@ public class AboutUsActivity extends BaseTitleActivity {
                         String verificationStatus = CommonUtils.getVerificationStatusText(AboutUsActivity.this);
                         mCompanyName.setText(companyName);
                         mVerificationStatus.setText(verificationStatus);
+                        String appStatusString = CommonUtils.getAppStatusString(AboutUsActivity.this);
+                        mTvAppStatus.setText(appStatusString);
                     }
                 });
             }
-        }, 100);
+        }, 500);
         mTvGo.setOnClickListener(v -> {
             finish();
         });
@@ -130,18 +143,22 @@ public class AboutUsActivity extends BaseTitleActivity {
             mTvGo.setVisibility(View.GONE);
         }
 
-        new Timer().schedule(new TimerTask() {
+        mIvInfo = view.findViewById(R.id.iv_info);
+        mIvInfo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String companyName = CommonUtils.getCompanyName(AboutUsActivity.this);
-                        mCompanyName.setText(companyName);
-                    }
-                });
+            public void onClick(View v) {
+                String appStatus = CommonUtils.getAppStatus(AboutUsActivity.this);
+                if (appStatus.equals("normal")){
+                    String ratelIpList = CommonUtils.getRatelIPList();
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText("Copied Text", ratelIpList);
+                    clipboard.setPrimaryClip(clip);
+
+                    String info = String.format(getString(R.string.ratel_ip_copied), ratelIpList);
+                    ToastUtil.showTextViewPrompt(info);
+                }
             }
-        }, 1000);
+        });
         return view;
     }
 

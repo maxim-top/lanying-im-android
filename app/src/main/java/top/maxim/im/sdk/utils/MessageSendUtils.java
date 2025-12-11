@@ -43,7 +43,7 @@ public final class MessageSendUtils {
      */
     public void sendRTCMessage(long from, long to,
                                      String ext) {
-        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "custom");
         msg.setExtension(ext);
         handlerMessage(msg);
     }
@@ -56,7 +56,7 @@ public final class MessageSendUtils {
         BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
         con.setRTCCallInfo(type, roomId, from, BMXMessageConfig.RTCRoomType.Broadcast, pin);
         con.setPushMessageLocKey("call_in");
-        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "call");
         msg.setConfig(con);
         msg.setExtension("{\"rtc\":\"call\"}");
         handlerMessage(msg);
@@ -69,7 +69,7 @@ public final class MessageSendUtils {
     public void sendRTCPickupMessage(long from, long to, String callId) {
         BMXMessageConfig con = BMXMessageConfig.createMessageConfig(false);
         con.setRTCPickupInfo(callId);
-        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "");
+        BMXMessage msg = BMXMessage.createRTCMessage(from, to, BMXMessage.MessageType.Single, to, "pickup");
         msg.setConfig(con);
         handlerMessage(msg);
     }

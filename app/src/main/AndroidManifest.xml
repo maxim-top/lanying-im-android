@@ -146,9 +146,14 @@
             android:name=".login.view.BindMobileActivity"
             android:screenOrientation="portrait"></activity>
 
-        <!--实名认证-->
+        <!--实名认证-手机号-->
         <activity
             android:name=".login.view.UserVerificationActivity"
+            android:screenOrientation="portrait"></activity>
+
+        <!--实名认证-姓名-身份证号-->
+        <activity
+            android:name=".login.view.UserVerificationIdNumberActivity"
             android:screenOrientation="portrait"></activity>
 
         <!--修改密码-->
@@ -444,6 +449,8 @@
         <activity
             android:name=".videocall.RTCConfigActivity"
             android:screenOrientation="portrait" />
+
+        <activity android:name=".common.WebViewActivity" />
 
         <!-- fileProvider -->
         <provider

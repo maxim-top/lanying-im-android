@@ -164,6 +164,8 @@ public abstract class MessageItemBaseView extends FrameLayout implements IItemCh
                     hideMemberInfo = false;
                 }
             }
+        } else {
+            hideMemberInfo = false;
         }
 
         if (mMaxMessage.isReceiveMsg()) {

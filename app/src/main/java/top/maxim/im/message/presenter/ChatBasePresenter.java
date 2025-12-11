@@ -57,6 +57,7 @@ import im.floo.floolib.BMXChatServiceListener;
 import im.floo.floolib.BMXConversation;
 import im.floo.floolib.BMXErrorCode;
 import im.floo.floolib.BMXFileAttachment;
+import im.floo.floolib.BMXGroup;
 import im.floo.floolib.BMXImageAttachment;
 import im.floo.floolib.BMXMessage;
 import im.floo.floolib.BMXMessageAttachment;
@@ -73,6 +74,7 @@ import rx.subscriptions.CompositeSubscription;
 import top.maxim.im.R;
 import top.maxim.im.bmxmanager.BaseManager;
 import top.maxim.im.bmxmanager.ChatManager;
+import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.UserManager;
 import top.maxim.im.common.base.MaxIMApplication;
 import top.maxim.im.common.base.PermissionActivity;
@@ -85,6 +87,7 @@ import top.maxim.im.common.utils.CameraUtils;
 import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.FileConfig;
 import top.maxim.im.common.utils.FileUtils;
+import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
 import top.maxim.im.common.utils.SharePreferenceUtils;
@@ -475,9 +478,9 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
                                             for (int i = 0; i < messageList.size(); i++) {
                                                 messages.add(messageList.get(i));
                                             }
-                                            if (mView != null && !messages.isEmpty()) {
-                                                mView.showPullChatMessages(messages, offset);
-                                            }
+                                        }
+                                        if (mView != null) {
+                                            mView.showPullChatMessages(messages, offset);
                                         }
                                     }
                                 });
@@ -857,6 +860,24 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
 
     }
 
+    private void addRevokeMenu(LinearLayout ll, final CustomDialog dialog,
+                               final BMXMessage message, LinearLayout.LayoutParams params){
+        TextView revoke = new TextView(mView.getContext());
+        revoke.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
+                ScreenUtils.dp2px(15), 0);
+        revoke.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
+        revoke.setTextColor(
+                mView.getContext().getResources().getColor(R.color.color_black));
+        revoke.setBackgroundColor(
+                mView.getContext().getResources().getColor(R.color.color_white));
+        revoke.setText(mView.getContext().getString(R.string.chat_msg_revoke));
+        revoke.setOnClickListener(v -> {
+            dialog.dismiss();
+            revokeMessage(message);
+        });
+        ll.addView(revoke, params);
+    }
+
     private void showOperateMessage(final BMXMessage message) {
         if (message == null) {
             return;
@@ -913,28 +934,34 @@ public class ChatBasePresenter implements ChatBaseContract.Presenter {
         });
         ll.addView(relay, params);
 
+        boolean isSentMessage = false;
         // 自己发送的消息才有撤回
         if (!message.isReceiveMsg()) {
             // 撤回
             BMXMessage.DeliveryStatus sendStatus = message.deliveryStatus();
             // 发送成功才有撤回
             if (sendStatus == null || sendStatus == BMXMessage.DeliveryStatus.Deliveried) {
-                TextView revoke = new TextView(mView.getContext());
-                revoke.setPadding(ScreenUtils.dp2px(15), ScreenUtils.dp2px(15),
-                        ScreenUtils.dp2px(15), 0);
-                revoke.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17);
-                revoke.setTextColor(
-                        mView.getContext().getResources().getColor(R.color.color_black));
-                revoke.setBackgroundColor(
-                        mView.getContext().getResources().getColor(R.color.color_white));
-                revoke.setText(mView.getContext().getString(R.string.chat_msg_revoke));
-                revoke.setOnClickListener(v -> {
-                    dialog.dismiss();
-                    revokeMessage(message);
-                });
-                ll.addView(revoke, params);
+                isSentMessage = true;
             }
         }
+        if (isSentMessage){
+            addRevokeMenu(ll, dialog, message, params);
+        }else{
+            GroupManager.getInstance().getGroupInfo(mChatId, true,
+                    (bmxErrorCode, group) -> {
+                        if (BaseManager.bmxFinish(bmxErrorCode)) {
+                            boolean isOwner = GroupManager.getInstance().isGroupOwner(group.ownerId());
+                            boolean isAdmin = GroupManager.getInstance().isAdmin(group,
+                                    SharePreferenceUtils.getInstance().getUserId()) || isOwner;
+                            if (isAdmin){
+                                ((Activity)mView.getContext())
+                                        .runOnUiThread(() -> addRevokeMenu(ll, dialog, message, params));
+                            }
+
+                        }
+                    });
+        }
+
         // 对方发送的消息才有标记已读
         if (message.isReceiveMsg()) {
             // 标记已读

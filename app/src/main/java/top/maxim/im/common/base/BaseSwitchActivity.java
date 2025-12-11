@@ -3,6 +3,7 @@ package top.maxim.im.common.base;
 
 import androidx.annotation.DrawableRes;
 import androidx.fragment.app.FragmentTransaction;
+
 import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.View;

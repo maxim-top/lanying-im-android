@@ -1,13 +1,18 @@
 
 package top.maxim.im.message.view;
 
+import static top.maxim.im.common.utils.AppContextUtils.getPackageName;
+
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Handler;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -37,9 +42,11 @@ import top.maxim.im.bmxmanager.GroupManager;
 import top.maxim.im.bmxmanager.RosterManager;
 import top.maxim.im.common.base.BaseTitleFragment;
 import top.maxim.im.common.utils.CommonConfig;
+import top.maxim.im.common.utils.CommonUtils;
 import top.maxim.im.common.utils.RosterFetcher;
 import top.maxim.im.common.utils.RxBus;
 import top.maxim.im.common.utils.ScreenUtils;
+import top.maxim.im.common.utils.SharePreferenceUtils;
 import top.maxim.im.common.utils.ToastUtil;
 import top.maxim.im.common.utils.dialog.CustomDialog;
 import top.maxim.im.common.view.Header;
@@ -60,6 +67,12 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
     private View mEmptyView;
 
     private SessionContract.Presenter mPresenter;
+
+    private TextView mBtnOpen;
+
+    private ViewGroup mNotificationBar;
+
+    private ImageView mBtnClose;
 
     private BMXChatServiceListener mListener = new BMXChatServiceListener() {
 
@@ -113,11 +126,59 @@ public class SessionFragment extends BaseTitleFragment implements SessionContrac
         return builder.build();
     }
 
+    private void gotoAppNotificationSettings() {
+        Intent intent = new Intent();
+        String packageName = getPackageName(getActivity());
+
+        try {
+            // 优先尝试跳转到当前应用的通知专属页面
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                // API 26+ (Android 8.0) 及以上使用
+                intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName);
+            } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                // API 21-25 (Android 5.0 - 7.1) 使用
+                intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
+                intent.putExtra("app_package", packageName);
+                intent.putExtra("app_uid", getActivity().getApplicationInfo().uid);
+            } else {
+                // 低于 Android 5.0 的备选方案
+                gotoAppDetailSettings();
+                return;
+            }
+            startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // 如果跳转出现异常（例如某些厂商定制系统不支持），则降级到应用详情页
+            gotoAppDetailSettings();
+        }
+    }
+
+    // 跳转到应用系统设置详情页的备选方法
+    private void gotoAppDetailSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(getActivity()), null);
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
     @Override
     protected View onCreateView() {
         hideTitleHeader();
         View view = View.inflate(getActivity(), R.layout.fragment_session, null);
         mRecyclerView = view.findViewById(R.id.session_recycler);
+        mNotificationBar = view.findViewById(R.id.notification_bar);
+        int visibility = SharePreferenceUtils.getInstance().getNotificationTipClosed() ? View.GONE : CommonUtils.areNotificationsEnabled(getActivity())?View.GONE:View.VISIBLE;
+        mNotificationBar.setVisibility(visibility);
+        mBtnOpen = view.findViewById(R.id.button_open);
+        mBtnOpen.setOnClickListener(v -> {
+            gotoAppNotificationSettings();
+        });
+        mBtnClose = view.findViewById(R.id.button_close);
+        mBtnClose.setOnClickListener(v -> {
+            mNotificationBar.setVisibility(View.GONE);
+            SharePreferenceUtils.getInstance().putNotificationTipClosed(true);
+        });
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter = new SessionAdapter(getActivity()));
         mRecyclerView

@@ -264,7 +264,7 @@
     <string name="support_empty_for_test">To contact technical support, please login Lanying official web site</string>
 
     <!--push设置-->
-    <string name="set_push">Push Settings</string>
+    <string name="set_push">Push Info</string>
     <string name="set_push_token">Push Token</string>
     <string name="set_push_cert">Push Cert</string>
     <string name="set_push_status">Push Status</string>
@@ -300,7 +300,7 @@
     <string name="call_open_camera">Open camera</string>
     <string name="call_close_camera">Close camera</string>
     <string name="call_hangup">Hangup</string>
-    <string name="call_mic_off">Mic of</string>
+    <string name="call_mic_off">Mic off</string>
     <string name="call_mic_on">Mic on</string>
     <string name="call_camera_off">Camera off</string>
     <string name="call_camera_on">Camera on</string>
@@ -318,7 +318,7 @@
     <string name="call_speaker_off_tips">Sound output device switched to receiver</string>
 
     <!-- 音视频会话设置-->
-    <string name="config_rtc">AV config</string>
+    <string name="config_rtc">RTC Settings</string>
     <string name="config_rtc_video_profile">resolution</string>
     <string name="config_rtc_camera">Camera</string>
     <string name="config_rtc_mic">Mic</string>
@@ -504,7 +504,7 @@
     <string name="permission_need_enabled">This service needs to be enabled. Contact the App administrator.</string>
     <string name="save_to_album">Save to Album</string>
     <string name="error_code_InvalidParam">There are invalid parameters in the input parameters.</string>
-    <string name="error_code_NotFound">The path or file does not exist.</string>
+    <string name="error_code_NotFound">The app ID or path or file does not exist.</string>
     <string name="error_code_DbOperationFailed">The local database operation failed.</string>
     <string name="error_code_SignInInvalidParam">The user login input parameters are invalid.</string>
     <string name="error_code_SignInUserMapDbOperationFailed">The user login user map database open failed.</string>
@@ -771,8 +771,33 @@
     <string name="verified_failed">Verification failure</string>
     <string name="change_the_verification_phone_number">Change the Verification Phone Number</string>
     <string name="go_to_verify">Go to Verify</string>
-    <string name="real_name_verified">You have completed real-name verification. Mobile number：%s</string>
+    <string name="real_name_verified">You have completed real-name verification. Mobile number:%s</string>
+    <string name="real_name_verified_id_card">You have completed real-name verification. Mobile number:%s\nName:%s\nID No.：%s</string>
     <string name="re_verify">Re-verify</string>
+    <string name="continue_verify">Next Verification</string>
     <string name="user_not_exist_or_app_id_not_same">The user has been deleted or does not match your App ID</string>
     <string name="unknown_error">Unknown Error</string>
+    <string name="error_solution_UserKickedByAppDeprecated">Please upgrade the Lanying IM to the latest version.</string>
+    <string name="error_code_UserKickedByAppDeprecated">The current version is outdated, please upgrade now.</string>
+    <string name="copy_url">Copy the URL</string>
+    <string name="navigate_url">Open in Web Browser</string>
+    <string name="app_status">App Status: %s</string>
+    <string name="app_status_normal">Normal</string>
+    <string name="app_status_frozen">Frozen</string>
+    <string name="app_status_banned">Banned</string>
+    <string name="app_status_revoked">Revoked</string>
+    <string name="ratel_ip_copied">Server IP:%s, has been copied to the clipboard.</string>
+    <string name="open_notification_tip">Turn on the app notification settings.</string>
+    <string name="open_notification">Turn On</string>
+    <string name="risk_notice">Risk Notice</string>
+    <string name="risk_notice_open_browser">Please keep your account and property safe. You will open this website with a built-in web browser.</string>
+    <string name="risk_notice_url_cannot_verified">After security inspection, the website is suspected of containing malicious content and has been blocked.</string>
+    <string name="realname_verification_name">Name</string>
+    <string name="realname_verification_id_number">ID Number</string>
+    <string name="error_sms_code_RequestTooMany">SMS verification code requests are too frequent. Please try again later.</string>
+    <string name="id_verified">ID verified</string>
+    <string name="phone_verified">Phone verified</string>
+    <string name="log_zip_empty_title">Log file path：</string>
+    <string name="log_zip_empty_content_part">" length: "</string>
+    <string name="share_log_to">Share Log File to...</string>
 </resources>

@@ -2,8 +2,10 @@
 package top.maxim.im.common.base;
 
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
@@ -37,6 +39,8 @@ public abstract class BaseTitleActivity extends BaseActivity {
 
     protected View mStatusBar;
 
+    protected View mNavigationBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,10 +51,11 @@ public abstract class BaseTitleActivity extends BaseActivity {
         mStatusBar = findViewById(R.id.container_status_bar);
         if (isFullScreen() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, ScreenUtils.getStatusBarHeight());
+                    LinearLayout.LayoutParams.MATCH_PARENT, ScreenUtils.getStatusBarHeight(this));
             mStatusBar.setLayoutParams(params);
             mStatusBar.setVisibility(View.VISIBLE);
             setStatusBar();
+            setNavigationBar();
         }
         initDataFromFront(getIntent());
         mHeader = onCreateHeader(headerContainer);
@@ -89,6 +94,24 @@ public abstract class BaseTitleActivity extends BaseActivity {
     }
 
     /**
+     * 设置沉浸式导航栏
+     */
+    protected void setNavigationBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Window window = getWindow();
+            int systemUiVisibility = window.getDecorView().getSystemUiVisibility();
+            systemUiVisibility |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            int color = getResources().getColor(R.color.color_background);
+            window.setStatusBarColor(color);
+            if (isLightColor(color)) {
+                window.getDecorView().setSystemUiVisibility(systemUiVisibility | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+            } else {
+                window.getDecorView().setSystemUiVisibility(systemUiVisibility & ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+            }
+        }
+    }
+
+    /**
      * 判断颜色是不是亮色
      *
      * @param color
@@ -108,6 +131,43 @@ public abstract class BaseTitleActivity extends BaseActivity {
                     LinearLayout.LayoutParams.MATCH_PARENT, 0);
             params.weight = 1;
             mContainer.addView(mContentView, params);
+
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                Display display = getWindow().getWindowManager().getDefaultDisplay();
+                Point realSize = new Point();
+                Point availableSize = new Point();
+                display.getRealSize(realSize); // 屏幕真实高度（包含导航栏）
+                display.getSize(availableSize); // 应用可用高度
+                boolean navigationBarIsTransparent = realSize.y == availableSize.y;
+
+                int height = ScreenUtils.getNavigationBarHeight(this);
+                boolean hasNavigationBar = height > 0;
+
+                if (isFullScreen() && hasNavigationBar && navigationBarIsTransparent) { //
+                    // 创建 View 实例
+                    mNavigationBar = new View(this);
+
+                    // 创建 RelativeLayout 布局参数
+                    RelativeLayout.LayoutParams paramsNavigationBar = new RelativeLayout.LayoutParams(
+                            RelativeLayout.LayoutParams.MATCH_PARENT, // 宽度匹配父布局
+                            height // 高度设置为 1dp
+                    );
+
+                    // 设置相对于父布局底部对齐
+                    paramsNavigationBar.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+
+                    // 将布局参数应用到 View
+                    mNavigationBar.setLayoutParams(paramsNavigationBar);
+
+                    // 设置背景颜色为白色
+                    mNavigationBar.setBackgroundColor(getResources().getColor(R.color.color_background));
+
+                    // 将 View 添加到父容器
+                    mContainer.addView(mNavigationBar);
+                }
+            }
+
         }
         setViewListener();
         initDataForActivity();

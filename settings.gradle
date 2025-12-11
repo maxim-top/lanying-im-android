@@ -6,10 +6,6 @@ pluginManagement {
         maven {
             url 'https://developer.huawei.com/repo/'
         }
-        // 听云
-        maven {
-            url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
-        }
         maven {
             url uri("${rootProject.projectDir}/repo")
         }
@@ -27,10 +23,6 @@ dependencyResolutionManagement {
         maven { url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/" }// 添加基调听云仓库
         maven {
             url 'https://developer.huawei.com/repo/'
-        }
-        // 听云
-        maven {
-            url "https://nexus2.tingyun.com/nexus/content/repositories/snapshots/"
         }
         maven {
             url uri("${rootProject.projectDir}/repo")
